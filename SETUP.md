@@ -57,10 +57,12 @@ Settings → Environment Variables (Production + Preview):
 
 | Key | Value |
 |---|---|
-| `VITE_SUPABASE_URL` | step 1 |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | step 1 (`sb_publishable_...`) |
-| `VITE_API_URL` | Render URL from step 2, no trailing slash |
-| `VITE_USE_BACKEND` | `1` |
+| `SUPABASE_URL` | step 1 |
+| `SUPABASE_PUBLISHABLE_KEY` | step 1 (`sb_publishable_...`) |
+| `API_URL` | Render URL from step 2, no trailing slash |
+| `USE_BACKEND` | `1` |
+
+(`VITE_`-prefixed equivalents work too — plain names preferred.)
 
 **Redeploy** so env vars bake in.
 
