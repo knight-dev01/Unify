@@ -33,6 +33,7 @@ model Profile {
   universityId  String?     @map("university_id") @db.Uuid
   universityRef University? @relation(fields: [universityId], references: [id])
   gradTarget    Decimal?    @map("grad_target") @db.Decimal
+  role          String      @default("student")
   createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt     DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 

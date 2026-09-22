@@ -144,16 +144,17 @@ app.get("/healthz", (req, res) => res.json({ ok: true, service: "unify-api" }));
 const v1 = require("./src/routes/v1");
 app.use("/v1", v1.default || v1);
 
-// Authoring guard: convert/save/upload cost money or disk — signed-in users
-// only, with tighter hourly budgets. validate/render/sample stay public
-// (pure functions, no secrets, no side effects).
+// Authoring guard: lecturers/collaborators only (students get 403).
+// convert costs Claude money; save/upload cost disk. validate/render/sample
+// stay public (pure functions, no secrets, no side effects).
 const { requireAuth } = require("./src/middleware/requireAuth");
+const { requireAuthor } = require("./src/middleware/requireAuthor");
 const authorWriteLimit = require("express-rate-limit")({ windowMs: 60 * 60 * 1000, max: 60, standardHeaders: true, legacyHeaders: false });
 const convertLimit = require("express-rate-limit")({ windowMs: 60 * 60 * 1000, max: 30, standardHeaders: true, legacyHeaders: false });
-app.use("/api/convert", requireAuth, convertLimit);
-app.use("/api/save", requireAuth, authorWriteLimit);
-app.use("/api/upload", requireAuth, authorWriteLimit);
-app.use("/api/notes", requireAuth);
+app.use("/api/convert", requireAuth, requireAuthor, convertLimit);
+app.use("/api/save", requireAuth, requireAuthor, authorWriteLimit);
+app.use("/api/upload", requireAuth, requireAuthor, authorWriteLimit);
+app.use("/api/notes", requireAuth, requireAuthor);
 
 // API Routes
 

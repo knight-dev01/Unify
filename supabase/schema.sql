@@ -20,6 +20,7 @@ create table if not exists profiles (
   level text,
   university_id uuid references universities(id),
   grad_target numeric,
+  role text not null default 'student',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

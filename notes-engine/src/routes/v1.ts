@@ -17,6 +17,7 @@ const onboardingSchema = z.object({
   level: z.string().min(1).max(40),
   universityId: z.string().uuid().max(80).optional(),
   gradTarget: z.number().min(0).max(5).optional(),
+  role: z.enum(["student", "lecturer", "collaborator"]).default("student"),
 });
 
 const profileSchema = onboardingSchema.partial();
@@ -94,6 +95,7 @@ router.put("/me", requireAuth, async (req: Request, res: Response) => {
           level: d.level,
           university_id: d.universityId,
           grad_target: d.gradTarget,
+          role: d.role,
           updated_at: new Date().toISOString(),
         },
         { onConflict: "id" }
@@ -129,6 +131,7 @@ router.post("/onboarding", requireAuth, async (req: Request, res: Response) => {
           level: d.level,
           university_id: d.universityId ?? null,
           grad_target: d.gradTarget ?? null,
+          role: d.role,
           updated_at: new Date().toISOString(),
         },
         { onConflict: "id" }
