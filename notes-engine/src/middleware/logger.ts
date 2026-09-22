@@ -30,3 +30,11 @@ export function requestLogger(req: Request, res: Response, next: NextFunction): 
   });
   next();
 }
+
+// Convenience object so call sites read logger.info(...) etc.
+export const logger = {
+  debug: (msg: string, fields: Record<string, unknown> = {}) => log("debug", msg, fields),
+  info: (msg: string, fields: Record<string, unknown> = {}) => log("info", msg, fields),
+  warn: (msg: string, fields: Record<string, unknown> = {}) => log("warn", msg, fields),
+  error: (msg: string, fields: Record<string, unknown> = {}) => log("error", msg, fields),
+};

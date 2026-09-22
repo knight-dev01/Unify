@@ -8,7 +8,7 @@ require("dotenv").config();
 
 const { validateUnifyNote } = require("./src/schema");
 const { renderUnifyNote } = require("./src/renderer");
-const { requestLogger, log } = require("./src/middleware/logger");
+const { requestLogger, logger } = require("./src/middleware/logger");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -310,7 +310,7 @@ ${rawNotesText}
 app.use((req, res) => res.status(404).json({ error: "Not found" }));
 
 app.listen(PORT, () => {
-  log.info("unify-api listening", {
+  logger.info("unify-api listening", {
     port: PORT,
     env: {
       supabaseUrl: Boolean(process.env.SUPABASE_URL),
