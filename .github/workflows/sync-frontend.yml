@@ -28,12 +28,14 @@ jobs:
         env:
           UPSTREAM_TOKEN: ${{ secrets.UPSTREAM_TOKEN }}
         run: |
-          git config user.name "frontend-sync[bot]"
-          git config user.email "frontend-sync[bot]@users.noreply.github.com"
+          SRC="$GITHUB_WORKSPACE"
           TMP=$(mktemp -d)
           git clone --depth 1 "https://x-access-token:${UPSTREAM_TOKEN}@github.com/DIBBLS/Unify.git" "$TMP"
-          rsync -a --delete --exclude node_modules --exclude dist --exclude '.env*' apps/web/ "$TMP/apps/web/"
-          cp vercel.json .gitignore README.md "$TMP/"
+          cd "$TMP"
+          git config user.name "frontend-sync[bot]"
+          git config user.email "frontend-sync[bot]@users.noreply.github.com"
+          rsync -a --delete --exclude node_modules --exclude dist --exclude '.env*' "$SRC/apps/web/" "$TMP/apps/web/"
+          cp "$SRC/vercel.json" "$SRC/.gitignore" "$SRC/README.md" "$TMP/"
           rm -rf "$TMP/notes-engine" "$TMP/supabase" "$TMP/render.yaml" "$TMP/SETUP.md" "$TMP/COLLAB.md" "$TMP/messages.unify.txt"
           cd "$TMP"
           git add -A

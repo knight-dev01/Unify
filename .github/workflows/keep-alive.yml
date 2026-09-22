@@ -17,7 +17,7 @@ jobs:
     steps:
       - name: Ping healthz (cold-start tolerant)
         env:
-          API_URL: ${{ secrets.RENDER_API_URL }}
+          API_URL: ${{ secrets.RENDER_API_URL || 'https://unify-api-z4zm.onrender.com' }}
         run: |
           if [ -z "$API_URL" ]; then echo "RENDER_API_URL secret not set"; exit 1; fi
           for i in 1 2 3; do
