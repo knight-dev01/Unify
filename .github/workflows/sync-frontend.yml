@@ -5,11 +5,9 @@
 name: Sync frontend to upstream
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'apps/web/**'
-      - 'vercel.json'
+  # Auto-sync PAUSED: a run once pushed a stale tree upstream and deleted live
+  # files. scripts/Sync-Frontend.ps1 is canonical until that's diagnosed.
+  workflow_dispatch:
 
 concurrency:
   group: sync-frontend
