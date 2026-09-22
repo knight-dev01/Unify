@@ -10,6 +10,5 @@
     { "source": "/Learn.html", "destination": "/course", "permanent": false },
     { "source": "/learn.html", "destination": "/course", "permanent": false }
   ],
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
-  "cleanUrls": true
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
