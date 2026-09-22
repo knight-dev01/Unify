@@ -1,0 +1,45 @@
+# Auto-sync frontend to the partner repo (DIBBLS/Unify -> Vercel).
+# Runs on the fork whenever apps/web or vercel.json changes on main.
+# Backend paths never leave the fork. Requires repo secret UPSTREAM_TOKEN
+# (PAT with Contents: read+write on DIBBLS/Unify).
+name: Sync frontend to upstream
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/web/**'
+      - 'vercel.json'
+
+concurrency:
+  group: sync-frontend
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Push frontend-only snapshot upstream
+        env:
+          UPSTREAM_TOKEN: ${{ secrets.UPSTREAM_TOKEN }}
+        run: |
+          git config user.name "frontend-sync[bot]"
+          git config user.email "frontend-sync[bot]@users.noreply.github.com"
+          TMP=$(mktemp -d)
+          git clone --depth 1 "https://x-access-token:${UPSTREAM_TOKEN}@github.com/DIBBLS/Unify.git" "$TMP"
+          rsync -a --delete --exclude node_modules --exclude dist --exclude '.env*' apps/web/ "$TMP/apps/web/"
+          cp vercel.json .gitignore README.md "$TMP/"
+          rm -rf "$TMP/notes-engine" "$TMP/supabase" "$TMP/render.yaml" "$TMP/SETUP.md" "$TMP/COLLAB.md" "$TMP/messages.unify.txt"
+          cd "$TMP"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "frontend: no changes to sync"
+          else
+            git commit -m "chore: frontend sync ${GITHUB_SHA}"
+            git push origin main
+          fi
