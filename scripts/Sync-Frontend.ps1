@@ -25,6 +25,12 @@ try {
     if (Test-Path -LiteralPath $p) { Remove-Item -LiteralPath $p -Recurse -Force }
   }
 
+  # Dead legacy paths (verified unreferenced): never shipped, drop upstream too
+  foreach ($d in @("Coursecontent.JS", "Coursecontents", "courses.js", "course2.js", "js", "css", "admin.css", "unify-analytics.js", "manifest.json", "sw.js", "icons", "firestore.rules")) {
+    $p = Join-Path $tmp $d
+    if (Test-Path -LiteralPath $p) { Remove-Item -LiteralPath $p -Recurse -Force }
+  }
+
   Set-Location -LiteralPath $tmp
   git add -A
   $dirty = git status --porcelain
