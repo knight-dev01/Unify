@@ -8,6 +8,7 @@ require("dotenv").config();
 
 const { validateUnifyNote } = require("./src/schema");
 const { renderUnifyNote } = require("./src/renderer");
+const { requestLogger, log } = require("./src/middleware/logger");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,6 +18,7 @@ app.use(cors({ origin: CORS_ORIGINS.length ? CORS_ORIGINS : true }));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.static("public"));
 app.use("/uploads", express.static("uploads"));
+app.use(requestLogger);
 
 // Storage directories
 const STORAGE_DIR = path.join(__dirname, "storage/notes");
@@ -304,6 +306,20 @@ ${rawNotesText}
   }
 });
 
+// Unknown routes -> JSON (not HTML) so API clients get a clean 404.
+app.use((req, res) => res.status(404).json({ error: "Not found" }));
+
 app.listen(PORT, () => {
-  console.log(`🚀 Unify Notes Creation Engine running at http://localhost:${PORT}`);
+  log.info("unify-api listening", {
+    port: PORT,
+    env: {
+      supabaseUrl: Boolean(process.env.SUPABASE_URL),
+      publishableKey: Boolean(process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY),
+      secretKey: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY),
+      databaseUrl: Boolean(process.env.DATABASE_URL),
+      directUrl: Boolean(process.env.DIRECT_URL),
+      cors: process.env.CORS_ORIGIN || "open (dev only)",
+    },
+  });
+  console.log(`Unify API running at http://localhost:${PORT}`);
 });
