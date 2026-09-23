@@ -339,4 +339,28 @@ router.get("/authored", requireAuth, async (req: Request, res: Response) => {
   }
 });
 
+// Public: week list for a course (titles for pickers + student week lists).
+router.get("/courses/:code/weeks", async (req: Request, res: Response) => {
+  const code = decodeURIComponent(req.params.code).toUpperCase();
+  try {
+    const sb = supabaseAdmin();
+    const variants = [...new Set([code, code.replace(/\s/g, "")])];
+    const seen = new Map<number, { week: number; title: string; subtitle: string }>();
+    for (const v of variants) {
+      const { data, error } = await sb
+        .from("weeks")
+        .select("week,title,subtitle")
+        .eq("course", v)
+        .order("week");
+      if (error) throw error;
+      for (const r of ((data ?? []) as { week: number; title: string; subtitle: string }[])) {
+        if (!seen.has(r.week)) seen.set(r.week, r);
+      }
+    }
+    res.json({ weeks: [...seen.values()].sort((a, b) => a.week - b.week) });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
 export default router;
