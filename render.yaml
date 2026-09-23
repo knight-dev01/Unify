@@ -31,3 +31,9 @@ services:
         sync: false # comma-separated bootstrap admins, e.g. you@lasu.edu.ng
       - key: ANTHROPIC_API_KEY
         sync: false # optional: only for /api/convert authoring
+      - key: AI_PROVIDER
+        value: anthropic # or 'gemini' for Google's free tier
+      - key: GEMINI_API_KEY
+        sync: false # required when AI_PROVIDER=gemini (AI Studio key)
+      - key: GEMINI_MODEL
+        value: gemini-2.0-flash

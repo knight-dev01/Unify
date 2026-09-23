@@ -236,12 +236,7 @@ app.get("/api/notes", (req, res) => {
 
 // 7. Claude API Conversion Endpoint
 app.post("/api/convert", async (req, res) => {
-  const apiKey = process.env.ANTHROPIC_API_KEY || req.headers["x-api-key"];
-  if (!apiKey) {
-    return res.status(400).json({
-      error: "Missing Anthropic API Key. Please set ANTHROPIC_API_KEY in process.env or pass x-api-key header."
-    });
-  }
+  const headerKey = req.headers["x-api-key"];
 
   const { course, week, segmentationMode, rawNotesText, title, subtitle, learningOutcome, tags } = req.body;
 
@@ -270,34 +265,16 @@ RAW LECTURE NOTES TO STRUCTURE:
 ${rawNotesText}
 `;
 
+  const { generateStructuredNote } = require("./src/lib/ai");
   try {
-    const fetch = (await import("node-fetch")).default || globalThis.fetch;
-
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01"
-      },
-      body: JSON.stringify({
-        model: process.env.CLAUDE_MODEL || "claude-3-7-sonnet-20250219",
-        max_tokens: 8192,
-        system: SYSTEM_PROMPT,
-        messages: [{ role: "user", content: userPrompt }]
-      })
+    const { text: rawJson, provider, model } = await generateStructuredNote({
+      system: SYSTEM_PROMPT,
+      user: userPrompt,
+      apiKeyOverride: typeof headerKey === "string" ? headerKey : undefined,
     });
 
-    if (!response.ok) {
-      const errText = await response.text();
-      return res.status(response.status).json({ error: "Anthropic API Error", details: errText });
-    }
-
-    const data = await response.json();
-    let jsonText = data.content.find(b => b.type === "text").text;
-
     // Clean any accidental markdown fences ```json ... ```
-    jsonText = jsonText.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/\s*```$/i, "").trim();
+    const jsonText = rawJson.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/\s*```$/i, "").trim();
 
     const noteJson = JSON.parse(jsonText);
 
@@ -310,11 +287,14 @@ ${rawNotesText}
     res.json({
       success: true,
       note: noteJson,
-      validation
+      validation,
+      provider,
+      model
     });
   } catch (err) {
     console.error("Conversion error:", err);
-    res.status(500).json({ error: "Failed to convert raw notes", message: err.message });
+    const status = (err && err.status) || 500;
+    res.status(status).json({ error: "Failed to convert raw notes", message: err.message });
   }
 });
 
