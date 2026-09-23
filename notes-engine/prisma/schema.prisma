@@ -55,6 +55,7 @@ model Week {
   title     String   @default("")
   subtitle  String   @default("")
   noteJson  Json     @map("note_json")
+  authorId  String?  @map("author_id") @db.Uuid
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   courseRef Course   @relation(fields: [course], references: [code], onDelete: Cascade)
 

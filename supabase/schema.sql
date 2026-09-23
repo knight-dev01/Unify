@@ -37,9 +37,11 @@ create table if not exists weeks (
   title text not null default '',
   subtitle text not null default '',
   note_json jsonb not null default '{}'::jsonb,
+  author_id uuid,
   created_at timestamptz not null default now(),
   primary key (course, week)
 );
+create index if not exists weeks_author_idx on weeks (author_id);
 
 create table if not exists topic_progress (
   user_id uuid not null,

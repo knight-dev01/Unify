@@ -245,6 +245,7 @@ router.post("/publish", requireAuth, requireAuthor, async (req: Request, res: Re
     return;
   }
   const { course, week, noteJson } = parsed.data;
+  const userId = (req as AuthedRequest).userId as string;
   const code = course.toUpperCase();
   const note = noteJson as { title?: unknown; subtitle?: unknown };
   try {
@@ -254,6 +255,7 @@ router.post("/publish", requireAuth, requireAuthor, async (req: Request, res: Re
         {
           course: code,
           week,
+          author_id: userId,
           title:
             parsed.data.title ??
             (typeof note.title === "string" ? note.title : `Week ${week}`),
@@ -315,6 +317,23 @@ router.get("/progress", requireAuth, async (req: Request, res: Response) => {
       .eq("week", week);
     if (error) throw error;
     res.json({ done: ((data ?? []) as { topic: number }[]).map((r) => r.topic) });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// Authed: weeks this user published (author dashboard lists own notes).
+router.get("/authored", requireAuth, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  try {
+    const { data, error } = await supabaseAdmin()
+      .from("weeks")
+      .select("course,week,title,subtitle")
+      .eq("author_id", userId)
+      .order("course")
+      .order("week");
+    if (error) throw error;
+    res.json({ notes: data ?? [] });
   } catch (e) {
     res.status(500).json(dbError(e));
   }
