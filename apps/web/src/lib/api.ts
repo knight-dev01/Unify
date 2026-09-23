@@ -66,8 +66,13 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}, retries 
     if (!res.ok) {
       let detail = "";
       try {
-        const body = (await res.json()) as { error?: string; message?: string };
-        detail = body.error || body.message || "";
+        const body = (await res.json()) as {
+          error?: string;
+          message?: string;
+          details?: { fieldErrors?: Record<string, string[]> };
+        };
+        const firstIssue = Object.values(body.details?.fieldErrors || {}).flat()[0];
+        detail = [body.error || body.message, firstIssue].filter(Boolean).join(" — ") || "";
       } catch {
         detail = "";
       }

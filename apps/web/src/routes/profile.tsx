@@ -74,9 +74,11 @@ export default function ProfileRoute() {
     ['University', profile?.university || '—'],
     ['Faculty', profile?.faculty || '—'],
     ['Department', profile?.department || '—'],
-    ['Level', profile?.level || '—'],
-    ['Graduation target', profile?.grad_target != null ? String(profile.grad_target) : '—'],
   ];
+  if (!canAuthor) {
+    rows.push(['Level', profile?.level || '—']);
+    rows.push(['Graduation target', profile?.grad_target != null ? String(profile.grad_target) : '—']);
+  }
 
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', padding: '24px 16px 80px' }}>

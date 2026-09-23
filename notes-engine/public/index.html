@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Unify Notes Creation Engine</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+    <title>Unify Learn Notes Engine</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -13,8 +14,8 @@
   <header class="header">
     <div class="header-content">
       <div class="brand">
-        <span class="brand-name">Unify<span>.</span></span>
-        <span class="engine-badge">Notes Creation Engine v1.0</span>
+        <span class="brand-name">Unify Learn</span>
+        <span class="engine-badge">Notes Engine</span>
       </div>
       <div class="header-status">
         <span class="status-indicator active">Engine Ready</span>
@@ -29,13 +30,13 @@
     <!-- MAIN NAV TABS -->
     <nav class="main-tabs">
       <button class="main-tab-btn active" onclick="switchMainTab('converter')" id="mtab-converter">
-        ⚡ Auto-Structure Raw Notes (Claude AI)
+        Auto-Structure Raw Notes
       </button>
       <button class="main-tab-btn" onclick="switchMainTab('editor')" id="mtab-editor">
-        📝 JSON Schema Editor & Authoring (Zero-AI)
+        JSON Editor & Authoring
       </button>
       <button class="main-tab-btn" onclick="switchMainTab('preview')" id="mtab-preview">
-        👁️ Live Note Preview & Export
+        Live Preview & Publish
       </button>
     </nav>
 
@@ -96,7 +97,7 @@
 
           <!-- FIGURE UPLOAD MANAGER -->
           <div class="figure-manager">
-            <h3>📷 Diagram & Figure Uploader</h3>
+            <h3>Diagram & Figure Uploader</h3>
             <p class="help-text">Upload actual image files here to get tag snippets like <code>[FIGURE: image_id | caption: ...]</code> to reference in raw notes text.</p>
             <div class="upload-row">
               <input type="file" id="fig-file" accept="image/*">
@@ -120,7 +121,7 @@
 
           <div class="convert-action-row">
             <button class="btn btn-primary btn-lg" id="btn-convert" onclick="convertRawNotes()">
-              ⚡ Convert Raw Notes to Unify JSON (Claude API)
+              Convert Raw Notes to Unify JSON
             </button>
           </div>
 
@@ -161,8 +162,8 @@
           <span id="preview-meta" class="meta-badge">MEE 352 • Week 2</span>
         </div>
         <div class="toolbar-right">
-          <button class="btn btn-secondary" onclick="saveNoteToEngine()">💾 Save JSON to Engine Storage</button>
-          <button class="btn btn-primary" onclick="downloadRenderedHtml()">📥 Download Standalone HTML</button>
+            <button class="btn btn-secondary" onclick="saveNoteToEngine()">Save JSON to Engine Storage</button>
+            <button class="btn btn-primary" onclick="downloadRenderedHtml()">Download Standalone HTML</button>
         </div>
       </div>
 
