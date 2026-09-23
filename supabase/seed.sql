@@ -14,3 +14,22 @@ values (
   '{"course":"MEE 352","week":1,"title":"Week 1","subtitle":"Getting started","learningOutcome":"","metaChips":[],"tags":[],"topics":[],"eoq":{"questions":[]}}'::jsonb
 )
 on conflict (course, week) do nothing;
+
+-- Default platform admin. Email: unify.admin@unify.learn / Password: unify.admin
+-- CHANGE THE PASSWORD right after first login (Supabase > Auth > Users > ... > Send reset).
+-- Idempotent: does nothing if the account already exists (never resets your password).
+create extension if not exists pgcrypto;
+do $$
+declare
+  admin_id uuid;
+begin
+  if not exists (select 1 from auth.users where email = 'unify.admin@unify.learn') then
+    admin_id := gen_random_uuid();
+    insert into auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
+    values ('00000000-0000-0000-0000-000000000000', admin_id, 'authenticated', 'authenticated', 'unify.admin@unify.learn', crypt('unify.admin', gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now());
+    insert into auth.identities (id, provider_id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
+    values (gen_random_uuid(), admin_id, admin_id, jsonb_build_object('sub', admin_id, 'email', 'unify.admin@unify.learn'), 'email', now(), now(), now());
+    insert into public.profiles (id, first_name, email, role, is_admin)
+    values (admin_id, 'Unify Admin', 'unify.admin@unify.learn', 'collaborator', true);
+  end if;
+end $$;
