@@ -60,6 +60,22 @@ async function gemini(system: string, user: string, model: string, apiKey: strin
   return text;
 }
 
+function geminiChain(): string[] {
+  const primary = process.env.GEMINI_MODEL || "gemini-3.6-flash";
+  const extra = (process.env.GEMINI_MODELS || "gemini-2.0-flash,gemini-1.5-flash")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  return [primary, ...extra.filter((m) => m !== primary)];
+}
+
+function isRateLimit(e: unknown): boolean {
+  const status = (e as { status?: number })?.status;
+  if (status === 429) return true;
+  const msg = e instanceof Error ? e.message : String(e);
+  return /RESOURCE_EXHAUSTED|quota|rate.?limit|429/i.test(msg);
+}
+
 export async function generateStructuredNote(args: {
   system: string;
   user: string;
@@ -71,8 +87,18 @@ export async function generateStructuredNote(args: {
     if (!apiKey) {
       throw Object.assign(new Error("Missing Gemini API Key. Set GEMINI_API_KEY."), { status: 400 });
     }
-    const model = process.env.GEMINI_MODEL || "gemini-3.6-flash";
-    return { text: await gemini(args.system, args.user, model, apiKey), provider, model };
+    let lastErr: unknown = null;
+    for (const model of geminiChain()) {
+      try {
+        const text = await gemini(args.system, args.user, model, apiKey);
+        return { text, provider, model };
+      } catch (e) {
+        lastErr = e;
+        if (!isRateLimit(e)) throw e;
+        console.warn(`Gemini ${model} rate-limited, trying next model`);
+      }
+    }
+    throw lastErr instanceof Error ? lastErr : new Error("All Gemini models rate-limited");
   }
   const apiKey = args.apiKeyOverride || process.env.ANTHROPIC_API_KEY || "";
   if (!apiKey) {

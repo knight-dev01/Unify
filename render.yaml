@@ -37,3 +37,5 @@ services:
         sync: false # required when AI_PROVIDER=gemini (AI Studio key)
       - key: GEMINI_MODEL
         value: gemini-3.6-flash
+      - key: GEMINI_MODELS
+        value: gemini-2.0-flash,gemini-1.5-flash # fallbacks when the primary hits 429
