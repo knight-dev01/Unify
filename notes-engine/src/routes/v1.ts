@@ -13,11 +13,12 @@ const TOPIC_XP = 10;
 const onboardingSchema = z.object({
   firstName: z.string().min(1).max(60),
   // Only students complete the full flow; lecturers/collaborators stop
-  // after name, so these stay optional server-side.
-  university: z.string().min(1).max(120).optional(),
-  faculty: z.string().min(1).max(120).optional(),
-  department: z.string().min(1).max(100).optional(),
-  level: z.string().min(1).max(40).optional(),
+  // after name, so these accept missing AND explicit null (client state
+  // initializes unpicked fields to null, not undefined).
+  university: z.string().min(1).max(120).nullish(),
+  faculty: z.string().min(1).max(120).nullish(),
+  department: z.string().min(1).max(100).nullish(),
+  level: z.string().min(1).max(40).nullish(),
   universityId: z.string().uuid().max(80).optional(),
   gradTarget: z.number().min(0).max(5).optional(),
   role: z.enum(["student", "lecturer", "collaborator"]).default("student"),
