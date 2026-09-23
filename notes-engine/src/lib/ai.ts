@@ -71,7 +71,7 @@ export async function generateStructuredNote(args: {
     if (!apiKey) {
       throw Object.assign(new Error("Missing Gemini API Key. Set GEMINI_API_KEY."), { status: 400 });
     }
-    const model = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+    const model = process.env.GEMINI_MODEL || "gemini-3.6-flash";
     return { text: await gemini(args.system, args.user, model, apiKey), provider, model };
   }
   const apiKey = args.apiKeyOverride || process.env.ANTHROPIC_API_KEY || "";
