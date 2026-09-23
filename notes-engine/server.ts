@@ -158,6 +158,27 @@ app.use("/api/save", requireAuth, requireAuthor, authorWriteLimit);
 app.use("/api/upload", requireAuth, requireAuthor, authorWriteLimit);
 app.use("/api/notes", requireAuth, requireAuthor);
 
+// Author-only: live Gemini models supporting generateContent (picker/debug).
+app.get("/api/models", requireAuth, requireAuthor, async (req, res) => {
+  try {
+    const { listLiveModels } = require("./src/lib/ai");
+    const provider = (process.env.AI_PROVIDER || "gemini").toLowerCase();
+    if (provider !== "gemini") {
+      return res.json({
+        provider,
+        default: process.env.CLAUDE_MODEL || "claude-3-7-sonnet-20250219",
+        models: [],
+      });
+    }
+    const apiKey = process.env.GEMINI_API_KEY || "";
+    if (!apiKey) return res.status(400).json({ error: "Set GEMINI_API_KEY first." });
+    const models = await listLiveModels(apiKey);
+    res.json({ provider, default: process.env.GEMINI_MODEL || "gemini-3.6-flash", models });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to list models", message: err.message });
+  }
+});
+
 // API Routes
 
 // 1. Get preloaded hand-authored sample note

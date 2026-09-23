@@ -60,20 +60,34 @@ async function gemini(system: string, user: string, model: string, apiKey: strin
   return text;
 }
 
-function geminiChain(): string[] {
-  const primary = process.env.GEMINI_MODEL || "gemini-3.6-flash";
-  const extra = (process.env.GEMINI_MODELS || "gemini-2.0-flash,gemini-1.5-flash")
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
-  return [primary, ...extra.filter((m) => m !== primary)];
-}
-
 function isRateLimit(e: unknown): boolean {
   const status = (e as { status?: number })?.status;
-  if (status === 429) return true;
+  // 429/RESOURCE_EXHAUSTED (quota) and 404 (unknown model id) both fall through.
+  if (status === 429 || status === 404) return true;
   const msg = e instanceof Error ? e.message : String(e);
-  return /RESOURCE_EXHAUSTED|quota|rate.?limit|429/i.test(msg);
+  return /RESOURCE_EXHAUSTED|quota|rate.?limit|429|not.?found/i.test(msg);
+}
+
+let liveCache: { at: number; models: string[] } | null = null;
+const LIVE_TTL = 60 * 60 * 1000;
+
+// Live discovery: what this key can actually call right now (no stale
+// hardcodes). Cached an hour; failures fall back to configured names.
+export async function listLiveModels(apiKey: string): Promise<string[]> {
+  if (liveCache && Date.now() - liveCache.at < LIVE_TTL) return liveCache.models;
+  const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models", {
+    headers: { "x-goog-api-key": apiKey },
+  });
+  if (!res.ok) throw new Error(`Gemini listModels failed: ${res.status}`);
+  const data = (await res.json()) as {
+    models?: { name?: string; supportedGenerationMethods?: string[] }[];
+  };
+  const models = (data.models || [])
+    .filter((m) => (m.supportedGenerationMethods || []).includes("generateContent"))
+    .map((m) => (m.name || "").replace(/^models\//, ""))
+    .filter(Boolean);
+  liveCache = { at: Date.now(), models };
+  return models;
 }
 
 export async function generateStructuredNote(args: {
@@ -87,18 +101,41 @@ export async function generateStructuredNote(args: {
     if (!apiKey) {
       throw Object.assign(new Error("Missing Gemini API Key. Set GEMINI_API_KEY."), { status: 400 });
     }
+    const primary = process.env.GEMINI_MODEL || "gemini-3.6-flash";
+    let live: string[] = [];
+    try {
+      live = await listLiveModels(apiKey);
+    } catch {
+      // discovery failed: configured names below still apply
+    }
+    const configured = (process.env.GEMINI_MODELS || "gemini-2.0-flash,gemini-1.5-flash")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const seen = new Set<string>([primary]);
+    const chain = [
+      primary,
+      ...configured.filter((m) => m !== primary),
+      ...live.filter((m) => /flash/i.test(m)),
+    ]
+      .filter((m) => {
+        if (seen.has(m)) return false;
+        seen.add(m);
+        return true;
+      })
+      .slice(0, 6);
     let lastErr: unknown = null;
-    for (const model of geminiChain()) {
+    for (const model of chain) {
       try {
         const text = await gemini(args.system, args.user, model, apiKey);
         return { text, provider, model };
       } catch (e) {
         lastErr = e;
         if (!isRateLimit(e)) throw e;
-        console.warn(`Gemini ${model} rate-limited, trying next model`);
+        console.warn(`Gemini ${model} unavailable or rate-limited, trying next model`);
       }
     }
-    throw lastErr instanceof Error ? lastErr : new Error("All Gemini models rate-limited");
+    throw lastErr instanceof Error ? lastErr : new Error("All Gemini models unavailable");
   }
   const apiKey = args.apiKeyOverride || process.env.ANTHROPIC_API_KEY || "";
   if (!apiKey) {
