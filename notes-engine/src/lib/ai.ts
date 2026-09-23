@@ -102,28 +102,14 @@ export async function generateStructuredNote(args: {
       throw Object.assign(new Error("Missing Gemini API Key. Set GEMINI_API_KEY."), { status: 400 });
     }
     const primary = process.env.GEMINI_MODEL || "gemini-3.6-flash";
-    let live: string[] = [];
-    try {
-      live = await listLiveModels(apiKey);
-    } catch {
-      // discovery failed: configured names below still apply
-    }
-    const configured = (process.env.GEMINI_MODELS || "gemini-2.0-flash,gemini-1.5-flash")
+    const configured = (process.env.GEMINI_MODELS || "")
       .split(",")
       .map((s) => s.trim())
-      .filter(Boolean);
-    const seen = new Set<string>([primary]);
-    const chain = [
-      primary,
-      ...configured.filter((m) => m !== primary),
-      ...live.filter((m) => /flash/i.test(m)),
-    ]
-      .filter((m) => {
-        if (seen.has(m)) return false;
-        seen.add(m);
-        return true;
-      })
-      .slice(0, 6);
+      .filter(Boolean)
+      .filter((m) => m !== primary);
+    // No lower-tier fallbacks, ever: only explicitly configured models are
+    // tried. A 429 surfaces so quotas get raised instead of silently downgrading.
+    const chain = [primary, ...configured].slice(0, 6);
     let lastErr: unknown = null;
     for (const model of chain) {
       try {
