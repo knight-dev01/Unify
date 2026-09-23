@@ -12,6 +12,8 @@ const { requestLogger, logger } = require("./src/middleware/logger");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+// Behind Render's proxy: trust one hop so rate limiters see real client IPs.
+app.set("trust proxy", 1);
 
 const CORS_ORIGINS = (process.env.CORS_ORIGIN || "").split(",").map((s) => s.trim()).filter(Boolean);
 app.use(cors({ origin: CORS_ORIGINS.length ? CORS_ORIGINS : true }));

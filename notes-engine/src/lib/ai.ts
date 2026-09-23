@@ -1,7 +1,7 @@
 // AI provider adapter for the studio's /api/convert endpoint.
-// Anthropic is the default; set AI_PROVIDER=gemini + GEMINI_API_KEY for
-// Google's free tier. Students never touch AI (standing rule) — only this
-// module spends keys, and only from the author-gated convert route.
+// Gemini is the default (free tier); set AI_PROVIDER=anthropic to switch back.
+// Students never touch AI (standing rule) — only this module spends keys,
+// and only from the author-gated convert route.
 const MAX_TOKENS = 8192;
 
 async function anthropic(system: string, user: string, model: string, apiKey: string): Promise<string> {
@@ -65,7 +65,7 @@ export async function generateStructuredNote(args: {
   user: string;
   apiKeyOverride?: string;
 }): Promise<{ text: string; provider: string; model: string }> {
-  const provider = (process.env.AI_PROVIDER || "anthropic").toLowerCase();
+  const provider = (process.env.AI_PROVIDER || "gemini").toLowerCase();
   if (provider === "gemini") {
     const apiKey = args.apiKeyOverride || process.env.GEMINI_API_KEY || "";
     if (!apiKey) {

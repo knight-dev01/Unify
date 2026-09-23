@@ -32,7 +32,7 @@ services:
       - key: ANTHROPIC_API_KEY
         sync: false # optional: only for /api/convert authoring
       - key: AI_PROVIDER
-        value: anthropic # or 'gemini' for Google's free tier
+        value: gemini # free tier; set 'anthropic' + ANTHROPIC_API_KEY to switch back
       - key: GEMINI_API_KEY
         sync: false # required when AI_PROVIDER=gemini (AI Studio key)
       - key: GEMINI_MODEL
