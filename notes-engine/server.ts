@@ -311,6 +311,9 @@ app.listen(PORT, () => {
       databaseUrl: Boolean(process.env.DATABASE_URL),
       directUrl: Boolean(process.env.DIRECT_URL),
       cors: process.env.CORS_ORIGIN || "open (dev only)",
+      aiProvider: process.env.AI_PROVIDER || "anthropic",
+      anthropicKey: Boolean(process.env.ANTHROPIC_API_KEY),
+      geminiKey: Boolean(process.env.GEMINI_API_KEY),
     },
   });
   console.log(`Unify API running at http://localhost:${PORT}`);
