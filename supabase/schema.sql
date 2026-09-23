@@ -77,3 +77,15 @@ alter table courses enable row level security;
 alter table weeks enable row level security;
 alter table topic_progress enable row level security;
 alter table xp_events enable row level security;
+
+create table if not exists quiz_attempts (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null,
+  course text not null,
+  week int not null,
+  score int not null,
+  total int not null,
+  created_at timestamptz not null default now()
+);
+create index if not exists quiz_attempts_user_idx on quiz_attempts (user_id, created_at desc);
+alter table quiz_attempts enable row level security;

@@ -334,10 +334,14 @@ router.get("/stats", requireAuth, async (req: Request, res: Response) => {
     for (const r of ((progRows ?? []) as { course: string }[])) {
       counts[r.course] = (counts[r.course] || 0) + 1;
     }
+    const { data: quizRows } = await sb.from("quiz_attempts").select("score,total").eq("user_id", userId).limit(200);
+    const qa = ((quizRows ?? []) as { score: number; total: number }[]).filter((r) => r.total > 0);
     res.json({
       xp: rows.reduce((s, r) => s + (r.amount || 0), 0),
       streak: calcStreak(rows.map((r) => r.created_at)),
       courses: Object.entries(counts).map(([course, topics]) => ({ course, topics })),
+      quizzesTaken: qa.length,
+      quizAvg: qa.length ? Math.round((qa.reduce((s, r) => s + r.score / r.total, 0) / qa.length) * 100) : 0,
     });
   } catch (e) {
     res.status(500).json(dbError(e));
@@ -663,6 +667,40 @@ router.post("/admin/users/invite", requireAuth, async (req: Request, res: Respon
         { onConflict: "id" }
       );
     }
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// Authed: record a completed quiz attempt (feeds stats: taken + average).
+const quizSchema = z.object({
+  course: z.string().min(1).max(20),
+  week: z.number().int().min(1).max(52),
+  score: z.number().int().min(0).max(100),
+  total: z.number().int().min(1).max(100),
+});
+
+router.post("/quiz/attempt", requireAuth, async (req: Request, res: Response) => {
+  const parsed = quizSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid body", details: parsed.error.flatten() });
+    return;
+  }
+  if (parsed.data.score > parsed.data.total) {
+    res.status(400).json({ error: "Invalid body" });
+    return;
+  }
+  const userId = (req as AuthedRequest).userId as string;
+  try {
+    const { error } = await supabaseAdmin().from("quiz_attempts").insert({
+      user_id: userId,
+      course: parsed.data.course.toUpperCase(),
+      week: parsed.data.week,
+      score: parsed.data.score,
+      total: parsed.data.total,
+    });
+    if (error) throw error;
     res.json({ ok: true });
   } catch (e) {
     res.status(500).json(dbError(e));
