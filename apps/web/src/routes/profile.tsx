@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { LogOut, Pencil } from 'lucide-react';
 import BackButton from '../components/BackButton';
 import { supabaseBrowser } from '../lib/supabase';
-import { api, getApiUrl, type Profile } from '../lib/api';
+import { api, type Profile } from '../lib/api';
 import Loading from '../components/Loading';
 import Mascot from '../components/Mascot';
 import Flash from '../components/Flash';
@@ -111,10 +111,10 @@ export default function ProfileRoute() {
           <LogOut size={16} /> Log out
         </button>
       </div>
-      {getApiUrl() && canAuthor && (
-        <a href={getApiUrl() as string} target="_blank" rel="noreferrer" style={{ marginTop: 8, padding: 14, background: '#fff', color: '#059669', border: '1px solid #e5e5e5', borderBottom: '4px solid #e5e5e5', borderRadius: 16, fontWeight: 800, textDecoration: 'none', textAlign: 'center', display: 'block' }}>
+      {canAuthor && (
+        <Link to="/studio" style={{ marginTop: 8, padding: 14, background: '#fff', color: '#059669', border: '1px solid #e5e5e5', borderBottom: '4px solid #e5e5e5', borderRadius: 16, fontWeight: 800, textDecoration: 'none', textAlign: 'center', display: 'block' }}>
           Open Authoring Studio
-        </a>
+        </Link>
       )}
     </div>
   );

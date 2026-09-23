@@ -131,4 +131,28 @@ export const api = {
     apiFetch<{ done: number[] }>(`/v1/progress?course=${encodeURIComponent(course)}&week=${week}`),
   authored: () =>
     apiFetch<{ notes: { course: string; week: number; title: string; subtitle: string }[] }>('/v1/authored'),
+  convert: (payload: {
+    course: string;
+    week: number;
+    title?: string;
+    subtitle?: string;
+    learningOutcome?: string;
+    tags?: string[];
+    segmentationMode?: string;
+    rawNotesText: string;
+  }) =>
+    apiFetch<{ success: boolean; note: unknown; validation: { valid: boolean; errors?: unknown } }>('/api/convert', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+  validateNote: (note: unknown) =>
+    apiFetch<{ valid: boolean; errors?: unknown }>('/api/validate', {
+      method: 'POST',
+      body: JSON.stringify(note),
+    }),
+  publish: (payload: { course: string; week: number; title?: string; subtitle?: string; noteJson: unknown }) =>
+    apiFetch<{ ok: boolean; course: string; week: number }>('/v1/publish', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
 };
