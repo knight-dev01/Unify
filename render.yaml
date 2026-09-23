@@ -27,5 +27,7 @@ services:
         sync: false # Supabase direct :5432 (prisma migrate deploy)
       - key: CORS_ORIGIN
         value: https://unify-virid.vercel.app
+      - key: ADMIN_EMAILS
+        sync: false # comma-separated bootstrap admins, e.g. you@lasu.edu.ng
       - key: ANTHROPIC_API_KEY
         sync: false # optional: only for /api/convert authoring

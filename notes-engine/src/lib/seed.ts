@@ -36,3 +36,44 @@ export async function ensureSeeded(): Promise<void> {
   );
   if (wErr) throw wErr;
 }
+
+const DEFAULT_ADMIN_EMAIL = "unify.admin@unify.learn";
+const DEFAULT_ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || "unify.admin";
+
+// Creates the default platform admin, pre-confirmed (no email verification).
+// Idempotent: does nothing when the account already exists, so it never
+// resets a rotated password. Rotate via Supabase Auth dashboard after login.
+export async function ensureDefaultAdmin(): Promise<void> {
+  const sb = supabaseAdmin();
+  const finish = async (id: string) => {
+    const { error } = await sb.from("profiles").upsert(
+      { id, first_name: "Unify Admin", email: DEFAULT_ADMIN_EMAIL, role: "collaborator", is_admin: true },
+      { onConflict: "id" }
+    );
+    if (error) throw error;
+  };
+  const { data: existing } = await sb.from("profiles").select("id").eq("email", DEFAULT_ADMIN_EMAIL).single();
+  if ((existing as { id?: string } | null)?.id) return;
+  try {
+    const { data, error } = await sb.auth.admin.createUser({
+      email: DEFAULT_ADMIN_EMAIL,
+      password: DEFAULT_ADMIN_PASSWORD,
+      email_confirm: true,
+      user_metadata: { display_name: "Unify Admin" },
+    });
+    if (error) throw error;
+    const newId = (data as { user?: { id?: string } } | null)?.user?.id;
+    if (!newId) throw new Error("admin user not returned");
+    await finish(newId);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    if (!/already/i.test(msg)) throw e;
+    // Auth row exists but profile missing (partial state) -> adopt it.
+    const { data: listed } = await sb.auth.admin.listUsers();
+    const found = (
+      (listed as { users?: { id?: string; email?: string }[] } | null)?.users || []
+    ).find((u) => (u.email || "").toLowerCase() === DEFAULT_ADMIN_EMAIL);
+    if (!found?.id) throw e;
+    await finish(found.id);
+  }
+}

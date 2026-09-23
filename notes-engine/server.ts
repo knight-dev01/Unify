@@ -335,3 +335,17 @@ app.listen(PORT, () => {
   });
   console.log(`Unify API running at http://localhost:${PORT}`);
 });
+
+// Reference seed + default admin (both idempotent). Never blocks boot;
+// failures land in the logs.
+try {
+  const seed = require("./src/lib/seed");
+  seed.ensureSeeded()
+    .then(() => logger.info("seed check done"))
+    .catch((e) => logger.warn("seed skipped", { message: e && e.message }));
+  seed.ensureDefaultAdmin()
+    .then(() => logger.info("default admin check done"))
+    .catch((e) => logger.warn("default admin skipped", { message: e && e.message }));
+} catch (e) {
+  logger.warn("seed skipped", { message: e && e.message });
+}

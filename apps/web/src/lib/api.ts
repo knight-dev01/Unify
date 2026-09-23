@@ -108,9 +108,22 @@ export type Profile = {
   role?: string;
 };
 
+export type AdminUser = {
+  id: string;
+  first_name?: string;
+  email?: string;
+  university?: string;
+  faculty?: string;
+  department?: string;
+  level?: string;
+  role?: string;
+  is_admin?: boolean;
+  created_at?: string;
+};
+
 export const api = {
   universities: () => apiFetch<University[]>("/v1/universities"),
-  me: () => apiFetch<{ onboarded: boolean; profile: Profile | null }>("/v1/me"),
+  me: () => apiFetch<{ onboarded: boolean; profile: Profile | null; isAdmin: boolean }>("/v1/me"),
   onboarding: (payload: Record<string, unknown>) =>
     apiFetch<{ ok: boolean; profile: Profile }>("/v1/onboarding", {
       method: "POST",
@@ -159,4 +172,27 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(payload),
     }),
+  adminStats: () =>
+    apiFetch<{
+      users: number;
+      byRole: Record<string, number>;
+      weeks: number;
+      xpTotal: number;
+    }>('/v1/admin/stats'),
+  adminUsers: (q = '', role = '') =>
+    apiFetch<{ users: AdminUser[] }>(`/v1/admin/users?q=${encodeURIComponent(q)}&role=${encodeURIComponent(role)}`),
+  adminPatchUser: (id: string, payload: { role?: string; is_admin?: boolean }) =>
+    apiFetch<{ ok: boolean }>(`/v1/admin/users/${id}`, { method: 'PATCH', body: JSON.stringify(payload) }),
+  adminDeleteUser: (id: string) => apiFetch<{ ok: boolean }>(`/v1/admin/users/${id}`, { method: 'DELETE' }),
+  adminInvite: (email: string, role: string) =>
+    apiFetch<{ ok: boolean }>('/v1/admin/users/invite', { method: 'POST', body: JSON.stringify({ email, role }) }),
+  courses: (level = '') =>
+    apiFetch<{ code: string; title: string; levels: string[] }[]>(`/v1/courses${level ? `?level=${encodeURIComponent(level)}` : ''}`),
+  adminCreateUni: (name: string, short_name?: string) =>
+    apiFetch<{ ok: boolean }>('/v1/admin/universities', { method: 'POST', body: JSON.stringify({ name, short_name }) }),
+  adminDeleteUni: (id: string) => apiFetch<{ ok: boolean }>(`/v1/admin/universities/${id}`, { method: 'DELETE' }),
+  adminCreateCourse: (code: string, title: string, levels: string[]) =>
+    apiFetch<{ ok: boolean; course: string }>('/v1/admin/courses', { method: 'POST', body: JSON.stringify({ code, title, levels }) }),
+  adminDeleteCourse: (code: string) =>
+    apiFetch<{ ok: boolean }>(`/v1/admin/courses/${encodeURIComponent(code)}`, { method: 'DELETE' }),
 };

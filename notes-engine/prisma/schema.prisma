@@ -34,6 +34,7 @@ model Profile {
   universityRef University? @relation(fields: [universityId], references: [id])
   gradTarget    Decimal?    @map("grad_target") @db.Decimal
   role          String      @default("student")
+  isAdmin       Boolean     @default(false) @map("is_admin")
   createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt     DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
@@ -45,8 +46,18 @@ model Course {
   title     String
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   weeks     Week[]
+  levels    CourseLevel[]
 
   @@map("courses")
+}
+
+model CourseLevel {
+  course    String
+  level     String
+  courseRef Course @relation(fields: [course], references: [code], onDelete: Cascade)
+
+  @@id([course, level])
+  @@map("course_levels")
 }
 
 model Week {

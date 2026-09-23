@@ -71,12 +71,28 @@ router.get("/me", requireAuth, async (req: Request, res: Response) => {
       res.json({ onboarded: false, profile: null });
       return;
     }
-    const p = data as { university?: string; role?: string; first_name?: string };
+    const p = data as { university?: string; role?: string; first_name?: string; is_admin?: boolean };
     // Students need a university; lecturers/collaborators stop after name.
     const onboarded =
       Boolean(p.university) ||
       ((p.role === "lecturer" || p.role === "collaborator") && Boolean(p.first_name));
-    res.json({ onboarded, profile: data });
+    let isAdmin = Boolean(p.is_admin);
+    if (!isAdmin) {
+      const adminEmails = (process.env.ADMIN_EMAILS || "")
+        .split(",")
+        .map((s) => s.trim().toLowerCase())
+        .filter(Boolean);
+      if (adminEmails.length) {
+        try {
+          const uRes = await supabaseAdmin().auth.admin.getUserById(userId);
+          const email = ((uRes.data as { user?: { email?: string } } | null)?.user?.email || "").toLowerCase();
+          if (email && adminEmails.includes(email)) isAdmin = true;
+        } catch {
+          // stay non-admin
+        }
+      }
+    }
+    res.json({ onboarded, profile: data, isAdmin });
   } catch (e) {
     res.status(500).json(dbError(e));
   }
@@ -104,7 +120,7 @@ router.put("/me", requireAuth, async (req: Request, res: Response) => {
           level: d.level,
           university_id: d.universityId,
           grad_target: d.gradTarget,
-          role: d.role,
+          // role is immutable: never updated via PUT (see POST lock above)
           updated_at: new Date().toISOString(),
         },
         { onConflict: "id" }
@@ -127,6 +143,21 @@ router.post("/onboarding", requireAuth, async (req: Request, res: Response) => {
   }
   const userId = (req as AuthedRequest).userId as string;
   const d = parsed.data;
+  // Roles are immutable: new profiles may set one, existing ones keep theirs.
+  try {
+    const { data: existing } = await supabaseAdmin()
+      .from("profiles")
+      .select("role")
+      .eq("id", userId)
+      .single();
+    const current = (existing as { role?: string } | null)?.role;
+    if (current && d.role !== current) {
+      res.status(403).json({ error: "Role cannot be changed once assigned" });
+      return;
+    }
+  } catch {
+    // No existing profile (or lookup failed) -> treat as new, continue.
+  }
   try {
     const { data, error } = await supabaseAdmin()
       .from("profiles")
@@ -154,12 +185,25 @@ router.post("/onboarding", requireAuth, async (req: Request, res: Response) => {
   }
 });
 
-// Public: course list.
-router.get("/courses", async (_req: Request, res: Response) => {
+// Public: course list, each with its levels. ?level= filters to a level.
+router.get("/courses", async (req: Request, res: Response) => {
+  const level = String(req.query.level || "");
   try {
-    const { data, error } = await supabaseAdmin().from("courses").select("code,title").order("code");
+    const sb = supabaseAdmin();
+    const { data: courses, error } = await sb.from("courses").select("code,title").order("code");
     if (error) throw error;
-    res.json(data ?? []);
+    const { data: links, error: linkErr } = await sb.from("course_levels").select("course,level");
+    if (linkErr) throw linkErr;
+    const byCourse: Record<string, string[]> = {};
+    for (const l of ((links ?? []) as { course: string; level: string }[])) {
+      (byCourse[l.course] = byCourse[l.course] || []).push(l.level);
+    }
+    let out = ((courses ?? []) as { code: string; title: string }[]).map((c) => ({
+      ...c,
+      levels: (byCourse[c.code] || []).sort(),
+    }));
+    if (level) out = out.filter((c) => c.levels.includes(level));
+    res.json(out);
   } catch (e) {
     res.status(500).json(dbError(e));
   }
@@ -359,6 +403,267 @@ router.get("/courses/:code/weeks", async (req: Request, res: Response) => {
       }
     }
     res.json({ weeks: [...seen.values()].sort((a, b) => a.week - b.week) });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// ---- Admin (platform owner): stats, user management ----
+async function requireAdminUser(req: Request, res: Response): Promise<string | null> {
+  const userId = (req as AuthedRequest).userId;
+  if (!userId) {
+    res.status(401).json({ error: "Missing session" });
+    return null;
+  }
+  try {
+    const sb = supabaseAdmin();
+    const { data } = await sb.from("profiles").select("is_admin").eq("id", userId).single();
+    if ((data as { is_admin?: boolean } | null)?.is_admin) return userId;
+    const adminEmails = (process.env.ADMIN_EMAILS || "")
+      .split(",")
+      .map((s) => s.trim().toLowerCase())
+      .filter(Boolean);
+    if (adminEmails.length) {
+      const uRes = await sb.auth.admin.getUserById(userId);
+      const email = ((uRes.data as { user?: { email?: string } } | null)?.user?.email || "").toLowerCase();
+      if (email && adminEmails.includes(email)) return userId;
+    }
+  } catch {
+    // deny below
+  }
+  res.status(403).json({ error: "Admin only" });
+  return null;
+}
+
+router.get("/admin/stats", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  try {
+    const sb = supabaseAdmin();
+    const [users, weeks, xp] = await Promise.all([
+      sb.from("profiles").select("id,role", { count: "exact" }),
+      sb.from("weeks").select("course", { count: "exact" }),
+      sb.from("xp_events").select("amount"),
+    ]);
+    const rows = ((users.data ?? []) as { role?: string }[]);
+    const byRole: Record<string, number> = {};
+    for (const r of rows) {
+      const k = r.role || "unknown";
+      byRole[k] = (byRole[k] || 0) + 1;
+    }
+    const xpRows = ((xp.data ?? []) as { amount: number }[]);
+    res.json({
+      users: users.count ?? rows.length,
+      byRole,
+      weeks: weeks.count ?? 0,
+      xpTotal: xpRows.reduce((s, r) => s + (r.amount || 0), 0),
+    });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+router.get("/admin/users", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  const q = String(req.query.q || "").toLowerCase();
+  const role = String(req.query.role || "");
+  const limit = Math.min(Number(req.query.limit) || 50, 200);
+  try {
+    let query = supabaseAdmin()
+      .from("profiles")
+      .select("id,first_name,email,university,faculty,department,level,role,is_admin,created_at")
+      .order("created_at", { ascending: false })
+      .limit(limit);
+    if (role === "student" || role === "lecturer" || role === "collaborator") {
+      query = query.eq("role", role);
+    }
+    const { data, error } = await query;
+    if (error) throw error;
+    let rows = ((data ?? []) as Record<string, unknown>[]);
+    if (q) {
+      rows = rows.filter(
+        (r) =>
+          String(r.first_name || "").toLowerCase().includes(q) ||
+          String(r.email || "").toLowerCase().includes(q)
+      );
+    }
+    res.json({ users: rows });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+const adminUserSchema = z.object({
+  role: z.enum(["student", "lecturer", "collaborator"]).optional(),
+  is_admin: z.boolean().optional(),
+});
+
+router.patch("/admin/users/:id", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  const parsed = adminUserSchema.safeParse(req.body);
+  if (!parsed.success || (!("role" in parsed.data) && !("is_admin" in parsed.data))) {
+    res.status(400).json({ error: "Provide role and/or is_admin" });
+    return;
+  }
+  if (req.params.id === adminId && parsed.data.is_admin === false) {
+    res.status(403).json({ error: "You cannot remove your own admin flag" });
+    return;
+  }
+  try {
+    const { data, error } = await supabaseAdmin()
+      .from("profiles")
+      .update({ ...parsed.data, updated_at: new Date().toISOString() })
+      .eq("id", req.params.id)
+      .select("*")
+      .single();
+    if (error) throw error;
+    res.json({ ok: true, profile: data });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+router.delete("/admin/users/:id", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  if (req.params.id === adminId) {
+    res.status(403).json({ error: "You cannot delete yourself" });
+    return;
+  }
+  try {
+    const sb = supabaseAdmin();
+    try {
+      await sb.auth.admin.deleteUser(req.params.id);
+    } catch {
+      // auth row may already be gone; profile delete still proceeds
+    }
+    const { error } = await sb.from("profiles").delete().eq("id", req.params.id);
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// ---- Admin catalog: universities ----
+const adminUniSchema = z.object({
+  name: z.string().min(1).max(120),
+  short_name: z.string().max(20).optional(),
+});
+
+router.post("/admin/universities", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  const parsed = adminUniSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid body", details: parsed.error.flatten() });
+    return;
+  }
+  try {
+    const { data, error } = await supabaseAdmin()
+      .from("universities")
+      .upsert(
+        { name: parsed.data.name, short_name: parsed.data.short_name ?? null },
+        { onConflict: "name" }
+      )
+      .select("*")
+      .single();
+    if (error) throw error;
+    res.json({ ok: true, university: data });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+router.delete("/admin/universities/:id", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  try {
+    const sb = supabaseAdmin();
+    await sb.from("profiles").update({ university_id: null }).eq("university_id", req.params.id);
+    const { error } = await sb.from("universities").delete().eq("id", req.params.id);
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// ---- Admin catalog: courses per level ----
+const adminCourseSchema = z.object({
+  code: z.string().min(1).max(20),
+  title: z.string().min(1).max(120),
+  levels: z.array(z.string().min(1).max(40)).min(1).max(8),
+});
+
+router.post("/admin/courses", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  const parsed = adminCourseSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid body", details: parsed.error.flatten() });
+    return;
+  }
+  const code = parsed.data.code.toUpperCase();
+  try {
+    const sb = supabaseAdmin();
+    const { error: cErr } = await sb.from("courses").upsert({ code, title: parsed.data.title }, { onConflict: "code" });
+    if (cErr) throw cErr;
+    await sb.from("course_levels").delete().eq("course", code);
+    const { error: lErr } = await sb
+      .from("course_levels")
+      .insert(parsed.data.levels.map((level) => ({ course: code, level })));
+    if (lErr) throw lErr;
+    res.json({ ok: true, course: code });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+router.delete("/admin/courses/:code", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  try {
+    const sb = supabaseAdmin();
+    const code = decodeURIComponent(req.params.code).toUpperCase();
+    await sb.from("course_levels").delete().eq("course", code);
+    const { error } = await sb.from("courses").delete().eq("code", code);
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// ---- Admin: invite a user by email (Supabase sends the invite; the
+// profile shell carries the starting role so onboarding resumes correctly).
+router.post("/admin/users/invite", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  const parsed = z
+    .object({
+      email: z.string().email().max(120),
+      role: z.enum(["student", "lecturer", "collaborator"]).default("student"),
+    })
+    .safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid body", details: parsed.error.flatten() });
+    return;
+  }
+  try {
+    const sb = supabaseAdmin();
+    const { data, error } = await sb.auth.admin.inviteUserByEmail(parsed.data.email);
+    if (error) throw error;
+    const newId = (data as { user?: { id?: string } } | null)?.user?.id;
+    if (newId) {
+      await sb.from("profiles").upsert(
+        { id: newId, email: parsed.data.email.toLowerCase(), role: parsed.data.role },
+        { onConflict: "id" }
+      );
+    }
+    res.json({ ok: true });
   } catch (e) {
     res.status(500).json(dbError(e));
   }

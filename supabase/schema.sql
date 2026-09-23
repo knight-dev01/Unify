@@ -21,6 +21,7 @@ create table if not exists profiles (
   university_id uuid references universities(id),
   grad_target numeric,
   role text not null default 'student',
+  is_admin boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -30,6 +31,14 @@ create table if not exists courses (
   title text not null,
   created_at timestamptz not null default now()
 );
+
+create table if not exists course_levels (
+  course text not null references courses(code) on delete cascade,
+  level text not null,
+  primary key (course, level)
+);
+create index if not exists course_levels_level_idx on course_levels (level);
+alter table course_levels enable row level security;
 
 create table if not exists weeks (
   course text not null references courses(code) on delete cascade,
