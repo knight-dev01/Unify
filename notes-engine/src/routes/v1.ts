@@ -3,6 +3,7 @@ import rateLimit from "express-rate-limit";
 import { z } from "zod";
 import { supabaseAdmin } from "../lib/supabase";
 import { requireAuth, type AuthedRequest } from "../middleware/requireAuth";
+import { requireAuthor } from "../middleware/requireAuthor";
 
 const router = Router();
 router.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 200, standardHeaders: true, legacyHeaders: false }));
@@ -11,10 +12,12 @@ const TOPIC_XP = 10;
 
 const onboardingSchema = z.object({
   firstName: z.string().min(1).max(60),
-  university: z.string().min(1).max(120),
-  faculty: z.string().min(1).max(120),
-  department: z.string().min(1).max(100),
-  level: z.string().min(1).max(40),
+  // Only students complete the full flow; lecturers/collaborators stop
+  // after name, so these stay optional server-side.
+  university: z.string().min(1).max(120).optional(),
+  faculty: z.string().min(1).max(120).optional(),
+  department: z.string().min(1).max(100).optional(),
+  level: z.string().min(1).max(40).optional(),
   universityId: z.string().uuid().max(80).optional(),
   gradTarget: z.number().min(0).max(5).optional(),
   role: z.enum(["student", "lecturer", "collaborator"]).default("student"),
@@ -67,7 +70,12 @@ router.get("/me", requireAuth, async (req: Request, res: Response) => {
       res.json({ onboarded: false, profile: null });
       return;
     }
-    res.json({ onboarded: Boolean((data as { university?: string }).university), profile: data });
+    const p = data as { university?: string; role?: string; first_name?: string };
+    // Students need a university; lecturers/collaborators stop after name.
+    const onboarded =
+      Boolean(p.university) ||
+      ((p.role === "lecturer" || p.role === "collaborator") && Boolean(p.first_name));
+    res.json({ onboarded, profile: data });
   } catch (e) {
     res.status(500).json(dbError(e));
   }
@@ -215,6 +223,48 @@ router.post("/progress", requireAuth, async (req: Request, res: Response) => {
     const rows = (xpRows ?? []) as { amount: number; created_at: string }[];
     const xp = rows.reduce((s, r) => s + (r.amount || 0), 0);
     res.json({ ok: true, xp, streak: calcStreak(rows.map((r) => r.created_at)) });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// Authed author: publish a week of notes (creates/overwrites the week row
+// learners read). This is how studio-authored content reaches the app.
+const publishSchema = z.object({
+  course: z.string().min(1).max(20),
+  week: z.number().int().min(1).max(52),
+  title: z.string().max(200).optional(),
+  subtitle: z.string().max(300).optional(),
+  noteJson: z.object({}).passthrough(),
+});
+
+router.post("/publish", requireAuth, requireAuthor, async (req: Request, res: Response) => {
+  const parsed = publishSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid body", details: parsed.error.flatten() });
+    return;
+  }
+  const { course, week, noteJson } = parsed.data;
+  const code = course.toUpperCase();
+  const note = noteJson as { title?: unknown; subtitle?: unknown };
+  try {
+    const { error } = await supabaseAdmin()
+      .from("weeks")
+      .upsert(
+        {
+          course: code,
+          week,
+          title:
+            parsed.data.title ??
+            (typeof note.title === "string" ? note.title : `Week ${week}`),
+          subtitle:
+            parsed.data.subtitle ?? (typeof note.subtitle === "string" ? note.subtitle : ""),
+          note_json: noteJson,
+        },
+        { onConflict: "course,week" }
+      );
+    if (error) throw error;
+    res.json({ ok: true, course: code, week });
   } catch (e) {
     res.status(500).json(dbError(e));
   }
