@@ -179,7 +179,9 @@ export async function generateStructuredNote(args: {
       .filter(Boolean)
       .filter((m) => m !== primary);
     // Healthiest accessible models first (failures < cap, fewest first).
-    const rows = await readRegistry();
+    // AI_ROTATION=off restricts to primary + explicitly configured models.
+    const rotate = (process.env.AI_ROTATION || "on").toLowerCase() !== "off";
+    const rows = rotate ? await readRegistry() : [];
     const healthy = rows
       .filter((r) => r.failures < MAX_FAILURES)
       .sort((a, b) => a.failures - b.failures || (a.model < b.model ? -1 : 1))
