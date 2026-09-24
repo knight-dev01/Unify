@@ -1,25 +1,81 @@
 import { supabaseAdmin } from "./supabase";
 
-const WEEK1_NOTE = {
-  course: "MEE 352",
-  week: 1,
-  title: "Week 1",
-  subtitle: "Getting started",
-  learningOutcome: "",
-  metaChips: [],
-  tags: [],
-  topics: [],
-  eoq: { questions: [] },
-};
+// Starter content: honest placeholder notes (not fake lectures) so every
+// seeded course opens with something readable. Lecturers publish real
+// topics over these; versions stack, nothing is wiped.
+function starterShell(code: string) {
+  return {
+    course: code,
+    week: 1,
+    title: "Week 1",
+    subtitle: "Starter note",
+    learningOutcome: `Settle into ${code}: read the starter topic and mark it complete.`,
+    metaChips: [code, "Week 1"],
+    tags: [],
+    topics: [],
+    eoq: { questions: [] },
+  };
+}
 
-// Idempotent reference seed (LASU + MEE 352 Week 1). Safe to run on every
-// boot/deploy: upserts never duplicate, never touch user data.
+function starterTopic(code: string, title: string) {
+  const abbr = code.split(" ")[0] || code;
+  const named = title && title !== code ? ` (${title})` : "";
+  return {
+    number: 1,
+    title: `${code} — Getting started`,
+    abbr,
+    subtopics: [
+      {
+        number: "1.1",
+        abbr,
+        title: `Welcome to ${code}`,
+        content: [
+          {
+            type: "paragraph",
+            text: `This starter note holds the place for ${code}${named} while your lecturer publishes full weekly topics. Everything you do here counts: complete topics for XP and grow your streak.`,
+          },
+          {
+            type: "bullets",
+            items: [
+              "New topics land here under Week 1, 2, 3… as your lecturer publishes them.",
+              "Tap Mark Topic Complete under any topic to earn 10 XP.",
+              "End-of-week quizzes appear once your lecturer publishes question sets.",
+            ],
+          },
+        ],
+        miniCheck: {
+          questions: [
+            {
+              type: "mcq",
+              question: `A new ${code} topic appears under Week 2. What do you do?`,
+              options: ["Ignore it", "Read it and mark it complete", "Delete it"],
+              correctIndex: 1,
+            },
+          ],
+        },
+      },
+    ],
+  };
+}
+
+// Idempotent reference seed (LASU + per-level catalog + starter notes).
+// Safe to run on every boot/deploy: inserts never duplicate, never touch
+// user data, and never overwrite admin-customized titles.
 export async function ensureSeeded(): Promise<void> {
   const sb = supabaseAdmin();
   const { error: uErr } = await sb
     .from("universities")
     .upsert({ name: "Lagos State University", short_name: "LASU" }, { onConflict: "name" });
   if (uErr) throw uErr;
+  // Admin-owned active semester (students see only this semester's courses).
+  // Insert-only: reboots must never revert an admin's semester switch.
+  const { data: semRow } = await sb.from("app_settings").select("key").eq("key", "current_semester").single();
+  if (!semRow) {
+    const { error: semErr } = await sb
+      .from("app_settings")
+      .insert({ key: "current_semester", value: "First Semester" });
+    if (semErr) throw semErr;
+  }
   // Course catalog, seeded per level so each level only sees its own
   // courses (codes match level by numbering convention). Insert-only:
   // never overwrites titles an admin customized via Admin → Courses.
@@ -41,7 +97,7 @@ export async function ensureSeeded(): Promise<void> {
     { code: "IPE 212", title: "IPE 212", level: "200 Level", semester: "First Semester" },
     { code: "MEE 202", title: "MEE 202", level: "200 Level", semester: "First Semester" },
     { code: "MEE 212", title: "MEE 212", level: "200 Level", semester: "First Semester" },
-    { code: "MEE 352", title: "Unify Learn", level: "300 Level", semester: "First Semester" },
+    { code: "MEE 352", title: "MEE 352", level: "300 Level", semester: "First Semester" },
   ];
   for (const c of catalog) {
     const { data: exists } = await sb.from("courses").select("code").eq("code", c.code).single();
@@ -53,19 +109,6 @@ export async function ensureSeeded(): Promise<void> {
       .from("course_levels")
       .upsert({ course: c.code, level: c.level, semester: c.semester }, { onConflict: "course,level" });
     if (lErr) throw lErr;
-  }
-  // MEE 352 Week 1 shell: insert-only (never upsert) so reboots can't
-  // wipe an authored title/subtitle/eoq once real content exists.
-  const { data: w1 } = await sb.from("weeks").select("course").eq("course", "MEE 352").eq("week", 1).single();
-  if (!w1) {
-    const { error: wErr } = await sb.from("weeks").insert({
-      course: "MEE 352",
-      week: 1,
-      title: "Week 1",
-      subtitle: "Getting started",
-      note_json: WEEK1_NOTE,
-    });
-    if (wErr) throw wErr;
   }
   // One-time backfill: legacy week-embedded topics -> topic_notes v1 rows.
   // Idempotent: only weeks that still carry embedded topics are touched,
@@ -112,6 +155,44 @@ export async function ensureSeeded(): Promise<void> {
       .eq("week", w.week);
     if (sErr) throw sErr;
   }
+  // Starter content runs AFTER the backfill so real legacy topics always
+  // win: every seeded course ends up with a Week 1 shell + one v1 starter
+  // topic, meaning every level opens with at least one readable note.
+  for (const c of catalog) {
+    const { data: shell } = await sb.from("weeks").select("course").eq("course", c.code).eq("week", 1).single();
+    if (!shell) {
+      const { error: shErr } = await sb.from("weeks").insert({
+        course: c.code,
+        week: 1,
+        author_id: null,
+        title: "Week 1",
+        subtitle: "Starter note",
+        note_json: starterShell(c.code),
+      });
+      if (shErr) throw shErr;
+    }
+    const { data: t1 } = await sb
+      .from("topic_notes")
+      .select("id")
+      .eq("course", c.code)
+      .eq("week", 1)
+      .eq("topic", 1)
+      .limit(1);
+    if (!(t1 as unknown[] | null)?.length) {
+      const { error: tErr } = await sb.from("topic_notes").insert({
+        course: c.code,
+        week: 1,
+        topic: 1,
+        version: 1,
+        title: `${c.code} — Getting started`,
+        note_json: starterTopic(c.code, c.title),
+        author_id: null,
+      });
+      if (tErr) throw tErr;
+    }
+  }
+  // Cleanup of the old MEE 352 stub title — only when still the untouched stub.
+  await sb.from("courses").update({ title: "MEE 352" }).eq("code", "MEE 352").eq("title", "Unify Learn");
 }
 
 const DEFAULT_ADMIN_EMAIL = "unify.admin@unify.learn";

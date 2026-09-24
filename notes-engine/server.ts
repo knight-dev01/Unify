@@ -54,7 +54,7 @@ const unifyMathRules = fs.existsSync(mathRulesPath) ? fs.readFileSync(mathRulesP
 
 const SCHEMA_SPEC = `
 {
-  "course": "string (e.g. MEE 352)",
+  "course": "string (e.g. CVE 214)",
   "week": number (e.g. 6),
   "title": "string",
   "subtitle": "string",
@@ -280,7 +280,7 @@ app.post("/api/convert", async (req, res) => {
     modeInstruction = "Segmentation Mode: Whole Week, AI Decides. You have authority to identify logical topic and subtopic break points from unstructured text.";
   }
 
-  const userPrompt = `Course Code: ${course || "MEE 352"}
+  const userPrompt = `Course Code: ${course || "Unspecified"}
 Week Number: ${week || 1}
 ${title ? `Title: ${title}` : ""}
 ${subtitle ? `Subtitle: ${subtitle}` : ""}

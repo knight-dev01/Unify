@@ -10,6 +10,25 @@ router.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 200, standardHeaders: true
 
 const TOPIC_XP = 10;
 
+const LEVEL_ORDER = ["100 Level", "200 Level", "300 Level", "400 Level", "500 Level"];
+const SEMESTERS = ["First Semester", "Second Semester"] as const;
+
+// Admin-owned active semester (students see only this semester's courses).
+async function getCurrentSemester(): Promise<string> {
+  try {
+    const { data } = await supabaseAdmin()
+      .from("app_settings")
+      .select("value")
+      .eq("key", "current_semester")
+      .single();
+    const v = (data as { value?: string } | null)?.value;
+    if (v && (SEMESTERS as readonly string[]).includes(v)) return v;
+  } catch {
+    // fall through to default
+  }
+  return "First Semester";
+}
+
 const onboardingSchema = z.object({
   firstName: z.string().min(1).max(60),
   // Only students complete the full flow; lecturers/collaborators stop
@@ -99,7 +118,105 @@ router.get("/me", requireAuth, async (req: Request, res: Response) => {
       .select("course")
       .eq("user_id", userId);
     const courses = ((enrolled ?? []) as { course: string }[]).map((r) => r.course);
-    res.json({ onboarded, profile: data, isAdmin, courses });
+    // Resume: live position if tracked, else the most recently completed
+    // topic (pre-tracking progress still resumes somewhere sensible).
+    let resume: { course: string; week: number; topic: number } | null = null;
+    const { data: saved } = await supabaseAdmin()
+      .from("resume_state")
+      .select("course,week,topic")
+      .eq("user_id", userId)
+      .single();
+    if (saved) {
+      const r = saved as { course: string; week: number; topic: number };
+      resume = { course: r.course, week: r.week, topic: r.topic };
+    } else {
+      const { data: last } = await supabaseAdmin()
+        .from("topic_progress")
+        .select("course,week,topic")
+        .eq("user_id", userId)
+        .order("completed_at", { ascending: false })
+        .limit(1);
+      const row = ((last ?? []) as { course: string; week: number; topic: number }[])[0];
+      if (row) resume = { course: row.course, week: row.week, topic: row.topic };
+    }
+    res.json({ onboarded, profile: data, isAdmin, courses, resume });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// Public: platform settings students need (active semester picker source).
+router.get("/settings", async (_req: Request, res: Response) => {
+  res.json({ currentSemester: await getCurrentSemester() });
+});
+
+// Authed: enroll/unenroll in a course (taking for students, teaching for
+// authors). This is the post-onboarding enrollment path (catalog buttons).
+router.post("/enrollments", requireAuth, async (req: Request, res: Response) => {
+  const parsed = z
+    .object({ course: z.string().min(1).max(20), enroll: z.boolean() })
+    .safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid body", details: parsed.error.flatten() });
+    return;
+  }
+  const userId = (req as AuthedRequest).userId as string;
+  const code = parsed.data.course.toUpperCase();
+  try {
+    const sb = supabaseAdmin();
+    const { data: courseRow } = await sb.from("courses").select("code").eq("code", code).single();
+    if (!courseRow) {
+      res.status(404).json({ error: "Course not found" });
+      return;
+    }
+    if (parsed.data.enroll) {
+      const { data: prof } = await sb.from("profiles").select("role").eq("id", userId).single();
+      const kind = (prof as { role?: string } | null)?.role === "student" ? "taking" : "teaching";
+      const { error } = await sb
+        .from("enrollments")
+        .upsert({ user_id: userId, course: code, kind }, { onConflict: "user_id,course" });
+      if (error) throw error;
+    } else {
+      const { error } = await sb.from("enrollments").delete().eq("user_id", userId).eq("course", code);
+      if (error) throw error;
+    }
+    const { data: enrolled } = await sb.from("enrollments").select("course").eq("user_id", userId);
+    res.json({ ok: true, enrolled: ((enrolled ?? []) as { course: string }[]).map((r) => r.course) });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// Authed: record the live learning position (week view / tab switch feeds
+// the dashboard Resume card). Topic here is the reader tab index.
+router.post("/resume", requireAuth, async (req: Request, res: Response) => {
+  const parsed = z
+    .object({
+      course: z.string().min(1).max(20),
+      week: z.number().int().min(1).max(52),
+      topic: z.number().int().min(0).max(100),
+    })
+    .safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid body", details: parsed.error.flatten() });
+    return;
+  }
+  const userId = (req as AuthedRequest).userId as string;
+  try {
+    const { error } = await supabaseAdmin()
+      .from("resume_state")
+      .upsert(
+        {
+          user_id: userId,
+          course: parsed.data.course.toUpperCase(),
+          week: parsed.data.week,
+          topic: parsed.data.topic,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id" }
+      );
+    if (error) throw error;
+    res.json({ ok: true });
   } catch (e) {
     res.status(500).json(dbError(e));
   }
@@ -461,6 +578,17 @@ router.post("/progress", requireAuth, async (req: Request, res: Response) => {
       { onConflict: "user_id,course,week,topic" }
     );
     if (upErr) throw upErr;
+    // Keep the Resume card on the just-completed position.
+    await sb.from("resume_state").upsert(
+      {
+        user_id: userId,
+        course,
+        week,
+        topic,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id" }
+    );
     await sb.from("xp_events").insert({
       user_id: userId,
       amount: TOPIC_XP,
@@ -821,14 +949,20 @@ router.get("/admin/users", requireAuth, async (req: Request, res: Response) => {
 const adminUserSchema = z.object({
   role: z.enum(["student", "lecturer", "collaborator"]).optional(),
   is_admin: z.boolean().optional(),
+  level: z
+    .string()
+    .min(1)
+    .max(40)
+    .refine((v) => [...LEVEL_ORDER, "Graduated"].includes(v), { message: "Unknown level" })
+    .optional(),
 });
 
 router.patch("/admin/users/:id", requireAuth, async (req: Request, res: Response) => {
   const adminId = await requireAdminUser(req, res);
   if (!adminId) return;
   const parsed = adminUserSchema.safeParse(req.body);
-  if (!parsed.success || (!("role" in parsed.data) && !("is_admin" in parsed.data))) {
-    res.status(400).json({ error: "Provide role and/or is_admin" });
+  if (!parsed.success || (!("role" in parsed.data) && !("is_admin" in parsed.data) && !("level" in parsed.data))) {
+    res.status(400).json({ error: "Provide role, level and/or is_admin" });
     return;
   }
   if (req.params.id === adminId && parsed.data.is_admin === false) {
@@ -989,6 +1123,60 @@ router.post("/admin/users/invite", requireAuth, async (req: Request, res: Respon
       );
     }
     res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// ---- Admin: academic session (active semester + bulk promotion) ----
+router.put("/admin/settings/semester", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  const parsed = z.object({ semester: z.enum(SEMESTERS) }).safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid body", details: parsed.error.flatten() });
+    return;
+  }
+  try {
+    const { error } = await supabaseAdmin()
+      .from("app_settings")
+      .upsert(
+        { key: "current_semester", value: parsed.data.semester, updated_at: new Date().toISOString() },
+        { onConflict: "key" }
+      );
+    if (error) throw error;
+    res.json({ ok: true, currentSemester: parsed.data.semester });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// One-click promotion: every student moves up exactly one level
+// (500 Level -> Graduated). Taking-enrollments are cleared so students
+// pick new-level courses; teaching assignments are kept.
+router.post("/admin/users/promote", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  try {
+    const sb = supabaseAdmin();
+    const { data, error } = await sb.from("profiles").select("id,level").eq("role", "student");
+    if (error) throw error;
+    let promoted = 0;
+    let graduated = 0;
+    for (const p of ((data ?? []) as { id: string; level: string | null }[])) {
+      const idx = LEVEL_ORDER.indexOf(p.level || "");
+      if (idx === -1) continue;
+      const next = idx + 1 < LEVEL_ORDER.length ? LEVEL_ORDER[idx + 1] : "Graduated";
+      const { error: uErr } = await sb
+        .from("profiles")
+        .update({ level: next, updated_at: new Date().toISOString() })
+        .eq("id", p.id);
+      if (uErr) throw uErr;
+      await sb.from("enrollments").delete().eq("user_id", p.id).eq("kind", "taking");
+      if (next === "Graduated") graduated += 1;
+      else promoted += 1;
+    }
+    res.json({ ok: true, promoted, graduated });
   } catch (e) {
     res.status(500).json(dbError(e));
   }

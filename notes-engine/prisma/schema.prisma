@@ -148,3 +148,21 @@ model QuizAttempt {
   @@index([userId, createdAt(sort: Desc)], map: "quiz_attempts_user_idx")
   @@map("quiz_attempts")
 }
+
+model AppSetting {
+  key       String   @id
+  value     String   @default("")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("app_settings")
+}
+
+model ResumeState {
+  userId    String   @id @map("user_id") @db.Uuid
+  course    String
+  week      Int
+  topic     Int      @default(0)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("resume_state")
+}

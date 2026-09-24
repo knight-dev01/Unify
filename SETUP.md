@@ -27,7 +27,7 @@ the Auth server.)
 5. **Schema — pick ONE path:**
    - **A (recommended, automatic):** do nothing. Render applies
      `notes-engine/prisma/migrations/0001_init` on first deploy. Then run
-     `supabase/seed.sql` once in **SQL Editor** for LASU + MEE 352 Week 1.
+     `supabase/seed.sql` once in **SQL Editor** for LASU + the per-level catalog.
    - **B (manual):** run `supabase/schema.sql` then `supabase/seed.sql` in SQL
      Editor, and baseline Prisma after the first deploy:
      `npx prisma migrate resolve --applied 0001_init`.

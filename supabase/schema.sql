@@ -128,3 +128,22 @@ create table if not exists ai_models (
   updated_at timestamptz not null default now()
 );
 alter table ai_models enable row level security;
+
+-- Admin-owned platform settings (current_semester drives which semester's
+-- courses students see) + per-student resume tracking for the Resume card.
+create table if not exists app_settings (
+  key text primary key,
+  value text not null default '',
+  updated_at timestamptz not null default now()
+);
+alter table app_settings enable row level security;
+
+create table if not exists resume_state (
+  user_id uuid primary key,
+  course text not null,
+  week int not null,
+  topic int not null default 0,
+  updated_at timestamptz not null default now()
+);
+create index if not exists resume_state_user_idx on resume_state (user_id);
+alter table resume_state enable row level security;
