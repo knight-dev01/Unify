@@ -125,7 +125,10 @@ router.get("/me", requireAuth, async (req: Request, res: Response) => {
       .from("enrollments")
       .select("course")
       .eq("user_id", userId);
-    const courses = ((enrolled ?? []) as { course: string }[]).map((r) => r.course);
+    // Never hand blank codes to clients (they render as ghost courses).
+    const courses = ((enrolled ?? []) as { course: string }[])
+      .map((r) => r.course)
+      .filter((c) => c && c.trim());
     // Resume: live position if tracked, else the most recently completed
     // topic (pre-tracking progress still resumes somewhere sensible).
     let resume: { course: string; week: number; topic: number } | null = null;
