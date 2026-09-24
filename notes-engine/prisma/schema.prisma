@@ -97,6 +97,15 @@ model XpEvent {
   @@map("xp_events")
 }
 
+model AiModel {
+  model     String   @id
+  failures  Int      @default(0)
+  lastOk    DateTime? @map("last_ok") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("ai_models")
+}
+
 model QuizAttempt {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId    String   @map("user_id") @db.Uuid

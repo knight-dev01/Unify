@@ -89,3 +89,11 @@ create table if not exists quiz_attempts (
 );
 create index if not exists quiz_attempts_user_idx on quiz_attempts (user_id, created_at desc);
 alter table quiz_attempts enable row level security;
+
+create table if not exists ai_models (
+  model text primary key,
+  failures int not null default 0,
+  last_ok timestamptz,
+  updated_at timestamptz not null default now()
+);
+alter table ai_models enable row level security;

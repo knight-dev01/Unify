@@ -1,8 +1,15 @@
+import { supabaseAdmin } from "./supabase";
+
 // AI provider adapter for the studio's /api/convert endpoint.
 // Gemini is the default (free tier); set AI_PROVIDER=anthropic to switch back.
+// A model registry (ai_models table) tracks what the key can call and each
+// model's health, so generation rotates across everything accessible.
+//
 // Students never touch AI (standing rule) — only this module spends keys,
 // and only from the author-gated convert route.
 const MAX_TOKENS = 8192;
+const MAX_FAILURES = 3;
+const CHAIN_CAP = 8;
 
 async function anthropic(system: string, user: string, model: string, apiKey: string): Promise<string> {
   const response = await fetch("https://api.anthropic.com/v1/messages", {
@@ -60,14 +67,6 @@ async function gemini(system: string, user: string, model: string, apiKey: strin
   return text;
 }
 
-function isRateLimit(e: unknown): boolean {
-  const status = (e as { status?: number })?.status;
-  // 429/RESOURCE_EXHAUSTED (quota) and 404 (unknown model id) both fall through.
-  if (status === 429 || status === 404) return true;
-  const msg = e instanceof Error ? e.message : String(e);
-  return /RESOURCE_EXHAUSTED|quota|rate.?limit|429|not.?found/i.test(msg);
-}
-
 let liveCache: { at: number; models: string[] } | null = null;
 const LIVE_TTL = 60 * 60 * 1000;
 
@@ -90,6 +89,78 @@ export async function listLiveModels(apiKey: string): Promise<string[]> {
   return models;
 }
 
+type RegistryRow = { model: string; failures: number; last_ok: string | null };
+
+async function readRegistry(): Promise<RegistryRow[]> {
+  try {
+    const { data, error } = await supabaseAdmin().from("ai_models").select("model,failures,last_ok");
+    if (error) return [];
+    return ((data ?? []) as RegistryRow[]);
+  } catch {
+    return [];
+  }
+}
+
+// Pull the live list with the env key and store it. Safe to run often;
+// upserts never duplicate. Throws when the key/network is unusable.
+export async function syncModelsOnce(): Promise<string[]> {
+  const apiKey = process.env.GEMINI_API_KEY || "";
+  if (!apiKey) throw new Error("Set GEMINI_API_KEY first.");
+  liveCache = null;
+  const live = await listLiveModels(apiKey);
+  try {
+    await supabaseAdmin()
+      .from("ai_models")
+      .upsert(
+        live.map((model) => ({ model })),
+        { onConflict: "model", ignoreDuplicates: true }
+      );
+  } catch {
+    // registry is advisory: discovery still succeeded
+  }
+  return live;
+}
+
+export function startModelSync(intervalMs = 30 * 60 * 1000): void {
+  const run = async () => {
+    try {
+      const live = await syncModelsOnce();
+      console.log(`model registry synced (${live.length} models)`);
+    } catch (e) {
+      console.warn("model sync skipped", e instanceof Error ? e.message : String(e));
+    }
+  };
+  void run();
+  setInterval(() => {
+    void run();
+  }, intervalMs);
+}
+
+async function recordModel(model: string, ok: boolean): Promise<void> {
+  try {
+    const sb = supabaseAdmin();
+    if (ok) {
+      await sb
+        .from("ai_models")
+        .upsert({ model, failures: 0, last_ok: new Date().toISOString() }, { onConflict: "model" });
+    } else {
+      const rows = await readRegistry();
+      const cur = rows.find((r) => r.model === model)?.failures ?? 0;
+      await sb.from("ai_models").upsert({ model, failures: cur + 1 }, { onConflict: "model" });
+    }
+  } catch {
+    // registry is advisory only
+  }
+}
+
+function isRateLimit(e: unknown): boolean {
+  const status = (e as { status?: number })?.status;
+  // 429/RESOURCE_EXHAUSTED (quota) and 404 (unknown model id) both fall through.
+  if (status === 429 || status === 404) return true;
+  const msg = e instanceof Error ? e.message : String(e);
+  return /RESOURCE_EXHAUSTED|quota|rate.?limit|429|not.?found/i.test(msg);
+}
+
 export async function generateStructuredNote(args: {
   system: string;
   user: string;
@@ -107,17 +178,33 @@ export async function generateStructuredNote(args: {
       .map((s) => s.trim())
       .filter(Boolean)
       .filter((m) => m !== primary);
-    // No lower-tier fallbacks, ever: only explicitly configured models are
-    // tried. A 429 surfaces so quotas get raised instead of silently downgrading.
-    const chain = [primary, ...configured].slice(0, 6);
+    // Healthiest accessible models first (failures < cap, fewest first).
+    const rows = await readRegistry();
+    const healthy = rows
+      .filter((r) => r.failures < MAX_FAILURES)
+      .sort((a, b) => a.failures - b.failures || (a.model < b.model ? -1 : 1))
+      .map((r) => r.model);
+    const seen = new Set<string>([primary]);
+    const chain = [primary, ...configured, ...healthy]
+      .filter((m) => {
+        if (seen.has(m)) return false;
+        seen.add(m);
+        return true;
+      })
+      .slice(0, CHAIN_CAP);
     let lastErr: unknown = null;
     for (const model of chain) {
       try {
         const text = await gemini(args.system, args.user, model, apiKey);
+        await recordModel(model, true);
         return { text, provider, model };
       } catch (e) {
         lastErr = e;
-        if (!isRateLimit(e)) throw e;
+        if (!isRateLimit(e)) {
+          await recordModel(model, false);
+          throw e;
+        }
+        await recordModel(model, false);
         console.warn(`Gemini ${model} unavailable or rate-limited, trying next model`);
       }
     }

@@ -172,6 +172,10 @@ app.get("/api/models", requireAuth, requireAuthor, async (req, res) => {
     }
     const apiKey = process.env.GEMINI_API_KEY || "";
     if (!apiKey) return res.status(400).json({ error: "Set GEMINI_API_KEY first." });
+    if (req.query.refresh) {
+      const { syncModelsOnce } = require("./src/lib/ai");
+      await syncModelsOnce();
+    }
     const models = await listLiveModels(apiKey);
     res.json({ provider, default: process.env.GEMINI_MODEL || "gemini-3.6-flash", models });
   } catch (err) {
@@ -354,4 +358,11 @@ try {
     .catch((e) => logger.warn("default admin skipped", { message: e && e.message }));
 } catch (e) {
   logger.warn("seed skipped", { message: e && e.message });
+}
+
+// Model registry sync (idempotent). Never blocks boot.
+try {
+  require("./src/lib/ai").startModelSync();
+} catch (e) {
+  logger.warn("model sync skipped", { message: e && e.message });
 }
