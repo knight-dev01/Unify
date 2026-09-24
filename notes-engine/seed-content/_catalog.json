@@ -1,0 +1,1094 @@
+[
+  {
+    "code": "CHM 101",
+    "title": "General Chemistry I",
+    "level": "100 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "CHM 107",
+    "title": "General Chemistry Practical I",
+    "level": "100 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "CSC 101",
+    "title": "Introduction to Computing Science",
+    "level": "100 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "GNS 111",
+    "title": "Communication in English, Use of Library and ICT",
+    "level": "100 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MAT 101",
+    "title": "Elementary Mathematics I (Algebra and Trigonometry)",
+    "level": "100 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MAT 161",
+    "title": "Descriptive Statistics",
+    "level": "100 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 101",
+    "title": "Engineer in Society",
+    "level": "100 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 105",
+    "title": "Engineering Graphics & Solid Modelling I",
+    "level": "100 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "PHY 101",
+    "title": "General Physics I",
+    "level": "100 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "PHY 107",
+    "title": "General Physics Practical I",
+    "level": "100 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "CHM 102",
+    "title": "General Chemistry II",
+    "level": "100 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "CHM 108",
+    "title": "General Chemistry Practical II",
+    "level": "100 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 104",
+    "title": "Introduction to Electronics Engineering",
+    "level": "100 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "GNS 104",
+    "title": "Use of Yoruba Language and Culture: Basic Communication Concepts",
+    "level": "100 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "GNS 112",
+    "title": "Nigerian Peoples and Culture",
+    "level": "100 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MAT 102",
+    "title": "Elementary Mathematics II (Calculus)",
+    "level": "100 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MAT 108",
+    "title": "General Mathematics III (Vectors Geometry and Dynamics)",
+    "level": "100 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MAT 162",
+    "title": "Statistical Inference I",
+    "level": "100 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "PHY 102",
+    "title": "General Physics II",
+    "level": "100 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "PHY 108",
+    "title": "General Physics Practical II",
+    "level": "100 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "ECE 201",
+    "title": "Fundamental of Electrical Engineering",
+    "level": "200 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "ECE 203",
+    "title": "Applied Electricity I",
+    "level": "200 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "ECE 211",
+    "title": "Computing and Software Engineering",
+    "level": "200 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "ENT 211",
+    "title": "Entrepreneurship & Innovation",
+    "level": "200 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 203",
+    "title": "Engineering Graphics",
+    "level": "200 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 205",
+    "title": "Fundamentals of Fluid Mechanics",
+    "level": "200 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 207",
+    "title": "Applied Mechanics",
+    "level": "200 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 209",
+    "title": "Engineering Mathematics I",
+    "level": "200 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "CHE 206",
+    "title": "Fundamentals Of Thermodynamics",
+    "level": "200 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "ECE 202",
+    "title": "Engineering Mathematics II",
+    "level": "200 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "ECE 206",
+    "title": "Electrical Insta IIation Practice Lab",
+    "level": "200 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "ECE 208",
+    "title": "Electrical And Electronic Drawing",
+    "level": "200 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "ECE 210",
+    "title": "Fundamental Of Electrical Engineering II",
+    "level": "200 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "ECE 220",
+    "title": "Introduction to Programming and Computations",
+    "level": "200 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "GNS 212",
+    "title": "Philosophy Logic and Human Existence and Gender-Based Violence",
+    "level": "200 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 202",
+    "title": "Engineering Materials",
+    "level": "200 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 204",
+    "title": "Students Workshop Experience",
+    "level": "200 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 212",
+    "title": "Mechanics of Machine I",
+    "level": "200 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 301",
+    "title": "Engineering Mathematics III",
+    "level": "300 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 305",
+    "title": "Fluid Mechanics II",
+    "level": "300 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 351",
+    "title": "Engineering Statistics & Data Analysis",
+    "level": "300 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 353",
+    "title": "Engineering Metallurgy I",
+    "level": "300 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 355",
+    "title": "Control System Engineering",
+    "level": "300 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 357",
+    "title": "Manufacturing Technology",
+    "level": "300 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "ECE 351",
+    "title": "Introduction to Artificial Intelligence and Machine Learning",
+    "level": "300 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "GNS 301",
+    "title": "Logic and Philosophy",
+    "level": "300 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "CHE 352",
+    "title": "Engineering Mathematics IV",
+    "level": "300 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "ECE 316",
+    "title": "Electrical Machines",
+    "level": "300 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "ECE 352",
+    "title": "Technical Writing and Communication",
+    "level": "300 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "ENT 312",
+    "title": "Venture Creation",
+    "level": "300 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "GNS 312",
+    "title": "Peace and Conflict Resolution",
+    "level": "300 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 308",
+    "title": "Thermo-fluid Laboratory I",
+    "level": "300 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 352",
+    "title": "Renewable Energy Systems and Technology",
+    "level": "300 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 354",
+    "title": "Computer-Aided Design and Manufacture",
+    "level": "300 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 398",
+    "title": "SIWES I (8 Weeks)",
+    "level": "300 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "ECE 401",
+    "title": "Engineering Mathematics V",
+    "level": "400 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "ECO 403",
+    "title": "Economics for Engineers",
+    "level": "400 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 411",
+    "title": "Engineering Materials Selection and Economics",
+    "level": "400 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "ECE 419",
+    "title": "Technical Communication",
+    "level": "400 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 401",
+    "title": "Applied Thermodynamics II",
+    "level": "400 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 403",
+    "title": "Machine Design II",
+    "level": "400 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 405",
+    "title": "Fluid Mechanics III",
+    "level": "400 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 407",
+    "title": "Vibrations",
+    "level": "400 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 413",
+    "title": "Technology Policy and Development",
+    "level": "400 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 415",
+    "title": "Laboratory Practical",
+    "level": "400 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 492",
+    "title": "Application of Engineering Design to Industry",
+    "level": "400 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 494",
+    "title": "Safety and Reliability in Nigeria Companies",
+    "level": "400 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 496",
+    "title": "Engineering Enterprise",
+    "level": "400 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 498",
+    "title": "SIWES III (24 Weeks Compulsory Industrial Attachment)",
+    "level": "400 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 599",
+    "title": "Project I",
+    "level": "500 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "BUL 507",
+    "title": "Law for Engineers / for Non-Law Students",
+    "level": "500 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 525",
+    "title": "Air-Conditioning and Refrigeration",
+    "level": "500 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 501",
+    "title": "Applied Thermodynamics III",
+    "level": "500 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 503",
+    "title": "Machine Design III",
+    "level": "500 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 513",
+    "title": "Mechanics of Metal Forming I",
+    "level": "500 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 515",
+    "title": "Maintenance Engineering",
+    "level": "500 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 535",
+    "title": "Production Engineering I",
+    "level": "500 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 523",
+    "title": "Project Drafting Lab.",
+    "level": "500 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 505",
+    "title": "Laboratory Practical",
+    "level": "500 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 507",
+    "title": "Advanced Mechanics of Materials I",
+    "level": "500 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 509",
+    "title": "Advanced Fluid Mechanics I",
+    "level": "500 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 511",
+    "title": "Heat and Mass Transfer",
+    "level": "500 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 517",
+    "title": "Fluid Machinery",
+    "level": "500 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 519",
+    "title": "Iron Making",
+    "level": "500 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 521",
+    "title": "Refractory Technology",
+    "level": "500 Level",
+    "semester": "First Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 598",
+    "title": "Project II",
+    "level": "500 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 502",
+    "title": "Engineering Management",
+    "level": "500 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 504",
+    "title": "Energy Sources and Conversion",
+    "level": "500 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 512",
+    "title": "Mechanics of Metal Forming II",
+    "level": "500 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 516",
+    "title": "Production Engineering II",
+    "level": "500 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 518",
+    "title": "Industrial Engineering",
+    "level": "500 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 534",
+    "title": "Advanced CAD/CAM",
+    "level": "500 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 506",
+    "title": "Thermal Engines",
+    "level": "500 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 508",
+    "title": "Operational Research",
+    "level": "500 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 510",
+    "title": "Advance Fluid Mechanics II",
+    "level": "500 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 514",
+    "title": "Advanced Mechanics of Materials II",
+    "level": "500 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 528",
+    "title": "Engineering Metallurgy II",
+    "level": "500 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 524",
+    "title": "Foundry Technology",
+    "level": "500 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 526",
+    "title": "Engineering Systems Analysis",
+    "level": "500 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "MEE 520",
+    "title": "Steel Making",
+    "level": "500 Level",
+    "semester": "Second Semester",
+    "src": "MECH"
+  },
+  {
+    "code": "CPE 102",
+    "title": "Introduction to Chemical & Polymer Engineering",
+    "level": "100 Level",
+    "semester": "Second Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "PHY 104",
+    "title": "General Physics Practical II",
+    "level": "100 Level",
+    "semester": "Second Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CHE 202",
+    "title": "CHE 202",
+    "level": "200 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CHE 204",
+    "title": "CHE 204",
+    "level": "200 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CHE 208",
+    "title": "CHE 208",
+    "level": "200 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CHE 298",
+    "title": "CHE 298",
+    "level": "200 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CHE 299",
+    "title": "CHE 299",
+    "level": "200 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CHE 304",
+    "title": "CHE 304",
+    "level": "300 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CHE 306",
+    "title": "CHE 306",
+    "level": "300 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CHE 308",
+    "title": "CHE 308",
+    "level": "300 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CHE 310",
+    "title": "CHE 310",
+    "level": "300 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CHE 312",
+    "title": "CHE 312",
+    "level": "300 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CHE 314",
+    "title": "CHE 314",
+    "level": "300 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CHE 316",
+    "title": "CHE 316",
+    "level": "300 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CPE 398",
+    "title": "CPE 398",
+    "level": "300 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CPE 401",
+    "title": "Chemical Engineering Analysis",
+    "level": "400 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CPE 403",
+    "title": "Separation Process III",
+    "level": "400 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CPE 405",
+    "title": "Chemical Reaction Engineering I",
+    "level": "400 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CPE 407",
+    "title": "Biochemical Engineering I",
+    "level": "400 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CPE 409",
+    "title": "Chemical Engineering Lab. III",
+    "level": "400 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CPE 411",
+    "title": "Polymer Processing Engineering II",
+    "level": "400 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CPE 415",
+    "title": "Polymer Engineering Laboratory III",
+    "level": "400 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CPE 417",
+    "title": "Introduction to Plant Design",
+    "level": "400 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CPE 599",
+    "title": "Research Project I",
+    "level": "500 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CPE 521",
+    "title": "Rubber Technology",
+    "level": "500 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CPE 517",
+    "title": "Pulp and Paper Technology",
+    "level": "500 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CPE 515",
+    "title": "Petrochemical Science and Petroleum Technology",
+    "level": "500 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CPE 509",
+    "title": "Chemical Reaction Engineering II",
+    "level": "500 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CPE 507",
+    "title": "Process Design I",
+    "level": "500 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CPE 505",
+    "title": "Environmental Engineering",
+    "level": "500 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CPE 503",
+    "title": "Transport Phenomena III",
+    "level": "500 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CPE 501",
+    "title": "Process Control",
+    "level": "500 Level",
+    "semester": "First Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "ENT 1000",
+    "title": "Professional Entrepreneurship",
+    "level": "500 Level",
+    "semester": "Second Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CPE 502",
+    "title": "Process Optimization",
+    "level": "500 Level",
+    "semester": "Second Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CPE 504",
+    "title": "Safety and Loss Prevention",
+    "level": "500 Level",
+    "semester": "Second Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CPE 506",
+    "title": "Biochemical Engineering II",
+    "level": "500 Level",
+    "semester": "Second Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CPE 508",
+    "title": "Process Design II",
+    "level": "500 Level",
+    "semester": "Second Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CPE 510",
+    "title": "Process Control II",
+    "level": "500 Level",
+    "semester": "Second Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CPE 516",
+    "title": "Reservoir Engineering",
+    "level": "500 Level",
+    "semester": "Second Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CPE 518",
+    "title": "Industrial Chemistry",
+    "level": "500 Level",
+    "semester": "Second Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CPE 520",
+    "title": "Medical Application of Polymer",
+    "level": "500 Level",
+    "semester": "Second Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CPE 598",
+    "title": "Research Project II",
+    "level": "500 Level",
+    "semester": "Second Semester",
+    "src": "CHEM"
+  },
+  {
+    "code": "CVE 308",
+    "title": "Engineering Survey and Photogrammetry I",
+    "level": "300 Level",
+    "semester": "Second Semester",
+    "src": "CIVIL"
+  },
+  {
+    "code": "CVE 310",
+    "title": "Solid Mechanics",
+    "level": "300 Level",
+    "semester": "Second Semester",
+    "src": "CIVIL"
+  },
+  {
+    "code": "CVE 304",
+    "title": "Civil Engineering Materials",
+    "level": "300 Level",
+    "semester": "Second Semester",
+    "src": "CIVIL"
+  },
+  {
+    "code": "ECE 303",
+    "title": "Electrical Circuit Theory",
+    "level": "300 Level",
+    "semester": "First Semester",
+    "src": "ECE"
+  },
+  {
+    "code": "ECE 492",
+    "title": "Application of Engineering Design to Industry",
+    "level": "400 Level",
+    "semester": "Second Semester",
+    "src": "ECE"
+  },
+  {
+    "code": "ECE 502",
+    "title": "Software Engineering II",
+    "level": "500 Level",
+    "semester": "First Semester",
+    "src": "ECE"
+  },
+  {
+    "code": "AAE 102",
+    "title": "Introduction to Aerospace Engineering",
+    "level": "100 Level",
+    "semester": "Second Semester",
+    "src": "AERO"
+  },
+  {
+    "code": "ASE 201",
+    "title": "Introduction to Aerospace Systems Engineering II",
+    "level": "200 Level",
+    "semester": "First Semester",
+    "src": "AERO"
+  },
+  {
+    "code": "ASE 202",
+    "title": "MATLAB Application to Aerospace Engineering",
+    "level": "200 Level",
+    "semester": "Second Semester",
+    "src": "AERO"
+  },
+  {
+    "code": "ASE 351",
+    "title": "Aircraft Structural Materials",
+    "level": "300 Level",
+    "semester": "First Semester",
+    "src": "AERO"
+  },
+  {
+    "code": "AAE 421",
+    "title": "Structural Dynamics",
+    "level": "400 Level",
+    "semester": "First Semester",
+    "src": "AERO"
+  },
+  {
+    "code": "AAE 498",
+    "title": "Industrial Experience (SIWES)",
+    "level": "400 Level",
+    "semester": "Second Semester",
+    "src": "AERO"
+  },
+  {
+    "code": "AAE 551",
+    "title": "Restricted Elective",
+    "level": "500 Level",
+    "semester": "First Semester",
+    "src": "AERO"
+  },
+  {
+    "code": "ASE 508",
+    "title": "Airline Enterprise Operations",
+    "level": "500 Level",
+    "semester": "Second Semester",
+    "src": "AERO"
+  }
+]

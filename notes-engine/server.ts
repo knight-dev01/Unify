@@ -18,7 +18,8 @@ app.set("trust proxy", 1);
 const CORS_ORIGINS = (process.env.CORS_ORIGIN || "").split(",").map((s) => s.trim()).filter(Boolean);
 app.use(cors({ origin: CORS_ORIGINS.length ? CORS_ORIGINS : true }));
 app.use(express.json({ limit: "50mb" }));
-app.use(express.static("public"));
+// NOTE: the legacy public/ playground was removed; authoring lives in the
+// web Studio now. /uploads stays (authored figure images).
 app.use("/uploads", express.static("uploads"));
 app.use(requestLogger);
 
