@@ -20,43 +20,98 @@ export async function ensureSeeded(): Promise<void> {
     .from("universities")
     .upsert({ name: "Lagos State University", short_name: "LASU" }, { onConflict: "name" });
   if (uErr) throw uErr;
-  const { error: cErr } = await sb
-    .from("courses")
-    .upsert({ code: "MEE 352", title: "Unify Learn" }, { onConflict: "code" });
-  if (cErr) throw cErr;
-  // Catalog test data (legacy course codes; levels by numbering convention).
-  const catalog: { code: string; level: string }[] = [
-    { code: "CVE 214", level: "200 Level" },
-    { code: "ECE 202", level: "200 Level" },
-    { code: "ECE 210", level: "200 Level" },
-    { code: "ECE 220", level: "200 Level" },
-    { code: "IPE 212", level: "200 Level" },
-    { code: "MEE 202", level: "200 Level" },
-    { code: "MEE 212", level: "200 Level" },
+  // Course catalog, seeded per level so each level only sees its own
+  // courses (codes match level by numbering convention). Insert-only:
+  // never overwrites titles an admin customized via Admin → Courses.
+  // 100 Level starters are standard first-year engineering generals —
+  // correct them in Admin → Courses if your faculty numbering differs.
+  const catalog: { code: string; title: string; level: string; semester: string }[] = [
+    { code: "GNS 101", title: "Use of English I", level: "100 Level", semester: "First Semester" },
+    { code: "MTH 101", title: "Elementary Mathematics I", level: "100 Level", semester: "First Semester" },
+    { code: "PHY 101", title: "General Physics I", level: "100 Level", semester: "First Semester" },
+    { code: "CHM 101", title: "General Chemistry I", level: "100 Level", semester: "First Semester" },
+    { code: "GNS 102", title: "Use of English II", level: "100 Level", semester: "Second Semester" },
+    { code: "MTH 102", title: "Elementary Mathematics II", level: "100 Level", semester: "Second Semester" },
+    { code: "PHY 102", title: "General Physics II", level: "100 Level", semester: "Second Semester" },
+    { code: "CHM 102", title: "General Chemistry II", level: "100 Level", semester: "Second Semester" },
+    { code: "CVE 214", title: "CVE 214", level: "200 Level", semester: "First Semester" },
+    { code: "ECE 202", title: "ECE 202", level: "200 Level", semester: "First Semester" },
+    { code: "ECE 210", title: "ECE 210", level: "200 Level", semester: "First Semester" },
+    { code: "ECE 220", title: "ECE 220", level: "200 Level", semester: "First Semester" },
+    { code: "IPE 212", title: "IPE 212", level: "200 Level", semester: "First Semester" },
+    { code: "MEE 202", title: "MEE 202", level: "200 Level", semester: "First Semester" },
+    { code: "MEE 212", title: "MEE 212", level: "200 Level", semester: "First Semester" },
+    { code: "MEE 352", title: "Unify Learn", level: "300 Level", semester: "First Semester" },
   ];
   for (const c of catalog) {
-    const { error: ccErr } = await sb.from("courses").upsert({ code: c.code, title: c.code }, { onConflict: "code" });
-    if (ccErr) throw ccErr;
+    const { data: exists } = await sb.from("courses").select("code").eq("code", c.code).single();
+    if (!exists) {
+      const { error: ccErr } = await sb.from("courses").insert({ code: c.code, title: c.title });
+      if (ccErr) throw ccErr;
+    }
     const { error: lErr } = await sb
       .from("course_levels")
-      .upsert({ course: c.code, level: c.level, semester: "First Semester" }, { onConflict: "course,level" });
+      .upsert({ course: c.code, level: c.level, semester: c.semester }, { onConflict: "course,level" });
     if (lErr) throw lErr;
   }
-  const { error: meeLevelErr } = await sb
-    .from("course_levels")
-    .upsert({ course: "MEE 352", level: "300 Level", semester: "First Semester" }, { onConflict: "course,level" });
-  if (meeLevelErr) throw meeLevelErr;
-  const { error: wErr } = await sb.from("weeks").upsert(
-    {
+  // MEE 352 Week 1 shell: insert-only (never upsert) so reboots can't
+  // wipe an authored title/subtitle/eoq once real content exists.
+  const { data: w1 } = await sb.from("weeks").select("course").eq("course", "MEE 352").eq("week", 1).single();
+  if (!w1) {
+    const { error: wErr } = await sb.from("weeks").insert({
       course: "MEE 352",
       week: 1,
       title: "Week 1",
       subtitle: "Getting started",
       note_json: WEEK1_NOTE,
-    },
-    { onConflict: "course,week" }
-  );
-  if (wErr) throw wErr;
+    });
+    if (wErr) throw wErr;
+  }
+  // One-time backfill: legacy week-embedded topics -> topic_notes v1 rows.
+  // Idempotent: only weeks that still carry embedded topics are touched,
+  // and only topics with no version row yet. Embedded topics that migrate
+  // are stripped from the shell so the versioned rows become canonical.
+  const { data: legacyWeeks } = await sb.from("weeks").select("course,week,author_id,note_json");
+  for (const w of ((legacyWeeks ?? []) as {
+    course: string;
+    week: number;
+    author_id: string | null;
+    note_json: { topics?: unknown } & Record<string, unknown>;
+  }[])) {
+    const embedded = Array.isArray(w.note_json?.topics)
+      ? (w.note_json.topics as Record<string, unknown>[])
+      : [];
+    const valid = embedded.filter((t) => Number.isInteger(Number(t.number)) && Number(t.number) >= 1);
+    if (valid.length === 0) continue;
+    for (const t of valid) {
+      const num = Number(t.number);
+      const { data: existing } = await sb
+        .from("topic_notes")
+        .select("id")
+        .eq("course", w.course)
+        .eq("week", w.week)
+        .eq("topic", num)
+        .limit(1);
+      if ((existing as unknown[] | null)?.length) continue;
+      const { error: bErr } = await sb.from("topic_notes").insert({
+        course: w.course,
+        week: w.week,
+        topic: num,
+        version: 1,
+        title: typeof t.title === "string" ? t.title : "",
+        note_json: t,
+        author_id: w.author_id,
+      });
+      if (bErr) throw bErr;
+    }
+    const leftover = embedded.filter((t) => !Number.isInteger(Number(t.number)));
+    const { error: sErr } = await sb
+      .from("weeks")
+      .update({ note_json: { ...w.note_json, topics: leftover } })
+      .eq("course", w.course)
+      .eq("week", w.week);
+    if (sErr) throw sErr;
+  }
 }
 
 const DEFAULT_ADMIN_EMAIL = "unify.admin@unify.learn";

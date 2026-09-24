@@ -48,6 +48,7 @@ model Course {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   weeks     Week[]
   levels    CourseLevel[]
+  topicNotes TopicNote[]
 
   @@map("courses")
 }
@@ -116,6 +117,23 @@ model Enrollment {
 
   @@id([userId, course])
   @@map("enrollments")
+}
+
+model TopicNote {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  course    String
+  week      Int
+  topic     Int
+  version   Int      @default(1)
+  title     String   @default("")
+  noteJson  Json     @map("note_json")
+  authorId  String?  @map("author_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  courseRef Course   @relation(fields: [course], references: [code], onDelete: Cascade)
+
+  @@unique([course, week, topic, version])
+  @@index([course, week, topic, version(sort: Desc)], map: "topic_notes_lookup_idx")
+  @@map("topic_notes")
 }
 
 model QuizAttempt {

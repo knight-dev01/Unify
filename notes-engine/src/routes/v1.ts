@@ -236,7 +236,81 @@ router.get("/courses", async (req: Request, res: Response) => {
   }
 });
 
-// Public: one week of a course (noteJson payload).
+// Public: one week of a course. Topics assemble from the latest version
+// of each topic_note (v1, v2, v3...); the weeks row is only the shell
+// (title/subtitle/eoq). Legacy week-embedded topics still work until the
+// boot backfill moves them into topic_notes.
+type TopicNoteRow = {
+  id: string;
+  course: string;
+  week: number;
+  topic: number;
+  version: number;
+  title: string;
+  note_json: unknown;
+  author_id: string | null;
+  created_at: string;
+};
+
+type TopicMeta = {
+  topic: number;
+  version: number;
+  id: string;
+  title: string;
+  authorId: string | null;
+  versions: { id: string; version: number; authorId: string | null; createdAt: string }[];
+};
+
+function courseVariants(code: string): string[] {
+  return [...new Set([code, code.replace(/\s/g, "")])];
+}
+
+async function topicRowsFor(course: string, week: number): Promise<TopicNoteRow[]> {
+  const sb = supabaseAdmin();
+  const out: TopicNoteRow[] = [];
+  for (const v of courseVariants(course)) {
+    const { data, error } = await sb
+      .from("topic_notes")
+      .select("id,course,week,topic,version,title,note_json,author_id,created_at")
+      .eq("course", v)
+      .eq("week", week)
+      .order("topic")
+      .order("version", { ascending: false });
+    if (error) throw error;
+    out.push(...((data ?? []) as TopicNoteRow[]));
+  }
+  return out;
+}
+
+function groupTopics(rows: TopicNoteRow[]): { topics: unknown[]; meta: TopicMeta[] } {
+  const byTopic = new Map<number, TopicNoteRow[]>();
+  for (const r of rows) {
+    const list = byTopic.get(r.topic) || [];
+    list.push(r);
+    byTopic.set(r.topic, list);
+  }
+  const topics: unknown[] = [];
+  const meta: TopicMeta[] = [];
+  for (const [num, list] of [...byTopic.entries()].sort((a, b) => a[0] - b[0])) {
+    const sorted = [...list].sort((a, b) => b.version - a.version);
+    topics.push(sorted[0].note_json);
+    meta.push({
+      topic: num,
+      version: sorted[0].version,
+      id: sorted[0].id,
+      title: sorted[0].title,
+      authorId: sorted[0].author_id,
+      versions: sorted.map((r) => ({
+        id: r.id,
+        version: r.version,
+        authorId: r.author_id,
+        createdAt: r.created_at,
+      })),
+    });
+  }
+  return { topics, meta };
+}
+
 router.get("/courses/:code/weeks/:week", async (req: Request, res: Response) => {
   const code = decodeURIComponent(req.params.code).toUpperCase();
   const week = Number(req.params.week);
@@ -246,8 +320,8 @@ router.get("/courses/:code/weeks/:week", async (req: Request, res: Response) => 
   }
   try {
     const sb = supabaseAdmin();
-    const variants = [...new Set([code, code.replace(/\s/g, "")])];
-    for (const v of variants) {
+    let shell: { course: string; week: number; title: string; subtitle: string; note_json: unknown } | null = null;
+    for (const v of courseVariants(code)) {
       const { data, error } = await sb
         .from("weeks")
         .select("course,week,title,subtitle,note_json")
@@ -255,11 +329,117 @@ router.get("/courses/:code/weeks/:week", async (req: Request, res: Response) => 
         .eq("week", week)
         .single();
       if (!error && data) {
-        res.json(data);
-        return;
+        shell = data as { course: string; week: number; title: string; subtitle: string; note_json: unknown };
+        break;
       }
     }
-    res.status(404).json({ error: "Week not found" });
+    const rows = await topicRowsFor(code, week);
+    if (!shell && rows.length === 0) {
+      res.status(404).json({ error: "Week not found" });
+      return;
+    }
+    if (rows.length === 0 && shell) {
+      res.json({ ...shell, topicMeta: [] });
+      return;
+    }
+    const { topics, meta } = groupTopics(rows);
+    const shellNote = ((shell?.note_json ?? {}) as Record<string, unknown>) || {};
+    const course = shell?.course ?? rows[0].course;
+    const title = shell?.title || (typeof shellNote.title === "string" ? shellNote.title : `Week ${week}`);
+    const subtitle = shell?.subtitle || (typeof shellNote.subtitle === "string" ? shellNote.subtitle : "");
+    res.json({
+      course,
+      week,
+      title,
+      subtitle,
+      note_json: { ...shellNote, course, week, title, subtitle, topics },
+      topicMeta: meta,
+    });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// Public: per-topic version lists for a week (reader badges + author tools).
+router.get("/courses/:code/weeks/:week/topics", async (req: Request, res: Response) => {
+  const code = decodeURIComponent(req.params.code).toUpperCase();
+  const week = Number(req.params.week);
+  if (!Number.isInteger(week) || week < 1) {
+    res.status(400).json({ error: "Invalid week" });
+    return;
+  }
+  try {
+    const { meta } = groupTopics(await topicRowsFor(code, week));
+    res.json({ topics: meta });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// Public: one published topic version (for viewing older v1, v2...).
+router.get("/notes/:id", async (req: Request, res: Response) => {
+  try {
+    const { data, error } = await supabaseAdmin()
+      .from("topic_notes")
+      .select("id,course,week,topic,version,title,note_json,author_id,created_at")
+      .eq("id", req.params.id)
+      .single();
+    if (error || !data) {
+      res.status(404).json({ error: "Note not found" });
+      return;
+    }
+    const r = data as TopicNoteRow;
+    res.json({
+      id: r.id,
+      course: r.course,
+      week: r.week,
+      topic: r.topic,
+      version: r.version,
+      title: r.title,
+      noteJson: r.note_json,
+      authorId: r.author_id,
+      createdAt: r.created_at,
+    });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// Authed: delete one topic version. Authors delete their own; admins any.
+// Older versions automatically become current again.
+router.delete("/notes/:id", requireAuth, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  try {
+    const sb = supabaseAdmin();
+    const { data: found, error: findErr } = await sb
+      .from("topic_notes")
+      .select("id,course,week,topic,author_id")
+      .eq("id", req.params.id)
+      .single();
+    if (findErr || !found) {
+      res.status(404).json({ error: "Note not found" });
+      return;
+    }
+    const row = found as { id: string; course: string; week: number; topic: number; author_id: string | null };
+    const owner = row.author_id === userId;
+    let admin = false;
+    if (!owner) {
+      const { data: prof } = await sb.from("profiles").select("is_admin").eq("id", userId).single();
+      admin = Boolean((prof as { is_admin?: boolean } | null)?.is_admin);
+    }
+    if (!owner && !admin) {
+      res.status(403).json({ error: "You can only delete your own notes" });
+      return;
+    }
+    const { error: delErr } = await sb.from("topic_notes").delete().eq("id", req.params.id);
+    if (delErr) throw delErr;
+    const { count } = await sb
+      .from("topic_notes")
+      .select("id", { count: "exact", head: true })
+      .eq("course", row.course)
+      .eq("week", row.week)
+      .eq("topic", row.topic);
+    res.json({ ok: true, remaining: count ?? 0 });
   } catch (e) {
     res.status(500).json(dbError(e));
   }
@@ -300,8 +480,10 @@ router.post("/progress", requireAuth, async (req: Request, res: Response) => {
   }
 });
 
-// Authed author: publish a week of notes (creates/overwrites the week row
-// learners read). This is how studio-authored content reaches the app.
+// Authed author: publish a week of notes. Each topic is stored as a NEW
+// version row (v1, v2, v3...) — publishing never overwrites, so re-testing
+// Week 1 stacks a new version instead of killing the previous note.
+// Identical content still stacks (explicit product choice).
 const publishSchema = z.object({
   course: z.string().min(1).max(20),
   week: z.number().int().min(1).max(52),
@@ -309,6 +491,19 @@ const publishSchema = z.object({
   subtitle: z.string().max(300).optional(),
   noteJson: z.object({}).passthrough(),
 });
+
+async function nextTopicVersion(course: string, week: number, topic: number): Promise<number> {
+  const { data } = await supabaseAdmin()
+    .from("topic_notes")
+    .select("version")
+    .eq("course", course)
+    .eq("week", week)
+    .eq("topic", topic)
+    .order("version", { ascending: false })
+    .limit(1);
+  const rows = (data ?? []) as { version: number }[];
+  return (rows[0]?.version || 0) + 1;
+}
 
 router.post("/publish", requireAuth, requireAuthor, async (req: Request, res: Response) => {
   const parsed = publishSchema.safeParse(req.body);
@@ -319,26 +514,121 @@ router.post("/publish", requireAuth, requireAuthor, async (req: Request, res: Re
   const { course, week, noteJson } = parsed.data;
   const userId = (req as AuthedRequest).userId as string;
   const code = course.toUpperCase();
-  const note = noteJson as { title?: unknown; subtitle?: unknown };
+  const note = noteJson as { title?: unknown; subtitle?: unknown; topics?: unknown };
+  const topics = Array.isArray(note.topics) ? (note.topics as Record<string, unknown>[]) : [];
   try {
-    const { error } = await supabaseAdmin()
-      .from("weeks")
-      .upsert(
-        {
+    const sb = supabaseAdmin();
+    // Safety: a course deleted mid-authoring must not FK-fail the publish.
+    // Insert-only so admin-customized titles are never overwritten.
+    const { data: courseRow } = await sb.from("courses").select("code").eq("code", code).single();
+    if (!courseRow) {
+      const { error: cErr } = await sb.from("courses").insert({ code, title: code });
+      if (cErr) throw cErr;
+    }
+    // Week shell keeps title/subtitle/eoq only; topics live in topic_notes.
+    const { error: shellErr } = await sb.from("weeks").upsert(
+      {
+        course: code,
+        week,
+        author_id: userId,
+        title:
+          parsed.data.title ??
+          (typeof note.title === "string" ? note.title : `Week ${week}`),
+        subtitle:
+          parsed.data.subtitle ?? (typeof note.subtitle === "string" ? note.subtitle : ""),
+        note_json: { ...(noteJson as Record<string, unknown>), topics: [] },
+      },
+      { onConflict: "course,week" }
+    );
+    if (shellErr) throw shellErr;
+    const versions: { topic: number; version: number; id: string }[] = [];
+    for (const t of topics) {
+      const num = Number(t.number);
+      if (!Number.isInteger(num) || num < 1 || num > 100) continue;
+      const version = await nextTopicVersion(code, week, num);
+      const { data: ins, error: insErr } = await sb
+        .from("topic_notes")
+        .insert({
           course: code,
           week,
+          topic: num,
+          version,
+          title: typeof t.title === "string" ? t.title : "",
+          note_json: t,
           author_id: userId,
-          title:
-            parsed.data.title ??
-            (typeof note.title === "string" ? note.title : `Week ${week}`),
-          subtitle:
-            parsed.data.subtitle ?? (typeof note.subtitle === "string" ? note.subtitle : ""),
-          note_json: noteJson,
-        },
-        { onConflict: "course,week" }
-      );
-    if (error) throw error;
-    res.json({ ok: true, course: code, week });
+        })
+        .select("id")
+        .single();
+      if (insErr) throw insErr;
+      versions.push({ topic: num, version, id: (ins as { id: string }).id });
+    }
+    res.json({ ok: true, course: code, week, versions });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// Authed author: publish ONE topic (new version v1, v2, v3...).
+// Creates the week shell when missing so the week appears in lists.
+const topicPublishSchema = z.object({
+  course: z.string().min(1).max(20),
+  week: z.number().int().min(1).max(52),
+  topic: z.number().int().min(1).max(100),
+  title: z.string().max(200).optional(),
+  noteJson: z.object({}).passthrough(),
+});
+
+router.post("/topics/publish", requireAuth, requireAuthor, async (req: Request, res: Response) => {
+  const parsed = topicPublishSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid body", details: parsed.error.flatten() });
+    return;
+  }
+  const { course, week, topic, noteJson } = parsed.data;
+  const userId = (req as AuthedRequest).userId as string;
+  const code = course.toUpperCase();
+  const single = noteJson as { title?: unknown };
+  try {
+    const sb = supabaseAdmin();
+    const { data: courseRow } = await sb.from("courses").select("code").eq("code", code).single();
+    if (!courseRow) {
+      const { error: cErr } = await sb.from("courses").insert({ code, title: code });
+      if (cErr) throw cErr;
+    }
+    const { data: shell } = await sb
+      .from("weeks")
+      .select("course")
+      .eq("course", code)
+      .eq("week", week)
+      .single();
+    if (!shell) {
+      const { error: shellErr } = await sb.from("weeks").insert({
+        course: code,
+        week,
+        author_id: userId,
+        title: `Week ${week}`,
+        subtitle: "",
+        note_json: { course: code, week, topics: [], eoq: { questions: [] } },
+      });
+      if (shellErr) throw shellErr;
+    }
+    const version = await nextTopicVersion(code, week, topic);
+    const { data: ins, error: insErr } = await sb
+      .from("topic_notes")
+      .insert({
+        course: code,
+        week,
+        topic,
+        version,
+        title:
+          parsed.data.title ?? (typeof single.title === "string" ? single.title : `Topic ${topic}`),
+        note_json: noteJson,
+        author_id: userId,
+      })
+      .select("id")
+      .single();
+    if (insErr) throw insErr;
+    res.json({ ok: true, id: (ins as { id: string }).id, version });
   } catch (e) {
     res.status(500).json(dbError(e));
   }
@@ -398,16 +688,19 @@ router.get("/progress", requireAuth, async (req: Request, res: Response) => {
   }
 });
 
-// Authed: weeks this user published (author dashboard lists own notes).
+// Authed: topic versions this user published (author dashboard lists own
+// notes with version numbers + delete).
 router.get("/authored", requireAuth, async (req: Request, res: Response) => {
   const userId = (req as AuthedRequest).userId as string;
   try {
     const { data, error } = await supabaseAdmin()
-      .from("weeks")
-      .select("course,week,title,subtitle")
+      .from("topic_notes")
+      .select("id,course,week,topic,version,title,created_at")
       .eq("author_id", userId)
       .order("course")
-      .order("week");
+      .order("week")
+      .order("topic")
+      .order("version", { ascending: false });
     if (error) throw error;
     res.json({ notes: data ?? [] });
   } catch (e) {
@@ -627,6 +920,7 @@ const adminCourseSchema = z.object({
   code: z.string().min(1).max(20),
   title: z.string().min(1).max(120),
   levels: z.array(z.string().min(1).max(40)).min(1).max(8),
+  semester: z.enum(["First Semester", "Second Semester"]).default("First Semester"),
 });
 
 router.post("/admin/courses", requireAuth, async (req: Request, res: Response) => {
@@ -645,7 +939,7 @@ router.post("/admin/courses", requireAuth, async (req: Request, res: Response) =
     await sb.from("course_levels").delete().eq("course", code);
     const { error: lErr } = await sb
       .from("course_levels")
-      .insert(parsed.data.levels.map((level) => ({ course: code, level })));
+      .insert(parsed.data.levels.map((level) => ({ course: code, level, semester: parsed.data.semester })));
     if (lErr) throw lErr;
     res.json({ ok: true, course: code });
   } catch (e) {
