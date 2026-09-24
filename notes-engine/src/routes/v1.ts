@@ -202,6 +202,51 @@ router.post("/enrollments", requireAuth, async (req: Request, res: Response) => 
   }
 });
 
+// Authed: re-enroll in every course with traces of this user (progress,
+// resume). Self-heal for accounts whose enrollments were wiped (promote,
+// admin cleanup) while learning history survived. Taking-kind only;
+// existing rows untouched.
+router.post("/enrollments/repair", requireAuth, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  try {
+    const sb = supabaseAdmin();
+    const [prog, resume, known] = await Promise.all([
+      sb.from("topic_progress").select("course").eq("user_id", userId).limit(500),
+      sb.from("resume_state").select("course").eq("user_id", userId).single(),
+      sb.from("courses").select("code"),
+    ]);
+    const valid = new Set(
+      ((known.data ?? []) as { code: string }[]).map((r) => r.code.toUpperCase())
+    );
+    const found = new Set<string>();
+    for (const r of ((prog.data ?? []) as { course: string }[])) {
+      const c = String(r.course || "").trim().toUpperCase();
+      if (c && valid.has(c)) found.add(c);
+    }
+    const rc = (resume.data as { course?: string } | null)?.course;
+    if (rc && rc.trim() && valid.has(rc.trim().toUpperCase())) {
+      found.add(rc.trim().toUpperCase());
+    }
+    const { data: prof } = await sb.from("profiles").select("role").eq("id", userId).single();
+    const kind = (prof as { role?: string } | null)?.role === "student" ? "taking" : "teaching";
+    let restored = 0;
+    for (const course of found) {
+      const { error } = await sb
+        .from("enrollments")
+        .upsert({ user_id: userId, course, kind }, { onConflict: "user_id,course" });
+      if (error) throw error;
+      restored += 1;
+    }
+    const { data: enrolled } = await sb.from("enrollments").select("course").eq("user_id", userId);
+    res.json({
+      ok: true,
+      restored,
+      enrolled: ((enrolled ?? []) as { course: string }[]).map((r) => r.course),
+    });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
 // Authed: record the live learning position (week view / tab switch feeds
 // the dashboard Resume card). Topic here is the reader tab index.
 router.post("/resume", requireAuth, async (req: Request, res: Response) => {
