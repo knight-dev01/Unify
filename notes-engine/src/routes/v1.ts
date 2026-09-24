@@ -128,7 +128,7 @@ router.get("/me", requireAuth, async (req: Request, res: Response) => {
       .single();
     if (saved) {
       const r = saved as { course: string; week: number; topic: number };
-      resume = { course: r.course, week: r.week, topic: r.topic };
+      if (r.course) resume = { course: r.course, week: r.week, topic: r.topic };
     } else {
       const { data: last } = await supabaseAdmin()
         .from("topic_progress")
@@ -137,7 +137,7 @@ router.get("/me", requireAuth, async (req: Request, res: Response) => {
         .order("completed_at", { ascending: false })
         .limit(1);
       const row = ((last ?? []) as { course: string; week: number; topic: number }[])[0];
-      if (row) resume = { course: row.course, week: row.week, topic: row.topic };
+      if (row && row.course) resume = { course: row.course, week: row.week, topic: row.topic };
     }
     res.json({ onboarded, profile: data, isAdmin, courses, resume });
   } catch (e) {
@@ -161,7 +161,7 @@ router.post("/enrollments", requireAuth, async (req: Request, res: Response) => 
     return;
   }
   const userId = (req as AuthedRequest).userId as string;
-  const code = parsed.data.course.toUpperCase();
+  const code = parsed.data.course.trim().toUpperCase();
   try {
     const sb = supabaseAdmin();
     const { data: courseRow } = await sb.from("courses").select("code").eq("code", code).single();
@@ -208,7 +208,7 @@ router.post("/resume", requireAuth, async (req: Request, res: Response) => {
       .upsert(
         {
           user_id: userId,
-          course: parsed.data.course.toUpperCase(),
+          course: parsed.data.course.trim().toUpperCase(),
           week: parsed.data.week,
           topic: parsed.data.topic,
           updated_at: new Date().toISOString(),
@@ -570,7 +570,8 @@ router.post("/progress", requireAuth, async (req: Request, res: Response) => {
     return;
   }
   const userId = (req as AuthedRequest).userId as string;
-  const { course, week, topic } = parsed.data;
+  const { week, topic } = parsed.data;
+  const course = parsed.data.course.trim();
   try {
     const sb = supabaseAdmin();
     const { error: upErr } = await sb.from("topic_progress").upsert(
@@ -1259,7 +1260,7 @@ router.post("/quiz/attempt", requireAuth, async (req: Request, res: Response) =>
   try {
     const { error } = await supabaseAdmin().from("quiz_attempts").insert({
       user_id: userId,
-      course: parsed.data.course.toUpperCase(),
+      course: parsed.data.course.trim().toUpperCase(),
       week: parsed.data.week,
       score: parsed.data.score,
       total: parsed.data.total,
