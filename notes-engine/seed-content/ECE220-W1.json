@@ -1,0 +1,157 @@
+{
+  "course": "ECE 220",
+  "week": 1,
+  "title": "Variables & Naming Rules",
+  "subtitle": "Variables are the absolute foundation of Python. This week covers what a variable is, how Python stores data in memory, and the five strict rules for naming them — rules that examiners love to test directly.",
+  "learningOutcome": "Variables are the absolute foundation of Python. This week covers what a variable is, how Python stores data in memory, and the five strict rules for naming them — rules that examiners love to test directly.",
+  "metaChips": [
+    "ECE 220",
+    "Week 1"
+  ],
+  "tags": [
+    "Variable",
+    "Named Location",
+    "Memory",
+    "Assignment",
+    "Case Sensitivity",
+    "Reserved Keywords"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "What Is a Variable?",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "What Is a Variable?",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>A variable is a <strong>named location used to store data in memory</strong>. It acts as a container for holding values that can be referenced and manipulated. You create one by giving it a name and assigning a value with the <code>=</code> sign.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre># Creating a variable ECE = 258 print(ECE) # Output: 258</pre>"
+            },
+            {
+              "type": "analogy",
+              "text": "Think of a variable like a labelled jar — the jar has a name (\"Sugar\") and holds something inside. The name is the label; the value is what's inside."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Enumerate five conditions for naming a perfect variable in Python. <span>2024/2025 Q1c</span></li>",
+                "<li>What happens when you start a variable name with a number? Give an example.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"What Is a Variable?\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "The Five Rules for Naming Variables",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "The Five Rules for Naming Variables",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Rule 1 — Valid Characters Only:</strong> Variable names can only contain letters (a–z, A–Z), digits (0–9), and underscores (_). Nothing else.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Rule 2 — Cannot Start with a Digit:</strong> The name cannot start with a number.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>2ECE = 258 # SyntaxError! ECE2 = 258 # Works perfectly</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Rule 3 — Python is Case Sensitive:</strong> <code>ECE</code>, <code>ece</code>, <code>Ece</code> are three different variables.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>Students_ECE = 258 half_ECE = Students_ECE / 2 print(half_ECE) # Output: 129.0 print(half_ece) # NameError: name 'half_ece' is not defined</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Rule 4 — No Reserved Keywords:</strong> Words like <code>if</code>, <code>else</code>, <code>elif</code>, <code>for</code>, <code>while</code>, <code>def</code>, <code>return</code> cannot be variable names. But you can modify them: <code>else_1</code> is fine.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>else = 4 # SyntaxError! else_1 = 4 # Works print(else_1 * 2) # Output: 8</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Rule 5 — No Special Characters:</strong> Characters like <code>#</code>, <code>!</code>, <code>@</code>, <code>%</code> are not allowed.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>else!1 = 4 # SyntaxError!</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Bonus Rule — Be Descriptive:</strong> Use <code>student_count</code> instead of <code>x</code>. Use <code>total_area</code> instead of <code>ta</code>.</p>"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Only listing 3 or 4 rules — the question asks for five. Also: mixing cases accidentally (defining half_ECE then typing half_ece ). And using else or if as variable names — fix by appending a number: else_1 ."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam answer — write this if asked:</strong> <div>Enumerate five conditions for naming a perfect variable: (1) valid characters only, (2) cannot start with a digit, (3) case sensitive, (4) no reserved keywords, (5) no special characters.</div>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "State the textbook definition — Exam answer — write this if asked.",
+                "answer": "<div>Enumerate five conditions for naming a perfect variable: (1) valid characters only, (2) cannot start with a digit, (3) case sensitive, (4) no reserved keywords, (5) no special characters.</div>"
+              },
+              {
+                "type": "reveal",
+                "question": "[Q1] Write valid and invalid Python variable names for each rule. For each invalid one, fix it.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] What is a variable? Why does Python need variables?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] You define Students_ECE = 258 then write print(students_ece) . Predict the output. Explain why.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Introduction to Programming & Computations"
+}

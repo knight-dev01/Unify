@@ -1,0 +1,190 @@
+{
+  "course": "IPE 212",
+  "week": 9,
+  "title": "Moving Parts of the Engine",
+  "subtitle": "The moving parts of the engine convert the linear explosion force into useful rotary motion. This week covers the piston assembly, piston rings, connecting rod, crankshaft, flywheel, and vibration damper in detail.",
+  "learningOutcome": "The moving parts of the engine convert the linear explosion force into useful rotary motion. This week covers the piston assembly, piston rings, connecting rod, crankshaft, flywheel, and vibration damper in detail.",
+  "metaChips": [
+    "IPE 212",
+    "Week 9"
+  ],
+  "tags": [
+    "Piston",
+    "Piston rings",
+    "Connecting rod",
+    "Crankshaft",
+    "Flywheel",
+    "Vibration damper",
+    "Gudgeon pin",
+    "Big-end / Small-end"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Piston and Piston Rings",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Piston and Piston Rings",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>The piston is like the head of a syringe inside the cylinder. When the fuel explodes, it pushes the piston down with enormous force. Piston rings are like rubber seals on the syringe — they keep the explosion pressure from leaking past the piston and keep oil from getting into the combustion area.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div><strong>Piston:</strong> A pressure-tight cylindrical plunger which is subjected to the expanding gas pressure. Its function is to convert the gas pressure from combustion into a concentrated driving thrust along the connecting rod. It must therefore also act as a guide for the small-end of the connecting-rod. <strong>Piston Rings:</strong> Circular rings which seal the gaps made between the piston and the cylinder. Their object being to prevent gas escaping and to control the amount of lubricant which is allowed to reach the top of the cylinder. Most pistons use three rings: two upper <strong>compression rings</strong> and one <strong>oil ring</strong> on the bottom. The compression rings prevent blow-by (combustion pressure leaking into the engine crankcase). The oil rings prevent oil from entering the combustion chamber.</div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div><strong>Piston Skirt:</strong> The side of the piston below the last ring. Without a skirt, the piston could tip and jam in the cylinder. A slipper skirt is produced when portions of the piston skirt below the piston ends are removed — allows the piston to slide farther down without hitting the crankshaft. <strong>Cam-Ground Piston:</strong> Machined slightly out-of-round when viewed from the top. When hot and expanded, it becomes perfectly round, providing proper cylinder clearance across operating temperatures.</div>"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Students say all piston rings do the same job. Wrong — compression rings (upper two) seal combustion pressure. The oil ring (bottom) controls lubrication. Mixing them up or installing them in the wrong order causes engine failure: too much oil burns in the chamber (blue smoke) or compression is lost."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "Describe the functions of the following engine components: piston, connecting rod, crankshaft, flywheel.",
+                "What are piston rings? State the two types and the function of each.",
+                "Explain the terms: gudgeon pin, small-end, big-end, main-ends, as they relate to the connecting rod and crankshaft.",
+                "What is a vibration damper and why is it necessary on an engine crankshaft?"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: Piston.",
+                "answer": "<div><strong>Piston:</strong> A pressure-tight cylindrical plunger which is subjected to the expanding gas pressure. Its function is to convert the gas pressure from combustion into a concentrated driving thrust along the connecting rod. It must therefore also act as a guide for the small-end of the connecting-rod. <strong>Piston Rings:</strong> Circular rings which seal the gaps made between the piston and the cylinder. Their object being to prevent gas escaping and to control the amount of lubricant which is allowed to reach the top of the cylinder. Most pistons use three rings: two upper <strong>compression rings</strong> and one <strong>oil ring</strong> on the bottom. The compression rings prevent blow-by (combustion pressure leaking into the engine crankcase). The oil rings prevent oil from entering the combustion chamber.</div>"
+              },
+              {
+                "type": "reveal",
+                "question": "Define: Piston Skirt.",
+                "answer": "<div><strong>Piston Skirt:</strong> The side of the piston below the last ring. Without a skirt, the piston could tip and jam in the cylinder. A slipper skirt is produced when portions of the piston skirt below the piston ends are removed — allows the piston to slide farther down without hitting the crankshaft. <strong>Cam-Ground Piston:</strong> Machined slightly out-of-round when viewed from the top. When hot and expanded, it becomes perfectly round, providing proper cylinder clearance across operating temperatures.</div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Connecting Rod",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Connecting Rod",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>The connecting rod is the link between the piston (moving up and down) and the crankshaft (spinning in circles). It converts straight-line motion into rotational motion — like a bicycle pedal arm converts your up-down leg push into circular wheel motion.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div><strong>Connecting Rod:</strong> Acts as both a strut and a tie link-rod. It transmits the linear pressure impulses acting on the piston to the crankshaft big-end journal, where they are converted into turning effort. <strong>Gudgeon-pin:</strong> Transfers the thrust from the piston to the connecting-rod small-end while permitting the rod to rock to and fro as the crankshaft rotates. <strong>Small-end:</strong> Refers to the hinged joint made by the gudgeon-pin between the piston and the connecting-rod so that the connecting-rod is free to oscillate relative to the cylinder axis as it moves to and fro in the cylinder. <strong>Big-end:</strong> Refers to the joint between the connecting-rod and the crankshaft big-end journal which provides the relative angular movement between the two components as the engine rotates. <strong>Main-ends:</strong> Refers to the rubbing parts formed between the crankshaft main journals and their respective plain bearings mounted in the crankcase.</div>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: Connecting Rod.",
+                "answer": "<div><strong>Connecting Rod:</strong> Acts as both a strut and a tie link-rod. It transmits the linear pressure impulses acting on the piston to the crankshaft big-end journal, where they are converted into turning effort. <strong>Gudgeon-pin:</strong> Transfers the thrust from the piston to the connecting-rod small-end while permitting the rod to rock to and fro as the crankshaft rotates. <strong>Small-end:</strong> Refers to the hinged joint made by the gudgeon-pin between the piston and the connecting-rod so that the connecting-rod is free to oscillate relative to the cylinder axis as it moves to and fro in the cylinder. <strong>Big-end:</strong> Refers to the joint between the connecting-rod and the crankshaft big-end journal which provides the relative angular movement between the two components as the engine rotates. <strong>Main-ends:</strong> Refers to the rubbing parts formed between the crankshaft main journals and their respective plain bearings mounted in the crankcase.</div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Crankshaft",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "Crankshaft",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>The crankshaft is the spine of the engine's power output. It's a shaft with offset bends (cranks) that receive the push from the connecting rods and convert it into smooth rotation — like the crankset on a bicycle converts pedal pushes into wheel spinning.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div><strong>Crankshaft:</strong> A simple crankshaft consists of a circular-sectioned shaft which is bent or cranked to form two perpendicular crank-arms and an offset big-end journal. The unbent part of the shaft provides the main journals. The crankshaft is indirectly linked by the connecting-rod to the piston — this enables the straight-line motion of the piston to be transformed into a rotary motion at the crankshaft about the main-journal axis. <strong>Counterweights:</strong> Weights placed opposite the crank throws (180° away from each throw). They reduce vibration caused by the offset throws trying to make the crankshaft rotate elliptically. <strong>Vibration Damper (Harmonic Balancer):</strong> A high frequency movement resulting from twisting and untwisting of the crankshaft is called harmonic vibration. A vibration damper or harmonic balancer controls this vibration. It consists of two metal rings separated by rubber — the inertia ring and the inner sleeve.</div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div><strong>Crankshaft Journals:</strong> — Highly finished cylindrical pins machined parallel on both the centre axes and the offset axes of the crankshaft. — Rotate in plain bush-type bearings mounted in the crankcase (the main journals) and at one end of the connecting rod.</div>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: Crankshaft.",
+                "answer": "<div><strong>Crankshaft:</strong> A simple crankshaft consists of a circular-sectioned shaft which is bent or cranked to form two perpendicular crank-arms and an offset big-end journal. The unbent part of the shaft provides the main journals. The crankshaft is indirectly linked by the connecting-rod to the piston — this enables the straight-line motion of the piston to be transformed into a rotary motion at the crankshaft about the main-journal axis. <strong>Counterweights:</strong> Weights placed opposite the crank throws (180° away from each throw). They reduce vibration caused by the offset throws trying to make the crankshaft rotate elliptically. <strong>Vibration Damper (Harmonic Balancer):</strong> A high frequency movement resulting from twisting and untwisting of the crankshaft is called harmonic vibration. A vibration damper or harmonic balancer controls this vibration. It consists of two metal rings separated by rubber — the inertia ring and the inner sleeve.</div>"
+              },
+              {
+                "type": "reveal",
+                "question": "Define: Crankshaft Journals.",
+                "answer": "<div><strong>Crankshaft Journals:</strong> — Highly finished cylindrical pins machined parallel on both the centre axes and the offset axes of the crankshaft. — Rotate in plain bush-type bearings mounted in the crankcase (the main journals) and at one end of the connecting rod.</div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Flywheel",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "4.1",
+          "title": "Flywheel",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>The flywheel is a heavy spinning disc that stores energy between power strokes. Think of a spinning top — once it's spinning fast, it resists changes in speed. The flywheel does the same for the engine: it absorbs the surge of energy from the power stroke and releases it smoothly during the non-power strokes, keeping the engine spinning evenly.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div><strong>Flywheel:</strong> Stores energy from the power strokes and smoothly delivers it to the drive train of the vehicle between the engine and the transmission. It keeps greater fluctuations in speed and smoother engine operation. The flywheel is mounted at the rear of the crankshaft near the rear main bearing. It is usually the longest and heaviest main bearing in the engine, as it must support the weight of the flywheel. On large, low-speed engines — usually cast iron. On small, high-speed engines — forged steel or forged aluminum (cast iron is too heavy and would pull itself apart at high speeds due to centrifugal force). The outer edge of the flywheel carries the <strong>ring gear</strong>, used to engage the drive gear on the starter motor for cranking the engine.</div>"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Students think the flywheel generates power. It does NOT. The flywheel only STORES and SMOOTHS power already generated. Power comes from the combustion strokes; the flywheel just carries the engine through the non-power strokes."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: Flywheel.",
+                "answer": "<div><strong>Flywheel:</strong> Stores energy from the power strokes and smoothly delivers it to the drive train of the vehicle between the engine and the transmission. It keeps greater fluctuations in speed and smoother engine operation. The flywheel is mounted at the rear of the crankshaft near the rear main bearing. It is usually the longest and heaviest main bearing in the engine, as it must support the weight of the flywheel. On large, low-speed engines — usually cast iron. On small, high-speed engines — forged steel or forged aluminum (cast iron is too heavy and would pull itself apart at high speeds due to centrifugal force). The outer edge of the flywheel carries the <strong>ring gear</strong>, used to engage the drive gear on the starter motor for cranking the engine.</div>"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Automotive Engineering & Workshop"
+}

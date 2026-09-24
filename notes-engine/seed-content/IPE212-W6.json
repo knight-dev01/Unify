@@ -1,0 +1,146 @@
+{
+  "course": "IPE 212",
+  "week": 6,
+  "title": "Engine Construction",
+  "subtitle": "A deep dive into the stationary parts of the engine: cylinder block details, cylinder sleeves (dry and wet), water jacket, core hole plugs, crankcase, oil pan, cylinder head, exhaust and intake manifolds, gaskets, and seals.",
+  "learningOutcome": "A deep dive into the stationary parts of the engine: cylinder block details, cylinder sleeves (dry and wet), water jacket, core hole plugs, crankcase, oil pan, cylinder head, exhaust and intake manifolds, gaskets, and seals.",
+  "metaChips": [
+    "IPE 212",
+    "Week 6"
+  ],
+  "tags": [
+    "Dry sleeve",
+    "Wet sleeve",
+    "Water jacket",
+    "Crankcase",
+    "Oil pan",
+    "Exhaust manifold",
+    "Intake manifold",
+    "Head gasket"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Cylinder Sleeve (Dry and Wet)",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Cylinder Sleeve (Dry and Wet)",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Cylinder sleeves are like replaceable metal tubes fitted inside the cylinder block. Instead of having to replace the entire block when a cylinder wears out, you just replace the sleeve — like changing the liner of a pot rather than buying a new pot.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div><strong>Cylinder Sleeves (Liners):</strong> Metal pipe-shaped inserts that fit into the cylinder block. They act as cylinder walls for the piston to slide up and down on. <strong>Dry Sleeve:</strong> Presses into a cylinder that has been bored or machined oversize. It is entirely surrounded by the cylinder block and is NOT exposed to engine coolant. The outside of a dry sleeve touches the walls of the cylinder block, which provides support. <strong>Wet Sleeve:</strong> Exposed to the engine coolant. It must withstand combustion pressure and heat without the added support of the cylinder block. Therefore, it must be thicker than a dry sleeve. A wet sleeve will generally have a flange at the top.</div>"
+            },
+            {
+              "type": "analogy",
+              "text": "Heavy-duty diesel engines (like those in trucks and generators) frequently use wet sleeves because they need better cooling under sustained high loads. Passenger car engines more commonly use dry sleeves in aluminum blocks to reduce weight while maintaining cylinder rigidity."
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Students say \"wet sleeves are stronger because they're thicker.\" The reason wet sleeves MUST be thicker is because they lack the structural support of surrounding block material — the thicker wall compensates for reduced external support, not to make them inherently stronger."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "Distinguish between a dry cylinder sleeve and a wet cylinder sleeve. Why are sleeves used?",
+                "What is the function of the crankcase? How does it also serve as a lubrication reservoir?",
+                "Describe the function of the exhaust manifold. What is a scavenging action?",
+                "What is the purpose of the water jacket in an engine?"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: Cylinder Sleeves (Liners).",
+                "answer": "<div><strong>Cylinder Sleeves (Liners):</strong> Metal pipe-shaped inserts that fit into the cylinder block. They act as cylinder walls for the piston to slide up and down on. <strong>Dry Sleeve:</strong> Presses into a cylinder that has been bored or machined oversize. It is entirely surrounded by the cylinder block and is NOT exposed to engine coolant. The outside of a dry sleeve touches the walls of the cylinder block, which provides support. <strong>Wet Sleeve:</strong> Exposed to the engine coolant. It must withstand combustion pressure and heat without the added support of the cylinder block. Therefore, it must be thicker than a dry sleeve. A wet sleeve will generally have a flange at the top.</div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Water Jacket, Core Hole Plugs & Crankcase",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Water Jacket, Core Hole Plugs & Crankcase",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<div><strong>Water Jacket:</strong> The cylinder block provides the foundation for the cooling and lubricating systems. Cylinders of a liquid-cooled engine are surrounded by interconnecting passages cast in the block. These passages form the water jacket that allows the circulation of coolant through the cylinder block and the cylinder head to carry off excessive heat created by combustion. <strong>Core Hole Plugs:</strong> The water jacket is accessible through holes machined in the head and block to allow removal of the material used for casting of the cylinder block. These holes are called core holes and are sealed by core hole plugs (freeze plugs). These plugs are of two types: cup and disk. <strong>Crankcase:</strong> That part of the cylinder block below the cylinders. It supports and encloses the crankshaft and provides a reservoir for lubricating oil. Also has mounting brackets to support the entire engine on the vehicle frame.</div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div><strong>Oil Pan:</strong> The lower part of the crankcase, bolted at the bottom. It holds the cast aluminum or pressed steel and holds the lubricating oil for the engine. Since the oil pan is the lowest part of the engine, it must be strong enough to withstand blows from flying stones or constructions sticking up from the road surface. <strong>Cylinder Head Gasket:</strong> Usually, a head gasket can be installed only one way. If installed backwards, coolant and oil passages may become blocked, causing serious problems. Metal dowels are often provided to align the head gasket.</div>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: Water Jacket.",
+                "answer": "<div><strong>Water Jacket:</strong> The cylinder block provides the foundation for the cooling and lubricating systems. Cylinders of a liquid-cooled engine are surrounded by interconnecting passages cast in the block. These passages form the water jacket that allows the circulation of coolant through the cylinder block and the cylinder head to carry off excessive heat created by combustion. <strong>Core Hole Plugs:</strong> The water jacket is accessible through holes machined in the head and block to allow removal of the material used for casting of the cylinder block. These holes are called core holes and are sealed by core hole plugs (freeze plugs). These plugs are of two types: cup and disk. <strong>Crankcase:</strong> That part of the cylinder block below the cylinders. It supports and encloses the crankshaft and provides a reservoir for lubricating oil. Also has mounting brackets to support the entire engine on the vehicle frame.</div>"
+              },
+              {
+                "type": "reveal",
+                "question": "Define: Oil Pan.",
+                "answer": "<div><strong>Oil Pan:</strong> The lower part of the crankcase, bolted at the bottom. It holds the cast aluminum or pressed steel and holds the lubricating oil for the engine. Since the oil pan is the lowest part of the engine, it must be strong enough to withstand blows from flying stones or constructions sticking up from the road surface. <strong>Cylinder Head Gasket:</strong> Usually, a head gasket can be installed only one way. If installed backwards, coolant and oil passages may become blocked, causing serious problems. Metal dowels are often provided to align the head gasket.</div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Cylinder Head, Exhaust & Intake Manifolds",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "Cylinder Head, Exhaust & Intake Manifolds",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<div><strong>Cylinder Head:</strong> Bolts to the deck of the cylinder block. It covers and encloses the top of the cylinders. Combustion chambers, small pockets formed in the cylinder heads where combustion occurs, are located directly over the cylinders. Intake and exhaust ports are cast into the cylinder head. <strong>Exhaust Manifold:</strong> Connects all of the engine cylinders to the rest of the exhaust system. If the exhaust manifold is made properly, it can create a <strong>scavenging action</strong> that causes all of the cylinders to help each other get rid of the gases. Back pressure (force that pistons must exert to push out exhaust gases) can be reduced by making the manifold with smooth walls and without sharp bends. <strong>Intake Manifold:</strong> On a gasoline engine, it carries the air-fuel mixture from the carburetor and distributes it to the cylinders. On a diesel engine, the manifold carries only air into the cylinders. The intake manifold is designed with smooth walls and a minimum of bends to collect fuel and reduce the condensing of the mixture.</div>"
+            },
+            {
+              "type": "analogy",
+              "text": "Performance car manufacturers (like those making sports cars) spend significant engineering effort on exhaust manifold design. A well-designed manifold with equal-length pipes creates the strongest scavenging effect, pulling exhaust gases out of each cylinder and helping pull in fresh air-fuel mixture — this directly increases engine power output."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: Cylinder Head.",
+                "answer": "<div><strong>Cylinder Head:</strong> Bolts to the deck of the cylinder block. It covers and encloses the top of the cylinders. Combustion chambers, small pockets formed in the cylinder heads where combustion occurs, are located directly over the cylinders. Intake and exhaust ports are cast into the cylinder head. <strong>Exhaust Manifold:</strong> Connects all of the engine cylinders to the rest of the exhaust system. If the exhaust manifold is made properly, it can create a <strong>scavenging action</strong> that causes all of the cylinders to help each other get rid of the gases. Back pressure (force that pistons must exert to push out exhaust gases) can be reduced by making the manifold with smooth walls and without sharp bends. <strong>Intake Manifold:</strong> On a gasoline engine, it carries the air-fuel mixture from the carburetor and distributes it to the cylinders. On a diesel engine, the manifold carries only air into the cylinders. The intake manifold is designed with smooth walls and a minimum of bends to collect fuel and reduce the condensing of the mixture.</div>"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Automotive Engineering & Workshop"
+}

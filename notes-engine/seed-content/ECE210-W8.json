@@ -1,0 +1,104 @@
+{
+  "course": "ECE 210",
+  "week": 8,
+  "title": "Transformer Equivalent Circuit, Tests & Efficiency",
+  "subtitle": "A real transformer has winding resistance, leakage flux, and core losses. The OC and SC tests find parameters experimentally. Maximum efficiency when iron loss = copper loss — this derivation is a guaranteed exam question.",
+  "learningOutcome": "A real transformer has winding resistance, leakage flux, and core losses. The OC and SC tests find parameters experimentally. Maximum efficiency when iron loss = copper loss — this derivation is a guaranteed exam question.",
+  "metaChips": [
+    "ECE 210",
+    "Week 8"
+  ],
+  "tags": [
+    "Equivalent Circuit",
+    "OC Test → Iron Loss",
+    "SC Test → Copper Loss",
+    "Efficiency η",
+    "Max Efficiency W_i=W_cu",
+    "kVA Rating"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "OC Test, SC Test & Maximum Efficiency",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "OC Test, SC Test & Maximum Efficiency",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Open Circuit Test</strong> — LV side excited at rated voltage, HV side open. No secondary current → zero copper loss. Wattmeter reads <strong>iron (core) loss</strong> only. Gives P_iron and magnetising branch (Ro, Xo).</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Short Circuit Test</strong> — HV side excited at reduced voltage (3–8% rated), LV side shorted. Tiny flux → negligible iron loss. Wattmeter reads <strong>full-load copper loss</strong>. Gives P_cu, Req, Zeq, Xeq.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Max efficiency when W_i = W_cu</strong>: Iron loss is constant (independent of load). Copper loss = x²×W_cu(FL) where x = fraction of full load. Setting equal: x = √(W_i/W_cu(FL)).</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Why kVA not kW?</strong> Iron loss depends only on voltage (constant at rated voltage). Copper loss depends only on current. Neither depends on power factor. Total loss = f(V,I) = f(kVA) — independent of cosφ.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Transformer efficiency and tests</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>η = V₂I₂cosφ / (V₂I₂cosφ + W_i + I²Req)</div>",
+                "<div>Max η condition: W_i = I²Req = x²×W_cu(FL)</div>",
+                "<div>x_maxη = √(W_i / W_cu(FL))</div>",
+                "<div>Req = P_sc/I_sc² Zeq = V_sc/I_sc Xeq = √(Zeq²−Req²)</div>"
+              ]
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — OC test → LV side (LV excited, HV open). SC test → HV side (HV excited, LV shorted). Reversing these loses all marks. Also: maximum efficiency ≠ full load — it depends on W_i/W_cu ratio."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>State and derive the condition for maximum efficiency in a transformer. <span>Past Q</span></li>",
+                "<li>Explain the open circuit test. What quantities does it give? <span>Past Q</span></li>",
+                "<li>Why are transformers rated in kVA not kW?</li>",
+                "<li>W_i=200W, W_cu(FL)=400W. Find load for maximum efficiency.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1] Describe the SC test. Which side is excited? What loss does the wattmeter measure? What parameters does it give?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] 50kVA transformer: W_i=500W, W_cu(FL)=800W. Find: (i) load at max efficiency (ii) max efficiency at unity PF.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] 10kVA, 2000/200V: SC test (HV side) gives V_sc=60V, I_sc=5A, P_sc=100W. Find Req, Zeq, Xeq referred to HV. Find efficiency at 75% FL, PF=0.85 lagging, W_i=80W.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Electrical Machines & Circuits"
+}

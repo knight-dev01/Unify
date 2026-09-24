@@ -1,0 +1,135 @@
+{
+  "course": "MEE 212",
+  "week": 8,
+  "title": "Gear Trains — Types & Speed Ratio",
+  "subtitle": "Dr Opemibo's section starts here. Gear trains are systems of gears working together to transmit motion. You'll learn the four main types, how to calculate speed ratio, and the relationship between number of teeth and speed.",
+  "learningOutcome": "Dr Opemibo's section starts here. Gear trains are systems of gears working together to transmit motion. You'll learn the four main types, how to calculate speed ratio, and the relationship between number of teeth and speed.",
+  "metaChips": [
+    "MEE 212",
+    "Week 8"
+  ],
+  "tags": [
+    "Gear train",
+    "Simple gear train",
+    "Compound gear train",
+    "Epicyclic",
+    "Speed ratio",
+    "Idler gear"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Gear Trains — Definition & Types",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Gear Trains — Definition & Types",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam-ready definition (from notes):</strong> <div>A gear train is a mechanical system consisting of 2 or more gears used to transmit motion, speed & direction. It's all about putting gears together and each one has its own shaft.</div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Four types of gear trains (from notes)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>1. Simple gear train — shafts are parallel and do not intersect</div>",
+                "<div>2. Compound gear train — one shaft carries (shares) 2 gears</div>",
+                "<div>3. Reverted gear train — input and output shafts are on the same line</div>",
+                "<div>4. Epicyclic gear train — gears rotate around other gears (also called Planetary gear system)</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "Epicyclic consists of: Ring/Angular gear · Planet gears · Sun gear"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Idler gear (from notes)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>An idler gear is placed between 2 other gears (usually driver and driven) and does NOT change the gear ratio.</div>",
+                "<div>It moves in opposite direction. It changes the direction of the driven gear and bridges distance between gears that are far apart.</div>"
+              ]
+            },
+            {
+              "type": "diagram",
+              "caption": "Types of gear trains — schematic",
+              "description": "SIMPLE · Driver · Driven · COMPOUND · Shared shaft carries 2 gears · REVERTED · Input/output same line",
+              "imageRef": null
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Speed ratio formula</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>Speed Ratio = N₁/N₂ = Z₂/Z₁</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "N₁ = speed of driver gear (rpm) · N₂ = speed of driven gear (rpm) · Z₁ = number of teeth on driver · Z₂ = number of teeth on driven · High gear ratio → high torque, low speed, bigger teeth · Low gear ratio → low torque, high speed, smaller teeth"
+            },
+            {
+              "type": "analogy",
+              "text": "A bicycle has gears. When you shift to a small front gear and big rear gear (low gear ratio), the wheel turns slower but you can climb hills easily (high torque). When you shift to high gear, the wheel spins fast (high speed) but you need to pedal harder on hills. That's exactly what gear ratio does."
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Students write N₁/N₂ = Z₁/Z₂ (wrong — teeth and speed are inversely proportional). More teeth = slower speed. The correct formula is N₁/N₂ = Z₂/Z₁."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Define a gear train. State and describe the four types.</li>",
+                "<li>Use speed ratio N₁/N₂ = Z₂/Z₁ to find unknown speeds or teeth counts.</li>",
+                "<li>What is an idler gear? What does it and doesn't it change?</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "State the textbook definition — Exam-ready definition (from notes).",
+                "answer": "<div>A gear train is a mechanical system consisting of 2 or more gears used to transmit motion, speed & direction. It's all about putting gears together and each one has its own shaft.</div>"
+              },
+              {
+                "type": "reveal",
+                "question": "[Q1] A driver gear has 20 teeth and rotates at 300 rpm. The driven gear has 60 teeth. Find the speed of the driven gear.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] What is an idler gear? Does it change the gear ratio?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] In a compound gear train with gears 1→2→3→4 on two shafts, write the overall speed ratio expression.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Theory of Machines"
+}

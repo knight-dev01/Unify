@@ -1,0 +1,184 @@
+{
+  "course": "MEE 202",
+  "week": 9,
+  "title": "Polymers & Composites",
+  "subtitle": "Polymers are long-chain molecules. Composites combine two or more materials to get properties neither has alone. Dr Obasa's composite section is heavily tested — know the classification chart, design goals, fiber-matrix interface, failure modes, and the critical fiber length formula.",
+  "learningOutcome": "Polymers are long-chain molecules. Composites combine two or more materials to get properties neither has alone. Dr Obasa's composite section is heavily tested — know the classification chart, design goals, fiber-matrix interface, failure modes, and the critical fiber length formula.",
+  "metaChips": [
+    "MEE 202",
+    "Week 9"
+  ],
+  "tags": [
+    "Polymer",
+    "Monomer",
+    "Thermoplastic",
+    "Thermoset",
+    "Elastomer",
+    "Composite",
+    "Matrix",
+    "Reinforcement",
+    "Critical Fiber Length"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Polymers — Classification",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Polymers — Classification",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Polymers can be classified in a number of ways: based on structure (linear, cyclic, branched, network), based on molecular forces (thermoplastic, thermosetting, elastomers, fibers), and based on source (natural, synthetic).</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Thermoplastic Polymers:</strong> The individual chains of thermoplastic polymer are held together by van der Waals forces. They are strong if the polymer chains are lined up in an ordered, closely packed array (crystallites). They are hard at room temperature but become soft when heated — individual chains slip from one another.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Thermosetting Polymers:</strong> The greater the degree of cross-linking makes the polymer more rigid. Generally stronger than thermoplastics due to strong covalent linkage (cross-linking) between polymer chains. <strong>Once it is hardened they cannot be recycled.</strong> Thermosetting plastics undergo a chemical change during their initial molding that makes them permanently hard. Once set, they cannot be remelted or reshaped.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Elastomers:</strong> An elastomer is a randomly oriented amorphous polymer which stretches and then reverts back to its original shape. Rubber is an example.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Fibers:</strong> These are thread-like polymers which can be used as fabrics. Strong intermolecular forces like hydrogen bonds provide high tensile strength. Examples: cotton, wool, silk, nylon.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "What are composite materials? State the design goals for compounding composites. (2022/23)",
+                "Draw a chart showing the different types of composite reinforcement. (2022/23, past papers)",
+                "State and explain four necessary parameters for Fiber-Matrix Interface. (2022/23)",
+                "What are the possible failure modes of composites? (2022/23)",
+                "Determine the efficiency of stress transference: fiber length 11mm, critical fiber stress 15 MPa, shear yield strength 10 MPa, fiber diameter 3mm. (2022/23)",
+                "Discuss the constitution of a composite, stating the functions of each constituent. (2022/23)"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Polymers — Classification\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Composites — Classification & Design Goals",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Composites — Classification & Design Goals",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>A composite material is a material made from two or more constituent materials with significantly different physical or chemical properties, that when combined, produce a material with characteristics different from the individual components. The constituent materials remain separate and distinct within the finished structure.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>Composites are designated by the matrix material (MMC, CMC, PMC) and the reinforcement (particles, fibers, structural).</p>"
+            },
+            {
+              "type": "diagram",
+              "caption": "Classification of Composites by Reinforcement Type",
+              "description": "Composites · Particle-reinforced · Large-particle · Dispersion-strengthened · Fiber-reinforced · Continuous · (aligned) · Discontinuous · (short) · Aligned · Random · Structural · Laminates · Sandwich · panels · Composite types designated by: matrix (MMC, CMC, PMC) + reinforcement (particles, fibers",
+              "imageRef": null
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Composites — Classification & Design Goals\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Fiber-Reinforced Composites & Critical Fiber Length",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "Fiber-Reinforced Composites & Critical Fiber Length",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Fiber reinforced composites are very strong in tension. Smaller diameter fiber is stronger than bulk in most materials. Properties depend on the LENGTH and ORIENTATION of the fibers.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Three possible failure modes:</strong> (1) Fiber breaking; (2) Matrix breaking; (3) Fiber pullout — interface between fiber and matrix fails.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Four necessary parameters for Fiber-Matrix Interface:</strong> (1) <strong>Molecular entanglement (inter-diffusion)</strong> — entanglement of molecules at the interface; (2) <strong>Electrostatic attraction</strong> — depends on surface charge density; (3) <strong>Covalent bonding</strong> — usually the strongest fiber-matrix interaction; (4) <strong>Mechanical adhesion</strong> — interlocking of two rough surfaces.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Critical Fiber Length Formula</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>l<sub>c</sub> = σ*<sub>f</sub> · d / 2τ<sub>c</sub></div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "l c = Critical fiber length (minimum length for effective stress transfer) σ* f = Fiber tensile strength (ultimate) · d = fiber diameter · τ c = smaller of: fiber-matrix bond strength OR matrix shear yield strength Continuous when fiber length >> l c · Discontinuous when fiber length < 15 l c"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Worked Example — 2022/23 Exam Question</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "Given: fiber length = 11mm, critical fiber stress σ* f = 15 MPa, shear yield strength τ c = 10 MPa, fiber diameter d = 3mm Step 1: Find critical fiber length: l c = (15 × 3) / (2 × 10) = 45/20 = 2.25 mm Step 2: Compare: fiber length (11mm) vs l c (2.25mm) 11mm > 2.25mm → fiber length > l c → stress transfer IS efficient The fiber is long enough to be classified as continuous — it effectively transfers load from matrix to fiber."
+            },
+            {
+              "type": "insight",
+              "text": "⚠ Common Mistake Students just calculate l c and stop. The question asks you to determine the efficiency — so you MUST compare the given fiber length with l c and state your conclusion. If fiber length > l c : efficient (continuous behavior). If fiber length < l c : inefficient (fiber too short, stress not fully transferred)."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Fiber-Reinforced Composites & Critical Fiber Length\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Science of Materials"
+}

@@ -1,0 +1,172 @@
+{
+  "course": "MEE 202",
+  "week": 6,
+  "title": "Short Range Structure",
+  "subtitle": "Now we zoom out from individual bonds to look at how atoms actually pack together. The key concept is the packing polyhedral — it tells us the 3D arrangement of atoms. Ligancy and the critical radius ratio are exam favourites every single year.",
+  "learningOutcome": "Now we zoom out from individual bonds to look at how atoms actually pack together. The key concept is the packing polyhedral — it tells us the 3D arrangement of atoms. Ligancy and the critical radius ratio are exam favourites every single year.",
+  "metaChips": [
+    "MEE 202",
+    "Week 6"
+  ],
+  "tags": [
+    "Equilibrium Distance",
+    "Packing Polyhedral",
+    "Ligancy",
+    "Critical Radius Ratio",
+    "Hard Sphere Model",
+    "Ion Polyhedral",
+    "Coordination Number"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Equilibrium Interatomic Distance",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Equilibrium Interatomic Distance",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>In any two bonded atoms there is a distance between the atoms at which the repulsive forces between the atoms are equal to the forces of attraction. <strong>This distance is the equilibrium distance</strong> — if the distance between the atoms is to be changed then energy has to be spent.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>The attractive force is proportional to e²/4πε₀r² while the repulsive force is proportional to e²/4πε₀rᵐ where m is greater than 2. The repulsive force decreases with increasing distances, faster than the attractive force since m > 2.</p>"
+            },
+            {
+              "type": "diagram",
+              "caption": "Force-Distance and Energy-Distance Curves for Bonded Atoms",
+              "description": "Force vs Distance · F · r · Repulsive · Attractive · Total · r₀ · Energy vs Distance · U · r · Repulsive · Attractive · Total · r₀ · U₀",
+              "imageRef": null
+            },
+            {
+              "type": "analogy",
+              "text": "💡 Think of it this way Two magnets facing the same way repel (repulsive energy). Two facing opposite ways attract (attractive energy). There's one sweet spot where they sit stably — neither being pushed apart nor snapping together. That's r₀, the equilibrium distance. It's the bottom of the energy well."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "Explain in detail the equilibrium interatomic distance, illustrating with relevant graphs and equations. (2019/20, 2015/16)",
+                "What is a packing polyhedral? Define ligancy. List three ligancy values and the geometry of their packing polyhedral. (2019/20, 2014/15)",
+                "Derive the critical radius ratio for a ligancy of 8 (cubic). (2022/23, 2019/20, 2011/12)",
+                "State the conditions that must be satisfied in the formation of the anion polyhedral. (2019/20)",
+                "Derive the critical radius ratio for a triangular packing polyhedral (ligancy 3). (2015/16)",
+                "Discuss the hard sphere model in detail. (2014/15, 2011/12)"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Equilibrium Interatomic Distance\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Packing Polyhedral & Ligancy",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Packing Polyhedral & Ligancy",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>A polyhedral is formed if the centers of all the atoms touching a central atom are joined together with straight lines. This describes the arrangement of atoms which visualizes more on the arrangement of atoms in short-range.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>For ionic bonding, this is called the <strong>ion-polyhedral</strong>, which is formed by joining the centers of an-ions surrounding the same cat-ion with straight lines.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Ligancy</strong> is the number of the anion/atom that can touch the cat-ion/central atom simultaneously. The smaller the difference of the size — i.e. the higher r/R ratio — the higher the ligancy.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>In the hard sphere model, atoms (or ions) are represented by hard spherical balls. The balls are spherical because the distribution of electrons in atoms or ions with a full external shell is spherically symmetrical. The balls are also hard because the strong repulsion between full shells renders each of them impenetrable.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>The packing of atoms in materials with non-directional bonds depends on the radius ratio of the atoms involved. The arrangement that lowers the energy of the packed structure must satisfy: (1) each cat-ion must be surrounded by the largest possible number of an-ions; (2) the cat-ions and an-ions must be at their equilibrium inter-ionic spacing; (3) the an-ions do not approach each other more closely than anion's diameter.</p>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "Ligancy",
+                "Radius Ratio (r/R)",
+                "Packing Type",
+                "Geometry",
+                "2",
+                "0.0 – 0.155",
+                "Linear",
+                "Straight line",
+                "3",
+                "0.155 – 0.225",
+                "Triangular",
+                "Equilateral triangle",
+                "4",
+                "0.225 – 0.414",
+                "Tetrahedral",
+                "Tetrahedron",
+                "6",
+                "0.414 – 0.732",
+                "Octahedral",
+                "Octahedron",
+                "8",
+                "0.732 – 1.0",
+                "Cubic",
+                "Cube",
+                "12",
+                "1.0",
+                "Cubo-octahedral",
+                "Cubo-octahedron"
+              ]
+            },
+            {
+              "type": "diagram",
+              "caption": "Critical Radius Ratio Derivation — Ligancy 3 (Triangular)",
+              "description": "Rₐ · Rₐ · Rₐ · rᶜ · At critical r/R: · |OC| = rᶜ + Rₐ · |BC| = Rₐ · ∠BCO = 30° · cos30° = Rₐ/(rᶜ+Rₐ) · √3/2 = Rₐ/(rᶜ+Rₐ) · √3(rᶜ+Rₐ) = 2Rₐ · rᶜ/Rₐ = 0.155 · Ligancy 3: when r/R = 0.155, an-ions just touching each other and the central cat-ion",
+              "imageRef": null
+            },
+            {
+              "type": "insight",
+              "text": "⚠ Common Mistake Students confuse ligancy with coordination number. They are the same thing in this context. Also — when deriving critical radius ratio for ligancy 8 (cubic), students forget the geometry. For a cube, the cat-ion sits at the body centre, touching 8 corner an-ions. The face diagonal = 2Rₐ, the body diagonal = 2(rᶜ + Rₐ). Use Pythagoras: body diagonal = a√3 where face = a√2. This gives rᶜ/Rₐ = 0.732."
+            },
+            {
+              "type": "insight",
+              "text": "Ligancy and critical radius ratio derivations have appeared in every paper from 2011–2023. Know the derivation for ligancy 3 (triangular, r/R = 0.155) and ligancy 8 (cubic, r/R = 0.732). For the exam, also know: why icosahedra are not packing polyhedral — because a regular icosahedron is not a valid space-filling 3D lattice (the angles don't work for periodic tiling)."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Packing Polyhedral & Ligancy\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Science of Materials"
+}

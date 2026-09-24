@@ -1,0 +1,113 @@
+{
+  "course": "MEE 212",
+  "week": 3,
+  "title": "Acceleration in Mechanisms",
+  "subtitle": "Velocity was one thing. Now we go one step further — acceleration. Every point on a moving link has two components of acceleration: one pointing toward the centre (normal/centripetal) and one along the rotation direction (tangential). You'll learn to find both and use them in 4-bar problems.",
+  "learningOutcome": "Velocity was one thing. Now we go one step further — acceleration. Every point on a moving link has two components of acceleration: one pointing toward the centre (normal/centripetal) and one along the rotation direction (tangential). You'll learn to find both and use them in 4-bar problems.",
+  "metaChips": [
+    "MEE 212",
+    "Week 3"
+  ],
+  "tags": [
+    "Acceleration",
+    "Normal acceleration",
+    "Tangential acceleration",
+    "4-bar mechanism",
+    "Acceleration diagram"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Normal and Tangential Acceleration",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Normal and Tangential Acceleration",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>When a link rotates, a point on it accelerates in two ways at the same time. Imagine you're on a roundabout: you feel pushed outward (that's the normal/centripetal part) and if the roundabout is speeding up, you also feel pushed backward (that's the tangential part).</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>The two acceleration components</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>aₙ = rω² (normal — points toward centre, always exists if ω ≠ 0)</div>",
+                "<div>aₜ = rα (tangential — perpendicular to link, only if α ≠ 0)</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "r = length of link (m) · ω = angular velocity (rad/s) · α = angular acceleration (rad/s²)"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Acceleration of B relative to A (vector equation)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>a_B = a_A + a_B/A</div>",
+                "<div>a_Bₙ + a_Bₜ = a_Aₙ + a_Aₜ + a_B/Aₙ + a_B/Aₜ</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "aₙ = normal (centripetal) component pointing inward · aₜ = tangential component perpendicular to link"
+            },
+            {
+              "type": "diagram",
+              "caption": "Normal vs tangential acceleration components on a link",
+              "description": "O (pivot) · A · aₙ = rω² · (toward centre) · aₜ = rα · (⊥ to link) · ω, α",
+              "imageRef": null
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Forgetting that aₙ_B/A acts from B toward A (inward), while aₜ_B/A acts perpendicular to link BA . Drawing them in the wrong direction ruins your entire acceleration diagram."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Given a 4-bar mechanism with ω and α, find the acceleration of points on all links. <span>Common exam Q</span></li>",
+                "<li>Distinguish between normal and tangential acceleration and write their formulas.</li>",
+                "<li>Find the angular acceleration of a link from an acceleration diagram.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1] A link is 0.08m long, ω = 100 rad/s. Find its normal acceleration.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] What is the direction of normal acceleration? What is the direction of tangential acceleration?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] If α = 0 (constant angular velocity), which acceleration component vanishes? Explain why physically.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Theory of Machines"
+}

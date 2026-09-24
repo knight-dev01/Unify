@@ -1,0 +1,147 @@
+{
+  "course": "MEE 202",
+  "week": 5,
+  "title": "Ionic, Hydrogen & Van der Waals Bonds",
+  "subtitle": "This week completes the bonding picture. Ionic bonds form between metals and non-metals. Hydrogen bond is the strongest secondary bond. Van der Waals is the weakest — but it's responsible for how noble gases liquify and how geckos stick to walls.",
+  "learningOutcome": "This week completes the bonding picture. Ionic bonds form between metals and non-metals. Hydrogen bond is the strongest secondary bond. Van der Waals is the weakest — but it's responsible for how noble gases liquify and how geckos stick to walls.",
+  "metaChips": [
+    "MEE 202",
+    "Week 5"
+  ],
+  "tags": [
+    "Ionic Bond",
+    "Ionization Energy",
+    "Electron Affinity",
+    "Cohesive Energy",
+    "Hydrogen Bond",
+    "Van der Waals",
+    "Electric Dipole",
+    "London Dispersion"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Ionic Bond",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Ionic Bond",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Of the primary bonds, the ionic bond is the only one that does not occur amongst elements to a considerable extent. This is because <strong>the ionic bond is essentially an electrostatic force between ions of opposite charge.</strong></p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>The ionic bond is usually formed between elements of low ionization energy (metallic elements) and elements of high electron affinity (non-metallic elements). Like other types of bonds, the ionic bond is formed due to the decrease in the energy of the valence electrons that results from the bonding.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>The formation of NaCl from free atoms of Na and Cl can be understood through energy steps:</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>NaCl Formation — Energy Analysis</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "Na(gas) → Na⁺(gas) + e⁻ ΔE = +5.14 eV (Ionization Energy — costs energy) Cl(gas) + e⁻ → Cl⁻(gas) ΔE = −3.61 eV (Electron Affinity — releases energy) Na⁺(gas) + Cl⁻(gas) → NaCl(crystal) ΔE = −7.9 eV (Cohesive Energy — releases energy) ΔE total = −5.14 + 3.61 + 7.9 = −6.37 eV (net energy decrease = driving force)"
+            },
+            {
+              "type": "diagram",
+              "caption": "NaCl Formation — Energy Steps from Free Atoms to Crystal",
+              "description": "Na + Cl · (free atoms) · Na⁺ + Cl + e⁻ · +5.14 eV ↑ · Na⁺ + Cl⁻ · −3.61 eV ↓ · NaCl Crystal · −7.9 eV (cohesive) · Net ΔE = −6.37 eV (decrease in energy = driving force)",
+              "imageRef": null
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "Compare and contrast: ionic bond, metallic bond and covalent bond. (2014/15)",
+                "Compare and contrast: Hydrogen bond and Van der Waals bond. (2014/15)",
+                "Describe the Van der Waals forces. Why is the hydrogen bond in a class of its own when it comes to the strength of secondary bonds? (2014/15)",
+                "Given ionization energy of sodium is -5.14eV and bond energy of NaCl is 6.37eV, determine the cohesive energy. (2011/12)",
+                "Define molecules in terms of atomic bonds. (2014/15)"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Ionic Bond\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Secondary Bonds: Hydrogen Bond & Van der Waals",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Secondary Bonds: Hydrogen Bond & Van der Waals",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Apart from the primary bonds, there is another group of bonds called the secondary bonds. They are so called because they are weak compared to the primary bonds. Secondary bonds are essentially electrostatic forces between electric dipoles. It is an order stronger when hydrogen is involved.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>An electric dipole is formed when the center of the positive charge distribution and the center of the negative charge distribution do not coincide.</strong></p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>Secondary bonds are of two types: the hydrogen bonds and the Van der Waals bond.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Hydrogen bonds</strong> are permanent dipolar bonds and they are an order stronger than other dipolar bonds. The hydrogen bond must involve the participation of a hydrogen atom. The hydrogen atom is always the positive end of the dipole — because when a hydrogen atom has an electron removed from it, only a nucleus is left. A nucleus is so much smaller than an atom that the charge distribution density is much higher.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Van der Waals forces</strong> arise from atomic or molecular dipoles when there is a Coulombic attraction between the (+) end of an atom and the negative region of an adjacent one. The Van der Waals bond arises from: fluctuating induced dipole bonds (London dispersion), polar molecule-induced dipole bonds, and permanent dipole bonds.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Dipolar bonds that do not involve hydrogen bonds are not permanent</strong> — they fluctuate and are non-directional. This force dominates in inert and noble gases, and is responsible for the liquefaction and solidification of some inert and noble gases.</p>"
+            },
+            {
+              "type": "diagram",
+              "caption": "Electric Dipole — H₂O Hydrogen Bonding",
+              "description": "O²⁻ · H⁺ · H⁺ · δ⁻ (Oxygen) · O²⁻ · H⁺ · H⁺ · H-bond · (permanent dipolar) · δ⁻ (Oxygen)",
+              "imageRef": null
+            },
+            {
+              "type": "insight",
+              "text": "2014/15 asks specifically: \"Why is the hydrogen bond in a class of its own?\" Answer: because hydrogen, after losing its electron, is just a bare nucleus — extremely small with very high charge density. This makes its bond much stronger (~10×) than other dipolar bonds. Hydrogen bonds hold water molecules together, give proteins their shape, and hold DNA strands together."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Secondary Bonds: Hydrogen Bond & Van der Waals\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Science of Materials"
+}

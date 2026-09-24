@@ -1,0 +1,108 @@
+{
+  "course": "IPE 212",
+  "week": 8,
+  "title": "Piston Engine Operations & Engine Classification",
+  "subtitle": "The four-stroke cycle is the fundamental operating sequence of most automobile engines. This week explains each stroke in detail, followed by a comprehensive classification of engines by fuel type, cylinder number, arrangement, operating cycle, and ignition type.",
+  "learningOutcome": "The four-stroke cycle is the fundamental operating sequence of most automobile engines. This week explains each stroke in detail, followed by a comprehensive classification of engines by fuel type, cylinder number, arrangement, operating cycle, and ignition type.",
+  "metaChips": [
+    "IPE 212",
+    "Week 8"
+  ],
+  "tags": [
+    "Intake stroke",
+    "Compression stroke",
+    "Power stroke",
+    "Exhaust stroke",
+    "SI engine",
+    "CI engine",
+    "Inline engine",
+    "V-engine"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "The Four-Stroke Engine Cycle",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "The Four-Stroke Engine Cycle",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>A four-stroke engine is like a pump that goes through 4 steps to make power. Breathe in (intake) → squeeze (compression) → explode (power) → blow out (exhaust). The piston goes up and down twice (two complete up-down cycles = four strokes) to complete one full power cycle.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div>A four-stroke engine must undergo <strong>four different strokes to complete one cycle to produce power</strong>. The four strokes are: <strong>Intake, Compression, Power, Exhaust</strong>. <strong>Intake Stroke:</strong> The cam motion triggers the opening of the inlet valve creating a suction; hence the air-fuel mixture is entered the cylinder giving room for the second stroke as the inlet valve closes. <strong>Compression Stroke:</strong> Both the inlet valve and the compression valve remain closed. The air-fuel is further compressed to build up more pressure within the cylinder. At the end of this stroke, compressed air-fuel is ignited by the spark plug. <strong>Power Stroke:</strong> The explosion exerts pressure and pushes the piston down, giving power to the crank. <strong>Exhaust Stroke:</strong> The outlet valve opens and pushes out the burnt gas. This marks the end of a cycle and the whole process is repeated over and over again keeping the engine running and producing power.</div>"
+            },
+            {
+              "type": "diagram",
+              "caption": "Figure",
+              "description": "1. INTAKE · Piston ↓ · Inlet valve open · → · 2. COMPRESSION · Piston ↑ · Both valves closed · → · 3. POWER · Piston ↓ · Spark ignites fuel · → · 4. EXHAUST · Piston ↑ · Exhaust valve open",
+              "imageRef": null
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "With the aid of a diagram, describe the four strokes of a four-stroke internal combustion engine.",
+                "Distinguish between Spark Ignition (SI) and Compression Ignition (CI) engines.",
+                "Classify engines based on cylinder arrangement. What are the advantages of a V-engine over an inline engine?",
+                "What is the difference between a naturally aspirated engine and a turbocharged engine?"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: four different strokes to complete one cycle to produce power.",
+                "answer": "<div>A four-stroke engine must undergo <strong>four different strokes to complete one cycle to produce power</strong>. The four strokes are: <strong>Intake, Compression, Power, Exhaust</strong>. <strong>Intake Stroke:</strong> The cam motion triggers the opening of the inlet valve creating a suction; hence the air-fuel mixture is entered the cylinder giving room for the second stroke as the inlet valve closes. <strong>Compression Stroke:</strong> Both the inlet valve and the compression valve remain closed. The air-fuel is further compressed to build up more pressure within the cylinder. At the end of this stroke, compressed air-fuel is ignited by the spark plug. <strong>Power Stroke:</strong> The explosion exerts pressure and pushes the piston down, giving power to the crank. <strong>Exhaust Stroke:</strong> The outlet valve opens and pushes out the burnt gas. This marks the end of a cycle and the whole process is repeated over and over again keeping the engine running and producing power.</div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Classification of Automobile Engines",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Classification of Automobile Engines",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<div><strong>1. Based on Fuel Type:</strong> — Internal Combustion Engines (ICE): Petrol Engines (use gasoline and spark ignition); Diesel Engines (use diesel fuel and compression ignition); Alternative Fuel Engines (CNG, LPG, other fuels). — Electric Motors: Electric vehicles (EVs) use batteries to power electric motors. — Hybrid Engines: Combine an ICE with an electric motor. Mild Hybrid (MHEV), Hybrid Electric Vehicle (HEV), Plug-in Hybrid (PHEV). <strong>2. Based on Number of Cylinders:</strong> Single-cylinder (motorcycles); Twin-cylinder; Three-cylinder (fuel-efficient cars); Four-cylinder (most common); Six-cylinder; Eight-cylinder (V8); Ten-cylinder (V10); Twelve-cylinder (V12) (high-performance and luxury). <strong>3. Based on Cylinder Arrangement:</strong> — Straight/Inline: Cylinders in a single line. — V-engine: Cylinders in two banks forming a \"V\" shape. — Flat or Boxer Engine: Cylinders arranged horizontally opposite each other. — W-engine: Combines two V-engines, creating a \"W\" shape. <strong>4. Based on Operating Cycle:</strong> — Two-stroke engine: Completes the combustion cycle in two strokes of the piston. — Four-stroke engine: Completes the combustion cycle in four strokes of the piston. <strong>5. Based on Ignition Type:</strong> — Spark Ignition (SI) engine: Uses a spark plug to ignite the air-fuel mixture (gasoline engines). — Compression Ignition (CI) engine: Compresses the air-fuel mixture to a high temperature, causing it to ignite (diesel engines). <strong>6. Other Classifications:</strong> — Naturally Aspirated: Relies on atmospheric pressure to fill the cylinders. — Turbocharged: Uses an exhaust-driven turbine to force more air into the cylinders. — Supercharged: Uses a mechanical compressor to force more air in. — Air-cooled vs. Water-cooled: Refers to the method of cooling the engine.</div>"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Students confuse SI and CI engines by saying \"diesel engines use spark plugs.\" Wrong — diesel (CI) engines do NOT have spark plugs. They ignite fuel by compressing air to such a high temperature that injected diesel spontaneously combusts. Spark plugs are only in petrol (SI) engines."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: 1. Based on Fuel Type.",
+                "answer": "<div><strong>1. Based on Fuel Type:</strong> — Internal Combustion Engines (ICE): Petrol Engines (use gasoline and spark ignition); Diesel Engines (use diesel fuel and compression ignition); Alternative Fuel Engines (CNG, LPG, other fuels). — Electric Motors: Electric vehicles (EVs) use batteries to power electric motors. — Hybrid Engines: Combine an ICE with an electric motor. Mild Hybrid (MHEV), Hybrid Electric Vehicle (HEV), Plug-in Hybrid (PHEV). <strong>2. Based on Number of Cylinders:</strong> Single-cylinder (motorcycles); Twin-cylinder; Three-cylinder (fuel-efficient cars); Four-cylinder (most common); Six-cylinder; Eight-cylinder (V8); Ten-cylinder (V10); Twelve-cylinder (V12) (high-performance and luxury). <strong>3. Based on Cylinder Arrangement:</strong> — Straight/Inline: Cylinders in a single line. — V-engine: Cylinders in two banks forming a \"V\" shape. — Flat or Boxer Engine: Cylinders arranged horizontally opposite each other. — W-engine: Combines two V-engines, creating a \"W\" shape. <strong>4. Based on Operating Cycle:</strong> — Two-stroke engine: Completes the combustion cycle in two strokes of the piston. — Four-stroke engine: Completes the combustion cycle in four strokes of the piston. <strong>5. Based on Ignition Type:</strong> — Spark Ignition (SI) engine: Uses a spark plug to ignite the air-fuel mixture (gasoline engines). — Compression Ignition (CI) engine: Compresses the air-fuel mixture to a high temperature, causing it to ignite (diesel engines). <strong>6. Other Classifications:</strong> — Naturally Aspirated: Relies on atmospheric pressure to fill the cylinders. — Turbocharged: Uses an exhaust-driven turbine to force more air into the cylinders. — Supercharged: Uses a mechanical compressor to force more air in. — Air-cooled vs. Water-cooled: Refers to the method of cooling the engine.</div>"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Automotive Engineering & Workshop"
+}

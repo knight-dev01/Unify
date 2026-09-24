@@ -1,0 +1,103 @@
+{
+  "course": "ECE 210",
+  "week": 10,
+  "title": "Induction Motors — Slip, Speed & Power Flow",
+  "subtitle": "Induction motors are the workhorses of industry — over 90% of all industrial motors. Rugged, cheap, AC supply direct. The key insight: the rotor never catches the rotating magnetic field. That gap (slip) is what produces torque.",
+  "learningOutcome": "Induction motors are the workhorses of industry — over 90% of all industrial motors. Rugged, cheap, AC supply direct. The key insight: the rotor never catches the rotating magnetic field. That gap (slip) is what produces torque.",
+  "metaChips": [
+    "ECE 210",
+    "Week 10"
+  ],
+  "tags": [
+    "Synchronous Speed Ns=120f/P",
+    "Slip s=(Ns-N)/Ns",
+    "Rotor Frequency fr=sf",
+    "SCIM",
+    "WRIM",
+    "P_cu=s×P_ag"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Slip, Speed, Power Flow & Motor Types",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Slip, Speed, Power Flow & Motor Types",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>3-phase AC in stator → rotating magnetic field at Ns. Field induces EMF in rotor conductors → rotor current → Lorentz force → torque. Rotor chases the field but <em>can never catch it</em>: if N=Ns, no relative motion → no EMF → no current → no torque → rotor slows down. So s is always >0 in normal operation.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>Rotor frequency fr = s×f. At standstill (s=1): fr = supply frequency. At normal speed (s=0.04): fr = 2Hz.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>Power flow: Air gap power P_ag reaches rotor. <strong>Rotor copper loss = s×P_ag</strong>. Mechanical power = (1−s)×P_ag. Rotor efficiency = N/Ns = 1−s. Low slip → small rotor copper loss → high efficiency.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>SCIM (Squirrel Cage): copper bars short-circuited at ends. Rugged, no maintenance, cheap. Fixed resistance. WRIM (Wound Rotor): full 3-phase winding, external resistance via slip rings. Variable speed and high starting torque at cost of complexity.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Induction motor equations</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>Ns = 120f / P s = (Ns−N)/Ns N = Ns(1−s)</div>",
+                "<div>fr = s × f Rotor copper loss = s × P_ag</div>",
+                "<div>P_mech = (1−s) × P_ag Rotor η = 1−s = N/Ns</div>"
+              ]
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — P in Ns=120f/P is total poles, NOT pole pairs. 4-pole motor: P=4, Ns=1500rpm. Using P=2 gives 3000rpm — double the correct answer. Always use total number of poles."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>4-pole, 3-phase IM, 50Hz. Find Ns, N at s=4%, fr at N=1200rpm. <span>Past Q</span></li>",
+                "<li>Explain why an induction motor can never reach synchronous speed. <span>Past Q</span></li>",
+                "<li>Define slip. What happens at s=0? At s=1?</li>",
+                "<li>Show that rotor copper loss = s × rotor input power.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1] 6-pole, 3-phase IM at 950rpm, 50Hz supply. Find: (i) Ns (ii) slip (iii) fr.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] Show that rotor copper loss = s × rotor input power by expressing both in terms of I₂ and rotor circuit parameters.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] 3-phase IM: P_ag=30kW, s=0.05. Find: (i) rotor copper loss (ii) P_mech (iii) rotor efficiency. If friction losses=500W, stator losses=1.5kW, input=32kW, find overall efficiency.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Electrical Machines & Circuits"
+}

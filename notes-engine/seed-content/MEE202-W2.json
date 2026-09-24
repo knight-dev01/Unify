@@ -1,0 +1,272 @@
+{
+  "course": "MEE 202",
+  "week": 2,
+  "title": "Quantum Mechanics & The Three Principles",
+  "subtitle": "Quantum mechanics is the new rulebook for electrons. It replaced the broken classical model. Three big principles come out of it, and every past paper tests at least one. Learn them with their equations.",
+  "learningOutcome": "Quantum mechanics is the new rulebook for electrons. It replaced the broken classical model. Three big principles come out of it, and every past paper tests at least one. Learn them with their equations.",
+  "metaChips": [
+    "MEE 202",
+    "Week 2"
+  ],
+  "tags": [
+    "Quantization of Energy",
+    "Pauli Exclusion Principle",
+    "Heisenberg Uncertainty Principle",
+    "Schrödinger Equation",
+    "Wave Function ψ",
+    "de Broglie Wavelength"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Quantization of Energy",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Quantization of Energy",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Imagine you're climbing stairs — you can only stand on a step, never between steps. That's quantization. An electron can only have certain specific values of energy. It <strong>cannot have any only some specific values of energy</strong>. It cannot have energy between these allowed energies.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>The electron can jump to a higher energy level by absorbing radiant energy; it can also fall to a lower energy level by emitting radiant energy. The frequency of the energy emitted or absorbed, f, is given by the Einstein equation:</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Einstein Equation — Quantization of Energy</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>ΔE = E₂ − E₁ = hf</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "E₁ = energy of electron before the jump · E₂ = energy after the jump · h = Planck's constant = 6.626 × 10⁻³⁴ J·s · f = frequency of radiation emitted or absorbed"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Bohr's Energy Equation</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>E = 2π²me⁴ / n²h² = −13.6/n² eV</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "m = mass of electron · e = electron charge · n = principal quantum number · h = Planck's constant Key insight: energy DECREASES (becomes less negative) as n increases. The energy difference between consecutive levels → zero as n → infinity."
+            },
+            {
+              "type": "analogy",
+              "text": "💡 Think of it this way An electron absorbing energy is like pressing a button on a lift — it can only go to specific floors (energy levels), not hover between floors. When it comes back down, it releases a photon of exactly the right colour (frequency) to match that energy gap."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "Discuss the three fundamental laws of quantum mechanics stating all relevant equations and the effect of each law on the atomic structure. (2014/15, 2011/12)",
+                "Starting from the 1D stationary wave equation, derive the Schrödinger equation. (2021/22, 2015/16)",
+                "Discuss the Heisenberg uncertainty principle and any other principle of the quantum theory. (2022/23)",
+                "Given that E = -13.6/n² eV, discuss the nature of the quantum. (2019/20, 2015/16, 2014/15)",
+                "State the two fundamental rules of wave mechanics. (2014/15)"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Quantization of Energy\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Pauli Exclusion Principle",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Pauli Exclusion Principle",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Not only is the energy of the electron restricted — the <strong>number of electrons that can have a particular energy is also restricted</strong>. The Pauli exclusion principle states that <strong>no more than two electrons can occupy the same orbital and those two electrons must have opposite spins.</strong></p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>It is interesting to note that in this new form of mechanics, the two electrons occupying the same energy level have opposite spins. The exclusion principle has a profound effect on the atomic structure. Since the most stable state of a structure is the state that has the least energy, then if there is no restriction on the number of electrons that can occupy an energy level, all the electrons would cluster together in the lowest energy level and all would then have the same energy.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>The most stable structure is the structure with the least energy.</p>"
+            },
+            {
+              "type": "insight",
+              "text": "⚠ Common Mistake Students say \"two electrons can't be in the same orbital.\" That's almost right — they CAN be in the same orbital, but they MUST have opposite spins (+½ and −½). The exclusion is about having the exact same quantum state (same n, l, m AND same spin). Get this nuance right."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Pauli Exclusion Principle\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Heisenberg Uncertainty Principle",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "Heisenberg Uncertainty Principle",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Heisenberg's principle says you can never know exactly where an electron is AND how fast it's moving at the same time. The more precisely you know the position, the less precisely you know the momentum — and vice versa.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>The Heisenberg uncertainty principle states that <strong>all the quantities describing the motion of a particle cannot be measured simultaneously with unlimited precision.</strong> The more accurate the measurement of one of the parameters describing the motion of a particle, the less accurate the others determined at the same time.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Heisenberg Uncertainty Equations</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>ΔpΔx ≥ h/2π (position–momentum)</div>",
+                "<div>ΔEΔt ≥ h/2π (energy–time)</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "Δx = error in measurement of distance x · Δpₓ = error in measurement of momentum in x direction · h = Planck's constant · ΔE = uncertainty in energy · Δt = uncertainty in time"
+            },
+            {
+              "type": "analogy",
+              "text": "💡 Think of it this way It's like trying to photograph a hummingbird with a slow camera. To freeze its position (sharp photo), you need a fast shutter — but then you lose info about how fast its wings were moving. To capture wing motion (blur = speed), you need slow shutter — but then position is blurry. You can't have both perfectly at once."
+            },
+            {
+              "type": "insight",
+              "text": "This principle is why we use spherical coordinates (r, θ, φ) to describe electrons — because the exact position of an electron is not defined, we describe it as a probability distribution (the electron cloud). 2019/20 Q1 and 2021/22 Q1 both test this directly."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Heisenberg Uncertainty Principle\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Wave Mechanics & The Schrödinger Equation",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "4.1",
+          "title": "Wave Mechanics & The Schrödinger Equation",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>de Broglie postulated in 1924 that the spatial distribution of an electron about a nucleus is given by a wave equation. This doesn't mean the electron IS a wave — it means that the <strong>distribution of electrons in space around a nucleus has the same form as the equation that describes the motion of a wave.</strong></p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>The wave function can be written as a product of three parameters, each a function of one variable: <strong>W(r,θ,φ) = R(r)·Φ(φ)·Θ(θ)</strong></p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>Two years later, Schrödinger added that the quantised energy levels (or the quantum states) of electrons in an atom corresponds to standing waves with different numbers of nodes. The equation of a one dimensional standing wave is d²A/dx² = −4π²A/λ²</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Derivation of Schrödinger 1D Equation</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>de Broglie: λ = h/p = h/mv</div>",
+                "<div>Substituting into standing wave equation:</div>",
+                "<div>d²ψ/dx² = −4π²ψ/λ² = −4π²(mv)²ψ/h²</div>",
+                "<div>Using KE = ½mv² → mv² = 2(E−V)m:</div>",
+                "<div>d²ψ/dx² + (8π²m/h²)(E−V)ψ = 0</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "ψ = wave function (amplitude of wave) · x = direction of propagation · λ = wavelength · m = mass of electron · E = total energy · V = potential energy · h = Planck's constant"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>3D Schrödinger Equation</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>∇²ψ + (8π²m/h²)(E−V)ψ = 0</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "∇² = Laplacian operator = ∂²/∂x² + ∂²/∂y² + ∂²/∂z² Solutions give three sets of integers: n, l, and m — the quantum numbers"
+            },
+            {
+              "type": "analogy",
+              "text": "💡 The Electron Cloud The accepted interpretation of the wave function W is that |ψ|² dv is the probability that an electron will be found in a volume dv. So if you could take a time-lapse photo of an electron's positions over billions of moments, you'd see a \"cloud\" — dense where the electron spends most time, thin where it barely goes. That cloud IS the orbital."
+            },
+            {
+              "type": "diagram",
+              "caption": "s-orbital vs p-orbitals — Shape of the Wave Function",
+              "description": "1s · Spherical · 2p, m=0 · Dumbbell along x · 2p, m=±1 · Rotated lobes · s-orbital (l=0) · p-orbital (l=1) · p-orbital (l=1)",
+              "imageRef": null
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Wave Mechanics & The Schrödinger Equation\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Science of Materials"
+}

@@ -1,0 +1,171 @@
+{
+  "course": "ECE 220",
+  "week": 2,
+  "title": "Operators & Expressions",
+  "subtitle": "This week covers arithmetic, bitwise, and comparison operators. The 2024/2025 exam dedicated 10 marks (Q3a) entirely to predicting the output of Python expressions — high-value material.",
+  "learningOutcome": "This week covers arithmetic, bitwise, and comparison operators. The 2024/2025 exam dedicated 10 marks (Q3a) entirely to predicting the output of Python expressions — high-value material.",
+  "metaChips": [
+    "ECE 220",
+    "Week 2"
+  ],
+  "tags": [
+    "Arithmetic Operators",
+    "Floor Division //",
+    "Modulus %",
+    "Exponentiation **",
+    "Bitwise AND &",
+    "Bitwise XOR ^",
+    "Comparison Operators"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Arithmetic Operators",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Arithmetic Operators",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Floor division (//):</strong> divides and drops everything after the decimal. <code>9 // 2 = 4</code>.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Modulus (%):</strong> remainder after division. <code>9 % 2 = 1</code>.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Exponentiation (**):</strong> raises to a power. <code>210 ** 3 = 9,261,000</code>.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>print(9 // 2) # Output: 4 print(9 % 2) # Output: 1 print(210 ** 3) # Output: 9261000 print(10 != 9) # Output: True</pre>"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Confusing // with / : 9/2 = 4.5 , 9//2 = 4 . Also: 210*3 = 630 , 210**3 = 9261000 ."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Give the output of: <code>print(9//2)</code>, <code>print(9%2)</code>, <code>print(210**3)</code>, <code>print(x>3 and x<10)</code>, <code>print(10!=9)</code>, <code>print(5 & 7)</code>, <code>print(5|7)</code>, <code>print(5^7)</code>, <code>print(5<<1)</code>, <code>print(5>>1)</code>. <span>2024/2025 Q3a</span></li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Arithmetic Operators\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Bitwise Operators",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Bitwise Operators",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Bitwise operators work on <strong>binary representation</strong>. Convert each number to binary, then apply the rule bit by bit.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><code>5</code> in binary = <code>101</code> · <code>7</code> in binary = <code>111</code></p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Bitwise rules</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "AND (&): both bits must be 1 → 101 & 111 = 101 = 5 OR (|): either bit is 1 → 101 | 111 = 111 = 7 XOR (^): bits must be different → 101 ^ 111 = 010 = 2 Left shift (<<): multiply by 2 per shift → 5 << 1 = 10 (101 → 1010) Right shift (>>): divide by 2 per shift → 5 >> 1 = 2 (101 → 10)"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>print(5 &amp; 7) # Output: 5 print(5 | 7) # Output: 7 print(5 ^ 7) # Output: 2 print(5 &lt;&lt; 1) # Output: 10 print(5 &gt;&gt; 1) # Output: 2</pre>"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Thinking ^ means \"to the power of\" — in Python, ^ is XOR, NOT exponentiation. For powers use ** . So 5^7 = 2 (XOR), not 78125."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Bitwise Operators\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Comparison & Logical Operators",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "Comparison & Logical Operators",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p><code>!=</code> means \"not equal to\". <code>10 != 9</code> → <code>True</code>.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><code>and</code>: both conditions must be true. <code>x > 3 and x < 10</code> with <code>x=5</code> → <code>True</code>.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>print(10 != 9) # Output: True x = 5 print(x &gt; 3 and x &lt; 10) # Output: True</pre>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1] What is the output of: print(17 // 3) , print(17 % 3) , print(2 ** 8) ?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] Convert 12 and 10 to binary. Then compute 12 & 10 , 12 | 10 , 12 ^ 10 .",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] A student writes print(5^2) expecting to get 25. What does Python actually output, and why? How should the student fix the code?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Introduction to Programming & Computations"
+}

@@ -1,0 +1,215 @@
+{
+  "course": "ECE 202",
+  "week": 6,
+  "title": "Nullity, Basis & Dimension",
+  "subtitle": "Nullity measures how many free variables a homogeneous system has. Rank + Nullity = number of columns — this is the rank-nullity theorem. Basis and dimension describe the structure of vector spaces: a basis is the minimal set of independent vectors that generates the whole space, and dimension is how many you need.",
+  "learningOutcome": "Nullity measures how many free variables a homogeneous system has. Rank + Nullity = number of columns — this is the rank-nullity theorem. Basis and dimension describe the structure of vector spaces: a basis is the minimal set of independent vectors that generates the whole space, and dimension is how many you need.",
+  "metaChips": [
+    "ECE 202",
+    "Week 6"
+  ],
+  "tags": [
+    "200 Level",
+    "First Semester",
+    "Peer Reviewed",
+    "Weeks 7–12 of 12",
+    "Nullity = cols − rank",
+    "Rank + Nullity = n columns",
+    "Basis vectors",
+    "Dimension",
+    "Span",
+    "Linear independence"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Nullity and the Rank-Nullity Theorem",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Nullity and the Rank-Nullity Theorem",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>After row reduction, zero rows = free variables. Nullity counts exactly those free variables. The rank-nullity theorem: rank + nullity = number of columns (not rows — columns).</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Rank-Nullity Theorem</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>Rank(A) + Nullity(A) = n where n = number of COLUMNS Nullity(A) = n - Rank(A)</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "Critical: n is the column count. Using row count instead is the most common error on this topic."
+            },
+            {
+              "type": "paragraph",
+              "text": "<span>Rank and Nullity — 3×4 matrix</span>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>01</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Matrix has 3 rows but 4 columns — n = 4</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>A = [ 1 3 4 3 ] ← 3 rows [ 3 9 12 9 ] ← 4 columns ← this is n [-1 3 4 1 ] n = 4 (we use this in rank-nullity)</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>02</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Row reduce to find rank</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>R₂' = R₂ - 3·R₁: [3-3, 9-9, 12-12, 9-9] = [0, 0, 0, 0] → entire zero row R₃' = R₃ + R₁: [-1+1, 3+3, 4+4, 1+3] = [0, 6, 8, 4] After reduction: [ 1 3 4 3 ] [ 0 0 0 0 ] ← zero row [ 0 6 8 4 ] Swap R₂ and R₃: [ 1 3 4 3 ] [ 0 6 8 4 ] [ 0 0 0 0 ] ← zero row Non-zero rows = 2 → Rank = 2</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>03</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Apply rank-nullity theorem</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>Rank + Nullity = n 2 + Nullity = 4 Nullity = 2 This means: AX = 0 has 2 free variables. The homogeneous solution space has dimension 2.</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div>Rank = 2, Nullity = 2</div>"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Using rows instead of columns: students write nullity = 3 − 2 = 1. Wrong. The theorem uses columns: nullity = 4 − 2 = 2. The matrix has 3 rows, 4 columns. Always count columns for n."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "Find rank and nullity of A = [[1,3,4,3],[3,9,12,9],[−1,3,4,1]].",
+                "State the standard basis of R³ and its dimension.",
+                "What is the dimension of the solution space of AX = 0 for a matrix with rank 2 and 5 columns?"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Nullity and the Rank-Nullity Theorem\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Basis and Dimension",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Basis and Dimension",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>A basis is any set of vectors that is (1) linearly independent — none can be built from the others — and (2) spans the space — every vector can be built from them. Dimension = number of vectors in any basis (always the same regardless of which basis you pick).</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<span>Standard basis of R², R³ — decomposing any vector</span>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>01</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Standard basis of R² — dimension 2</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>e₁ = (1, 0) e₂ = (0, 1) Any vector in R² = a·e₁ + b·e₂ Example: (5, -3) = 5·(1,0) + (-3)·(0,1) = (5,0) + (0,-3) = (5, -3) ✓</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>02</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Standard basis of R³ — dimension 3</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>e₁ = (1,0,0) e₂ = (0,1,0) e₃ = (0,0,1) Any vector in R³ = a·e₁ + b·e₂ + c·e₃ Example: (4, -2, 7) = 4·(1,0,0) + (-2)·(0,1,0) + 7·(0,0,1) = (4,0,0) + (0,-2,0) + (0,0,7) = (4, -2, 7) ✓</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>03</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Why this is a valid basis — checking both conditions</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>Condition 1 (Independent): Can e₁ be built from e₂ and e₃? a·(0,1,0) + b·(0,0,1) = (0, a, b) For this to equal (1,0,0): need first entry = 1, impossible. → e₁, e₂, e₃ are independent ✓ Condition 2 (Spans R³): any (x,y,z) = x·e₁ + y·e₂ + z·e₃ ✓</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div>dim(R²) = 2, dim(R³) = 3, dim(Rₙ) = n</div>"
+            },
+            {
+              "type": "diagram",
+              "caption": "Standard Basis Vectors in R³",
+              "description": "e₁ = (1,0,0) · e₂ = (0,1,0) · e₃ = (0,0,1) · origin · Decompose (4, −2, 7): · 4·e₁ = (4, 0, 0) · −2·e₂ = (0, −2, 0) · 7·e₃ = (0, 0, 7) · sum = (4, −2, 7) ✓",
+              "imageRef": null
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Thinking there's only one basis for a vector space. Any 3 linearly independent vectors in R³ form a valid basis — not just e₁, e₂, e₃. What is fixed is the dimension (3). Examiners may ask you to find \"a basis\", not \"the basis\"."
+            },
+            {
+              "type": "insight",
+              "text": "Connects directly to Week 10: eigenvectors form a basis for eigenspaces, and the dimension of each eigenspace determines whether a matrix is diagonalisable."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Basis and Dimension\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Engineering Mathematics"
+}

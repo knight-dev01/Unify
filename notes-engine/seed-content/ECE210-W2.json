@@ -1,0 +1,131 @@
+{
+  "course": "ECE 210",
+  "week": 2,
+  "title": "Series, Parallel, Air Gaps & The B-H Curve",
+  "subtitle": "This is where you actually solve magnetic circuit problems. The B-H curve links H to B for each material and is used in every multi-material problem. The air gap always dominates — a 2mm gap typically needs more MMF than 100mm of steel.",
+  "learningOutcome": "This is where you actually solve magnetic circuit problems. The B-H curve links H to B for each material and is used in every multi-material problem. The air gap always dominates — a 2mm gap typically needs more MMF than 100mm of steel.",
+  "metaChips": [
+    "ECE 210",
+    "Week 2"
+  ],
+  "tags": [
+    "Series Magnetic Circuit",
+    "Parallel Magnetic Circuit",
+    "Air Gap",
+    "B-H Curve",
+    "Hysteresis Loop",
+    "Ampere's Circuital Law"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Series Circuits, Air Gaps & Ampere's Circuital Law",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Series Circuits, Air Gaps & Ampere's Circuital Law",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>In a <strong>series magnetic circuit</strong>, the same flux φ passes through all sections. <strong>Ampere's Circuital Law: NI = Σ(HᵢLᵢ)</strong> — sum H×L for every section around the loop. That total = MMF provided by the coil.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>For an <strong>air gap</strong>: no B-H curve. Use <strong>H_gap = B/μ₀ = 7.96×10⁵ × B</strong> directly. Because air has μᵣ=1, even a tiny gap dominates the circuit.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>5-step procedure for series magnetic circuits</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "1. Find B = φ/A (same for all sections in series) 2. From B-H curve: read H for each iron/steel section 3. For air gap: H_gap = B/μ₀ = 7.96×10⁵ × B 4. Ampere's Law: NI = H_core×L_core + H_gap×L_gap + ... 5. Solve for I = NI/N"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Trying to use a B-H curve for air — there isn't one. For air ALWAYS use H_gap = B/μ₀ = 7.96×10⁵ × B. Memorise this."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Cast iron core with air gap: find current to establish a given flux. <span>Past Q</span></li>",
+                "<li>Series magnetic circuit: find I required to develop flux = 4×10⁻⁴ Wb. <span>Past Q</span></li>",
+                "<li>Sketch a hysteresis loop. Label: Bₘ, Bᵣ, Hc, saturation, remanence.</li>",
+                "<li>Distinguish between eddy current loss and hysteresis loss — cause and remedy for each.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Series Circuits, Air Gaps & Ampere's Circuital Law\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "B-H Curve & Hysteresis",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "B-H Curve & Hysteresis",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>The <strong>B-H curve</strong> links field intensity H (applied) to flux density B (result) for a material. Starts linear, curves over at saturation. Materials: Sheet steel (highest μ), Cast steel (medium), Cast iron (lowest, cheapest).</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>The <strong>hysteresis loop</strong> shows energy lost as heat when magnetising/demagnetising cyclically. Key points: Bₘ (saturation), Bᵣ (remanence — flux when H=0), Hc (coercive force — H needed to make B=0). Loop area = energy loss per cycle per unit volume.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>The distinction that loses exam marks every year:</strong> <div><strong>Eddy current loss</strong>: caused by induced circulating currents in solid iron rotating in magnetic field. Remedy: laminate the core (thin insulated layers break up current paths). <strong>Hysteresis loss</strong>: caused by magnetic domain realignment each cycle. Remedy: use silicon steel (narrow hysteresis loop — material choice, not structural). Laminations → eddy current loss. Silicon steel → hysteresis loss. Never mix these up.</div>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "State the textbook definition — The distinction that loses exam marks every year.",
+                "answer": "<div><strong>Eddy current loss</strong>: caused by induced circulating currents in solid iron rotating in magnetic field. Remedy: laminate the core (thin insulated layers break up current paths). <strong>Hysteresis loss</strong>: caused by magnetic domain realignment each cycle. Remedy: use silicon steel (narrow hysteresis loop — material choice, not structural). Laminations → eddy current loss. Silicon steel → hysteresis loss. Never mix these up.</div>"
+              },
+              {
+                "type": "reveal",
+                "question": "[Q1] Cast steel core, L_core=200mm, air gap=1mm, A=3×10⁻⁴ m², N=150, φ=6×10⁻⁵ Wb. At B=0.2T, H_steel=500 A/m. Find I.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] Sketch a hysteresis loop and label all five key points. State what the enclosed area physically represents.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] A parallel magnetic circuit has a centre limb with a coil and two outer limbs. The flux in the centre limb is 1.2×10⁻³ Wb and splits equally. Area = 5×10⁻⁴ m² throughout. Find B in each limb. If H for each outer limb at that B is 400 A/m and outer limb length is 0.3m, find total MMF required.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Electrical Machines & Circuits"
+}

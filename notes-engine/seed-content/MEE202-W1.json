@@ -1,0 +1,231 @@
+{
+  "course": "MEE 202",
+  "week": 1,
+  "title": "Atomic Structure",
+  "subtitle": "This week is about the atom — what it looks like, what's inside it, and why the old model broke down. You need to understand the Rutherford-Bohr model and be ready to draw and explain its faults. Every past paper since 2011 has asked about this.",
+  "learningOutcome": "This week is about the atom — what it looks like, what's inside it, and why the old model broke down. You need to understand the Rutherford-Bohr model and be ready to draw and explain its faults. Every past paper since 2011 has asked about this.",
+  "metaChips": [
+    "MEE 202",
+    "Week 1"
+  ],
+  "tags": [
+    "Atom",
+    "Nucleus",
+    "Proton",
+    "Electron",
+    "Atomic Radius",
+    "Rutherford-Bohr Model",
+    "Electrostatic Force",
+    "Classical Mechanics"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "The Atom — What It Is",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "The Atom — What It Is",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p> Think of an atom like a tiny solar system. At the centre is the <strong>nucleus</strong> — incredibly small and dense, made up of protons and neutrons. Orbiting around it are electrons, moving in shells at fixed distances. </p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p> <strong>The atomic radius</strong> is the distance between the center of the nucleus and the outermost electrons. Generally, the atomic radius is of the order of 10⁻¹⁰ m, while the nucleus is relatively small — having a radius of the order of 10⁻¹⁴ m. </p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p> The mass of a proton is 1.675 × 10⁻²⁷ g. A proton has a positive electric charge of 1.602 × 10⁻¹⁹ Coulombs, while the electron has an equal amount of charge but of negative sign. The mass of an electron is 1/1836 of the mass of the proton. </p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p> Here's the wild part — if you blow up the atom to the size of a football stadium, the nucleus would be roughly the size of a marble in the centre. The atom is mostly empty space. In fact, <strong>99.9999% of the atom's volume is empty space</strong>. </p>"
+            },
+            {
+              "type": "diagram",
+              "caption": "Rutherford–Bohr Atomic Model — Element Number 6 (Carbon)",
+              "description": "6p · 6n · Shell 1: 2 electrons · Shell 2: 4 electrons · Nucleus · Electron (e⁻) · Note: Nucleus is ~10⁻¹⁴m; atom is ~10⁻¹⁰m — diagram NOT to scale",
+              "imageRef": null
+            },
+            {
+              "type": "insight",
+              "text": "⚠ Common Mistake Students draw the Bohr model with electrons in circular orbits and say \"this is correct.\" It is NOT — the Bohr model shows electrons in fixed circular orbits like planets. The real atom uses wave mechanics and orbitals, not orbits. The diagram can NEVER be drawn to scale in your exam script — the nucleus is 10,000× smaller than the atom."
+            },
+            {
+              "type": "insight",
+              "text": "In every exam since 2011, Q1 asks you to draw and critique the Rutherford-Bohr model. Know its fault: classical electrodynamics says a charged particle moving in a circular path should continuously emit radiation and lose energy — meaning electrons should spiral into the nucleus. Atoms should not exist. But they do. This failure drove the development of quantum mechanics."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "Draw a well-labelled sketch of the Rutherford-Bohr atomic model. Explain the major fault with this model. (2022/23, 2021/22, 2019/20, 2015/16, 2011/12)",
+                "List the forces that act within a typical atom in detail and arrange them in decreasing order of magnitude. (2019/20, 2015/16, 2011/12)",
+                "Determine the percentage space within an atom. (2015/16)",
+                "What are the differences and similarities between an orbit and an orbital? (2015/16)",
+                "Determine the ratio of the electrostatic force to the gravitational force of attraction for the hydrogen atom."
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"The Atom — What It Is\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Forces Within the Atom",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Forces Within the Atom",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p> There are four forces acting within an atom. The examiners love asking you to list and rank them — so memorise this order. </p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p> The forces within the nucleus are not of direct interest to this course. Considering the simplest atom — hydrogen, which has only one proton and one electron — the forces within this atom are: </p>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li> The <strong>electrostatic force of attraction</strong> between the proton and the electron </li>",
+                "<li> The <strong>gravitational force of attraction</strong> between the electron and the proton </li>",
+                "<li> For the helium atom (2 electrons added): the <strong>electrostatic force of repulsion</strong> between the two electrons </li>",
+                "<li> The <strong>magnetic force of attraction</strong> between the two electrons as one moves in the field of the other </li>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<p> <strong>The electrostatic forces are the highest in magnitude. The magnetic forces are relatively small while the gravitational forces are negligible.</strong> It is the interaction of these forces that determines the stability of the atom. </p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Formula — Forces Between Charges</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div> F<sub>electrostatic</sub> = e² / 4πε₀r² </div>",
+                "<div> F<sub>gravitational</sub> = Gm₁m₂ / r² ≈ 7 × 10⁻⁴⁷ N </div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "e = charge of electron = 1.602 × 10⁻¹⁹ C · ε₀ = electric permittivity of vacuum · r = distance · G = gravitational constant = 6.67 × 10⁻¹¹ Nm²kg⁻²"
+            },
+            {
+              "type": "diagram",
+              "caption": "Four Forces Within the Atom — Decreasing Order of Magnitude",
+              "description": "1. Strong · Nuclear · 2. Electro- · magnetic · 3. Weak · Nuclear · 4. Gravity · (negligible) · Strongest",
+              "imageRef": null
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>% Empty Space Within an Atom</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div> % space = [(4/3πR³) − (4/3πr³)] / (4/3πR³) × 100 </div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "R = radius of atom = 10⁻¹⁰ m · r = radius of nucleus = 10⁻¹⁴ m Substituting: [(10⁻¹⁰)³ − (10⁻¹⁴)³] / (10⁻¹⁰)³ × 100 = 49.99% ≈ 99.99%"
+            },
+            {
+              "type": "insight",
+              "text": "⚠ Common Mistake Students rank Electrostatic force as #1. Wrong. The Strong Nuclear Force (which binds protons and neutrons in the nucleus) is the strongest. Within the atom (not nucleus), the electrostatic force is dominant. Know the context — the question usually asks about forces acting \"within a typical atom,\" not within the nucleus."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Forces Within the Atom\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Why Classical Mechanics Failed — Orbit vs Orbital",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "Why Classical Mechanics Failed — Orbit vs Orbital",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p> Classical mechanics — Newton's laws, Faraday's laws — works great for big things like cars and bridges. But when scientists applied these laws to electrons in atoms, everything broke down. </p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p> Application of the laws of classical mechanics and electromagnetic theory to analyze the stability of the atom shows that the atom should be very unstable. The instability arises from the fact that electrons are charged particles — and since they are moving in the field of the protons, they should be continuously losing energy. The distance between the electrons and the protons should then be decreasing continuously until the electrons collapse into the nucleus. </p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p> <strong>Such a phenomenon has not been known to occur. Generally atoms are very stable.</strong> This is what forced scientists to develop quantum mechanics. </p>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "ORBIT",
+                "ORBITAL",
+                "A fixed path along which an electron revolves around the atom's nucleus",
+                "An area of finding the maximum density of electrons in an atom, or an area used to calculate the probability of finding an electron",
+                "A planar (2D) representation — like a circle",
+                "A 3D representation of the region around the nucleus",
+                "Cannot be used to describe the shape of an atom — it's non-directional in nature",
+                "Can be used to describe the shape of an atom — it's directional in nature",
+                "The orbit follows the theory of Bohr/Sommerfield",
+                "The orbital follows the Heisenberg Uncertainty Principle"
+              ]
+            },
+            {
+              "type": "insight",
+              "text": "2015/16 and 2021/22 both ask \"what are the differences and similarities between an orbit and an orbital?\" Know this table cold. The key phrase: orbit = where we think electron goes (wrong); orbital = region where electron is likely to be found (correct)."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Why Classical Mechanics Failed — Orbit vs Orbital\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Science of Materials"
+}

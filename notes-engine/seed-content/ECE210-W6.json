@@ -1,0 +1,113 @@
+{
+  "course": "ECE 210",
+  "week": 6,
+  "title": "DC Motors — Back EMF, Torque & Speed Control",
+  "subtitle": "DC motors convert electrical energy into mechanical rotation. Back EMF is the self-regulating mechanism. Torque and speed are deeply connected through flux and armature current. These are the most examined topics in ECE 210.",
+  "learningOutcome": "DC motors convert electrical energy into mechanical rotation. Back EMF is the self-regulating mechanism. Torque and speed are deeply connected through flux and armature current. These are the most examined topics in ECE 210.",
+  "metaChips": [
+    "ECE 210",
+    "Week 6"
+  ],
+  "tags": [
+    "Back EMF Eb",
+    "Torque T ∝ φIa",
+    "Speed N ∝ Eb/φ",
+    "Shunt Motor",
+    "Series Motor",
+    "Max Power Eb=V/2"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Back EMF, Torque, Speed & Maximum Power",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Back EMF, Torque, Speed & Maximum Power",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>A rotating armature generates back EMF <strong>Eb = kNφ</strong> opposing supply voltage V. Motor equation: <strong>V = Eb + IaRa</strong>. At start-up Eb=0 → huge Ia=V/Ra — need starting resistors. As speed builds, Eb rises, Ia falls to normal operating level.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Torque</strong>: T = 0.159×Z×φ×P×(Ia/a). So <strong>T ∝ φIa</strong>. Shunt: φ constant → T ∝ Ia. Series: φ ∝ Ia → T ∝ Ia² (huge starting torque).</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Speed</strong>: N ∝ Eb/φ = (V−IaRa)/φ. Reduce φ → speed increases (used in speed control).</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Maximum power condition</strong>: P = Eb×Ia = (V−IaRa)×Ia. Differentiate: dP/dIa = V−2IaRa = 0 → <strong>Eb = V/2</strong>. Maximum power when back EMF = half supply voltage. (Efficiency only 50% at this point — not the efficient operating point.)</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>DC Motor equations</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>V = Eb + IaRa Ia = (V−Eb)/Ra</div>",
+                "<div>T = 0.159×Z×φ×P×(Ia/a) T ∝ φIa</div>",
+                "<div>N ∝ Eb/φ N₂ = N₁×(Eb₂/Eb₁)×(φ₁/φ₂)</div>",
+                "<div>Max power: Eb = V/2 Pmax = V²/(4Ra)</div>"
+              ]
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Generator: V = E−IaRa. Motor: V = Eb+IaRa. These are opposite signs — do not swap them. Also: when comparing two operating points, Eb changes at each point (because Ia changed). Always recalculate Eb separately at each operating condition."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam-ready — series motor no-load danger:</strong> <div>A series motor must never run on no-load because at no load Ia → 0 → φ → 0. Since N ∝ Eb/φ and φ approaches zero, speed increases without limit — the motor runs away and can reach destructive speeds causing mechanical failure. Series motors must always be permanently coupled to their load.</div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>15kW, 230V, 1150rpm shunt motor: Z=882, Ra=0.2Ω, Ia=73A. Find torque. If φ reduced to 80%, find new speed for same torque. <span>Past Q</span></li>",
+                "<li>220V shunt motor: no-load Ia=2.5A at 1400rpm. Full-load Ia=60A, flux weakened 3%. Find new speed. <span>Past Q</span></li>",
+                "<li>State the condition for maximum power in a DC motor.</li>",
+                "<li>Why should a series motor never run on no-load?</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "State the textbook definition — Exam-ready — series motor no-load danger.",
+                "answer": "<div>A series motor must never run on no-load because at no load Ia → 0 → φ → 0. Since N ∝ Eb/φ and φ approaches zero, speed increases without limit — the motor runs away and can reach destructive speeds causing mechanical failure. Series motors must always be permanently coupled to their load.</div>"
+              },
+              {
+                "type": "reveal",
+                "question": "[Q1] A 220V shunt motor: Ra=0.4Ω, Ia=40A. Find: (i) back EMF (ii) gross power developed (iii) torque at 1200rpm.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] Derive the condition Eb=V/2 for maximum power in a DC motor. Why is this NOT the condition for maximum efficiency?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] A 220V shunt motor: no-load Ia=2.5A, N=1400rpm, Ra=0.3Ω. At full load Ia=60A and armature reaction weakens flux by 3%. Find the full-load speed.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Electrical Machines & Circuits"
+}

@@ -1,0 +1,132 @@
+{
+  "course": "MEE 212",
+  "week": 6,
+  "title": "Governors — Types & Simple Governor Analysis",
+  "subtitle": "A governor is a speed regulator. When an engine goes too fast, the governor cuts fuel. When it's too slow, it adds more. This week you learn the types of governors and how to analyse the simplest kind using the height formula h = g/ω².",
+  "learningOutcome": "A governor is a speed regulator. When an engine goes too fast, the governor cuts fuel. When it's too slow, it adds more. This week you learn the types of governors and how to analyse the simplest kind using the height formula h = g/ω².",
+  "metaChips": [
+    "MEE 212",
+    "Week 6"
+  ],
+  "tags": [
+    "Governor",
+    "Centrifugal governor",
+    "Inertial governor",
+    "Height formula",
+    "Sleeve lift",
+    "Equilibrium speed"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "What is a Governor? Types",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "What is a Governor? Types",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>A governor is the automatic speed controller of an engine. Without it, if load suddenly drops (say a machine disconnects), the engine would race to dangerous speeds. The governor senses the speed change and physically adjusts the fuel supply to bring speed back to normal.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam-ready definition (from notes):</strong> <div>A governor is a device used to regulate the fluctuation of speed in an engine. It maintains the constant mid speed.</div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Types of governors</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>1. Centrifugal governors — use centrifugal force of rotating balls</div>",
+                "<div> a) Pendulum type</div>",
+                "<div> b) Loaded type → Dead weight type / Spring load type</div>",
+                "<div>2. Inertial governors — work on principle of inertia force</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "Key terms: h = height of governor · Fc = centrifugal force = mω²r · r = radius of rotation · W = weight of ball · T = tension in arms · Sleeve lift = vertical distance travelled by sleeve due to change in equilibrium speed"
+            },
+            {
+              "type": "diagram",
+              "caption": "Simple centrifugal governor — force diagram",
+              "description": "Spindle · O (pivot) · Ball · Ball · h · r · Fc = mω²r · W · Sleeve",
+              "imageRef": null
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Simple governor height formula (derived from moment equilibrium)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>Taking moments about O: Wlr − Fc·h = 0</div>",
+                "<div>∴ Fc·h = W·l·r</div>",
+                "<div>∴ h = g / ω²</div>",
+                "<div>where ω = 2πN/60 (in radians per second)</div>",
+                "<div>∴ h = g / (2πN/60)²</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "h = height of governor (m) · g = 9.81 m/s² · ω = angular speed (rad/s) · N = speed in rpm"
+            },
+            {
+              "type": "analogy",
+              "text": "Think of a spinning coin on a table. The faster it spins, the more it tilts outward (centrifugal effect). A governor's balls do the same — spin faster → balls fly outward → sleeve lifts → fuel valve closes → engine slows. It's a beautiful automatic feedback loop."
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Plugging N (in rpm) directly into h = g/ω² without converting to rad/s. ω = 2πN/60. Always convert first. If N = 100 rpm → ω = 10.47 rad/s, NOT 100."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Define a governor. State the two main types and their working principles.</li>",
+                "<li>For a simple governor, derive and use h = g/ω².</li>",
+                "<li>Define: sleeve lift, height of governor, equilibrium speed, radius of rotation.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "State the textbook definition — Exam-ready definition (from notes).",
+                "answer": "<div>A governor is a device used to regulate the fluctuation of speed in an engine. It maintains the constant mid speed.</div>"
+              },
+              {
+                "type": "reveal",
+                "question": "[Q1] Define a governor. What is the difference between centrifugal and inertial governors?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] Using h = g/ω², find h when N = 200 rpm.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] As engine speed increases, the balls fly outward and h decreases. Why does decreasing h lead to the sleeve moving up and fuel being cut?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Theory of Machines"
+}

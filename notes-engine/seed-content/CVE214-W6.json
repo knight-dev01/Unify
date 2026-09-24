@@ -1,0 +1,147 @@
+{
+  "course": "CVE 214",
+  "week": 6,
+  "title": "Averaging Precipitation over an Area",
+  "subtitle": "A single rain gauge gives you rainfall at one point. But engineers need the average rainfall over an entire catchment area. Three methods exist — Arithmetic Average, Thiessen, and Isohyetal. Each has advantages and limitations you need to know.",
+  "learningOutcome": "A single rain gauge gives you rainfall at one point. But engineers need the average rainfall over an entire catchment area. Three methods exist — Arithmetic Average, Thiessen, and Isohyetal. Each has advantages and limitations you need to know.",
+  "metaChips": [
+    "CVE 214",
+    "Week 6"
+  ],
+  "tags": [
+    "Arithmetic average",
+    "Thiessen method",
+    "Isohyetal method",
+    "Average precipitation",
+    "Catchment area"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Three Methods of Averaging Precipitation",
+      "abbr": "CVE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Three Methods of Averaging Precipitation",
+          "abbr": "CVE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<strong>Method 1 — Arithmetic Average Method</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>P_mean = (P₁ + P₂ + P₃ + ... + Pₙ) / n</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "P₁, P₂...Pₙ = precipitation recorded at each gauge station · n = number of gauge stations · This method consists of simply finding the average depth by averaging the gauge amounts in the area."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Limitation of Arithmetic Average (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>This method yields good estimates in flat regions and if the gauges are uniformly distributed and the individual gauge catches do not vary widely from the mean.</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Method 2 — Thiessen Method</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>P_mean = (A₁P₁ + A₂P₂ + ... + AₙPₙ) / (A₁ + A₂ + ... + Aₙ)</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "This method attempts to allow for non-uniform distribution of gauges by providing a weighting factor for each gauge. The stations are plotted on a map and connecting lines are drawn. The perpendicular bisectors of these connecting lines form the polygons around each station (Thiessen polygons). The area of each polygon is determined by planimeter and expressed as a percentage of the total area."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Limitation of Thiessen Method (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>The greatest limitation of the Thiessen method is its inflexibility — a new Thiessen diagram being required every time there is a change in the gauge network. Also the method does not allow for orographical influence.</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Method 3 — Isohyetal Method</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>The most accurate method of averaging precipitation over an area is the isohyetal method. Station locations and amounts are plotted on a map and contours of equal precipitation (isohyets) are drawn. The average precipitation for an area is then computed by weighting the average precipitation between successive isohyets (usually taken as the average of the two isohyetal values), by the area between isohyets, then totalling these products and dividing by total area.</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Advantage of Isohyetal Method</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>Isohyetal method permits the use and interpretation of all available data and is well adapted to display and discussion. In constructing an isohyetal map, the analyst can make full use of his knowledge of orographic effects and storm morphology.</div>"
+              ]
+            },
+            {
+              "type": "diagram",
+              "caption": "Thiessen polygon method — schematic",
+              "description": "CATCHMENT BOUNDARY (dashed) — THIESSEN POLYGONS (solid) · A (1.46m) · B (1.92m) · C (2.69m) · D (2.98m) · E (4.50m) · Each polygon's area is the weighting factor for that gauge station.",
+              "imageRef": null
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Students say Thiessen is the most accurate method. It's not — the Isohyetal method is most accurate because it uses contour interpolation and can account for orographic effects. Thiessen is more accurate than Arithmetic Average but less accurate than Isohyetal."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Describe the three methods of estimating average rainfall over an area. State limitations of each. <span>Exercise 4</span></li>",
+                "<li>Given gauge values, calculate average precipitation using Arithmetic and Thiessen methods.</li>",
+                "<li>Which method is most accurate? Why?</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1] Five gauges record: 45, 38, 62, 50, 55 mm. Find the arithmetic average precipitation.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] What is a Thiessen polygon? How are the polygons constructed?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] Rank the three methods from least to most accurate and justify your ranking with reference to what each method accounts for (or fails to account for).",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Engineering Hydrology"
+}

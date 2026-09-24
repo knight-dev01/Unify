@@ -1,0 +1,149 @@
+{
+  "course": "ECE 220",
+  "week": 10,
+  "title": "Functions — def, Parameters & Return Values",
+  "subtitle": "Functions let you write code once and use it many times. The exam tests whether you can define a function, pass arguments to it, and use its return value. Default parameters and recursive functions are the hard-mode topics here.",
+  "learningOutcome": "Functions let you write code once and use it many times. The exam tests whether you can define a function, pass arguments to it, and use its return value. Default parameters and recursive functions are the hard-mode topics here.",
+  "metaChips": [
+    "ECE 220",
+    "Week 10"
+  ],
+  "tags": [
+    "def",
+    "Parameters & Arguments",
+    "return",
+    "Default Parameters",
+    "Scope",
+    "Recursion"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Defining and Calling Functions",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Defining and Calling Functions",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>A <strong>function</strong> is a named, reusable block of code. Define it once with <code>def</code>, call it anywhere. Functions can accept inputs (<strong>parameters</strong>) and send back results (<code>return</code>).</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Parameter vs Argument:</strong> <div> <strong>Parameter</strong> — the variable name inside the function definition: <code>def greet(name)</code> — here <code>name</code> is the parameter. <strong>Argument</strong> — the actual value you pass when calling: <code>greet(\"Amaka\")</code> — here <code>\"Amaka\"</code> is the argument. </div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre># Basic function — no return value def greet(name): print(f\"Hello, {name}! Welcome to ECE 220.\") greet(\"Amaka\") # Hello, Amaka! Welcome to ECE 220. greet(\"Bola\") # Hello, Bola! Welcome to ECE 220. # Function WITH return value def add(a, b): return a + b result = add(10, 25) print(result) # 35 # Grade function — exam favourite def calculate_grade(score): if score &gt;= 70: return \"A\" elif score &gt;= 60: return \"B\" elif score &gt;= 50: return \"C\" elif score &gt;= 45: return \"D\" else: return \"F\" print(calculate_grade(75)) # A print(calculate_grade(52)) # C</pre>"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Forgetting return . A function without a return statement returns None . So result = add(3, 4) where add has no return gives result = None , not 7."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Write a function <code>calculate_grade(score)</code> that returns the letter grade for a given score. <span>Past Q</span></li>",
+                "<li>What is the difference between a parameter and an argument in Python?</li>",
+                "<li>Write a recursive function to compute the factorial of a number.</li>",
+                "<li>What does a function return if there is no <code>return</code> statement?</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "State the textbook definition — Parameter vs Argument.",
+                "answer": "<div> <strong>Parameter</strong> — the variable name inside the function definition: <code>def greet(name)</code> — here <code>name</code> is the parameter. <strong>Argument</strong> — the actual value you pass when calling: <code>greet(\"Amaka\")</code> — here <code>\"Amaka\"</code> is the argument. </div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Default Parameters & Scope",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Default Parameters & Scope",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>A <strong>default parameter</strong> has a preset value that's used if no argument is passed for that position. <strong>Scope</strong> determines where a variable is visible.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre># Default parameters def power(base, exp=2): # exp defaults to 2 return base ** exp print(power(3)) # 9 (3² — uses default) print(power(3, 3)) # 27 (3³ — overrides default) # Scope: local vs global x = 10 # global variable def show(): y = 20 # local variable — only exists inside show() print(x, y) # can access global x show() # 10 20 # print(y) ← NameError: y is not defined here</pre>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Default Parameters & Scope\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Recursion",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "Recursion",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>A <strong>recursive function</strong> calls itself. Every recursive function needs a <strong>base case</strong> (stopping condition) to prevent infinite recursion.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre># Factorial using recursion def factorial(n): if n == 0 or n == 1: # base case return 1 return n * factorial(n - 1) # recursive call print(factorial(5)) # 120 (5×4×3×2×1) print(factorial(0)) # 1 (base case) # Trace for factorial(4): # factorial(4) → 4 × factorial(3) # factorial(3) → 3 × factorial(2) # factorial(2) → 2 × factorial(1) # factorial(1) → 1 ← base case # Unwinds: 2×1=2, 3×2=6, 4×6=24</pre>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1] Write a function circle_area(r) that returns the area of a circle. Call it for r=5 and r=10.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] What is the output of: def f(x, y=3): return x*y; print(f(4), f(4, 5)) ?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] Write a recursive function sum_digits(n) that returns the sum of digits of a positive integer. E.g. sum_digits(123) = 6 . Trace your function for n=123.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Introduction to Programming & Computations"
+}

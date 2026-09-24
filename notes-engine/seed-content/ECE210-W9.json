@@ -1,0 +1,100 @@
+{
+  "course": "ECE 210",
+  "week": 9,
+  "title": "AC Circuits — RMS, Impedance & Power Factor",
+  "subtitle": "AC circuits are the backbone of power systems. R, L, C behave very differently in AC. Impedance and power factor are the two concepts that unlock everything. The RMS value is what actually matters for power calculations.",
+  "learningOutcome": "AC circuits are the backbone of power systems. R, L, C behave very differently in AC. Impedance and power factor are the two concepts that unlock everything. The RMS value is what actually matters for power calculations.",
+  "metaChips": [
+    "ECE 210",
+    "Week 9"
+  ],
+  "tags": [
+    "RMS = 0.707Vm",
+    "XL = 2πfL",
+    "XC = 1/2πfC",
+    "Z = √(R²+X²)",
+    "Power Factor cosφ",
+    "P Q S Triangle"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "AC Parameters, Impedance & Power Factor",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "AC Parameters, Impedance & Power Factor",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>AC voltage: <strong>e(t) = Eₘsin(ωt+φ)</strong>. RMS = Eₘ/√2 = 0.707Eₘ — DC equivalent for same average power. \"230V mains\" = 230V RMS; actual peak = 325V. Average (half-cycle) = 0.637Eₘ.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>R: opposes at all frequencies, V and I in phase. XL = 2πfL — increases with f, voltage leads current 90°. XC = 1/(2πfC) — decreases with f, current leads voltage 90°. Total impedance Z = √(R²+X²), V = IZ.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>Power factor cosφ = R/Z = P/S. Lagging = inductive load. Leading = capacitive load. Low PF → more current needed for same real power → more I²R line losses. Utilities penalise industrial customers for low PF.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>AC circuit equations</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>E_rms = Eₘ/√2 XL = 2πfL XC = 1/(2πfC)</div>",
+                "<div>Z = √(R² + X²) V = IZ cosφ = R/Z</div>",
+                "<div>P = VIcosφ (W) Q = VIsinφ (VAR) S = VI (VA)</div>",
+                "<div>S² = P² + Q²</div>"
+              ]
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — The most common AC mistake Adding VR + VL directly: 159+166.5=325.5V ≠ 230V. You CANNOT add out-of-phase AC voltages arithmetically. They are 90° apart — use Pythagoras: V = √(VR²+VL²). This costs marks in almost every exam cohort."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Define RMS value. Derive it for sinusoidal waveform. <span>Past Q</span></li>",
+                "<li>RL series: R=30Ω, L=0.1H, 230V, 50Hz. Find Z, I, PF, VR, VL. <span>Past Q</span></li>",
+                "<li>What is power factor? Significance of low power factor?</li>",
+                "<li>State e(t) = Emsin(ωt+φ) and define each term.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1] Sinusoidal voltage: peak=340V, f=50Hz. Find (i) Erms (ii) average (half-cycle) (iii) ω (iv) write e(t).",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] RLC series: R=10Ω, XL=20Ω, XC=12Ω, V=100V. Find Z, I, PF. Is it leading or lagging?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] Industrial load: 500kW at 0.7 PF lagging, 11kV. Capacitor bank improves PF to 0.95. Find: (i) original kVA, kVAR (ii) new kVA, kVAR (iii) kVAR of capacitor bank required.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Electrical Machines & Circuits"
+}

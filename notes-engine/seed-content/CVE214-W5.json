@@ -1,0 +1,134 @@
+{
+  "course": "CVE 214",
+  "week": 5,
+  "title": "Rain Gauges — Types, Errors & Classification",
+  "subtitle": "You can't work with rainfall data if you don't know how it's collected. This week covers the instruments used to measure rainfall, the errors that affect measurements, and how raingauge stations are classified.",
+  "learningOutcome": "You can't work with rainfall data if you don't know how it's collected. This week covers the instruments used to measure rainfall, the errors that affect measurements, and how raingauge stations are classified.",
+  "metaChips": [
+    "CVE 214",
+    "Week 5"
+  ],
+  "tags": [
+    "Rain gauge",
+    "Met Office MkII",
+    "Automatic gauge",
+    "Radar",
+    "Measurement errors",
+    "Station classification"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Rain Gauge Types",
+      "abbr": "CVE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Rain Gauge Types",
+          "abbr": "CVE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<strong>Standard gauge features (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>a) Rain falling into the gauge cannot splash out.</div>",
+                "<div>b) Rain falling outside the gauge cannot splash in.</div>",
+                "<div>c) Collected rainwater cannot evaporate or leak away.</div>",
+                "<div>d) Collected rainfall cannot be increased either by condensation or freezing.</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "Standard meteorological office (UK) approved gauges: turned brass knife-edged rim forming the aperture of the gauge; the vertical cylinder 100mm in depth above the sloping funnel to retain snow and hail and to prevent rain splash; simplicity of construction."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Types of rain gauges</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>1. Met Office MkII — consists of a 125mm opening, a snow collection funnel which eventually melts and goes down. The gauge is made from copper with riveted walls and does not deteriorate. To ensure correct orifice, a brass ring is sharp and rounded to prevent rain entering.</div>",
+                "<div>2. Automatic Radio-Reporting Rain Gauge — used where it is not possible to normally collect the rainfall data manually. Employs a tipping bucket arrangement — rain falls over the bucket through a measuring funnel; the buckets tip and give electric pulses (equal in number to the rainfall) which are stored by a data rigger. A coding unit converts the data into coded messages transmitted on a transmitter.</div>",
+                "<div>3. Radar — application of radars in the study of storm mechanics: areal extent, orientation and movement of the rainstorm; magnitude of storm precipitation and its areal distribution.</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Errors in measurement of precipitation (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>1. Observational Errors — usually small but cumulative.</div>",
+                "<div>2. Instrumental Errors — may be quite large and are cumulative.</div>",
+                "<div>3. It is estimated that 0.25mm of each rain is required to moisten the insides of a dry rain gauge.</div>",
+                "<div>4. Measuring stick increases the reading by about 1%.</div>",
+                "<div>5. Rain drops splash from the collector.</div>",
+                "<div>6. Of all the errors, the most serious is the deficiency of measurement due to wind — the deficiency is greater for small rain drops compared to large rain drops, and greater for light rainfall than heavy rainfall.</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "The higher the gauge, the greater is the wind error. When rain is falling vertically, a gauge inclined 10° from the vertical will catch 1.5% less than if vertical. A gauge inclined slightly towards the wind will catch more than the true amount."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Classification of raingauge stations (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>a) Primary Stations — stations established for long-term planning. They must be very reliable and their establishment needs great care. They must be able to give good representative records.</div>",
+                "<div>b) Secondary Stations — the data collected are used to correlate with those of primaries. They may be removed if consistent correlations are obtained and maintenance costs exceed the benefit.</div>",
+                "<div>c) Special Stations — stations restored for a particular study, research etc. They are usually removed after the completion of the project.</div>"
+              ]
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Students say the most serious error is the measuring stick adding 1%. Wrong — the textbook clearly states the most serious error is WIND EFFECT (deficiency due to wind). Wind reduces catch, and the effect is greater for small raindrops and light rain."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Describe the Met Office MkII rain gauge. What are the important features of a standard rain gauge?</li>",
+                "<li>List the errors in rainfall measurement. Which is the most significant?</li>",
+                "<li>Classify raingauge stations. What are the roles of primary, secondary and special stations?</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1] List the four most important features of a standard rain gauge.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] What is the most serious error in rain measurement? Why is it worse for light rainfall?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] Distinguish between primary, secondary and special raingauge stations. When would you use a special station?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Engineering Hydrology"
+}

@@ -1,0 +1,151 @@
+{
+  "course": "IPE 212",
+  "week": 10,
+  "title": "Valve Train & Engine Bearings",
+  "subtitle": "The valve train is the system that controls the opening and closing of the engine's intake and exhaust valves. This week covers the camshaft, camshaft followers, valves and valve seats, valve guides, timing gears, and engine bearings including their lubrication and materials.",
+  "learningOutcome": "The valve train is the system that controls the opening and closing of the engine's intake and exhaust valves. This week covers the camshaft, camshaft followers, valves and valve seats, valve guides, timing gears, and engine bearings including their lubrication and materials.",
+  "metaChips": [
+    "IPE 212",
+    "Week 10"
+  ],
+  "tags": [
+    "Camshaft",
+    "Cam lobe",
+    "Hydraulic lifter",
+    "Mechanical lifter",
+    "Poppet valve",
+    "Valve seat",
+    "Timing gears",
+    "Bearing clearance"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Valve and Valve Mechanisms — Camshaft",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Valve and Valve Mechanisms — Camshaft",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Think of the camshaft as a rotating stick with bumps (lobes) on it. As it turns, each bump pushes up on a small rod (tappet), which pushes open a valve. When the bump passes, a spring closes the valve again. This is how the engine breathes — the camshaft controls exactly when air comes in and exhaust goes out.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div>There are two valves for each cylinder in most engines — one intake and one exhaust. Valves are held closed by heavy springs and by compression in the combustion chamber. <strong>Camshaft:</strong> Provides for the opening and closing of the engine valves. It is enclosed in the engine block. It has eccentric lobes (cams) ground on it for each valve in the engine. As the camshaft rotates, the cam lobe moves up under the valve tappet, exerting an upward thrust through the tappet against the valve stem or the pushrod. The camshaft of a four-stroke-cycle engine turns at <strong>one half of engine speed</strong>. It is driven off the crankshaft through timing gears or a timing chain.</div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div><strong>Followers (Tappets / Valve Lifters):</strong> Part of the valve actuating mechanism that contacts the camshaft. There are four types: — <strong>Hydraulic valve lifters:</strong> Operate quietly by maintaining zero valve clearance. Oil pressure fills the inside of the hydraulic lifter with motor oil. The pressure pushes the lifter plunger up in its bore until all the play is out of the valve train. Act as a solid unit to open the valve. — <strong>Mechanical (Solid) lifters:</strong> Do not contain oil. Simply transfer cam lobe action to the push rod. Require periodic setting — a screw adjustment is normally provided at the rocker arm. — <strong>Roller lifters:</strong> Have a small roller that rides on the camshaft lobe. Can be mechanical or hydraulic. Reduce frictional losses of power. — <strong>OHC followers:</strong> Fit between the camshaft and the valve. Slide up and down in a bore machined in the head.</div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "What is the camshaft? Describe how the cam lobe operates the engine valve.",
+                "Distinguish between hydraulic and mechanical camshaft followers. State an advantage of each.",
+                "Explain the purpose of valve guides. What problems result from excessive valve guide wear?",
+                "Why are timing gears used? At what speed does the camshaft turn relative to the crankshaft?"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: Camshaft.",
+                "answer": "<div>There are two valves for each cylinder in most engines — one intake and one exhaust. Valves are held closed by heavy springs and by compression in the combustion chamber. <strong>Camshaft:</strong> Provides for the opening and closing of the engine valves. It is enclosed in the engine block. It has eccentric lobes (cams) ground on it for each valve in the engine. As the camshaft rotates, the cam lobe moves up under the valve tappet, exerting an upward thrust through the tappet against the valve stem or the pushrod. The camshaft of a four-stroke-cycle engine turns at <strong>one half of engine speed</strong>. It is driven off the crankshaft through timing gears or a timing chain.</div>"
+              },
+              {
+                "type": "reveal",
+                "question": "Define: Followers (Tappets / Valve Lifters).",
+                "answer": "<div><strong>Followers (Tappets / Valve Lifters):</strong> Part of the valve actuating mechanism that contacts the camshaft. There are four types: — <strong>Hydraulic valve lifters:</strong> Operate quietly by maintaining zero valve clearance. Oil pressure fills the inside of the hydraulic lifter with motor oil. The pressure pushes the lifter plunger up in its bore until all the play is out of the valve train. Act as a solid unit to open the valve. — <strong>Mechanical (Solid) lifters:</strong> Do not contain oil. Simply transfer cam lobe action to the push rod. Require periodic setting — a screw adjustment is normally provided at the rocker arm. — <strong>Roller lifters:</strong> Have a small roller that rides on the camshaft lobe. Can be mechanical or hydraulic. Reduce frictional losses of power. — <strong>OHC followers:</strong> Fit between the camshaft and the valve. Slide up and down in a bore machined in the head.</div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Valves, Valve Seats & Valve Guides",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Valves, Valve Seats & Valve Guides",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<div><strong>Valve and Valve Seats:</strong> Each cylinder in a four-stroke-cycle engine must have one intake and one exhaust valve. The most common type is the poppet valve. Intake valves are kept cool by the incoming intake mixture. <strong>Exhaust valves</strong> are subject to intense heat from the burnt gases — the temperature of an exhaust valve can be in excess of 1300°F. Intake valves are made of nickel chromium alloy; exhaust valves are made of silchrome alloy. <strong>Valve seats</strong> are round, machined surfaces in the combustion chamber port openings. When a valve is closed, it seals against the valve seat. Valve seat inserts are commonly used in aluminum cylinder heads. <strong>Valve Guides:</strong> Parts that support the valves in the cylinder head. They are machined to fit a few thousandths of an inch clearance with a valve stem. Functions: — Keeps lubricating oil from getting sucked into the combustion chamber past the intake valve stem. — Keeps exhaust gases from getting into the crankcase area past the exhaust valve stem. — Keeps the valve face in perfect alignment with the valve seat.</div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div><strong>Timing Gears:</strong> Common in engines used for heavy-duty applications such as taxis or trucks. Two timing gears are used to drive the engine camshaft. A <strong>crank gear</strong> is keyed to the crankshaft snout. It turns a <strong>cam gear</strong> on the end of the camshaft. The cam gear is twice the size of the crank gear — this results in the desired <strong>2:1 reduction</strong> (camshaft turns at half crankshaft speed).</div>"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Students state that the camshaft and crankshaft turn at the same speed. This is wrong. The camshaft turns at EXACTLY HALF the crankshaft speed. This is because each valve only needs to open once every two revolutions of the crankshaft (once per complete 4-stroke cycle). The 2:1 gear ratio ensures this."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: Valve and Valve Seats.",
+                "answer": "<div><strong>Valve and Valve Seats:</strong> Each cylinder in a four-stroke-cycle engine must have one intake and one exhaust valve. The most common type is the poppet valve. Intake valves are kept cool by the incoming intake mixture. <strong>Exhaust valves</strong> are subject to intense heat from the burnt gases — the temperature of an exhaust valve can be in excess of 1300°F. Intake valves are made of nickel chromium alloy; exhaust valves are made of silchrome alloy. <strong>Valve seats</strong> are round, machined surfaces in the combustion chamber port openings. When a valve is closed, it seals against the valve seat. Valve seat inserts are commonly used in aluminum cylinder heads. <strong>Valve Guides:</strong> Parts that support the valves in the cylinder head. They are machined to fit a few thousandths of an inch clearance with a valve stem. Functions: — Keeps lubricating oil from getting sucked into the combustion chamber past the intake valve stem. — Keeps exhaust gases from getting into the crankcase area past the exhaust valve stem. — Keeps the valve face in perfect alignment with the valve seat.</div>"
+              },
+              {
+                "type": "reveal",
+                "question": "Define: Timing Gears.",
+                "answer": "<div><strong>Timing Gears:</strong> Common in engines used for heavy-duty applications such as taxis or trucks. Two timing gears are used to drive the engine camshaft. A <strong>crank gear</strong> is keyed to the crankshaft snout. It turns a <strong>cam gear</strong> on the end of the camshaft. The cam gear is twice the size of the crank gear — this results in the desired <strong>2:1 reduction</strong> (camshaft turns at half crankshaft speed).</div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Engine Bearings — Lubrication & Materials",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "Engine Bearings — Lubrication & Materials",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Bearings are the smooth interfaces between rotating parts and stationary ones. Without them, metal-on-metal contact would grind the engine apart in minutes. Oil forms an invisible film between the bearing surfaces, keeping parts separated — like how a thin film of water lets ice skates glide.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div><strong>Engine Bearings:</strong> Installed in an engine where there is relative motion between parts. Camshaft bearings are called sleeve bearings because they are in the shape of a sleeve that fits around the rotating journal or shaft. <strong>Bearing Lubrication:</strong> The lubrication of bearings is very important to engine service life because it forces oil to high friction points within the engine. Without lubrication, bearings overheat and score from friction. The journal or shaft must be smaller in diameter than the bearing — this creates a clearance through which oil circulates. The greater the oil clearance, the faster the oil flows through the bearing; however, excessive oil clearance causes some bearings to fail from oil starvation — if clearances are excessive, most of the oil passes through the nearest bearings, leaving not enough oil for the most distant bearings. <strong>Bearing Materials:</strong> Three basic types of engine bearings — connecting rod bearings, crankshaft main bearings, and camshaft bearings. The backing material (body) is normally steel. Softer alloys bonded over the backing form the bearing surface. Metal alloys used: Babbitt (lead-tin alloy), copper, or aluminum — in different combinations for light-, medium-, or heavy-duty applications.</div>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: Engine Bearings.",
+                "answer": "<div><strong>Engine Bearings:</strong> Installed in an engine where there is relative motion between parts. Camshaft bearings are called sleeve bearings because they are in the shape of a sleeve that fits around the rotating journal or shaft. <strong>Bearing Lubrication:</strong> The lubrication of bearings is very important to engine service life because it forces oil to high friction points within the engine. Without lubrication, bearings overheat and score from friction. The journal or shaft must be smaller in diameter than the bearing — this creates a clearance through which oil circulates. The greater the oil clearance, the faster the oil flows through the bearing; however, excessive oil clearance causes some bearings to fail from oil starvation — if clearances are excessive, most of the oil passes through the nearest bearings, leaving not enough oil for the most distant bearings. <strong>Bearing Materials:</strong> Three basic types of engine bearings — connecting rod bearings, crankshaft main bearings, and camshaft bearings. The backing material (body) is normally steel. Softer alloys bonded over the backing form the bearing surface. Metal alloys used: Babbitt (lead-tin alloy), copper, or aluminum — in different combinations for light-, medium-, or heavy-duty applications.</div>"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Automotive Engineering & Workshop"
+}

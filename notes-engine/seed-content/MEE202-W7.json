@@ -1,0 +1,260 @@
+{
+  "course": "MEE 202",
+  "week": 7,
+  "title": "Crystal Structure",
+  "subtitle": "Crystal structure is how atoms arrange themselves in a repeating 3D pattern. You need to know the 7 crystal systems, the 14 Bravais lattices, and how to calculate atomic packing factor (APF) and density for FCC, BCC, and HCP. This comes up in every paper.",
+  "learningOutcome": "Crystal structure is how atoms arrange themselves in a repeating 3D pattern. You need to know the 7 crystal systems, the 14 Bravais lattices, and how to calculate atomic packing factor (APF) and density for FCC, BCC, and HCP. This comes up in every paper.",
+  "metaChips": [
+    "MEE 202",
+    "Week 7"
+  ],
+  "tags": [
+    "Space Lattice",
+    "Unit Cell",
+    "Basis",
+    "Bravais Lattice",
+    "FCC",
+    "BCC",
+    "HCP",
+    "APF",
+    "Packing Density"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Space Lattice, Unit Cell & Basis",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Space Lattice, Unit Cell & Basis",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p><strong>A space lattice is a regular periodic arrangement of points in space over long distances.</strong> It is strictly a geometric entity and ordinarily has nothing to do with atoms. In a space lattice the surrounding of each point is identical — this means that for all lattice points the nearest neighbours, the second nearest neighbours, and so on ad infinitum must be identical with respect to the direction and locations of the points in each neighbourhood group.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>The <strong>unit cell</strong> is the smallest repeated unit in a structure. Think of it like the tile pattern on a floor — one tile is the unit cell, the whole floor is the lattice.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>A <strong>crystal lattice (crystal structure)</strong> is a group of atoms identical in species and orientation attached identically to each lattice point. The identical group of atoms attached identically to each lattice point is called the <strong>Basis</strong>.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>The Fundamental Relationship</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>Lattice + Basis = Crystal Structure</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "A primitive cell is a cell that contains only one lattice point. P = Primitive cell · F = Face centred cell · I = Body centred cell · C = Base centred cell · R = Rhombohedral"
+            },
+            {
+              "type": "analogy",
+              "text": "💡 Think of it this way The space lattice is like a grid of dots on graph paper — pure geometry, no atoms. The basis is the atom (or group of atoms) you glue to every dot. The result — dots + atoms — is the crystal structure. Diamond has an FCC lattice with a 2-atom basis (one C at the corner, one displaced ¼ along the body diagonal)."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "What is a crystal lattice? State the relationship between a crystal lattice and a space lattice. (2022/23, 2015/16, 2011/12)",
+                "Define a basis in crystallography. Write the relationship between basis, space lattice and crystal lattice. (2021/22)",
+                "Describe any 3 of the 4 types of crystal lattice unit cells with good sketches. Write the crystallographic term (P,C,F,I) for each type. (2021/22)",
+                "Determine the Atomic Packing Density of an FCC cell. Sketch (111), [111] and (011). (2022/23)",
+                "Determine the volumetric packing density of a BCC lattice. (2019/20, 2015/16)",
+                "Derive the relationship between packing density and density for crystalline material. (2021/22)",
+                "Describe any three crystal systems using standard crystallographic notation, state possible lattice types. (2019/20)"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Space Lattice, Unit Cell & Basis\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "The 7 Crystal Systems & 14 Bravais Lattices",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "The 7 Crystal Systems & 14 Bravais Lattices",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>There are seven systems of three-dimensional space lattices. The 14 Bravais lattices cover all possible ways atoms can arrange periodically in 3D.</p>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "#",
+                "System",
+                "Lattice Parameters",
+                "Angles",
+                "Types",
+                "No. of Lattices",
+                "1",
+                "Cubic",
+                "a = b = c",
+                "α = β = γ = 90°",
+                "P, I, F",
+                "3",
+                "2",
+                "Tetragonal",
+                "a = b ≠ c",
+                "α = β = γ = 90°",
+                "P, I",
+                "2",
+                "3",
+                "Orthorhombic",
+                "a ≠ b ≠ c",
+                "α = β = γ = 90°",
+                "P, C, I, F",
+                "4",
+                "4",
+                "Monoclinic",
+                "a ≠ b ≠ c",
+                "α = β = 90° ≠ γ",
+                "P, C",
+                "2",
+                "5",
+                "Triclinic",
+                "a ≠ b ≠ c",
+                "α ≠ β ≠ γ ≠ 90°",
+                "P",
+                "1",
+                "6",
+                "Trigonal (Rhombohedral)",
+                "a = b = c",
+                "α = β = γ ≠ 90°, <120°",
+                "R",
+                "1",
+                "7",
+                "Hexagonal",
+                "a = b ≠ c",
+                "α = β = 90°, γ = 120°",
+                "P",
+                "1"
+              ]
+            },
+            {
+              "type": "diagram",
+              "caption": "The Three Cubic Unit Cells — Simple, Body-Centred, Face-Centred",
+              "description": "Simple Cubic (P) · 1 atom/cell · Body-Centred (I) · 2 atoms/cell · Face-Centred (F) · 4 atoms/cell",
+              "imageRef": null
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"The 7 Crystal Systems & 14 Bravais Lattices\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Atoms Per Unit Cell & Atomic Packing Factor",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "Atoms Per Unit Cell & Atomic Packing Factor",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>In counting atoms in a unit cell, atoms are shared between cells. Corner atoms are shared by 8 cells (count ⅛ each), face atoms by 2 cells (count ½ each), edge atoms by 4 cells (count ¼ each), body-centre atoms belong entirely to one cell (count 1 each).</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Atoms Per Unit Cell</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>N = N<sub>interior</sub> + N<sub>face</sub>/2 + N<sub>corner</sub>/8</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "Simple Cubic: N = 0 + 0 + 8/8 = 1 BCC: N = 1 + 0 + 8/8 = 2 FCC: N = 0 + 6/2 + 8/8 = 4"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Atomic Packing Factor (APF)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>APF = (Number of atoms × Volume of one atom) / Volume of unit cell</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "FCC derivation: Face diagonal = 4R = a√2 → a = 2√2 R Volume of unit cell = a³ = (2√2R)³ = 16√2 R³ APF = 4 × (4/3)πR³ / 16√2 R³ = π/(3√2) ≈ 0.74 BCC derivation: Body diagonal = 4R = a√3 → a = 4R/√3 APF = 2 × (4/3)πR³ / (4R/√3)³ = π√3/8 ≈ 0.68 Simple Cubic: a = 2R, APF = π/6 ≈ 0.52"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Density of Crystalline Material</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>ρ = (n × w) / (N<sub>A</sub> × V<sub>cell</sub>)</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "n = number of atoms per unit cell · w = atomic weight · N A = Avogadro's number (6.02 × 10²³) · V cell = volume of unit cell"
+            },
+            {
+              "type": "insight",
+              "text": "⚠ Common Mistake Students mix up the face diagonal and body diagonal. For FCC: the face diagonal = 4R (atoms touch along the face). For BCC: the body diagonal = 4R (atoms touch through the body). Never use the edge length as 4R — the edge length is a, derived from the relevant diagonal."
+            },
+            {
+              "type": "insight",
+              "text": "APF calculation has appeared in every exam. For FCC, APF = 0.74 — this is also the packing fraction for HCP (both are close-packed structures). BCC = 0.68. Simple cubic = 0.52. The 2021/22 paper also asks to derive the density–packing density relationship: ρ = APF × (mass of atoms)/(volume of unit cell). State your assumption: atoms are hard spheres and the material is perfectly crystalline."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Atoms Per Unit Cell & Atomic Packing Factor\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Science of Materials"
+}

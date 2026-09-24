@@ -1,0 +1,298 @@
+{
+  "course": "MEE 352",
+  "week": 4,
+  "title": "India's Industries, Infrastructure & Energy Consumption",
+  "subtitle": "Infrastructure Gaps, Power Sector Demand-Supply, Exploration Scenario",
+  "learningOutcome": "By the end of this week, you should be able to analyse India's infrastructure energy gap, interpret demand-supply tables, and describe the categorisation of India's sedimentary basins.",
+  "metaChips": [
+    "MEE 352",
+    "Week 4"
+  ],
+  "tags": [
+    "Infrastructure",
+    "Power Sector",
+    "Demand-Supply Gap",
+    "Exploration",
+    "NELP",
+    "Sedimentary Basins",
+    "Energy Consumption"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "India's Industries and Infrastructure",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "India's Industries and Infrastructure",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>The infrastructure sectors <em>viz.,</em> transport, power, telecommunication provide critical input to the manufacturing sectors. The infrastructure services constitute direct input to the production, lowering the costs and improving the quality of these sectors have direct bearing on the improvements in the profitability of the production sectors. The availability and efficient use of infrastructure sectors may help in improving the quality and cost of production sectors. Industrial output growth has closely tracked the movements in the composite index of infrastructure industries during 1980s and 1990s. The observed relationship between infrastructure growth and industrial performance has important implication for sustaining higher output. The average growth of production and composite index of infrastructure in 1980s was 7.8% and 8.4 respectively which declined to 6.5% and 6.3% in 1990s. The main reason of this declined trend was the decline in <em>growth of electricity, coal</em> and <em>petroleum i.e.,</em> essentially the energy subsector. Due to this it seems that identification and bridging of gap of infrastructure plays important role in economic growth.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>Amongst the important sub-sectors, power sector has shown significant gap. The demand-supply gap in power sector is shown in the table below (Table 2.2), listing requirement vs availability in billion kWH from 1991 to 2014.</p>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"India's Industries and Infrastructure\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "What are the key facts, figures, and definitions from India's Industries and Infrastructure?",
+          "answer": "<div>Review the notes above. Focus on: specific numerical values, definitions, classification schemes, and the logic connecting ideas in <strong>India's Industries and Infrastructure</strong>.</div>"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Energy Consumption",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Energy Consumption",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>The energy consumption in 1965 was approximately 53 MTOE (million tons oil equivalent) and per capita consumption was about 110 kg of oil equivalent. By 2010, the primary energy consumption has crossed the 500 m tonne marked roughly 9 times that of 1965. Population during the same period has tripled and thus the per capita energy consumption shows 9 times jump over 1965 level.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>Except coal and hydro all other energy sources have increase that gives that the population has become more wise and prefer to use more safe energy sources. The principles of pricing adopted for energy products have greatly influenced the pattern of growth of the energy sector.</p>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Energy Consumption\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "What are the key facts, figures, and definitions from Energy Consumption?",
+          "answer": "<div>Review the notes above. Focus on: specific numerical values, definitions, classification schemes, and the logic connecting ideas in <strong>Energy Consumption</strong>.</div>"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Exploration Scenario",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "Exploration Scenario",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>India's basins have been categorized into four categories based on the prospectivity of the basins:</p>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Established commercial production — seven basins</li>",
+                "<li>Known accumulation but no commercial production — two basins</li>",
+                "<li>Indicated and geologically prospective — seven basins</li>",
+                "<li>Uncertain potential — two basins</li>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Salient Features of NELP (New Exploration Licensing Policy):</strong></p>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>No mandatory state participation through ONGC/Oil etc.</li>",
+                "<li>All companies have to compete to obtain PEL.</li>",
+                "<li>Open availability of exploration average.</li>",
+                "<li>The average will be demarcated on a grid system.</li>",
+                "<li>Freedom for marketing of crude oil and gas.</li>",
+                "<li>Royalty payment for on land and offshore area @ 12.5% and 10% respectively.</li>",
+                "<li>Cess has been abolished for the blocks offered.</li>",
+                "<li>No import duty on the goods imported.</li>",
+                "<li>No signature, discovery and production bonuses.</li>",
+                "<li>Seven year tax holiday from the date of commencement.</li>",
+                "<li>Fiscal stability to be provided during entire period.</li>",
+                "<li>A separate petroleum tax guide to facilitate investors.</li>",
+                "<li>A revised model contract.</li>",
+                "<li>Royality will be charged at half the prevailing rate for normal off shore areas for deep water.</li>",
+                "<li>No royality for the first seven year after commencement for deep water beyond 400 meters.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Exploration Scenario\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "What are the key facts, figures, and definitions from Exploration Scenario?",
+          "answer": "<div>Review the notes above. Focus on: specific numerical values, definitions, classification schemes, and the logic connecting ideas in <strong>Exploration Scenario</strong>.</div>"
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": [
+      {
+        "number": 1,
+        "question": "In the 1980s, the average growth of production and composite index of infrastructure were:",
+        "feedback": {
+          "correct": "✓ In the 1980s, average growth of production was 7.8% and composite index of infrastructure was 8.4%.",
+          "wrong": "✗ In the 1980s, average growth of production was 7.8% and composite index of infrastructure was 8.4%."
+        },
+        "topicRef": "1",
+        "type": "mcq",
+        "options": [
+          "5.2% and 6.1%",
+          "7.8% and 8.4%",
+          "6.5% and 6.3%",
+          "9.0% and 9.5%"
+        ],
+        "correct": "B"
+      },
+      {
+        "number": 2,
+        "question": "In the 1990s, both indicators declined to:",
+        "feedback": {
+          "correct": "✓ In the 1990s, growth declined to 6.5% and 6.3% due mainly to decline in electricity, coal and petroleum sub-sectors.",
+          "wrong": "✗ In the 1990s, growth declined to 6.5% and 6.3% due mainly to decline in electricity, coal and petroleum sub-sectors."
+        },
+        "topicRef": "2",
+        "type": "mcq",
+        "options": [
+          "7.8% and 8.4%",
+          "5.0% and 4.9%",
+          "6.5% and 6.3%",
+          "4.2% and 3.8%"
+        ],
+        "correct": "C"
+      },
+      {
+        "number": 3,
+        "question": "Energy consumption in 1965 was approximately ________ MTOE.",
+        "feedback": {
+          "correct": "✓ Energy consumption in 1965 was approximately 53 MTOE (million tons oil equivalent).",
+          "wrong": "✗ Energy consumption in 1965 was approximately 53 MTOE (million tons oil equivalent)."
+        },
+        "topicRef": "3",
+        "type": "fitb",
+        "acceptedAnswers": [
+          "53"
+        ]
+      },
+      {
+        "number": 4,
+        "question": "India's basins fall into how many categories based on prospectivity?",
+        "feedback": {
+          "correct": "✓ India's basins are categorised into four categories: established commercial production, known accumulation, indicated/geologically prospective, and uncertain potential.",
+          "wrong": "✗ India's basins are categorised into four categories: established commercial production, known accumulation, indicated/geologically prospective, and uncertain potential."
+        },
+        "topicRef": "1",
+        "type": "mcq",
+        "options": [
+          "Two",
+          "Three",
+          "Four",
+          "Five"
+        ],
+        "correct": "C"
+      },
+      {
+        "number": 5,
+        "question": "Under NELP, royalty payment for onshore areas is:",
+        "feedback": {
+          "correct": "✓ Royalty payment for on land areas is 12.5% and for offshore areas is 10%.",
+          "wrong": "✗ Royalty payment for on land areas is 12.5% and for offshore areas is 10%."
+        },
+        "topicRef": "2",
+        "type": "mcq",
+        "options": [
+          "10%",
+          "12.5%",
+          "15%",
+          "20%"
+        ],
+        "correct": "B"
+      },
+      {
+        "number": 6,
+        "question": "Under NELP, there is a ________ year tax holiday from commencement.",
+        "feedback": {
+          "correct": "✓ NELP provides a seven-year tax holiday from the date of commencement.",
+          "wrong": "✗ NELP provides a seven-year tax holiday from the date of commencement."
+        },
+        "topicRef": "3",
+        "type": "fitb",
+        "acceptedAnswers": [
+          "7",
+          "seven"
+        ]
+      },
+      {
+        "number": 7,
+        "question": "Per capita energy consumption by 2010 was approximately how many times the 1965 level?",
+        "feedback": {
+          "correct": "✓ Per capita energy consumption by 2010 shows 9 times jump over the 1965 level.",
+          "wrong": "✗ Per capita energy consumption by 2010 shows 9 times jump over the 1965 level."
+        },
+        "topicRef": "1",
+        "type": "mcq",
+        "options": [
+          "3 times",
+          "5 times",
+          "7 times",
+          "9 times"
+        ],
+        "correct": "D"
+      },
+      {
+        "number": 8,
+        "question": "The main reason for the declining infrastructure trend in the 1990s was:",
+        "feedback": {
+          "correct": "✓ The main reason was the decline in growth of electricity, coal and petroleum — the energy subsector.",
+          "wrong": "✗ The main reason was the decline in growth of electricity, coal and petroleum — the energy subsector."
+        },
+        "topicRef": "2",
+        "type": "mcq",
+        "options": [
+          "Political instability",
+          "Decline in electricity, coal and petroleum",
+          "Over-investment in manufacturing",
+          "Foreign exchange crisis"
+        ],
+        "correct": "B"
+      }
+    ]
+  }
+}

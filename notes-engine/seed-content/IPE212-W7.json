@@ -1,0 +1,146 @@
+{
+  "course": "IPE 212",
+  "week": 7,
+  "title": "Fueling Supply Systems & Electronic Engine Controls",
+  "subtitle": "Fuel must reach the engine's combustion chamber in precisely the right form, amount, and timing. This week covers the two fuel delivery systems (carburetor and fuel injector) and the electronic control systems that manage modern engine performance.",
+  "learningOutcome": "Fuel must reach the engine's combustion chamber in precisely the right form, amount, and timing. This week covers the two fuel delivery systems (carburetor and fuel injector) and the electronic control systems that manage modern engine performance.",
+  "metaChips": [
+    "IPE 212",
+    "Week 7"
+  ],
+  "tags": [
+    "Carburetor",
+    "Fuel injector",
+    "Atomization",
+    "ECU",
+    "Sensors",
+    "Actuators",
+    "Air-fuel mixture"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "The Carburetor",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "The Carburetor",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Think of a carburetor like a spray bottle that mixes air and fuel. When you press a spray bottle, liquid gets broken into tiny droplets — that's atomization. The carburetor does the same thing with petrol, breaking it into microscopic droplets and mixing it with air so it can burn properly inside the engine.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div>The fuel-air mixture delivered by a carburetor to the engine cylinder is indeed in an <strong>atomized form</strong>. The carburetor's primary function is to <strong>break down liquid fuel into fine droplets</strong> (atomize it) and <strong>mix it with air, creating a combustible mixture that can be ignited within the cylinder</strong>. This atomization is crucial for proper and efficient combustion.</div>"
+            },
+            {
+              "type": "analogy",
+              "text": "Older vehicles (pre-1990s in most countries) used carburetors. The carburetor relied on engine vacuum to draw fuel into the airstream — simple and reliable, but imprecise. On cold days, you had to use the choke to richen the mixture because the carburetor couldn't automatically compensate for temperature changes."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "Compare the carburetor and the fuel injector as fuel delivery systems. Which is more efficient and why?",
+                "What is the function of the ECU in an automobile engine?",
+                "What is atomization? Why is it important for efficient combustion?",
+                "How do electronic engine control systems improve engine performance over purely mechanical systems?"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: atomized form.",
+                "answer": "<div>The fuel-air mixture delivered by a carburetor to the engine cylinder is indeed in an <strong>atomized form</strong>. The carburetor's primary function is to <strong>break down liquid fuel into fine droplets</strong> (atomize it) and <strong>mix it with air, creating a combustible mixture that can be ignited within the cylinder</strong>. This atomization is crucial for proper and efficient combustion.</div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "The Fuel Injector",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "The Fuel Injector",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>The fuel injector is like a very precise computer-controlled syringe. Instead of relying on vacuum to pull fuel in like a carburetor, the injector is commanded by a computer (ECU) to spray exactly the right amount of fuel at exactly the right time. It's like the difference between pouring seasoning from a jar (carburetor) versus a chef using a precise dropper (injector).</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div>A fuel injector in an automobile is a critical component that <strong>precisely sprays fuel into the engine's combustion chamber to create the correct air-fuel mixture for efficient combustion</strong>. It is essentially an <strong>electronically controlled valve</strong> that opens and closes to deliver fuel <strong>at the right time and in the right amount</strong>, determined by the Engine Control Unit (ECU).</div>"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Students say carburetors and injectors do the same thing so it doesn't matter which is used. Major difference: a carburetor uses engine vacuum and is non-adjustable in real time. A fuel injector is electronically controlled and can vary fuel delivery thousands of times per second based on conditions like engine load, temperature, and throttle position — giving dramatically better fuel economy and lower emissions."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: precisely sprays fuel into the engine's combustion chamber to create the correct air-fuel mixture for efficient combustion.",
+                "answer": "<div>A fuel injector in an automobile is a critical component that <strong>precisely sprays fuel into the engine's combustion chamber to create the correct air-fuel mixture for efficient combustion</strong>. It is essentially an <strong>electronically controlled valve</strong> that opens and closes to deliver fuel <strong>at the right time and in the right amount</strong>, determined by the Engine Control Unit (ECU).</div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Electronic Engine Control Systems (ECU)",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "Electronic Engine Control Systems (ECU)",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Modern car engines have a tiny brain called the ECU (Engine Control Unit). It's like a very smart thermostat — it reads dozens of sensors around the engine (temperature, airflow, oxygen levels), and then sends commands to actuators (like the fuel injectors) to keep the engine running at its ideal conditions.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div>Electronic engine control systems in automobiles utilize <strong>Electronic Control Units (ECUs)</strong> to manage and optimize engine performance, fuel efficiency, and emissions. These systems employ <strong>sensors</strong> to gather data about engine conditions and <strong>actuators</strong> to adjust engine parameters accordingly, all orchestrated by the ECU. This technology has revolutionized engine management, replacing mechanical systems with sophisticated electronic control.</div>"
+            },
+            {
+              "type": "diagram",
+              "caption": "Figure",
+              "description": "SENSORS · Temp / O2 / MAF · Throttle / Knock · Data in · ECU · Engine Control Unit · Processes inputs & · sends commands · Commands · ACTUATORS · Fuel Injectors · Ignition / Throttle",
+              "imageRef": null
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: Electronic Control Units (ECUs).",
+                "answer": "<div>Electronic engine control systems in automobiles utilize <strong>Electronic Control Units (ECUs)</strong> to manage and optimize engine performance, fuel efficiency, and emissions. These systems employ <strong>sensors</strong> to gather data about engine conditions and <strong>actuators</strong> to adjust engine parameters accordingly, all orchestrated by the ECU. This technology has revolutionized engine management, replacing mechanical systems with sophisticated electronic control.</div>"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Automotive Engineering & Workshop"
+}

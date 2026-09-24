@@ -1,0 +1,110 @@
+{
+  "course": "MEE 202",
+  "week": 3,
+  "title": "Quantum Numbers & Electron Configuration",
+  "subtitle": "The Schrödinger equation gives us three integers — n, l, m — that fully describe an electron's state. Add spin and you have four quantum numbers. These numbers govern the periodic table and determine how elements behave.",
+  "learningOutcome": "The Schrödinger equation gives us three integers — n, l, m — that fully describe an electron's state. Add spin and you have four quantum numbers. These numbers govern the periodic table and determine how elements behave.",
+  "metaChips": [
+    "MEE 202",
+    "Week 3"
+  ],
+  "tags": [
+    "Principal Quantum Number n",
+    "Azimuthal Quantum Number l",
+    "Magnetic Quantum Number m",
+    "Spin Quantum Number Mₛ",
+    "Aufbau Principle",
+    "Electron Configuration"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "The Four Quantum Numbers",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "The Four Quantum Numbers",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>The solutions to the three-dimensional Schrödinger equation are three sets of integers: n, l, and m. Each combination of n, l, and m is a unique quantum state called an <strong>orbital</strong>. Each orbital can have a maximum of two electrons, and the two electrons must have opposite spin.</p>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "Quantum Number",
+                "Name",
+                "What it determines",
+                "Permissible Values",
+                "n",
+                "Principal",
+                "Total energy of the electron; which shell it's in. As n increases, energy decreases (less negative) and approaches zero at infinity.",
+                "1, 2, 3, 4, 5 … n",
+                "l",
+                "Azimuthal (Angular momentum)",
+                "Shape and energy of the sub-level. Describes how the angular momentum of the electron is quantized. s, p, d, f correspond to l = 0, 1, 2, 3",
+                "0, 1, 2, 3 … (n−1)",
+                "m",
+                "Magnetic",
+                "The angle between the electron's angular momentum vector and an applied magnetic field. Has only a small effect on energy.",
+                "−l … 0 … +l",
+                "Mₛ",
+                "Spin",
+                "The spin of each electron — either \"up\" or \"down.\" The quantum number of the spin of each electron is usually denoted Mₛ.",
+                "+½ or −½ only"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Quantum Numbers for n = 1, 2, 3</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "n=1: l=0 (s), m=0 → 1 orbital, max 2 electrons [1s²] n=2: l=0 (s): m=0; l=1 (p): m=−1,0,+1 → 4 orbitals, max 8 electrons [2s²2p⁶] n=3: l=0,1,2 (s,p,d): m values from −l to +l → 9 orbitals, max 18 electrons Filling order (Aufbau): 1s → 2s → 2p → 3s → 3p → 4s → 3d → 4p → 5s → 4d… Note: 4s fills before 3d because the energy of the 4s orbital is lower than the energy of the 3d orbital."
+            },
+            {
+              "type": "analogy",
+              "text": "💡 The s, p, d, f Letters The letters s, p, d, f come from spectroscopy — they represent the lines which give rise to sharp, principal, diffuse and fundamental lines respectively. l=0 → s (spherically symmetrical, like a ball); l=1 → p (dumbbell, 3 orientations); l=2 → d (more complex, 5 orientations); l=3 → f (most complex, 7 orientations)."
+            },
+            {
+              "type": "insight",
+              "text": "⚠ Common Mistake Students confuse the total number of permissible m values with the total number of electrons. The total number of permissible m values gives the total number of orbitals while the total number of Mₛ values gives the total number of electrons in the atom . Each orbital holds max 2 electrons."
+            },
+            {
+              "type": "insight",
+              "text": "The 2021/22 paper asks you to complete a table of quantum numbers for n=1 and n=2. For n=2, you need: l can be 0 or 1. When l=0: m=0 only. When l=1: m=−1, 0, +1. Each combination is one orbital. Total orbitals for n=2: 4. Max electrons: 8."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "Discuss the quantum numbers n, l and m in detail. (2021/22, 2019/20)",
+                "Complete the quantum numbers table for n=1 and n=2. (2021/22)",
+                "State and explain three principles responsible for how orbitals in an atom are filled. (2021/22)",
+                "To specify an element one needs only to give the values of n and l and the number of electrons in each state. Explain with example."
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"The Four Quantum Numbers\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Science of Materials"
+}

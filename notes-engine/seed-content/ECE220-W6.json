@@ -1,0 +1,177 @@
+{
+  "course": "ECE 220",
+  "week": 6,
+  "title": "Functions & Libraries",
+  "subtitle": "Functions let you write code once and reuse it anywhere. Libraries extend Python with pre-built tools. Together they are the foundation of writing real, maintainable programs.",
+  "learningOutcome": "Functions let you write code once and reuse it anywhere. Libraries extend Python with pre-built tools. Together they are the foundation of writing real, maintainable programs.",
+  "metaChips": [
+    "ECE 220",
+    "Week 6"
+  ],
+  "tags": [
+    "def",
+    "Parameters",
+    "Return",
+    "Arguments",
+    "Built-in Functions",
+    "import",
+    "math",
+    "random"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Defining Functions with def",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Defining Functions with def",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>A function is a <strong>reusable block of code</strong>. Define it with <code>def</code>, then call it by name.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>def greet(name): print(\"Hello,\", name + \"!\") greet(\"Mumuni\") # Hello, Mumuni! greet(\"ECE 220\") # Hello, ECE 220!</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Write a Python function that takes two numbers and returns the larger one.</li>",
+                "<li>What is the difference between a parameter and an argument?</li>",
+                "<li>How do you import and use a library in Python?</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Defining Functions with def\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Parameters, Arguments & Return",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Parameters, Arguments & Return",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Parameters</strong> are variables in the function definition. <strong>Arguments</strong> are the actual values passed in. <code>return</code> sends a value back to the caller.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>def calculate_area(length, width): area = length * width return area result = calculate_area(5, 3) print(\"Area:\", result) # Area: 15 def get_larger(a, b): if a &gt;= b: return a else: return b print(get_larger(10, 7)) # 10 print(get_larger(3, 9)) # 9</pre>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Parameters, Arguments & Return\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Built-in Functions",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "Built-in Functions",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Python comes with many built-in functions: <code>len()</code>, <code>range()</code>, <code>int()</code>, <code>float()</code>, <code>str()</code>, <code>type()</code>, <code>abs()</code>, <code>round()</code>, <code>max()</code>, <code>min()</code>, <code>sum()</code>.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>numbers = [4, 7, 2, 9, 1] print(len(numbers)) # 5 print(max(numbers)) # 9 print(min(numbers)) # 1 print(sum(numbers)) # 23 print(round(3.7)) # 4</pre>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Built-in Functions\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Importing Libraries",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "4.1",
+          "title": "Importing Libraries",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Use <code>import</code> to bring in a library. The <code>math</code> library has <code>sqrt()</code>, <code>pi</code>, <code>pow()</code>, <code>floor()</code>, <code>ceil()</code>.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>import math print(math.sqrt(144)) # 12.0 print(math.pi) # 3.14159... print(math.floor(4.9)) # 4 print(math.ceil(4.1)) # 5 import random print(random.randint(1, 10)) # Random int between 1 and 10</pre>"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Calling a function before defining it — Python reads top to bottom. Also: forgetting return — without it, the function returns None ."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1] Write a function compute_bmi(weight, height) that returns the BMI (weight / height²).",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] Use the math library to compute the hypotenuse of a right triangle with sides 3 and 4.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] Write a function that takes a list of scores and returns the average, highest, and lowest score.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Introduction to Programming & Computations"
+}

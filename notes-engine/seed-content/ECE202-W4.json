@@ -1,0 +1,200 @@
+{
+  "course": "ECE 202",
+  "week": 4,
+  "title": "LU Decomposition",
+  "subtitle": "LU decomposition splits A into two triangular matrices L (lower) and U (upper) where LU = A. Solving AX = C becomes two simple triangular problems: LE = C (forward substitution), then UX = E (back substitution). The notes work through the 3×3 manufacturing problem giving x₁=1, x₂=2, x₃=4.",
+  "learningOutcome": "LU decomposition splits A into two triangular matrices L (lower) and U (upper) where LU = A. Solving AX = C becomes two simple triangular problems: LE = C (forward substitution), then UX = E (back substitution). The notes work through the 3×3 manufacturing problem giving x₁=1, x₂=2, x₃=4.",
+  "metaChips": [
+    "ECE 202",
+    "Week 4"
+  ],
+  "tags": [
+    "L = lower triangular, 1s on diagonal",
+    "U = upper triangular, 1s on diagonal",
+    "LU = A",
+    "Step 1: LE = C",
+    "Step 2: UX = E"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Finding L and U, then Solving in Two Stages",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Finding L and U, then Solving in Two Stages",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>L has 1s on the diagonal and the elimination multipliers below. U has 1s on the diagonal and the modified row values above. You find their entries by expanding LU = A term by term using the formulas from matrix multiplication.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>LU Structure (3×3)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>L = [ 1 0 0 ] U = [ 1 u₁₂ u₁₃ ] [ l₂₁ 1 0 ] [ 0 1 u₂₃ ] [ l₃₁ l₃₂ 1 ] [ 0 0 1 ] l₁₁ = l₂₂ = l₃₃ = 1 (always, for both L and U diagonals) l₂₁ = a₂₁ u₁₂ = a₁₂ l₃₁ = a₃₁ u₁₃ = a₁₃</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "Then the remaining entries are found from: l₂₂·u₂₂ + ... = a₂₂ etc."
+            },
+            {
+              "type": "paragraph",
+              "text": "<span>LU Decomposition — Manufacturing Problem from Notes</span>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>01</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>System and matrices</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>x₁ + 3x₂ + 2x₃ = 15 2x₁ + 4x₂ + 3x₃ = 22 3x₁ + 4x₂ + 7x₃ = 39 A = [ 1 3 2 ] C = [ 15 ] [ 2 4 3 ] [ 22 ] [ 3 4 7 ] [ 39 ]</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>02</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Find first column of L and first row of U — read directly from A</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>l₁₁ = 1 (diagonal, always) l₂₁ = a₂₁ = 2 l₃₁ = a₃₁ = 3 u₁₁ = 1 (diagonal, always) u₁₂ = a₁₂ = 3 u₁₃ = a₁₃ = 2</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>03</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Find l₂₂ from LU = A entry (2,2)</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>LU entry (2,2) must equal a₂₂ = 4: l₂₁·u₁₂ + l₂₂·1 = a₂₂ 2·3 + l₂₂ = 4 6 + l₂₂ = 4 l₂₂ = -2</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>04</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Find u₂₃ from LU = A entry (2,3)</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>LU entry (2,3) must equal a₂₃ = 3: l₂₁·u₁₃ + l₂₂·u₂₃ = a₂₃ 2·2 + (-2)·u₂₃ = 3 4 - 2·u₂₃ = 3 -2·u₂₃ = -1 u₂₃ = 1/2</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>05</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Find l₃₂ from LU = A entry (3,2)</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>LU entry (3,2) must equal a₃₂ = 4: l₃₁·u₁₂ + l₃₂·1 = a₃₂ 3·3 + l₃₂ = 4 9 + l₃₂ = 4 l₃₂ = -5</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>06</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Find l₃₃ from LU = A entry (3,3)</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>LU entry (3,3) must equal a₃₃ = 7: l₃₁·u₁₃ + l₃₂·u₂₃ + l₃₃·1 = a₃₃ 3·2 + (-5)·(1/2) + l₃₃ = 7 6 - 5/2 + l₃₃ = 7 l₃₃ = 7 - 6 + 5/2 = 7/2 = 3.5</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>07</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Write out the final L and U matrices</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>L = [ 1 0 0 ] U = [ 1 3 2 ] [ 2 -2 0 ] [ 0 1 1/2 ] [ 3 -5 7/2 ] [ 0 0 1 ] Verify: L × U should equal A ✓</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>08</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Solve LE = C (forward substitution)</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>[ 1 0 0 ][ e₁ ] [ 15 ] [ 2 -2 0 ][ e₂ ] = [ 22 ] [ 3 -5 7/2 ][ e₃ ] [ 39 ] Row 1: 1·e₁ = 15 → e₁ = 15 Row 2: 2·e₁ - 2·e₂ = 22 2(15) - 2e₂ = 22 30 - 2e₂ = 22 → e₂ = 4 Row 3: 3·e₁ - 5·e₂ + (7/2)·e₃ = 39 3(15) - 5(4) + (7/2)e₃ = 39 45 - 20 + (7/2)e₃ = 39 (7/2)e₃ = 14 → e₃ = 4 E = [ 15, 4, 4 ]</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>09</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Solve UX = E (back substitution)</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>[ 1 3 2 ][ x₁ ] [ 15 ] [ 0 1 1/2 ][ x₂ ] = [ 4 ] [ 0 0 1 ][ x₃ ] [ 4 ] Row 3: x₃ = 4 Row 2: x₂ + (1/2)(4) = 4 x₂ + 2 = 4 → x₂ = 2 Row 1: x₁ + 3(2) + 2(4) = 15 x₁ + 6 + 8 = 15 x₁ = 1</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div>x₁ = 1 (Supplier A), x₂ = 2 (Supplier B), x₃ = 4 (Supplier C)</div>"
+            },
+            {
+              "type": "analogy",
+              "text": "Why use LU? If you have the same matrix A but need to solve it for 10 different right-hand sides, LU means you decompose once and run 10 cheap substitutions. Redoing full Gaussian each time would be 10× the work. This is why engineering software prefers LU."
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Mixing up L and U: L is the lower triangle (values below the diagonal come from the elimination multipliers). U is the upper triangle (values above the diagonal come from the modified row entries after scaling). Both have 1s on the main diagonal itself."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "Solve x₁+3x₂+2x₃=15, 2x₁+4x₂+3x₃=22, 3x₁+4x₂+7x₃=39 using LU decomposition. (Core example — A=1, B=2, C=4)",
+                "Decompose A into L and U matrices, show LU = A, then solve LE = C and UX = E."
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Finding L and U, then Solving in Two Stages\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Engineering Mathematics"
+}

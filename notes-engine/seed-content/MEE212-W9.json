@@ -1,0 +1,108 @@
+{
+  "course": "MEE 212",
+  "week": 9,
+  "title": "Epicyclic Gear System — Tabular Method",
+  "subtitle": "The epicyclic (planetary) gear system is the most complex gear arrangement. One or more gears orbit around another gear. The tabular method is the cleanest way to solve these problems — and it always follows the same 3 steps.",
+  "learningOutcome": "The epicyclic (planetary) gear system is the most complex gear arrangement. One or more gears orbit around another gear. The tabular method is the cleanest way to solve these problems — and it always follows the same 3 steps.",
+  "metaChips": [
+    "MEE 212",
+    "Week 9"
+  ],
+  "tags": [
+    "Epicyclic gear",
+    "Planetary gear",
+    "Tabular method",
+    "Sun gear",
+    "Planet gear",
+    "Arm"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "The Tabular Method — 3 Steps",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "The Tabular Method — 3 Steps",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Here's the deal with epicyclic gears: the arm (the thing that holds the planet gears) can also rotate. This makes it confusing. The tabular method fixes that by breaking everything into 3 simple steps that always work.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>3-step tabular method</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>Step 1: Fix the arm. Give gear A exactly +1 revolution. Fill in all gear speeds using gear ratio rules (−Z_A/Z_C for meshing gears).</div>",
+                "<div>Step 2: Now fix the arm. Give gear A exactly +x revolutions. Multiply entire Step 1 row by x.</div>",
+                "<div>Step 3: Add y to every element in every column. This accounts for the arm's actual rotation.</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "x and y are found by applying conditions (e.g. arm speed = y, fixed gear speed = 0 → set the gear's column = 0 and solve)"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Speed of gear B in compound epicyclic</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>N_B = y + x[Z_A/Z_C × Z_D/Z_B]</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "Z_A = teeth on gear A · Z_C, Z_D = teeth on intermediate gears · Z_B = teeth on gear B · y = arm speed · x = relative rotation"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Forgetting to ADD y in Step 3 — students often just multiply by x and stop. The y term is the arm's absolute rotation, and without it, all your answers are relative, not absolute. Always do all 3 steps."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Use the tabular method to find speed of any gear in an epicyclic system. <span>Common exam Q</span></li>",
+                "<li>Set up the table with 3 steps: arm fixed, arm rotates x, add y.</li>",
+                "<li>Apply conditions (fixed gear = 0 speed) to find x and y, then solve.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1] In an epicyclic gear system, what does the arm do? Why do we need the tabular method?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] State the 3 steps of the tabular method briefly.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] Gear A (72 teeth) is fixed. Arm speed = 18 rpm CW. Z_B = 20. Find N_B using the tabular method.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Theory of Machines"
+}

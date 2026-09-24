@@ -1,0 +1,154 @@
+{
+  "course": "IPE 212",
+  "week": 3,
+  "title": "Automotive Shop Safety",
+  "subtitle": "90% of workplace accidents are due to negligence and impatience. This week covers the definition of safety, its types, and the eight categories of shop safety rules that every engineer must know before stepping into a workshop.",
+  "learningOutcome": "90% of workplace accidents are due to negligence and impatience. This week covers the definition of safety, its types, and the eight categories of shop safety rules that every engineer must know before stepping into a workshop.",
+  "metaChips": [
+    "IPE 212",
+    "Week 3"
+  ],
+  "tags": [
+    "Safety",
+    "PPE",
+    "Negligence",
+    "MSDS",
+    "PASS method",
+    "CPR",
+    "Jack stand"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Definition and Types of Safety",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Definition and Types of Safety",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Safety isn't just a set of rules — it's a mindset. If you walk into a workshop already thinking about what could go wrong, you're much less likely to get hurt. Think of safety like a mental helmet you wear before you even put on the physical one.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div><strong>Safety consciousness</strong> is an attitude, i.e. it is a frame of mind that secures you from accident. Most accidents at workplaces are preventable if we have a safety mindset. <strong>Safety</strong> is a condition of being protected from or unlikely incident that can cause danger, risk, or injury.</div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div><strong>Types of Safety:</strong> 1. Self-safety or personal safety 2. General Shop Safety Rules 3. Fire and Chemical Safety 4. Electrical Safety 5. Machine and tool safety 6. Lifting and Vehicle Safety 7. Clean-Up and Waste Disposal 8. Training and Awareness</div>"
+            },
+            {
+              "type": "analogy",
+              "text": "90% of accidents at workplaces are mainly due to negligence and impatience of skilled and unskilled workers, resulting in grievous consequences such as damage of properties, loss of wealth, and sometimes loss of lives."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "Define safety. List and explain FOUR types of safety in an automotive workshop.",
+                "What is PPE? List five personal protective equipment items and state when each is used.",
+                "What percentage of workplace accidents are attributed to negligence and impatience? Discuss how safety culture prevents accidents.",
+                "Explain the correct procedure for lifting and vehicle safety in an automotive shop."
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: Safety consciousness.",
+                "answer": "<div><strong>Safety consciousness</strong> is an attitude, i.e. it is a frame of mind that secures you from accident. Most accidents at workplaces are preventable if we have a safety mindset. <strong>Safety</strong> is a condition of being protected from or unlikely incident that can cause danger, risk, or injury.</div>"
+              },
+              {
+                "type": "reveal",
+                "question": "Define: Types of Safety.",
+                "answer": "<div><strong>Types of Safety:</strong> 1. Self-safety or personal safety 2. General Shop Safety Rules 3. Fire and Chemical Safety 4. Electrical Safety 5. Machine and tool safety 6. Lifting and Vehicle Safety 7. Clean-Up and Waste Disposal 8. Training and Awareness</div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Self-Safety / Personal Protective Equipment (PPE)",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Self-Safety / Personal Protective Equipment (PPE)",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Personal safety is your first line of defence. Before touching any machine, you gear up — just like a soldier puts on armour before battle. Each piece of PPE protects a specific part of your body from a specific hazard.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div><strong>Safety Glasses/Goggles:</strong> Always wear eye protection to prevent injury from flying debris, fluids, or sparks. <strong>Gloves:</strong> Use appropriate gloves for handling chemicals or sharp parts. Avoid wearing gloves near rotating machinery. <strong>Coveralls or Shop Coats:</strong> Wear flame-resistant clothing to prevent injury from hot surfaces and sparks. <strong>Steel-Toed Boots:</strong> Protect feet from heavy objects and tools. <strong>Hearing Protection:</strong> Use earplugs or earmuffs in high-noise environments.</div>"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — A very common error: wearing gloves while operating a drill press or lathe. Gloves near rotating machinery are actually DANGEROUS — the glove can get caught and pull your hand into the machine. The rule is: no gloves near rotating machinery."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: Safety Glasses/Goggles.",
+                "answer": "<div><strong>Safety Glasses/Goggles:</strong> Always wear eye protection to prevent injury from flying debris, fluids, or sparks. <strong>Gloves:</strong> Use appropriate gloves for handling chemicals or sharp parts. Avoid wearing gloves near rotating machinery. <strong>Coveralls or Shop Coats:</strong> Wear flame-resistant clothing to prevent injury from hot surfaces and sparks. <strong>Steel-Toed Boots:</strong> Protect feet from heavy objects and tools. <strong>Hearing Protection:</strong> Use earplugs or earmuffs in high-noise environments.</div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "General Shop, Fire, Chemical, Electrical & Remaining Safety Rules",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "General Shop, Fire, Chemical, Electrical & Remaining Safety Rules",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<div><strong>2. General Shop Safety Rules:</strong> — No Horseplay: Always act professionally and stay focused. — Keep the Shop Clean: Spills, tools, and parts left around can cause accidents. — Proper Lighting: Work areas must be well-lit. — Ventilation: Use fans or exhaust systems to clear fumes from chemicals and exhaust gases. — Emergency Exits: Know all emergency exit locations and keep them unobstructed. <strong>3. Fire and Chemical Safety:</strong> — No Smoking especially near flammable liquids or batteries. — Proper Storage: Store flammable materials in approved cabinets. — Labelling: Ensure all chemicals are labelled properly with MSDS available. — Fire Extinguishers: Know where extinguishers are located and how to use them (PASS method). <strong>4. Electrical Safety:</strong> — Disconnect Power: Before working on any electrical system, disconnect the battery. — Inspect Tools: Ensure electrical tools and cords are in good condition. — Dry Hands and Area: Never work with electrical components in wet or damp conditions.</div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div><strong>5. Tool and Equipment Safety:</strong> — Use the Right Tool: Always use tools for their intended purpose. — Inspect Before Use: Check tools and equipment for wear or damage. — Secure Work: Ensure parts or vehicles are properly supported before working under them. — Follow Manufacturer Instructions: For lifts, hoists, jacks, and specialty equipment. <strong>6. Lifting and Vehicle Safety:</strong> — Use Jack Stands: Never rely solely on a hydraulic jack. — Lift Properly: Use your legs, not your back, when lifting heavy items. — Chock Wheels: Prevent vehicles from rolling unexpectedly. — Hoist Operation: Only trained personnel should use vehicle lifts. <strong>7. Clean-Up and Waste Disposal:</strong> — Dispose of Fluids Properly: Use designated containers for oil, coolant, etc. — Recycle Batteries and Tires: Follow local regulations for disposal. — Spill Kits: Have absorbents and spill kits available. <strong>8. Training and Awareness:</strong> — First Aid & CPR: At least one person per shift should be trained. — Emergency Procedures: Know how to respond to fires, injuries, or chemical spills. — Toolbox Talks: Regular safety briefings help reinforce good habits. — Report Hazards: Notify a supervisor immediately if you spot unsafe conditions.</div>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: 2. General Shop Safety Rules.",
+                "answer": "<div><strong>2. General Shop Safety Rules:</strong> — No Horseplay: Always act professionally and stay focused. — Keep the Shop Clean: Spills, tools, and parts left around can cause accidents. — Proper Lighting: Work areas must be well-lit. — Ventilation: Use fans or exhaust systems to clear fumes from chemicals and exhaust gases. — Emergency Exits: Know all emergency exit locations and keep them unobstructed. <strong>3. Fire and Chemical Safety:</strong> — No Smoking especially near flammable liquids or batteries. — Proper Storage: Store flammable materials in approved cabinets. — Labelling: Ensure all chemicals are labelled properly with MSDS available. — Fire Extinguishers: Know where extinguishers are located and how to use them (PASS method). <strong>4. Electrical Safety:</strong> — Disconnect Power: Before working on any electrical system, disconnect the battery. — Inspect Tools: Ensure electrical tools and cords are in good condition. — Dry Hands and Area: Never work with electrical components in wet or damp conditions.</div>"
+              },
+              {
+                "type": "reveal",
+                "question": "Define: 5. Tool and Equipment Safety.",
+                "answer": "<div><strong>5. Tool and Equipment Safety:</strong> — Use the Right Tool: Always use tools for their intended purpose. — Inspect Before Use: Check tools and equipment for wear or damage. — Secure Work: Ensure parts or vehicles are properly supported before working under them. — Follow Manufacturer Instructions: For lifts, hoists, jacks, and specialty equipment. <strong>6. Lifting and Vehicle Safety:</strong> — Use Jack Stands: Never rely solely on a hydraulic jack. — Lift Properly: Use your legs, not your back, when lifting heavy items. — Chock Wheels: Prevent vehicles from rolling unexpectedly. — Hoist Operation: Only trained personnel should use vehicle lifts. <strong>7. Clean-Up and Waste Disposal:</strong> — Dispose of Fluids Properly: Use designated containers for oil, coolant, etc. — Recycle Batteries and Tires: Follow local regulations for disposal. — Spill Kits: Have absorbents and spill kits available. <strong>8. Training and Awareness:</strong> — First Aid & CPR: At least one person per shift should be trained. — Emergency Procedures: Know how to respond to fires, injuries, or chemical spills. — Toolbox Talks: Regular safety briefings help reinforce good habits. — Report Hazards: Notify a supervisor immediately if you spot unsafe conditions.</div>"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Automotive Engineering & Workshop"
+}

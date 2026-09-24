@@ -1,0 +1,156 @@
+{
+  "course": "ECE 220",
+  "week": 12,
+  "title": "Past Questions — 2024/2025 Exam Paper",
+  "subtitle": "Full 2024/2025 ECE 220 exam paper with model answers. Study the question patterns carefully — the same question types reappear every year with different numbers. Cover each answer and try to write yours before looking.",
+  "learningOutcome": "Full 2024/2025 ECE 220 exam paper with model answers. Study the question patterns carefully — the same question types reappear every year with different numbers. Cover each answer and try to write yours before looking.",
+  "metaChips": [
+    "ECE 220",
+    "Week 12"
+  ],
+  "tags": [],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Question 1 — Compulsory (25 Marks)",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Question 1 — Compulsory (25 Marks)",
+          "abbr": "ECE",
+          "content": [],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1a · 4 marks] What is a computer program? List any four (4) characteristics of a good computer program.",
+                "answer": "<div> <div>Model Answer</div> <p>A <strong>computer program</strong> is a set of instructions written in a programming language that tells a computer how to perform a specific task. Characteristics of a good program: (1) <strong>Correctness</strong> — produces accurate results; (2) <strong>Readability</strong> — easy to understand; (3) <strong>Efficiency</strong> — uses minimal time/memory; (4) <strong>Maintainability</strong> — easy to modify; (5) <strong>Reliability</strong> — works correctly under all conditions.</p> </div>"
+              },
+              {
+                "type": "reveal",
+                "question": "[Q1b · 5 marks] Define the following Python terms: (i) Variable (ii) Data type (iii) Operator (iv) Expression (v) Keyword",
+                "answer": "<div> <div>Model Answer</div> <p> (i) <strong>Variable</strong> — a named location in memory used to store data. (ii) <strong>Data type</strong> — classifies the kind of value a variable can hold (int, float, str, bool). (iii) <strong>Operator</strong> — a symbol that performs an operation on operands (e.g., +, -, *, /). (iv) <strong>Expression</strong> — a combination of variables, operators, and values that evaluates to a result (e.g., <code>3 + x * 2</code>). (v) <strong>Keyword</strong> — a reserved word with a special meaning in Python that cannot be used as a variable name (e.g., <code>if</code>, <code>for</code>, <code>def</code>). </p> </div>"
+              },
+              {
+                "type": "reveal",
+                "question": "[Q1c · 5 marks] Enumerate five (5) conditions for naming a perfect variable in Python.",
+                "answer": "<div> <div>Model Answer</div> <p> (1) Variable names can only contain letters (a–z, A–Z), digits (0–9), and underscores (_). (2) A variable name cannot start with a digit — it must begin with a letter or underscore. (3) Python is case-sensitive: <code>Score</code>, <code>score</code>, and <code>SCORE</code> are three different variables. (4) Reserved keywords (e.g., <code>if</code>, <code>else</code>, <code>for</code>, <code>class</code>) cannot be used as variable names. (5) Special characters (#, @, !, $, %, -, space, etc.) are not allowed in variable names. </p> </div>"
+              },
+              {
+                "type": "reveal",
+                "question": "[Q1d · 6 marks] Write a Python program that accepts user input for: (i) test score (ii) assignment score (iii) attendance percentage. The program should compute the final mark using the formula: Final = (Test + 2×Assignment) / 3 + (5 if attendance ≥ 90 else 0). Print the final mark.",
+                "answer": "<div> <div>Model Answer</div> <div>test_score = <span>float</span>(<span>input</span>(<span>\"Enter test score: \"</span>)) assignment_score = <span>float</span>(<span>input</span>(<span>\"Enter assignment score: \"</span>)) attendance = <span>float</span>(<span>input</span>(<span>\"Enter attendance (%): \"</span>)) bonus = <span>5</span> <span>if</span> attendance >= <span>90</span> <span>else</span> <span>0</span> final = (test_score + <span>2</span> * assignment_score) / <span>3</span> + bonus <span>print</span>(<span>f</span><span>\"Final Mark: {final:.2f}\"</span>)</div> </div>"
+              },
+              {
+                "type": "reveal",
+                "question": "[Q1e · 5 marks] Write a Python program that reads 10 numbers from the user using a while loop and prints (i) the sum (ii) the average (iii) the largest number entered.",
+                "answer": "<div> <div>Model Answer</div> <div>count = <span>0</span> total = <span>0</span> largest = <span>None</span> <span>while</span> count <span>10</span>: num = <span>float</span>(<span>input</span>(<span>f</span><span>\"Enter number {count+1}: \"</span>)) total += num <span>if</span> largest <span>is</span> <span>None</span> <span>or</span> num > largest: largest = num count += <span>1</span> average = total / <span>10</span> <span>print</span>(<span>f</span><span>\"Sum: {total}\"</span>) <span>print</span>(<span>f</span><span>\"Average: {average:.2f}\"</span>) <span>print</span>(<span>f</span><span>\"Largest: {largest}\"</span>)</div> </div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Question 2 (25 Marks)",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Question 2 (25 Marks)",
+          "abbr": "ECE",
+          "content": [],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q2a · 5 marks] With the aid of a diagram, describe the Software Development Life Cycle (SDLC). State any four phases.",
+                "answer": "<div> <div>Model Answer</div> <p> The <strong>SDLC</strong> is a structured process for planning, creating, testing, and deploying software. <strong>Phases:</strong> 1. <strong>Planning</strong> — Define scope, feasibility, resources 2. <strong>Analysis / Requirements</strong> — Gather and document what the system must do 3. <strong>Design</strong> — System architecture, database design, UI design 4. <strong>Implementation (Coding)</strong> — Write the actual program 5. <strong>Testing</strong> — Verify the program works correctly (unit, integration, user testing) 6. <strong>Deployment</strong> — Release to users 7. <strong>Maintenance</strong> — Fix bugs, add features </p> </div>"
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2b · 10 marks] Give the output of the following Python statements: (i) print(9//2) (ii) print(9%2) (iii) print(210**3) (iv) x=5; print(x>3 and x<10) (v) print(10!=9) (vi) print(5 & 7) (vii) print(5|7) (viii) print(5^7) (ix) print(5<<1) (x) print(5>>1)",
+                "answer": "<div> <div>Model Answer</div> <p> (i) <code>4</code> (ii) <code>1</code> (iii) <code>9261000</code> (iv) <code>True</code> (v) <code>True</code> (vi) <code>5</code> (5=101, 7=111, AND→101=5) (vii) <code>7</code> (OR→111=7) (viii) <code>2</code> (XOR→010=2) (ix) <code>10</code> (5×2=10) (x) <code>2</code> (5÷2=2) </p> </div>"
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2c · 10 marks] Write a Python program that: reads a list of 5 student names and their scores, stores them, then prints each student's name, score, and grade (A/B/C/D/F). Finally print the class average.",
+                "answer": "<div> <div>Model Answer</div> <div>students = [] <span>for</span> i <span>in</span> <span>range</span>(<span>5</span>): name = <span>input</span>(<span>f</span><span>\"Enter name {i+1}: \"</span>) score = <span>float</span>(<span>input</span>(<span>f</span><span>\"Enter score for {name}: \"</span>)) students.<span>append</span>((name, score)) <span>print</span>(<span>\"\\n--- Results ---\"</span>) total = <span>0</span> <span>for</span> name, score <span>in</span> students: <span>if</span> score >= <span>70</span>: grade = <span>\"A\"</span> <span>elif</span> score >= <span>60</span>: grade = <span>\"B\"</span> <span>elif</span> score >= <span>50</span>: grade = <span>\"C\"</span> <span>elif</span> score >= <span>45</span>: grade = <span>\"D\"</span> <span>else</span>: grade = <span>\"F\"</span> <span>print</span>(<span>f</span><span>\"{name}: {score:.1f} — Grade {grade}\"</span>) total += score <span>print</span>(<span>f</span><span>\"\\nClass Average: {total/5:.2f}\"</span>)</div> </div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Question 3 (25 Marks)",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "Question 3 (25 Marks)",
+          "abbr": "ECE",
+          "content": [],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q3a · 5 marks] Distinguish between: (i) for loop and while loop (ii) break and continue",
+                "answer": "<div> <div>Model Answer</div> <p> <strong>for loop vs while loop:</strong> A <code>for</code> loop iterates over a sequence (list, range, string) a known number of times. A <code>while</code> loop repeats as long as a condition is True — used when the number of iterations is unknown. <strong>break vs continue:</strong> <code>break</code> immediately exits the entire loop. <code>continue</code> skips the rest of the current iteration and jumps to the next one — the loop keeps running. </p> </div>"
+              },
+              {
+                "type": "reveal",
+                "question": "[Q3b · 10 marks] Write a Python function called is_prime(n) that returns True if n is a prime number and False otherwise. Use it to print all prime numbers between 1 and 50.",
+                "answer": "<div> <div>Model Answer</div> <div><span>def</span> <span>is_prime</span>(n): <span>if</span> n <span>2</span>: <span>return</span> <span>False</span> <span>for</span> i <span>in</span> <span>range</span>(<span>2</span>, n): <span>if</span> n % i == <span>0</span>: <span>return</span> <span>False</span> <span>return</span> <span>True</span> <span>print</span>(<span>\"Prime numbers from 1 to 50:\"</span>) <span>for</span> num <span>in</span> <span>range</span>(<span>1</span>, <span>51</span>): <span>if</span> <span>is_prime</span>(num): <span>print</span>(num, end=<span>\" \"</span>) <span># Output: 2 3 5 7 11 13 17 19 23 29 31 37 41 43 47</span></div> </div>"
+              },
+              {
+                "type": "reveal",
+                "question": "[Q3c · 10 marks] Write a Python program that: (i) reads a string from the user, (ii) counts the number of vowels, consonants, spaces, and digits in the string, (iii) prints the string reversed and in uppercase.",
+                "answer": "<div> <div>Model Answer</div> <div>text = <span>input</span>(<span>\"Enter a string: \"</span>) vowels = consonants = spaces = digits = <span>0</span> <span>for</span> ch <span>in</span> text.<span>lower</span>(): <span>if</span> ch <span>in</span> <span>\"aeiou\"</span>: vowels += <span>1</span> <span>elif</span> ch.<span>isalpha</span>(): consonants += <span>1</span> <span>elif</span> ch == <span>\" \"</span>: spaces += <span>1</span> <span>elif</span> ch.<span>isdigit</span>(): digits += <span>1</span> <span>print</span>(<span>f</span><span>\"Vowels: {vowels}, Consonants: {consonants}\"</span>) <span>print</span>(<span>f</span><span>\"Spaces: {spaces}, Digits: {digits}\"</span>) <span>print</span>(<span>f</span><span>\"Reversed: {text[::-1]}\"</span>) <span>print</span>(<span>f</span><span>\"Uppercase: {text.upper()}\"</span>)</div> </div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Question 4 (25 Marks)",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "4.1",
+          "title": "Question 4 (25 Marks)",
+          "abbr": "ECE",
+          "content": [],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q4a · 5 marks] What is a list in Python? State four (4) differences between a list and a tuple.",
+                "answer": "<div> <div>Model Answer</div> <p> A <strong>list</strong> is an ordered, mutable collection of items in Python, enclosed in square brackets <code>[]</code>. <strong>List vs Tuple:</strong> 1. Lists are <strong>mutable</strong> (can be changed); tuples are <strong>immutable</strong> (cannot be changed after creation). 2. Lists use <code>[]</code>; tuples use <code>()</code>. 3. Lists have more methods (append, remove, sort); tuples have fewer. 4. Tuples are faster and use less memory than lists. </p> </div>"
+              },
+              {
+                "type": "reveal",
+                "question": "[Q4b · 10 marks] Write a recursive Python function to compute the Fibonacci sequence. Print the first 10 Fibonacci numbers.",
+                "answer": "<div> <div>Model Answer</div> <div><span>def</span> <span>fibonacci</span>(n): <span>if</span> n = <span>0</span>: <span>return</span> <span>0</span> <span># base case 1</span> <span>if</span> n == <span>1</span>: <span>return</span> <span>1</span> <span># base case 2</span> <span>return</span> <span>fibonacci</span>(n - <span>1</span>) + <span>fibonacci</span>(n - <span>2</span>) <span>print</span>(<span>\"First 10 Fibonacci numbers:\"</span>) <span>for</span> i <span>in</span> <span>range</span>(<span>10</span>): <span>print</span>(<span>fibonacci</span>(i), end=<span>\" \"</span>) <span># Output: 0 1 1 2 3 5 8 13 21 34</span></div> </div>"
+              },
+              {
+                "type": "reveal",
+                "question": "[Q4c · 10 marks] Write a Python program that uses a dictionary to store the names and ages of five (5) students. Then: (i) print all names and ages, (ii) find and print the oldest student, (iii) add a new student, (iv) delete one student by name.",
+                "answer": "<div> <div>Model Answer</div> <div>students = { <span>\"Amaka\"</span>: <span>20</span>, <span>\"Bola\"</span>: <span>22</span>, <span>\"Chidi\"</span>: <span>19</span>, <span>\"Dami\"</span>: <span>21</span>, <span>\"Emeka\"</span>: <span>23</span> } <span># (i) Print all names and ages</span> <span>for</span> name, age <span>in</span> students.<span>items</span>(): <span>print</span>(<span>f</span><span>\"{name}: {age} years\"</span>) <span># (ii) Find oldest student</span> oldest = <span>max</span>(students, key=students.<span>get</span>) <span>print</span>(<span>f</span><span>\"Oldest: {oldest} ({students[oldest]} years)\"</span>) <span># (iii) Add new student</span> students[<span>\"Fatima\"</span>] = <span>20</span> <span># (iv) Delete a student</span> <span>del</span> students[<span>\"Chidi\"</span>] <span>print</span>(<span>\"Updated list:\"</span>, <span>list</span>(students.<span>keys</span>()))</div> </div>"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Introduction to Programming & Computations"
+}

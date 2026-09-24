@@ -1,0 +1,120 @@
+{
+  "course": "IPE 212",
+  "week": 12,
+  "title": "Aerodynamics & Vehicle Maintenance",
+  "subtitle": "Aerodynamics explains how air interacts with moving vehicles, affecting drag, lift, and fuel efficiency. Vehicle maintenance covers the eight types of maintenance strategies used in engineering to keep vehicles and equipment running reliably.",
+  "learningOutcome": "Aerodynamics explains how air interacts with moving vehicles, affecting drag, lift, and fuel efficiency. Vehicle maintenance covers the eight types of maintenance strategies used in engineering to keep vehicles and equipment running reliably.",
+  "metaChips": [
+    "IPE 212",
+    "Week 12"
+  ],
+  "tags": [
+    "Aerodynamics",
+    "Drag",
+    "Lift",
+    "Preventive maintenance",
+    "Corrective maintenance",
+    "Predictive maintenance",
+    "CBM",
+    "TPM"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Aerodynamics and Resistances to Vehicle Motion",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Aerodynamics and Resistances to Vehicle Motion",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>When a car moves, it has to push air out of the way. The air pushes back — this is drag. Good aerodynamic design reduces drag so the engine doesn't have to work as hard to maintain speed. It's why sports cars are shaped like teardrops and not like boxes — a box shape creates much more drag than a curved shape.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div> <strong>Aerodynamics:</strong> From Greek — aer (air) + dynamike (dynamics). It is a branch of dynamics concerned with studying the motion of air, particularly when it interacts with a solid object, such as an airplane wing. Aerodynamics is a sub-field of fluid dynamics and gas dynamics. The term aerodynamics is often used synonymously with gas dynamics. <strong>Fundamental Concept:</strong> Understanding the motion of air around an object (a flow field) enables the calculation of forces and moments acting on the object. The fundamental forces of flight (and vehicle motion): <strong>lift, drag, thrust, and weight</strong>. Of these, lift and drag are aerodynamic forces — forces due to air flow over a solid body. </div>"
+            },
+            {
+              "type": "diagram",
+              "caption": "Figure",
+              "description": "LIFT ↑ · WEIGHT ↓ · THRUST → · ← DRAG",
+              "imageRef": null
+            },
+            {
+              "type": "analogy",
+              "text": "Formula 1 cars have large rear wings that create downforce (negative lift) to push the car into the track, improving tyre grip and cornering. This increases drag but the benefit — much faster cornering speeds — outweighs the cost in straight-line speed."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "Define aerodynamics. What are the four fundamental forces acting on an airfoil / vehicle in motion?",
+                "List and explain FOUR types of maintenance in engineering. Give an example of each.",
+                "Distinguish between Preventive Maintenance and Corrective Maintenance. When is each appropriate?",
+                "What is Total Productive Maintenance (TPM)? State its three pillars."
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: Aerodynamics.",
+                "answer": "<div> <strong>Aerodynamics:</strong> From Greek — aer (air) + dynamike (dynamics). It is a branch of dynamics concerned with studying the motion of air, particularly when it interacts with a solid object, such as an airplane wing. Aerodynamics is a sub-field of fluid dynamics and gas dynamics. The term aerodynamics is often used synonymously with gas dynamics. <strong>Fundamental Concept:</strong> Understanding the motion of air around an object (a flow field) enables the calculation of forces and moments acting on the object. The fundamental forces of flight (and vehicle motion): <strong>lift, drag, thrust, and weight</strong>. Of these, lift and drag are aerodynamic forces — forces due to air flow over a solid body. </div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Types of Maintenance in Engineering",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Types of Maintenance in Engineering",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Maintenance is how you keep machines running reliably. Different situations call for different strategies — sometimes you schedule regular check-ups (preventive), sometimes you fix things after they break (corrective), and sometimes technology tells you when something is about to fail before it actually does (predictive).</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div> <strong>1. Preventive Maintenance (PM):</strong> Scheduled maintenance performed to prevent breakdowns or failures. Examples: Lubrication, inspections, cleaning, part replacement on a schedule. Advantage: Reduces the likelihood of equipment failure. <strong>2. Corrective Maintenance (CM):</strong> Carried out after a fault is detected and is aimed at restoring equipment to proper working condition. Two types: — Planned Corrective: When the issue is known and scheduled for repair. — Unplanned Corrective (Breakdown Maintenance): After equipment has failed unexpectedly. <strong>3. Predictive Maintenance (PdM):</strong> Uses data and condition monitoring tools to predict failure before they occur. Examples: Vibration analysis, thermography, oil analysis. Advantage: Perform maintenance only when needed, based on actual equipment condition. <strong>4. Condition Based Maintenance (CBM):</strong> Performed when certain indicators show signs of decreasing performance or upcoming failure. Tools used: Sensors, diagnostic software. Difference from PdM: CBM reacts to current conditions; PdM predicts future failure. <strong>5. Reliability Centred Maintenance (RCM):</strong> A strategy focused on identifying the most effective maintenance approach based on risk and reliability. Advantage: Optimize safety, performance, and cost-effectiveness. <strong>6. Emergency Maintenance:</strong> Urgent repairs to prevent serious consequences or safety hazards. Example: Fixing a gas leak or electrical short. <strong>7. Deferred Maintenance:</strong> Maintenance that has been delayed due to budget or resource constraints. Risk: Can lead to larger issues or failures later. <strong>8. Total Productive Maintenance (TPM):</strong> Involves all employees in maintaining equipment with the goal of zero breakdowns and zero defects. Pillars: Autonomous Maintenance, Focused Improvement, Training. </div>"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Students confuse Predictive (PdM) and Condition Based (CBM) maintenance. Key distinction: PdM uses historical data and trends to PREDICT future failure — it acts BEFORE any symptom appears. CBM responds to current condition indicators already showing signs of decline. PdM is proactive; CBM is reactive to early warning signs."
+            },
+            {
+              "type": "analogy",
+              "text": "Airlines use Predictive Maintenance extensively. Jet engines transmit thousands of data points per second to ground teams. Algorithms detect subtle changes in vibration patterns that indicate a bearing is starting to wear — and the engine is serviced during the next scheduled stop, before any failure occurs. This prevents mid-flight emergencies."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: 1. Preventive Maintenance (PM).",
+                "answer": "<div> <strong>1. Preventive Maintenance (PM):</strong> Scheduled maintenance performed to prevent breakdowns or failures. Examples: Lubrication, inspections, cleaning, part replacement on a schedule. Advantage: Reduces the likelihood of equipment failure. <strong>2. Corrective Maintenance (CM):</strong> Carried out after a fault is detected and is aimed at restoring equipment to proper working condition. Two types: — Planned Corrective: When the issue is known and scheduled for repair. — Unplanned Corrective (Breakdown Maintenance): After equipment has failed unexpectedly. <strong>3. Predictive Maintenance (PdM):</strong> Uses data and condition monitoring tools to predict failure before they occur. Examples: Vibration analysis, thermography, oil analysis. Advantage: Perform maintenance only when needed, based on actual equipment condition. <strong>4. Condition Based Maintenance (CBM):</strong> Performed when certain indicators show signs of decreasing performance or upcoming failure. Tools used: Sensors, diagnostic software. Difference from PdM: CBM reacts to current conditions; PdM predicts future failure. <strong>5. Reliability Centred Maintenance (RCM):</strong> A strategy focused on identifying the most effective maintenance approach based on risk and reliability. Advantage: Optimize safety, performance, and cost-effectiveness. <strong>6. Emergency Maintenance:</strong> Urgent repairs to prevent serious consequences or safety hazards. Example: Fixing a gas leak or electrical short. <strong>7. Deferred Maintenance:</strong> Maintenance that has been delayed due to budget or resource constraints. Risk: Can lead to larger issues or failures later. <strong>8. Total Productive Maintenance (TPM):</strong> Involves all employees in maintaining equipment with the goal of zero breakdowns and zero defects. Pillars: Autonomous Maintenance, Focused Improvement, Training. </div>"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Automotive Engineering & Workshop"
+}

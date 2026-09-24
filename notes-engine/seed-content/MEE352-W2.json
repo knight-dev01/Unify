@@ -1,0 +1,435 @@
+{
+  "course": "MEE 352",
+  "week": 2,
+  "title": "Unconventional/Renewable Energy Sources",
+  "subtitle": "Solar, Wind, Biomass, Geothermal, Ocean, Chemical & MHD Energy",
+  "learningOutcome": "By the end of this week, you should be able to describe each unconventional energy source, state their potential, and explain how MHD power generation works.",
+  "metaChips": [
+    "MEE 352",
+    "Week 2"
+  ],
+  "tags": [
+    "Solar Energy",
+    "Wind Energy",
+    "Biomass",
+    "Geothermal",
+    "Ocean Energy",
+    "MHD",
+    "Chemical Energy"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Unconventional Energy Sources",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Unconventional Energy Sources",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>While fossil fuel is considered the main fuels for thermal power, there is fear that they well get exhausted eventually by the next century. Therefor the renewable sources are being tried. These are listed above.</p>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Unconventional Energy Sources\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "Summarise the key facts about Unconventional Energy Sources.",
+          "answer": "<div>Re-read the notes above and recall: the definition, key figures/statistics, examples, and applications of <strong>Unconventional Energy Sources</strong>.</div>"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Solar Energy",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Solar Energy",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>It is the major source of energy. Its potential is 180 billion mega watt (BMW) which is nearly 20,000 times the worlds demand but till now it could not be used in large scale. Solar energy can be utilized as thermal and photo voltaics. The former is being used for steam hot water drying the agricultural products as a very limited extent.</p>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Solar Energy\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "Summarise the key facts about Solar Energy.",
+          "answer": "<div>Re-read the notes above and recall: the definition, key figures/statistics, examples, and applications of <strong>Solar Energy</strong>.</div>"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Wind Energy",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "Wind Energy",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>It uses high wind velocity to generate power. California (USA) generates. 500 MW from 900 wind mills. The energy can be used for pumping the water /power generation. Approximately 0.7 million wind pumps are needed to suffix the demand of the world. A minimum wind velocity of 3m/s required to generate power, coastal hilly and valley areas are suitable for this purpose. Potential in India is estimated between 20 × 10⁴ to 2.5 × 10⁵ MW. Coastal areas of Gujarat, Maharashtra, Andhara Pardesh, Tamil Naidu are considered as favourable locations.</p>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Wind Energy\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "Summarise the key facts about Wind Energy.",
+          "answer": "<div>Re-read the notes above and recall: the definition, key figures/statistics, examples, and applications of <strong>Wind Energy</strong>.</div>"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Biomass Energy",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "4.1",
+          "title": "Biomass Energy",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Its potential lies with agricultural residue. The estimated quantity of agricultural residue is 520 mT. ton out of which food grains contributes nearly 120 mT. The residues can be burnt directly for the production of steam. Or they may be gasified and gas so generated is used in an I.C. Engine for pumping or power generation. In case of forest wood the requirement of wood is between 250 to 360 mT and this quantity is not readily available. Bio gas can also be produced by anaerobic digestion of animal dung, excreta and sewage. Biomass may be a useful fuel for localized power generation in rural India.</p>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Biomass Energy\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "Summarise the key facts about Biomass Energy.",
+          "answer": "<div>Re-read the notes above and recall: the definition, key figures/statistics, examples, and applications of <strong>Biomass Energy</strong>.</div>"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "title": "Geothermal Energy",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "5.1",
+          "title": "Geothermal Energy",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>It derives the power from the centre of the earth which is stated to be main potential to the extent of 3500 MW. India has not explore this option till now.</p>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Geothermal Energy\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "Summarise the key facts about Geothermal Energy.",
+          "answer": "<div>Re-read the notes above and recall: the definition, key figures/statistics, examples, and applications of <strong>Geothermal Energy</strong>.</div>"
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "title": "Ocean Energy",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "6.1",
+          "title": "Ocean Energy",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Energy from ocean can be utilized either in form of wave, tide and/or ocean, thermal energy, about 13 kW power can be generated permeter of wave/tide height. A plant to generate 4.45 × 10⁵ kWH/YR is operating in Kerala. It generates 75 kW in calm months (from October to May) and 120-150 kW from June - September. It utilizes the temperature difference between warm surface sea water at around 28°C and the cold deep sea water at 4 to 5°C at a depth of 1000 to 1200 m in tropical areas. The golf of Kutch, Cambay gulf and Sunderban of Gujarat are potential sites. The total potential from sea is estimated as 5 × 10⁴ MW from ocean thermal energy conservation. Out of this 4 × 10⁴ MW can be obtained from wave energy and remains from tidal energy.</p>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Ocean Energy\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "Summarise the key facts about Ocean Energy.",
+          "answer": "<div>Re-read the notes above and recall: the definition, key figures/statistics, examples, and applications of <strong>Ocean Energy</strong>.</div>"
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "title": "Chemical Energy",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "7.1",
+          "title": "Chemical Energy",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>It includes augmentation of efforts on the development of fuel cells and batteries. These developments hold promise for <em>(i)</em> running small/light commercial vehicles followed by the heavy vehicles <em>(ii)</em> rural electrification of remote small villages having a higher population through rechargeable batteries (can be charged with the help of wind mills). Attention is being focused on R and D efforts relating to chemical and electrochemical sources of energy keeping in view their potential role in the long run.</p>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Chemical Energy\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "Summarise the key facts about Chemical Energy.",
+          "answer": "<div>Re-read the notes above and recall: the definition, key figures/statistics, examples, and applications of <strong>Chemical Energy</strong>.</div>"
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "title": "Magneto Hydro Dynamic (MHD) Energy",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "8.1",
+          "title": "Magneto Hydro Dynamic (MHD) Energy",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>80% of the total electricity produced in the word is hydral while remaining 20% is produced from other sources such as thermal, nuclear, solar, geothermal and MHD sources of production. MHD power generation is a new system of power generation and claimed to be most efficient and low polluting sources. At the moment this technique is used in the advanced countries. In India this technique is under construction at Trichi (T.N.) under joint efforts of BARC, A.C.C. and Russian Government.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>It is concerned with the flow of conducting fluid in the presence of magnetic and electrical fields. Fluid used may be either gas at elevated temperature or liquid metal viz. Sodium/potassium. An MHD generator is a device for converting heat energy of a fuel directly into electrical energy without a conventional electric generator. Here an MHD converter system is a heat engine; where heat taken up at a higher temperature is partly converted into useful electrical work and the remainder is rejected at lower temperature. The thermal efficiency of an MHD converter is increased by supplying the heat at the higher possible temperature and rejected at the lowest possible temperature.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>It is the most promising of all the direct conversion techniques for large scale production of electric power. MHD is really of interest only for the central power generation, its potentialities for a propulsion units are remote.</p>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Magneto Hydro Dynamic (MHD) Energy\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "Summarise the key facts about Magneto Hydro Dynamic (MHD) Energy.",
+          "answer": "<div>Re-read the notes above and recall: the definition, key figures/statistics, examples, and applications of <strong>Magneto Hydro Dynamic (MHD) Energy</strong>.</div>"
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": [
+      {
+        "number": 1,
+        "question": "What is the potential of solar energy in billion mega watts?",
+        "feedback": {
+          "correct": "✓ Solar energy potential is 180 billion mega watt (BMW) — nearly 20,000 times the world's demand.",
+          "wrong": "✗ Solar energy potential is 180 billion mega watt (BMW) — nearly 20,000 times the world's demand."
+        },
+        "topicRef": "1",
+        "type": "mcq",
+        "options": [
+          "100 BMW",
+          "180 BMW",
+          "250 BMW",
+          "320 BMW"
+        ],
+        "correct": "B"
+      },
+      {
+        "number": 2,
+        "question": "What minimum wind velocity is required to generate power?",
+        "feedback": {
+          "correct": "✓ A minimum wind velocity of 3m/s is required to generate power.",
+          "wrong": "✗ A minimum wind velocity of 3m/s is required to generate power."
+        },
+        "topicRef": "2",
+        "type": "mcq",
+        "options": [
+          "1 m/s",
+          "2 m/s",
+          "3 m/s",
+          "5 m/s"
+        ],
+        "correct": "C"
+      },
+      {
+        "number": 3,
+        "question": "California generates ________ MW from 900 wind mills.",
+        "feedback": {
+          "correct": "✓ California (USA) generates 500 MW from 900 wind mills.",
+          "wrong": "✗ California (USA) generates 500 MW from 900 wind mills."
+        },
+        "topicRef": "3",
+        "type": "fitb",
+        "acceptedAnswers": [
+          "500"
+        ]
+      },
+      {
+        "number": 4,
+        "question": "Geothermal energy derives power from the centre of the earth with potential of:",
+        "feedback": {
+          "correct": "✓ Geothermal energy has a potential to the extent of 3500 MW.",
+          "wrong": "✗ Geothermal energy has a potential to the extent of 3500 MW."
+        },
+        "topicRef": "4",
+        "type": "mcq",
+        "options": [
+          "1500 MW",
+          "2500 MW",
+          "3500 MW",
+          "4500 MW"
+        ],
+        "correct": "C"
+      },
+      {
+        "number": 5,
+        "question": "Ocean energy in Kerala operates at how many kW in calm months?",
+        "feedback": {
+          "correct": "✓ The plant generates 75 kW in calm months (October to May).",
+          "wrong": "✗ The plant generates 75 kW in calm months (October to May)."
+        },
+        "topicRef": "5",
+        "type": "mcq",
+        "options": [
+          "50 kW",
+          "75 kW",
+          "100 kW",
+          "150 kW"
+        ],
+        "correct": "B"
+      },
+      {
+        "number": 6,
+        "question": "In MHD generation, what percentage of world electricity is hydral?",
+        "feedback": {
+          "correct": "✓ 80% of total electricity produced in the world is hydral; remaining 20% from other sources.",
+          "wrong": "✗ 80% of total electricity produced in the world is hydral; remaining 20% from other sources."
+        },
+        "topicRef": "6",
+        "type": "mcq",
+        "options": [
+          "60%",
+          "70%",
+          "80%",
+          "90%"
+        ],
+        "correct": "C"
+      },
+      {
+        "number": 7,
+        "question": "MHD stands for Magneto ________ Dynamic.",
+        "feedback": {
+          "correct": "✓ MHD = Magneto Hydro Dynamic.",
+          "wrong": "✗ MHD = Magneto Hydro Dynamic."
+        },
+        "topicRef": "7",
+        "type": "fitb",
+        "acceptedAnswers": [
+          "hydro",
+          "hydra"
+        ]
+      },
+      {
+        "number": 8,
+        "question": "Biogas can be produced by anaerobic digestion of:",
+        "feedback": {
+          "correct": "✓ Biogas is produced by anaerobic digestion of animal dung, excreta and sewage.",
+          "wrong": "✗ Biogas is produced by anaerobic digestion of animal dung, excreta and sewage."
+        },
+        "topicRef": "8",
+        "type": "mcq",
+        "options": [
+          "Coal dust",
+          "Animal dung, excreta and sewage",
+          "Solar waste",
+          "Ocean sediment"
+        ],
+        "correct": "B"
+      }
+    ]
+  }
+}

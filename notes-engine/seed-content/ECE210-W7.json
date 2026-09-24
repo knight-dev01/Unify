@@ -1,0 +1,104 @@
+{
+  "course": "ECE 210",
+  "week": 7,
+  "title": "Transformers — Working Principle & Turns Ratio",
+  "subtitle": "A transformer is the most elegant device in electrical engineering — no moving parts, over 98% efficiency. The turns ratio unlocks everything. It works ONLY on AC: DC gives constant flux → dφ/dt=0 → zero secondary EMF.",
+  "learningOutcome": "A transformer is the most elegant device in electrical engineering — no moving parts, over 98% efficiency. The turns ratio unlocks everything. It works ONLY on AC: DC gives constant flux → dφ/dt=0 → zero secondary EMF.",
+  "metaChips": [
+    "ECE 210",
+    "Week 7"
+  ],
+  "tags": [
+    "Mutual Induction",
+    "Turns Ratio k",
+    "Primary N₁",
+    "Secondary N₂",
+    "Core Type",
+    "Shell Type",
+    "Referred Impedance k²Z"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Working Principle, Turns Ratio & Referred Impedance",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Working Principle, Turns Ratio & Referred Impedance",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>AC in primary → changing flux in core → changing flux links secondary → EMF induced. No direct electrical connection. <strong>Only works on AC</strong> because steady DC gives constant flux (dφ/dt=0) → no induced EMF → primary burns.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Turns ratio k = N₁/N₂ = E₁/E₂ = V₁/V₂.</strong> Current transforms inversely: I₁/I₂ = N₂/N₁ = 1/k. Power conserved: V₁I₁ = V₂I₂ (ideal).</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Referred impedance:</strong> Z₂' = k²×Z₂ (secondary → primary). Z₁' = Z₁/k² (primary → secondary). Moving to HV side: multiply by k². Moving to LV side: divide by k².</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Transformer equations</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>k = N₁/N₂ = V₁/V₂ I₁/I₂ = 1/k</div>",
+                "<div>Z₂' = k² × Z₂ (refer to primary)</div>",
+                "<div>Z₁' = Z₁ / k² (refer to secondary)</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "k > 1 → step-down · k < 1 → step-up Core type: flux passes through one limb, windings on same limb Shell type: flux divides, windings surrounded by core — better for LV high current"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Moving LV→HV: multiply by k². Moving HV→LV: divide by k². Students multiply in both directions. Also never say \"transformer works on DC if powerful enough\" — DC transformers do not exist."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Explain the working principle of a transformer. Why does it not work on DC? <span>Past Q</span></li>",
+                "<li>Distinguish between core-type and shell-type transformers. <span>Past Q</span></li>",
+                "<li>N₁/N₂ = 100. LV has 100Ω load. Find resistance seen from HV side.</li>",
+                "<li>100kVA, 1100/220V: R₁=0.1Ω, R₂=0.004Ω. Find Req referred to each side.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1] A step-down transformer: N₁=2000, N₂=200, V₁=11kV. Find V₂. If I₂=50A, find I₁ and input VA.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] Distinguish between core-type and shell-type transformers. State one application advantage for each.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] Why does a transformer not work on DC? Explain using Faraday's Law. What happens physically to the primary winding if DC is connected?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Electrical Machines & Circuits"
+}

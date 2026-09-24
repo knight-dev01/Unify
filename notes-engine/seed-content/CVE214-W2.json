@@ -1,0 +1,163 @@
+{
+  "course": "CVE 214",
+  "week": 2,
+  "title": "The Hydrological Cycle & Aquifer Types",
+  "subtitle": "The water cycle is the engine that drives all of hydrology. This week you learn how water moves from the ocean to the atmosphere to land and back — and the underground water storage systems (aquifers) that hold water between cycles.",
+  "learningOutcome": "The water cycle is the engine that drives all of hydrology. This week you learn how water moves from the ocean to the atmosphere to land and back — and the underground water storage systems (aquifers) that hold water between cycles.",
+  "metaChips": [
+    "CVE 214",
+    "Week 2"
+  ],
+  "tags": [
+    "Water cycle",
+    "Hydrological cycle",
+    "Aquifer",
+    "Aquiclude",
+    "Aquifuge",
+    "Artesian well"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "The Hydrological (Water) Cycle",
+      "abbr": "CVE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "The Hydrological (Water) Cycle",
+          "abbr": "CVE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam-ready definition (word-for-word from textbook):</strong> <div>The cyclic movement of water from the sea to the atmosphere and thence by precipitation to the earth, where it collects in streams and runs back to the sea, is referred to as the hydrological or water cycle. The cycle entails how atmospheric water gets to us, how it is dispensed and how it gets back to the atmosphere.</div>"
+            },
+            {
+              "type": "diagram",
+              "caption": "The hydrological cycle — water movement diagram",
+              "description": "ATMOSPHERE · (Clouds / Vapour) · EARTH (Land) · OCEAN / SEA · Precipitation · Evaporation · Evaporation · Run-off / Infiltration · Green = water moving toward land/ocean · Red = water returning to atmosphere",
+              "imageRef": null
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Four basic phases of the hydrological cycle (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>1. Precipitation — water falls from atmosphere to earth</div>",
+                "<div>2. Evaporation and transpiration — water returns to atmosphere</div>",
+                "<div>3. Surface stream flow — water flows over land surface to streams and rivers</div>",
+                "<div>4. Ground water — water infiltrates into the ground and is stored underground</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Importance of the hydrological cycle (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>The hydrological cycle gives a rough guide on the scope of hydrology — that portion between precipitation on the land and the return of this water to the atmosphere or ocean. It also provides the four basic phases of interest to the hydrologist: precipitation, evaporation and transpiration, surface stream flow and ground water.</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "The hydrological cycle is neither a continuous mechanism nor does water move through it steadily at a constant rate. On occasions nature seems to work overtime — heavy rains may exceed surface channel capacities to cause floods. At other times the machinery of the cycle may stop completely. These extremes of flood and drought are of utmost interest to the engineering hydrologist."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Define the hydrological cycle. Describe its four basic phases. <span>Exercise 1</span></li>",
+                "<li>Distinguish between aquifer, aquiclude and aquifuge.</li>",
+                "<li>What is an artesian well? Under what condition does it form?</li>",
+                "<li>State the importance of the hydrological cycle to engineering hydrology.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "State the textbook definition — Exam-ready definition (word-for-word from textbook).",
+                "answer": "<div>The cyclic movement of water from the sea to the atmosphere and thence by precipitation to the earth, where it collects in streams and runs back to the sea, is referred to as the hydrological or water cycle. The cycle entails how atmospheric water gets to us, how it is dispensed and how it gets back to the atmosphere.</div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Aquifer, Aquiclude & Aquifuge",
+      "abbr": "CVE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Aquifer, Aquiclude & Aquifuge",
+          "abbr": "CVE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Underground water doesn't just soak into random soil — it sits in specific geological formations. Understanding these formations is key to ground water development.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Underground water storage definitions (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>Aquifer — a pervious layer of soil able to store water. The best known aquifer medium is sand. An aquiclude is a semi-pervious geological formation which transmits water at a slow rate compared to an aquifer.</div>",
+                "<div>Aquiclude — insufficient for pumping from wells e.g. clay lenses inter-bedded with sand.</div>",
+                "<div>Aquifuge — a geological formation with no interconnected pores and hence can neither store nor transmit water.</div>",
+                "<div>Confined aquifer — when an aquifer is situated between two aquicludes, the aquifer is said to be confined and the water stored in it is under pressure.</div>",
+                "<div>Artesian Well — a well sunk into a confined aquifer. The water rises to the artesian level (above the aquifer level) due to pressure.</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "Unconfined aquifer = water table not under pressure = shallow well · Confined aquifer = water under pressure = artesian well"
+            },
+            {
+              "type": "diagram",
+              "caption": "Aquifer types — cross-section through ground layers",
+              "description": "Ground surface · Unconfined Aquifer (Water Table) · Water Table · Aquiclude (clay layer — semi-impervious) · Confined Aquifer (under pressure) · Aquiclude · Aquifuge (rock — impervious, no pores) · Artesian · Well · Water rises",
+              "imageRef": null
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Confusing aquifer with aquiclude. An aquifer STORES and transmits water well. An aquiclude slows transmission significantly (semi-impervious). An aquifuge does NEITHER — no water storage, no transmission. Remember: A-quifer = Allows water, A-quiclude = Clogs it, A-quifuge = Fugues (keeps) water out completely."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1] Define the hydrological cycle. Draw a simple triangle diagram showing its key processes.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] Distinguish between aquifer, aquiclude and aquifuge.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] Why is the hydrological cycle described as neither continuous nor steady? What engineering implications do its extremes (flood and drought) have?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Engineering Hydrology"
+}

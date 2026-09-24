@@ -1,0 +1,259 @@
+{
+  "course": "ECE 210",
+  "week": 1,
+  "title": "Magnetic Circuits — Fundamentals",
+  "subtitle": "This week introduces the magnetic equivalent of an electric circuit. Every concept here has a direct electrical analogue — once you see the pattern, the whole topic unlocks. The key insight: flux follows magnetic paths the same way current follows wires.",
+  "learningOutcome": "This week introduces the magnetic equivalent of an electric circuit. Every concept here has a direct electrical analogue — once you see the pattern, the whole topic unlocks. The key insight: flux follows magnetic paths the same way current follows wires.",
+  "metaChips": [
+    "ECE 210",
+    "Week 1"
+  ],
+  "tags": [
+    "Magnetic Flux φ",
+    "Flux Density B",
+    "Permeability μ",
+    "Reluctance ℛ",
+    "MMF (NI)",
+    "Magnetising Force H",
+    "Ohm's Law for Magnetics"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "What Is a Magnetic Field?",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "What Is a Magnetic Field?",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Magnetism shows up in every electrical machine — motors, generators, transformers. You cannot escape it. So let's nail it properly.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>Around every magnet (and around every wire carrying current), there exists a <strong>magnetic field</strong> — an invisible region where magnetic forces act. We visualise this field using <strong>magnetic flux lines</strong> (symbol: φ, pronounced \"phi\"). Think of flux lines as the \"flow paths\" of magnetism.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>Four rules about flux lines — know these cold: ① They always form <strong>closed loops</strong> — they never start or end anywhere. ② They travel from North to South <em>outside</em> the magnet, and South to North <em>inside</em>. ③ They never cross each other. ④ They take the <strong>shortest, highest-permeability path</strong> available.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>The SI unit of magnetic flux is the <strong>Weber (Wb)</strong>.</p>"
+            },
+            {
+              "type": "analogy",
+              "text": "Think of it like this Magnetic flux lines are like water flowing in a closed pipe loop — the water always flows in a loop, never disappearing at one end. And just like water prefers wider pipes (less resistance), flux prefers materials with high permeability (less reluctance)."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Examinable definition:</strong> <div>\"Unlike electric field lines, magnetic flux lines always form closed loops — they have no beginning or end.\"</div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Define magnetic flux density and state its SI unit. <span>Past Q</span></li>",
+                "<li>State the analogy between electric and magnetic circuits. <span>Past Q</span></li>",
+                "<li>A coil has N=20 turns, I=2A, mean path length L=0.2m. Find the magnetising force H.</li>",
+                "<li>Calculate the reluctance of a magnetic path given its dimensions and material.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "State the textbook definition — Examinable definition.",
+                "answer": "<div>\"Unlike electric field lines, magnetic flux lines always form closed loops — they have no beginning or end.\"</div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Magnetic Flux Density (B)",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Magnetic Flux Density (B)",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Flux (φ) tells you the <em>total</em> amount of magnetism passing through a surface. But <strong>flux density (B)</strong> tells you how <em>concentrated</em> that flux is — how many Webers pass through each square metre. This is the more useful engineering quantity.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>Squash the same flux into a smaller area → flux density goes up. Spread it over a bigger area → flux density goes down. Same total, different concentration.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Magnetic flux density</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>B = φ / A</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "B = magnetic flux density (T, where 1 T = 1 Wb/m²) φ = total magnetic flux (Weber, Wb) A = cross-sectional area of the magnetic path (m²) Rearranged: φ = B × A"
+            },
+            {
+              "type": "analogy",
+              "text": "Think of it like this Shine a torch at a wall. Total light output (lumens) = flux φ. Move the torch closer — same light, smaller circle on the wall, brighter spot. That brightness per unit area is flux density B. Same φ, smaller A → higher B."
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Students confuse φ (total flux, in Wb) with B (flux density, in T). They are not the same thing. B = φ/A. If a question gives flux and area → divide to find B. If it gives B and area → multiply to find φ. Plugging the wrong quantity into the wrong formula is one of the most common ways to lose marks on this topic."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Magnetic Flux Density (B)\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "MMF, Magnetising Force H & Permeability μ",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "MMF, Magnetising Force H & Permeability μ",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Magnetomotive Force (MMF)</strong> is what drives flux through a magnetic circuit — exactly like EMF drives current through an electric circuit. For a coil of N turns carrying current I: MMF (F) = NI, measured in Ampere-turns (A·t).</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Magnetising Force H</strong> is the MMF per unit length of the magnetic path. It tells you how much \"magnetic pressure\" is applied per metre of the path. The same MMF applied to a short path gives a higher H than if applied to a long path.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Permeability (μ)</strong> is the magnetic equivalent of conductivity — it measures how easily a material allows flux through it. μ = μ₀ × μᵣ, where μ₀ = 4π×10⁻⁷ H/m is the permeability of free space and μᵣ is the relative permeability of the material (dimensionless). For air: μᵣ = 1. For silicon steel: μᵣ can reach 1000–10000.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>MMF, H, and permeability</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>F = NI (MMF, Ampere-turns)</div>",
+                "<div>H = NI / L = F / L (A/m)</div>",
+                "<div>B = μH = μ₀μᵣH (links H to B)</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "N = number of turns · I = current (A) · L = mean path length (m) μ₀ = 4π×10⁻⁷ H/m (permeability of free space) μᵣ = relative permeability — dimensionless, material-specific High μᵣ → easy to magnetise (silicon steel, soft iron)"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"MMF, Magnetising Force H & Permeability μ\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Reluctance & Ohm's Law for Magnetic Circuits",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "4.1",
+          "title": "Reluctance & Ohm's Law for Magnetic Circuits",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Reluctance (ℛ)</strong> is the opposition a magnetic path offers to flux — the magnetic equivalent of resistance. A long, thin path through a low-permeability material has high reluctance. A short, wide path through a high-permeability material has low reluctance.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>The <strong>magnetic Ohm's Law</strong> completes the analogy: just like V = IR drives current through resistance, MMF = φ × ℛ drives flux through reluctance. This is the single most important relationship in magnetic circuit analysis.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Reluctance & Magnetic Ohm's Law</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>ℛ = L / (μ₀μᵣA) (A·t/Wb)</div>",
+                "<div>F = φ × ℛ (Ohm's Law for magnetics)</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "L = mean path length (m) · A = cross-sectional area (m²) μ₀μᵣ = absolute permeability of the material (H/m) Compare: V ↔ F(MMF) · I ↔ φ(flux) · R ↔ ℛ(reluctance)"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>The electric–magnetic analogy (frequent exam question):</strong> <div> EMF (V) ↔ MMF (NI, A·t) Current (I, A) ↔ Flux (φ, Wb) Resistance (R, Ω) ↔ Reluctance (ℛ, A·t/Wb) Conductivity (σ) ↔ Permeability (μ) Ohm's Law: V = IR ↔ F = φℛ </div>"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — The reluctance formula uses absolute permeability μ₀μᵣ — not just μᵣ alone. Writing ℛ = L/(μᵣA) instead of ℛ = L/(μ₀μᵣA) gives an answer that's 4π×10⁷ times too large. Always include μ₀ = 4π×10⁻⁷ H/m in the denominator."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "State the textbook definition — The electric–magnetic analogy (frequent exam question).",
+                "answer": "<div> EMF (V) ↔ MMF (NI, A·t) Current (I, A) ↔ Flux (φ, Wb) Resistance (R, Ω) ↔ Reluctance (ℛ, A·t/Wb) Conductivity (σ) ↔ Permeability (μ) Ohm's Law: V = IR ↔ F = φℛ </div>"
+              },
+              {
+                "type": "reveal",
+                "question": "[Q1] A cast iron ring: mean diameter=20cm, cross-section=4cm², N=200 turns, μᵣ=200. Find: (i) reluctance ℛ, (ii) MMF required for φ=0.8×10⁻³ Wb, (iii) current I.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] State four properties of magnetic flux lines. Define flux density B and state its SI unit.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] Construct a full electric–magnetic analogy table (at least 5 pairs). Then explain why the analogy is useful but not perfect — what happens to energy in each case?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Electrical Machines & Circuits"
+}

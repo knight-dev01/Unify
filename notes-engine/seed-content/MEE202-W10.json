@@ -1,0 +1,127 @@
+{
+  "course": "MEE 202",
+  "week": 10,
+  "title": "Cement & Weed as Engineering Materials",
+  "subtitle": "Two non-traditional engineering materials that Dr Obasa covers. Cement is one of the most important construction materials ever. Weed (fibrous plants) is an emerging sustainable engineering material. Know the definitions, properties, types, and applications.",
+  "learningOutcome": "Two non-traditional engineering materials that Dr Obasa covers. Cement is one of the most important construction materials ever. Weed (fibrous plants) is an emerging sustainable engineering material. Know the definitions, properties, types, and applications.",
+  "metaChips": [
+    "MEE 202",
+    "Week 10"
+  ],
+  "tags": [
+    "Cement",
+    "Hydration",
+    "OPC",
+    "Concrete",
+    "Weed",
+    "Bio-composite",
+    "Pozzolanic",
+    "Sustainability"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Cement as an Engineering Material",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Cement as an Engineering Material",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Definition:</strong> Cement is a finely ground inorganic substance that, when mixed with water, forms a paste which sets and hardens by chemical reaction (hydration). It binds aggregates like sand and gravel into a solid mass to form concrete or mortar.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>Cement is one of the most important and widely used engineering materials in the construction industry. It serves as a key binding material that sets, hardens, and adheres to other materials, making it vital for creating strong and durable structures.</p>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "Type of Cement",
+                "Key Property",
+                "Use",
+                "Ordinary Portland Cement (OPC)",
+                "Most common, general-purpose",
+                "Buildings, slabs, columns",
+                "Portland Pozzolana Cement (PPC)",
+                "Improved durability, sulfate resistance",
+                "Marine structures, sewage",
+                "Rapid Hardening Cement",
+                "Gains strength quickly",
+                "Early completion projects",
+                "Sulphate Resisting Cement",
+                "Resistant to aggressive soils",
+                "Foundations in sulfate soils",
+                "White Cement",
+                "Decorative",
+                "Architectural finishes",
+                "Hydrophobic Cement",
+                "Moisture-resistant",
+                "Humid environments"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Cement as an Engineering Material\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Weed as an Engineering Material",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Weed as an Engineering Material",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>While \"weed\" typically refers to unwanted plants or vegetation, in engineering and materials science, certain types of fast-growing plants or fibrous weeds are gaining attention for their sustainable, biodegradable, and low-cost properties.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Definition:</strong> In this context, \"weed\" refers to fast-growing, fibrous plants (e.g., water hyacinth, hemp, bamboo grass, cogon grass) that are abundant, invasive (often considered waste), and rich in cellulose, lignin, and natural fibres. These properties make them potential eco-friendly reinforcements or fillers in construction and engineering materials.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Engineering Applications:</strong></p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>a. Natural Fiber Composites:</strong> Weeds can be processed into fibers and mixed with polymers (e.g., PLA, epoxy) to produce bio-composites. Used in automotive panels, insulation boards, and interior building panels.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>b. Concrete Additives:</strong> Ashes or fibers from weeds (e.g., water hyacinth, elephant grass) can be added to cement as pozzolanic materials (for partial cement replacement) or lightweight aggregate/filler. Enhances thermal insulation, reduces density, and supports sustainability.</p>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Weed as an Engineering Material\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Science of Materials"
+}

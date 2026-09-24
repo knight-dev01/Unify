@@ -1,0 +1,157 @@
+{
+  "course": "CVE 214",
+  "week": 8,
+  "title": "Evaporation — Factors & Determination",
+  "subtitle": "Evaporation is the biggest single loss of water from reservoirs and lakes. Engineers need to estimate how much water evaporates to design storage systems properly. This week covers the definition, the meteorological factors that control evaporation, and the methods used to determine it.",
+  "learningOutcome": "Evaporation is the biggest single loss of water from reservoirs and lakes. Engineers need to estimate how much water evaporates to design storage systems properly. This week covers the definition, the meteorological factors that control evaporation, and the methods used to determine it.",
+  "metaChips": [
+    "CVE 214",
+    "Week 8"
+  ],
+  "tags": [
+    "Evaporation",
+    "Solar radiation",
+    "Wind speed",
+    "Reservoir evaporation",
+    "Water budget",
+    "Energy budget",
+    "Penman"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Evaporation — Definition & Factors",
+      "abbr": "CVE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Evaporation — Definition & Factors",
+          "abbr": "CVE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam-ready definition (from textbook):</strong> <div>Evaporation is the net rate of vapour transport to the atmosphere. Evaporation is important in all water resources studies. It affects the yield of river basins, the necessary capacity of reservoirs, the size of pumping plant, the necessary use of water by crops, and the yield of underground supplies, to name only a few of the factors affected by it.</div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Meteorological factors affecting evaporation (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>(a) Solar Radiation — conversion of water into water vapour. It is a process which is taking place almost without interruption during daylight hours. During the day the change of state of molecules from liquid to gas requires an energy input known as the latent heat of vaporisation. This process is most active under direct radiation of the sun. Clouds prevent the penetration of the sun's radiation and reduce energy input and slow the process of evaporation.</div>",
+                "<div>(b) Wind Speed — as water vapour enters the atmosphere the boundary layer between air and water surface becomes saturated. This layer must be removed and continually replaced by drier air if evaporation is to proceed. The movement of air in the boundary layer depends on wind and the wind speed frequency is important.</div>",
+                "<div>(c) Relative Humidity — as air humidity rises, its ability to absorb more water vapour decreases and eventually evaporation stops. Replacement of the boundary layer of saturated air by air of equally high humidity will not maintain the evaporation rate.</div>",
+                "<div>(d) Temperature — above an energy level is necessary for evaporation. It follows that if the ambient temperature of the air and ground is high, evaporation will proceed more rapidly. Cool air, since heat to absorb water vapour increases as temperature rises.</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Define evaporation. What are the factors that influence the process? <span>Exercise 5</span></li>",
+                "<li>List and explain the methods of determining reservoir evaporation.</li>",
+                "<li>Write the water-budget equation for evaporation. Define all terms.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "State the textbook definition — Exam-ready definition (from textbook).",
+                "answer": "<div>Evaporation is the net rate of vapour transport to the atmosphere. Evaporation is important in all water resources studies. It affects the yield of river basins, the necessary capacity of reservoirs, the size of pumping plant, the necessary use of water by crops, and the yield of underground supplies, to name only a few of the factors affected by it.</div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Methods of Determining Reservoir Evaporation",
+      "abbr": "CVE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Methods of Determining Reservoir Evaporation",
+          "abbr": "CVE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<strong>5 methods (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>1. Water-budget determination of reservoir evaporation</div>",
+                "<div>2. Energy-budget determination of reservoir evaporation</div>",
+                "<div>3. Estimation of reservoir evaporation from pan evaporation</div>",
+                "<div>4. Empirical formulae</div>",
+                "<div>5. Penman's theory</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>5.3.1 Water-Budget Method (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>E = (S₁ − S₂) + I + P − O − Og</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "S₁ = initial storage · S₂ = final storage · I = surface inflow · P = precipitation · O = surface outflow · Og = subsurface seepage · E = evaporation · Assuming storage S, surface inflow I, surface outflow O, sub-surface seepage Og and precipitation P can be measured, Evaporation E can be computed."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>5.3.2 Energy-Budget Method (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>E = (Q_n − Q_a − Q_s + Q_v) / L</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "Q_n = net radiation absorbed by the water body · Q_a = sensible heat transfer to the atmosphere · Q_s = increase in energy stored in the water body · Q_v = energy advected into the water body · L = latent heat of vaporisation · Shortcoming: requires a great deal of instrumentation and still in active development. Cannot readily be used without specialist approach, not suitable for broad-scale use."
+            },
+            {
+              "type": "analogy",
+              "text": "Kainji Dam on the Niger River loses enormous amounts of water to evaporation every year. Engineers used the water-budget method to estimate these losses when designing the dam's storage capacity. Without accounting for evaporation, the reservoir would run significantly lower than designed."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1] Define evaporation. List the four meteorological factors that affect it.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] Write the water-budget equation for evaporation. What does each term represent?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] Why is the energy-budget method of determining reservoir evaporation not suitable for broad-scale use? What are its shortcomings?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Engineering Hydrology"
+}

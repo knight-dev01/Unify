@@ -1,0 +1,240 @@
+{
+  "course": "ECE 202",
+  "week": 10,
+  "title": "Eigenvalues & Eigenvectors",
+  "subtitle": "An eigenvalue is a scalar λ such that Ax = λx — multiplying a vector by A just scales it, without changing its direction. That special vector is an eigenvector. Finding eigenvalues means solving the characteristic equation det(A − λI) = 0. Finding eigenvectors means substituting each eigenvalue back and solving the resulting homogeneous system.",
+  "learningOutcome": "An eigenvalue is a scalar λ such that Ax = λx — multiplying a vector by A just scales it, without changing its direction. That special vector is an eigenvector. Finding eigenvalues means solving the characteristic equation det(A − λI) = 0. Finding eigenvectors means substituting each eigenvalue back and solving the resulting homogeneous system.",
+  "metaChips": [
+    "ECE 202",
+    "Week 10"
+  ],
+  "tags": [
+    "Eigenvalue λ",
+    "Eigenvector x",
+    "Characteristic equation",
+    "det(A − λI) = 0",
+    "Characteristic polynomial p(λ)",
+    "Eigenspace"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Finding Eigenvalues — The Characteristic Equation",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Finding Eigenvalues — The Characteristic Equation",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>The eigenvalue equation Ax = λx can be rearranged to (A − λI)x = 0. This homogeneous system has non-trivial solutions only when the matrix (A − λI) is singular — that is, when its determinant is zero. So eigenvalues are the values of λ that satisfy det(A − λI) = 0.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>Setting up and expanding that determinant gives you the characteristic polynomial p(λ). Its roots are the eigenvalues. For a 2×2 matrix you get a quadratic; for 3×3 you get a cubic.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<span>Find eigenvalues of A = [[1,0],[2,3]]</span>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>01</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Form A − λI</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>A = [ 1 0 ] I = [ 1 0 ] [ 2 3 ] [ 0 1 ] A - λI = [ 1-λ 0 ] [ 2 3-λ ]</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>02</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Set det(A − λI) = 0 and expand</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>det(A - λI) = (1-λ)(3-λ) - (0)(2) = 0 (1-λ)(3-λ) = 0 3 - λ - 3λ + λ² = 0 λ² - 4λ + 3 = 0</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>03</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Factorise the characteristic polynomial</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>λ² - 4λ + 3 = 0 (λ - 1)(λ - 3) = 0</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div>λ₁ = 1, λ₂ = 3</div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<span>2019/2020 Q3e — Find eigenvalues of E = [[1,−3,3],[3,−5,3],[6,−6,4]]</span>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>01</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Form det(E − λI) = 0</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>E - λI = [ 1-λ -3 3 ] [ 3 -5-λ 3 ] [ 6 -6 4-λ ]</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>02</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Expand the 3×3 determinant along row 1</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>det = (1-λ)[(-5-λ)(4-λ) - (3)(-6)] - (-3)[(3)(4-λ) - (3)(6)] + (3)[(3)(-6) - (-5-λ)(6)] Term 1: (1-λ)[(-5-λ)(4-λ) + 18] (-5-λ)(4-λ) = -20+5λ-4λ+λ² = λ²+λ-20 So: (1-λ)(λ²+λ-20+18) = (1-λ)(λ²+λ-2) = (1-λ)(λ+2)(λ-1) Term 2: +3[(12-3λ) - 18] = +3[-3λ-6] = -9λ-18 Term 3: +3[-18 - (-30-6λ)] = +3[-18+30+6λ] = +3[12+6λ] = 36+18λ Combining: (1-λ)(λ+2)(λ-1) + (-9λ-18) + (36+18λ) = (1-λ)(λ-1)(λ+2) + 9λ + 18 = -(λ-1)²(λ+2) + 9(λ+2) = (λ+2)[-(λ-1)² + 9] = (λ+2)[-(λ²-2λ+1) + 9] = (λ+2)(-λ²+2λ+8) = -(λ+2)(λ²-2λ-8) = -(λ+2)(λ-4)(λ+2) = -(λ+2)²(λ-4) = 0</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>03</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Read off eigenvalues</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>-(λ+2)²(λ-4) = 0 λ + 2 = 0 → λ = -2 (repeated root, multiplicity 2) λ - 4 = 0 → λ = 4</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div>λ₁ = λ₂ = −2 (repeated), λ₃ = 4</div>"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — When solving (A − λI)x = 0 for eigenvectors, students try to find a unique solution. But the whole point is that there's no unique solution — at least one component is free (that's what it means to be a null space vector). If you get x = 0 as the only solution, you made an arithmetic error somewhere in the eigenvalue step."
+            },
+            {
+              "type": "insight",
+              "text": "Eigenvalue questions are in Section B of the exam — they carry the most marks. 2019/2020 Q3 alone is worth over 20 marks covering eigenvalue theory, characteristic polynomials, properties, and Cayley-Hamilton."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "Find eigenvalues of E = [[1,−3,3],[3,−5,3],[6,−6,4]]. (2019/2020 Q3e, 3 marks)",
+                "Find characteristic polynomial of B = [[3,2],[3,4]] and illustrate Cayley-Hamilton. (2019/2020 Q3c, 4 marks)",
+                "What are eigenvalue problems? Show that A and Aᵀ have the same eigenvalues. Show that for upper triangular A, eigenvalues are the diagonal entries. (2019/2020 Q3a–b, 6 marks)",
+                "Find eigenvalues and eigenvectors of A = [[1,0],[2,3]]."
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Finding Eigenvalues — The Characteristic Equation\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Finding Eigenvectors — One for Each Eigenvalue",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Finding Eigenvectors — One for Each Eigenvalue",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Once you have eigenvalue λ, substitute it back into (A − λI)x = 0 and solve the homogeneous system. You get a relationship between the components of x — the eigenvector is any non-zero vector satisfying that relationship. Conventionally pick the simplest integer values.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<span>Find eigenvectors for A = [[1,0],[2,3]] with λ₁=1 and λ₂=3</span>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>01</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>For λ₁ = 1: substitute into (A − λI)x = 0</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>A - 1·I = [ 1-1 0 ] = [ 0 0 ] [ 2 3-1 ] [ 2 2 ] System: [ 0 0 ][ x₁ ] = [ 0 ] [ 2 2 ][ x₂ ] [ 0 ] Row 2: 2x₁ + 2x₂ = 0 → x₁ = -x₂ Row 1: 0x₁ + 0x₂ = 0 → always true (no new info) Let x₂ = 1 → x₁ = -1</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div>Eigenvector for λ₁ = 1: x₁ = [−1, 1]ᵀ (or any scalar multiple)</div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>02</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>For λ₂ = 3: substitute into (A − λI)x = 0</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>A - 3·I = [ 1-3 0 ] = [ -2 0 ] [ 2 3-3 ] [ 2 0 ] System: [ -2 0 ][ x₁ ] = [ 0 ] [ 2 0 ][ x₂ ] [ 0 ] Row 1: -2x₁ + 0x₂ = 0 → x₁ = 0 Row 2: 2x₁ + 0x₂ = 0 → x₁ = 0 (same info) x₂ is free — let x₂ = 1</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div>Eigenvector for λ₂ = 3: x₂ = [0, 1]ᵀ</div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>03</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Verify eigenvectors — Ax should equal λx</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>For λ₁=1, x₁=[-1,1]ᵀ: A·x₁ = [ 1 0 ][-1] = [ -1 ] = 1·[-1] ✓ [ 2 3 ][ 1] [ 1] [ 1] For λ₂=3, x₂=[0,1]ᵀ: A·x₂ = [ 1 0 ][0] = [0] = 3·[0] ✓ [ 2 3 ][1] [3] [1]</pre>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Finding Eigenvectors — One for Each Eigenvalue\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Engineering Mathematics"
+}

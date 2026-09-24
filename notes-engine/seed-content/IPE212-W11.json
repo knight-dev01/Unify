@@ -1,0 +1,187 @@
+{
+  "course": "IPE 212",
+  "week": 11,
+  "title": "Suspension & Transmission Systems",
+  "subtitle": "The suspension system isolates the vehicle body from road impacts while maintaining tyre contact. The transmission system transfers engine power to the drive wheels at the appropriate speed and torque. This week covers both systems, including IFS, IRS, springs, gearbox types, and how gears work.",
+  "learningOutcome": "The suspension system isolates the vehicle body from road impacts while maintaining tyre contact. The transmission system transfers engine power to the drive wheels at the appropriate speed and torque. This week covers both systems, including IFS, IRS, springs, gearbox types, and how gears work.",
+  "metaChips": [
+    "IPE 212",
+    "Week 11"
+  ],
+  "tags": [
+    "Suspension",
+    "IFS",
+    "IRS",
+    "Coil spring",
+    "Leaf spring",
+    "Transmission",
+    "Manual / Automatic",
+    "CVT",
+    "Synchronizer"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "The Suspension System",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "The Suspension System",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Imagine driving over a speed bump without a suspension system. All of that impact would go straight into the vehicle's frame and into you. The suspension is a set of springs and dampers that absorb bumps before they reach the frame, keeping the ride smooth and keeping the tyres in contact with the road.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div> <strong>Suspension systems</strong> are used in vehicles to insulate the wheel and axles from the frame in order to avoid transmission of road effects to the passengers while travelling on uneven roads. It provides a comfortable ride to the passengers and avoids additional stresses in the motor car frame. Your car's suspension absorbs the impact of bumps before they strike the frame, giving you a smooth ride. Furthermore, modern suspension systems can react to the type of terrain and automatically adjust to smooth or bumpy roads. </div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div> <strong>Objectives of the Suspension System:</strong> 1. To safeguard the occupants against shocks and provide riding comfort. 2. To minimize the rolling, pitching or vertical movement tendency of motor vehicle while travelling over a rough road or when turning. 3. To minimise the effects of stresses due to road shocks on the mechanism of the motor vehicle and provide a cushioning effect. 4. To isolate the structure of the vehicle from shock loading and vibration due to irregularities of the road surface without impairing its stability. 5. To provide the requisite height to body structure as well as to bear the torque and braking reactions. </div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div> <strong>Three Principles of Suspension Springing:</strong> (a) Reduction of the weight of the wheels and other components receiving the road shocks to minimum or reduction of un-sprung weight. (b) Reduction of rolling or pitching of the body to a minimum with suitable design and attachment of springs. (c) To absorb satisfactorily the large as well as the smaller road impacts with the help of a single springing device. </div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "Define the suspension system. List FIVE objectives of the suspension system.",
+                "What are the THREE principles underlying the satisfactory springing of motor vehicles?",
+                "Compare Independent Front Suspension (IFS) and Independent Rear Suspension (IRS). State two advantages and two disadvantages of each.",
+                "Distinguish between manual, automatic, and CVT transmissions. List the components of a typical gearbox."
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: Suspension systems.",
+                "answer": "<div> <strong>Suspension systems</strong> are used in vehicles to insulate the wheel and axles from the frame in order to avoid transmission of road effects to the passengers while travelling on uneven roads. It provides a comfortable ride to the passengers and avoids additional stresses in the motor car frame. Your car's suspension absorbs the impact of bumps before they strike the frame, giving you a smooth ride. Furthermore, modern suspension systems can react to the type of terrain and automatically adjust to smooth or bumpy roads. </div>"
+              },
+              {
+                "type": "reveal",
+                "question": "Define: Objectives of the Suspension System.",
+                "answer": "<div> <strong>Objectives of the Suspension System:</strong> 1. To safeguard the occupants against shocks and provide riding comfort. 2. To minimize the rolling, pitching or vertical movement tendency of motor vehicle while travelling over a rough road or when turning. 3. To minimise the effects of stresses due to road shocks on the mechanism of the motor vehicle and provide a cushioning effect. 4. To isolate the structure of the vehicle from shock loading and vibration due to irregularities of the road surface without impairing its stability. 5. To provide the requisite height to body structure as well as to bear the torque and braking reactions. </div>"
+              },
+              {
+                "type": "reveal",
+                "question": "Define: Three Principles of Suspension Springing.",
+                "answer": "<div> <strong>Three Principles of Suspension Springing:</strong> (a) Reduction of the weight of the wheels and other components receiving the road shocks to minimum or reduction of un-sprung weight. (b) Reduction of rolling or pitching of the body to a minimum with suitable design and attachment of springs. (c) To absorb satisfactorily the large as well as the smaller road impacts with the help of a single springing device. </div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Independent Front Suspension (IFS) and Independent Rear Suspension (IRS)",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Independent Front Suspension (IFS) and Independent Rear Suspension (IRS)",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<div> <strong>Independent Front Suspension (IFS):</strong> A vehicle suspension system where each front wheel can move vertically without affecting the other. Here each of the front wheels is independently supported by a coil or leaf spring. <strong>Advantages of IFS:</strong> Improved ride quality; better handling; enhanced traction; reduced body roll; reduced steering input affected by wheel movement; low inertia — resistance to change of state of chassis body and wheel tenderness to move instead of chassis body; large wheel movement possible with softer suspension; considerable reduction or elimination of tilting tendency. <strong>Disadvantages of IFS:</strong> More complex design; potentially less durable in rugged off-road conditions; higher cost due to more complex design. <strong>Independent Rear Suspension (IRS):</strong> Each rear wheel can move up and down independently of the other. Contrasts with a solid axle or beam axle system where both wheels are linked together. <strong>Advantages of IRS:</strong> Improved traction (each wheel maintains better contact); smoother ride; better handling in cornering. Example: Chevrolet Corvette uses IRS. <strong>Disadvantages of IRS:</strong> Higher cost; increased complexity and maintenance; reduced load capacity; space considerations (may encroach on cabin or cargo space). </div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div> <strong>Springs in the Suspension System:</strong> Springs are fitted between the frame and the wheel to prevent the upward movement of the frame along with the up and down movement of the wheel. A spring is a reservoir of energy stored in steel springs by bending them or by twining them. Types: (i) Steel-laminated, helical coil type, leaf type and torsion bar; (ii) Rubber suspension spring; (iii) Air or pneumatic suspension bags. <strong>Laminated/Leaf Springs:</strong> Preferably for the rear suspension of passenger cars, front and rear spring of commercial vehicles, and in certain types of independent front suspension in transverse situation. Provide even stress distribution and a varying frequency of spring vibration. </div>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: Independent Front Suspension (IFS).",
+                "answer": "<div> <strong>Independent Front Suspension (IFS):</strong> A vehicle suspension system where each front wheel can move vertically without affecting the other. Here each of the front wheels is independently supported by a coil or leaf spring. <strong>Advantages of IFS:</strong> Improved ride quality; better handling; enhanced traction; reduced body roll; reduced steering input affected by wheel movement; low inertia — resistance to change of state of chassis body and wheel tenderness to move instead of chassis body; large wheel movement possible with softer suspension; considerable reduction or elimination of tilting tendency. <strong>Disadvantages of IFS:</strong> More complex design; potentially less durable in rugged off-road conditions; higher cost due to more complex design. <strong>Independent Rear Suspension (IRS):</strong> Each rear wheel can move up and down independently of the other. Contrasts with a solid axle or beam axle system where both wheels are linked together. <strong>Advantages of IRS:</strong> Improved traction (each wheel maintains better contact); smoother ride; better handling in cornering. Example: Chevrolet Corvette uses IRS. <strong>Disadvantages of IRS:</strong> Higher cost; increased complexity and maintenance; reduced load capacity; space considerations (may encroach on cabin or cargo space). </div>"
+              },
+              {
+                "type": "reveal",
+                "question": "Define: Springs in the Suspension System.",
+                "answer": "<div> <strong>Springs in the Suspension System:</strong> Springs are fitted between the frame and the wheel to prevent the upward movement of the frame along with the up and down movement of the wheel. A spring is a reservoir of energy stored in steel springs by bending them or by twining them. Types: (i) Steel-laminated, helical coil type, leaf type and torsion bar; (ii) Rubber suspension spring; (iii) Air or pneumatic suspension bags. <strong>Laminated/Leaf Springs:</strong> Preferably for the rear suspension of passenger cars, front and rear spring of commercial vehicles, and in certain types of independent front suspension in transverse situation. Provide even stress distribution and a varying frequency of spring vibration. </div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Transmission and Gearing Systems",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "Transmission and Gearing Systems",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Transmission is like a bicycle's gear system. When you're starting from a stop or going uphill, you need a low gear — lots of force but slow speed. When you're cruising at high speed, you need a high gear — less force but high speed. The transmission does this automatically (or manually) for your car engine.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div> <strong>Transmission:</strong> The mechanism through which the driving torque of the engine is transmitted to the driving wheel of the vehicle through sets of gear. It is a sort of speed and power changing device needed between the engine of the automobile and its driving wheels. <strong>Gearing systems</strong> in automobiles are crucial for transferring power from the engine to the wheels, enabling various speeds and torque outputs. They achieve this by utilising a series of gears of different sizes that mesh together, allowing the driver to select the optimal gear ratio for different driving conditions. </div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div> <strong>Types of Gearing Systems:</strong> — <strong>Manual Transmission:</strong> Requires the driver to manually select gears using a clutch pedal and gearshift lever. — <strong>Automatic Transmission:</strong> Automatically shifts gears based on driving conditions, eliminating the need for manual gear selection. — <strong>Continuously Variable Transmission (CVT):</strong> Offers a virtually infinite number of gear ratios, providing smooth and efficient power delivery. <strong>Components of a Typical Gearbox:</strong> — Input Shaft: Receives power from the engine. — Output Shaft: Transmits power to the wheels. — Gears: Various sizes arranged on shafts to create different gear ratios. — Synchronizers (in manual transmissions): Used to synchronize the speed of the gear and shaft before engagement, ensuring smooth gear changes. — Clutch (in manual transmissions): Disconnects the engine from the transmission during gear changes. </div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div> <strong>How Gears Work:</strong> Gears of different sizes are arranged on shafts. When a gear on one shaft meshes with a gear on another shaft, the rotation of the first shaft is transferred to the second, but at a different speed and torque depending on the gear sizes. A smaller gear driving a larger gear will result in a <strong>lower speed but higher torque</strong>, while the opposite is true for a larger gear driving a smaller one. </div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Gear Ratio Formula</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "If ratio > 1: Output shaft is slower but more torque (low gear) If ratio < 1: Output shaft is faster but less torque (high gear/overdrive)"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Students think \"a higher gear always means more power.\" Wrong — a higher gear means higher SPEED but LOWER torque. Torque (turning force) is what actually moves the vehicle from rest or up a hill. In a high gear at low speed, the engine struggles because there isn't enough torque — that's why you downshift when climbing a steep slope."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: Transmission.",
+                "answer": "<div> <strong>Transmission:</strong> The mechanism through which the driving torque of the engine is transmitted to the driving wheel of the vehicle through sets of gear. It is a sort of speed and power changing device needed between the engine of the automobile and its driving wheels. <strong>Gearing systems</strong> in automobiles are crucial for transferring power from the engine to the wheels, enabling various speeds and torque outputs. They achieve this by utilising a series of gears of different sizes that mesh together, allowing the driver to select the optimal gear ratio for different driving conditions. </div>"
+              },
+              {
+                "type": "reveal",
+                "question": "Define: Types of Gearing Systems.",
+                "answer": "<div> <strong>Types of Gearing Systems:</strong> — <strong>Manual Transmission:</strong> Requires the driver to manually select gears using a clutch pedal and gearshift lever. — <strong>Automatic Transmission:</strong> Automatically shifts gears based on driving conditions, eliminating the need for manual gear selection. — <strong>Continuously Variable Transmission (CVT):</strong> Offers a virtually infinite number of gear ratios, providing smooth and efficient power delivery. <strong>Components of a Typical Gearbox:</strong> — Input Shaft: Receives power from the engine. — Output Shaft: Transmits power to the wheels. — Gears: Various sizes arranged on shafts to create different gear ratios. — Synchronizers (in manual transmissions): Used to synchronize the speed of the gear and shaft before engagement, ensuring smooth gear changes. — Clutch (in manual transmissions): Disconnects the engine from the transmission during gear changes. </div>"
+              },
+              {
+                "type": "reveal",
+                "question": "Define: How Gears Work.",
+                "answer": "<div> <strong>How Gears Work:</strong> Gears of different sizes are arranged on shafts. When a gear on one shaft meshes with a gear on another shaft, the rotation of the first shaft is transferred to the second, but at a different speed and torque depending on the gear sizes. A smaller gear driving a larger gear will result in a <strong>lower speed but higher torque</strong>, while the opposite is true for a larger gear driving a smaller one. </div>"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Automotive Engineering & Workshop"
+}

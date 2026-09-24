@@ -1,0 +1,178 @@
+{
+  "course": "MEE 212",
+  "week": 11,
+  "title": "Power Transmission & Belt Drives — Theory",
+  "subtitle": "Belt drives are one of the most common ways to transmit power — they're on bicycles, washing machines, car engines. This week covers the theory: open vs cross belts, slip, creep, angle of contact, velocity ratio, and the all-important tension ratio.",
+  "learningOutcome": "Belt drives are one of the most common ways to transmit power — they're on bicycles, washing machines, car engines. This week covers the theory: open vs cross belts, slip, creep, angle of contact, velocity ratio, and the all-important tension ratio.",
+  "metaChips": [
+    "MEE 212",
+    "Week 11"
+  ],
+  "tags": [
+    "Belt drive",
+    "Open belt",
+    "Cross belt",
+    "Slip",
+    "Tension ratio",
+    "Angle of contact",
+    "Velocity ratio"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Power Transmission & Belt Drive Theory",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Power Transmission & Belt Drive Theory",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam-ready definition (from notes):</strong> <div>Power transmission is used to transfer power from the prime mover to the moving machine [source to driven machine]. A transmission system is the combination of clutch and gearbox. It is a mechanical device which varies the engine torque according to the driver requirement.</div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Types of belt drives (from notes)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>1. Flat belt · 2. V-belt · 3. Tooth belt</div>",
+                "<div>Open belt system: pulleys rotate in the SAME direction</div>",
+                "<div>Cross belt system: pulleys rotate in OPPOSITE directions (belt crosses itself)</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Key definitions (from notes)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>Creep: extension of belt on tight side and contraction at slack side</div>",
+                "<div>Slip: relative motion between pulley and belt, expressed as percentage (ε = 0.01 to 0.03)</div>",
+                "<div>Optimum angle of contact: 90°–170°</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Velocity ratio with slip</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>N_s/N_L = D_L/D_s × [1 − S₁/100] × [1 − S₂/100]</div>",
+                "<div>Without slip: N₁/N₂ = D₂/D₁</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "N_s = speed of smaller pulley (rpm) · N_L = speed of larger pulley · D_L = diameter of large pulley · D_s = diameter of small pulley · S₁, S₂ = slip percentages"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Angle of contact (wrap angle)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>Open belt: β = sin⁻¹[(D_L − D_s) / 2C]</div>",
+                "<div>θ_s = 180° − 2β (angle on small pulley)</div>",
+                "<div>θ_L = 180° + 2β (angle on large pulley)</div>",
+                "<div>Cross belt: θ_s = θ_L = 180° + 2β</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "C = centre-to-centre distance · β = angle of lap · Use smaller θ in tension ratio formula"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Tension ratio (key formula)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>T₁/T₂ = e^(μθ)</div>",
+                "<div>(T₁ − Tc) / (T₂ − Tc) = e^(μθ) [including centrifugal tension]</div>",
+                "<div>Tc = mv² [centrifugal tension]</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "T₁ = tension in tight side · T₂ = tension in slack side · Tc = centrifugal tension · μ = coefficient of friction · θ = angle of contact (radians)"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Power transmitted & belt length</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>Power = (T₁ − T₂) × V</div>",
+                "<div>V = πDN/60 (belt velocity, m/s)</div>",
+                "<div>L = 2C + 1.57(D_L + D_s) + (D_L − D_s)²/4C [Open belt]</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "C = centre distance (m) · D_L, D_s = pulley diameters (m)"
+            },
+            {
+              "type": "diagram",
+              "caption": "Open belt vs cross belt — angle of contact",
+              "description": "OPEN BELT · Same direction rotation · Driver · Driven · CROSS BELT · Opposite direction rotation",
+              "imageRef": null
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Using the LARGE pulley's angle of contact in the tension ratio. Always use the SMALLER angle (which is on the smaller pulley for open belts). The belt slips first where the wrap angle is smallest. Using the wrong θ gives a completely wrong tension ratio."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Define power transmission. State the types of belt drives.</li>",
+                "<li>Derive/state the tension ratio T₁/T₂ = e^(μθ). Know what each symbol means.</li>",
+                "<li>Calculate velocity ratio including slip. Know the difference between open and cross belt angle of contact formulas.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "State the textbook definition — Exam-ready definition (from notes).",
+                "answer": "<div>Power transmission is used to transfer power from the prime mover to the moving machine [source to driven machine]. A transmission system is the combination of clutch and gearbox. It is a mechanical device which varies the engine torque according to the driver requirement.</div>"
+              },
+              {
+                "type": "reveal",
+                "question": "[Q1] State the tension ratio formula. What is centrifugal tension and when do we include it?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] What is the difference between slip and creep?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] Motor pulley D_s=800mm, pump pulley D_L=600mm, C=1000mm, N_s=1440rpm. Find belt velocity V and angle of contact θ_s.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Theory of Machines"
+}

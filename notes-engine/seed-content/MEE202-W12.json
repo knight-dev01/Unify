@@ -1,0 +1,164 @@
+{
+  "course": "MEE 202",
+  "week": 12,
+  "title": "Eutectic Systems & Fe-C Diagram",
+  "subtitle": "The eutectic system is the most important binary system in engineering — it's why soldering works, why lead-tin alloys melt at lower temperatures than pure metals. The Fe-C diagram underpins all steel and cast iron production. Know your invariant reactions and how to read cooling curves.",
+  "learningOutcome": "The eutectic system is the most important binary system in engineering — it's why soldering works, why lead-tin alloys melt at lower temperatures than pure metals. The Fe-C diagram underpins all steel and cast iron production. Know your invariant reactions and how to read cooling curves.",
+  "metaChips": [
+    "MEE 202",
+    "Week 12"
+  ],
+  "tags": [
+    "Eutectic Reaction",
+    "Eutectic Point",
+    "Invariant Reaction",
+    "Eutectoid",
+    "Peritectic",
+    "Fe-C Diagram",
+    "Ferrite",
+    "Austenite",
+    "Pearlite"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Eutectic Binary Systems",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Eutectic Binary Systems",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>These binary systems, with <strong>unlimited liquid state miscibility and low or negligible solid state miscibility</strong>, are referred to as <strong>eutectic</strong>.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Eutectic reaction:</strong> A transition between liquid and mixture of two solid phases, α + β, at eutectic concentration C<sub>E</sub>. The reaction is written: Liquid → α + β</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>The melting point of the eutectic alloy is lower than that of the components (eutectic = easy to melt in Greek). At most two phases can be in equilibrium within a phase field. Three phases (L, α, β) may be in equilibrium only at a few points along the eutectic isotherm. Single-phase regions are separated by 2-phase regions.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Eutectic or invariant point:</strong> Liquid and two solid phases co-exist in equilibrium at the eutectic composition C<sub>E</sub> and the eutectic temperature T<sub>E</sub>. The <strong>eutectic isotherm</strong> is the horizontal solidus line at T<sub>E</sub>.</p>"
+            },
+            {
+              "type": "diagram",
+              "caption": "Binary Eutectic Phase Diagram (e.g., Lead-Tin System)",
+              "description": "Temperature (°C) · Composition (wt% Sn →) · Pb(A) · Sn(B) · 327°C · 232°C · Eutectic Point E · T=183°C, C=61.9%Sn · Eutectic · Isotherm · Liquid · α · β · α + L · β + L · α + β · Hypo-eutectic · Hyper-eutectic · 183°C",
+              "imageRef": null
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "Sketch a binary eutectic phase diagram. Label all curves and the equilibrium phases. Sketch cooling curves for: (i) pure component A, (ii) solid solution alloy, (iii) hypo-eutectic alloy, (iv) eutectic alloy, (v) hyper-eutectic alloy. (2019/20)",
+                "On the diagram given (A-20%B at 550°C): composition of liquid phase; composition of solid phase; fraction of material that is liquid; weight of solid if total alloy = 35Kg. (2011/12)",
+                "Draw a binary eutectic for alloys with unlimited solubility in liquid and limited in solid. Label all curves and indicate phases present in each zone. Sketch cooling curve for eutectic alloy and hyper-eutectic alloy. (2014/15)",
+                "Give examples of invariant points in a unary and binary system. Illustrate with sketches. (2022/23)"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Eutectic Binary Systems\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Invariant Reactions Summary",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Invariant Reactions Summary",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>There are 5 invariant reactions (F = 0). At an invariant point, no independent variables can be changed — temperature, pressure, and composition are all fixed.</p>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "#",
+                "Reaction Name",
+                "Reaction Equation",
+                "Notes",
+                "1",
+                "Eutectic",
+                "Liquid → α + β",
+                "Liquid decomposes to TWO solids on cooling",
+                "2",
+                "Eutectoid",
+                "α → β + γ",
+                "One solid decomposes to TWO solids. Fe-C: austenite → ferrite + cementite (pearlite)",
+                "3",
+                "Peritectic",
+                "Liquid + α → β",
+                "Liquid reacts with solid to form new solid",
+                "4",
+                "Peritectoid",
+                "α + β → γ",
+                "Two solids combine to form one solid",
+                "5",
+                "Monotectic",
+                "L₁ → α + L₂",
+                "One liquid transforms to solid + different liquid"
+              ]
+            },
+            {
+              "type": "diagram",
+              "caption": "Fe-C Phase Diagram — Key Points & Phases",
+              "description": "Temperature (°C) · Carbon content (wt%) → · 0 · 0.77 · 2.11 · 4.30 · 6.67 · 1538 · 1148 · 727 · γ · (Austenite) · α · Ferrite · Eutectoid · 727°C · Eutectic · 1148°C · Eutectoid · 0.77% C · Eutectic 4.30%C · Fe₃C (Cementite) 6.67%C · α+γ · γ + Fe₃C · α + Fe₃C · (Pearlite region) · ← Steel (0–2.11% C",
+              "imageRef": null
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Key Fe-C Phases & Transformations</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "Ferrite (α): BCC iron, max 0.022% C at 727°C. Soft, ductile, magnetic. Austenite (γ): FCC iron, max 2.11% C at 1148°C. Non-magnetic, forms at high temperature. Cementite (Fe₃C): Iron carbide, 6.67% C. Very hard and brittle. Pearlite: Eutectoid mixture of ferrite + cementite (0.77% C, 727°C). Lamellar structure. γ → α + Fe₃C Ledeburite: Eutectic mixture at 4.30% C, 1148°C. L → γ + Fe₃C Eutectoid reaction: γ(0.77%C) → α(0.022%C) + Fe₃C(6.67%C) at 727°C Eutectic reaction: L(4.30%C) → γ(2.11%C) + Fe₃C(6.67%C) at 1148°C"
+            },
+            {
+              "type": "insight",
+              "text": "The phase diagram question is worth 25 marks in every paper. The lever rule calculation typically gives 6–10 marks. For alloy A-20%B at 550°C: draw the tie line at 550°C, read off the compositions at the liquidus (C L ) and solidus (C α ) intersections, then apply the lever rule formulas to get the weight fractions. Always state your tie-line values explicitly before calculating."
+            },
+            {
+              "type": "insight",
+              "text": "⚠ Common Mistake Students mix up eutectic and eutectoid. Eutectic: involves a LIQUID reacting → two solids. Eutectoid: involves a SOLID reacting → two other solids. In the Fe-C diagram, ledeburite forms at the eutectic point (1148°C, liquid → γ + Fe₃C). Pearlite forms at the eutectoid point (727°C, austenite → ferrite + cementite). The eutectic and eutectoid reactions are similar — both involve decomposition of a single phase into two solid phases. The \"-oid\" suffix means \"resembling\" (resembling the eutectic but in solid state)."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Invariant Reactions Summary\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Science of Materials"
+}

@@ -1,0 +1,110 @@
+{
+  "course": "MEE 212",
+  "week": 4,
+  "title": "Flywheel — Theory & Turning Moment Diagram",
+  "subtitle": "A flywheel is like a rechargeable energy battery for rotating machines. When there's extra energy, it stores it. When energy is needed, it releases it. This week you learn what a flywheel is, what it does, and how to read the turning moment diagram that shows when it stores and releases energy.",
+  "learningOutcome": "A flywheel is like a rechargeable energy battery for rotating machines. When there's extra energy, it stores it. When energy is needed, it releases it. This week you learn what a flywheel is, what it does, and how to read the turning moment diagram that shows when it stores and releases energy.",
+  "metaChips": [
+    "MEE 212",
+    "Week 4"
+  ],
+  "tags": [
+    "Flywheel",
+    "Turning moment diagram",
+    "Rotational energy",
+    "ICE",
+    "Jerk"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "What is a Flywheel?",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "What is a Flywheel?",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>A flywheel is a heavy rotating disc attached to an engine's crankshaft. Its job is to smooth out the engine's operation. In a car engine (ICE), the pistons only produce power during the power stroke — the other strokes (intake, compression, exhaust) need energy to keep going. The flywheel absorbs the extra energy from the power stroke and gives it back during the other strokes.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam-ready definition (from notes):</strong> <div>A flywheel is a device that serves as a reservoir for rotational energy — e.g. ICE (Internal Combustion Engine). When an ICE is in operation, sometimes the power produced by the engine could be more than sufficient for the operation of the engine. If it is less sufficient, the power is being released.</div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Functions of a flywheel (from notes)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>1. Engine balancing — suppresses side-to-side motion</div>",
+                "<div>2. Assists in engine start-up</div>",
+                "<div>3. Serves as drive / drivetrain / stress reduction</div>",
+                "<div>4. Assists in engine speed smoothening (avoids engine jerk)</div>",
+                "<div>5. Serves as wave manipulation</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "NB: Jerk is the rate of change of acceleration with time."
+            },
+            {
+              "type": "diagram",
+              "caption": "Turning moment diagram — crank angle vs torque",
+              "description": "Crank Angle · T · Mean torque (Tₘ) · +a₁ · −a₂ · +a₃ · P · 90° · 180° · 270° · Above line = storing energy · Below line = releasing energy",
+              "imageRef": null
+            },
+            {
+              "type": "analogy",
+              "text": "Think of a potter's wheel. The potter kicks it with a burst of energy, then the wheel keeps spinning smoothly on its own because of its mass. Without that heavy wheel, the clay would feel every tiny variation in push. The flywheel in an engine does the same thing — it keeps rotation smooth between power pulses."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Define a flywheel. State its functions. <span>Common exam Q</span></li>",
+                "<li>Explain what a turning moment diagram shows and how to use it to find maximum fluctuation of energy.</li>",
+                "<li>What is \"jerk\" in the context of flywheel theory?</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "State the textbook definition — Exam-ready definition (from notes).",
+                "answer": "<div>A flywheel is a device that serves as a reservoir for rotational energy — e.g. ICE (Internal Combustion Engine). When an ICE is in operation, sometimes the power produced by the engine could be more than sufficient for the operation of the engine. If it is less sufficient, the power is being released.</div>"
+              },
+              {
+                "type": "reveal",
+                "question": "[Q1] Define a flywheel. Give one example of a machine that uses one.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] List four functions of a flywheel.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] On a turning moment diagram, what do the areas above and below the mean torque line represent? How does the flywheel respond to each?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Theory of Machines"
+}

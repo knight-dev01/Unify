@@ -1,0 +1,128 @@
+{
+  "course": "IPE 212",
+  "week": 4,
+  "title": "Safety Signs, Measuring Systems & Tools",
+  "subtitle": "Safety signs use universal symbols to communicate danger. This week covers the five types of safety signs, hazardous substances in automotive shops, and the three categories of measuring tools used in vehicle repair and maintenance.",
+  "learningOutcome": "Safety signs use universal symbols to communicate danger. This week covers the five types of safety signs, hazardous substances in automotive shops, and the three categories of measuring tools used in vehicle repair and maintenance.",
+  "metaChips": [
+    "IPE 212",
+    "Week 4"
+  ],
+  "tags": [
+    "Mandatory signs",
+    "Prohibition signs",
+    "Warning signs",
+    "Callipers",
+    "Micrometer",
+    "Feeler gauge",
+    "Torque wrench"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Types of Safety Signs",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Types of Safety Signs",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Safety signs are like a visual language everyone must understand. No words needed — just a shape and colour tells you whether to do something, not do something, or watch out for something. This universal language saves lives across language barriers.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div>Safety signs give information through picture about maintaining and following rules in different workplaces. There are five types: <strong>1. Mandatory Signs (Blue Circle):</strong> Indicate actions that must be followed. Examples: Wear Safety Glasses, Gloves Must Be Worn, Hearing Protection Required. <strong>2. Prohibition Signs (Red Circle with Slash):</strong> Prohibit unsafe or unauthorized actions. Examples: No Smoking, Do Not Enter — Authorized Personnel Only, Do Not Operate Without Guards in Place. <strong>3. Warning Signs (Yellow Triangle):</strong> Alert workers to potential hazards. Examples: Warning: Flammable Materials, Caution: Hot Surface, Watch for Forklift Traffic. <strong>4. Emergency Information Signs (Green Rectangle):</strong> Provide information about emergency equipment or exits. Examples: Fire Extinguisher, Emergency Exit, First Aid Station. <strong>5. Fire Safety Signs (Red Rectangle):</strong> Indicate the location of fire-fighting equipment. Examples: Fire Hose Reel, Fire Extinguisher, Fire Alarm Call Point.</div>"
+            },
+            {
+              "type": "diagram",
+              "caption": "Figure",
+              "description": "MUST DO · Mandatory · (Blue Circle) · NO · Prohibition · (Red Circle/Slash) · ! · Warning · (Yellow Triangle) · EXIT · Emergency Info · (Green Rectangle) · FIRE · SAFETY · Fire Safety · (Red Rectangle)",
+              "imageRef": null
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Students often confuse Warning signs (yellow triangles) with Prohibition signs (red circles with slashes). Remember: triangles = WATCH OUT for something. Circles with slashes = DON'T DO something. Filled blue circles = YOU MUST DO this."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "List and describe FIVE types of safety signs used in the automotive industry. Give two examples of each.",
+                "Categorise measuring tools used in an automotive shop. Give two examples under each category.",
+                "What are hazardous substances? How should petrol and solvents be handled safely in an automotive workshop?"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: 1. Mandatory Signs (Blue Circle).",
+                "answer": "<div>Safety signs give information through picture about maintaining and following rules in different workplaces. There are five types: <strong>1. Mandatory Signs (Blue Circle):</strong> Indicate actions that must be followed. Examples: Wear Safety Glasses, Gloves Must Be Worn, Hearing Protection Required. <strong>2. Prohibition Signs (Red Circle with Slash):</strong> Prohibit unsafe or unauthorized actions. Examples: No Smoking, Do Not Enter — Authorized Personnel Only, Do Not Operate Without Guards in Place. <strong>3. Warning Signs (Yellow Triangle):</strong> Alert workers to potential hazards. Examples: Warning: Flammable Materials, Caution: Hot Surface, Watch for Forklift Traffic. <strong>4. Emergency Information Signs (Green Rectangle):</strong> Provide information about emergency equipment or exits. Examples: Fire Extinguisher, Emergency Exit, First Aid Station. <strong>5. Fire Safety Signs (Red Rectangle):</strong> Indicate the location of fire-fighting equipment. Examples: Fire Hose Reel, Fire Extinguisher, Fire Alarm Call Point.</div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Measuring Systems and Measuring Tools",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Measuring Systems and Measuring Tools",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Automotive repair is precise work. A gap of 0.5mm in the wrong place can mean an engine that won't start or a brake that won't stop. Measuring tools are therefore as important as any spanner or socket set. They fall into three categories.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div>Automotive shops utilize a variety of measuring systems and tools to ensure <strong>accuracy and precision in vehicle repair and maintenance</strong>. These tools can be broadly categorized into: <strong>Mechanical tools</strong>, <strong>Pneumatic</strong>, and <strong>Electrical measuring tools</strong>, each serving a specific purpose within the shop environment.</div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div><strong>Mechanical Measuring Tools:</strong> — <strong>Callipers:</strong> Used for measuring internal and external dimensions of parts, as well as depth measurements. Types include vernier callipers, digital callipers, and internal/external callipers. — <strong>Micrometers:</strong> Offer high-precision measurements of thickness and diameter, often used for machining parts. — <strong>Feeler Gauges:</strong> Used to measure small clearances and gaps, like those found between engine parts or spark plugs. — <strong>Vernier Height Gauges:</strong> For measuring the height of objects or features, often used with a surface plate. — <strong>Torque Wrenches:</strong> Essential for tightening fasteners to specific torque specifications, preventing damage or leakage. — <strong>Dial Indicators:</strong> Used to measure small movements or deflections, often for checking runout, backlash, or endplay in rotating assemblies. — <strong>Protractor:</strong> Used to measure angles, useful for bodywork and frame alignment. — <strong>Steel Scale/Ruler:</strong> Basic measuring tools for linear measurements.</div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div><strong>Pneumatic Measuring Tools:</strong> Utilize compressed air to perform various measurements, including tire pressure, manifold pressure, and compression testing. Especially useful for measuring cylindrical parts like bores and shafts due to their non-contact nature. — <strong>Tire Pressure Gauges:</strong> Used to measure and maintain proper tire pressure. — <strong>AC and Manifold Pressure Gauges:</strong> Used to diagnose issues with the vehicle's air conditioning and engine intake systems. — <strong>Compression Testers:</strong> Used to measure cylinder compression, indicating engine health. — <strong>Cooling System Pressure Testers:</strong> Used to check for leaks in the cooling system.</div>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: accuracy and precision in vehicle repair and maintenance.",
+                "answer": "<div>Automotive shops utilize a variety of measuring systems and tools to ensure <strong>accuracy and precision in vehicle repair and maintenance</strong>. These tools can be broadly categorized into: <strong>Mechanical tools</strong>, <strong>Pneumatic</strong>, and <strong>Electrical measuring tools</strong>, each serving a specific purpose within the shop environment.</div>"
+              },
+              {
+                "type": "reveal",
+                "question": "Define: Mechanical Measuring Tools.",
+                "answer": "<div><strong>Mechanical Measuring Tools:</strong> — <strong>Callipers:</strong> Used for measuring internal and external dimensions of parts, as well as depth measurements. Types include vernier callipers, digital callipers, and internal/external callipers. — <strong>Micrometers:</strong> Offer high-precision measurements of thickness and diameter, often used for machining parts. — <strong>Feeler Gauges:</strong> Used to measure small clearances and gaps, like those found between engine parts or spark plugs. — <strong>Vernier Height Gauges:</strong> For measuring the height of objects or features, often used with a surface plate. — <strong>Torque Wrenches:</strong> Essential for tightening fasteners to specific torque specifications, preventing damage or leakage. — <strong>Dial Indicators:</strong> Used to measure small movements or deflections, often for checking runout, backlash, or endplay in rotating assemblies. — <strong>Protractor:</strong> Used to measure angles, useful for bodywork and frame alignment. — <strong>Steel Scale/Ruler:</strong> Basic measuring tools for linear measurements.</div>"
+              },
+              {
+                "type": "reveal",
+                "question": "Define: Pneumatic Measuring Tools.",
+                "answer": "<div><strong>Pneumatic Measuring Tools:</strong> Utilize compressed air to perform various measurements, including tire pressure, manifold pressure, and compression testing. Especially useful for measuring cylindrical parts like bores and shafts due to their non-contact nature. — <strong>Tire Pressure Gauges:</strong> Used to measure and maintain proper tire pressure. — <strong>AC and Manifold Pressure Gauges:</strong> Used to diagnose issues with the vehicle's air conditioning and engine intake systems. — <strong>Compression Testers:</strong> Used to measure cylinder compression, indicating engine health. — <strong>Cooling System Pressure Testers:</strong> Used to check for leaks in the cooling system.</div>"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Automotive Engineering & Workshop"
+}

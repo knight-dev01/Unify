@@ -1,0 +1,140 @@
+{
+  "course": "IPE 212",
+  "week": 2,
+  "title": "Classification of Vehicles",
+  "subtitle": "Vehicles are classified based on multiple criteria including structure, load capacity, number of wheels, fuel type, body style, transmission, drive configuration, driving axle, and engine position. This week covers all classification bases with key examples.",
+  "learningOutcome": "Vehicles are classified based on multiple criteria including structure, load capacity, number of wheels, fuel type, body style, transmission, drive configuration, driving axle, and engine position. This week covers all classification bases with key examples.",
+  "metaChips": [
+    "IPE 212",
+    "Week 2"
+  ],
+  "tags": [
+    "HTV / HMV",
+    "LTV / LMV",
+    "Articulated vehicle",
+    "Single unit vehicle",
+    "Flexible joint",
+    "Pivot joint",
+    "ICE"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Classification on the Basis of Structure",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Classification on the Basis of Structure",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Think of vehicle structure like how a train is built. A single train car that can move by itself is like a single unit vehicle. A train made of many sections hooked together, able to bend around corners, is like an articulated vehicle.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div><strong>Single Unit Vehicle:</strong> A vehicle where the engine and cargo area are on the same frame, or chassis. It is not a combination of a truck tractor and a separate trailer. Examples include buses, box trucks, and straight trucks. <strong>Articulated Vehicle:</strong> Composed of <strong>two or more rigid sections linked by a flexible joint</strong>. This joint can be a permanent or semi-permanent coupling. It allows the vehicle to bend and turn more sharply. Examples: heavy equipment, buses, trams, trains, articulated dump trucks, wheel loaders. <strong>Heavy Tractor Vehicles:</strong> Encompass a wide range of machinery designed for hauling, construction, and other demanding tasks like moving heavy loads. Commonly operate in pairs either as tandem or as 'puller' and 'pusher.' Examples: tractor-trailers (semi-trucks), dump trucks, bulldozers, artillery tractors.</div>"
+            },
+            {
+              "type": "analogy",
+              "text": "A bendy-bus (articulated bus) that bends in the middle when turning a corner is a classic articulated vehicle. The front and rear sections are separate rigid bodies joined by a pivot, allowing sharp turns impossible for a rigid single-unit bus of the same length."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "List and explain FIVE bases for classifying automobiles, giving two examples for each.",
+                "What is an articulated vehicle? How does it differ from a single unit vehicle?",
+                "Classify the following vehicles: Toyota Camry, Mercedes-Benz 18-wheeler, Chevrolet Corvette, Honda CB500. Give reasons for each classification.",
+                "Distinguish between front-wheel drive and rear-wheel drive. What are the implications of each for vehicle performance?"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: Single Unit Vehicle.",
+                "answer": "<div><strong>Single Unit Vehicle:</strong> A vehicle where the engine and cargo area are on the same frame, or chassis. It is not a combination of a truck tractor and a separate trailer. Examples include buses, box trucks, and straight trucks. <strong>Articulated Vehicle:</strong> Composed of <strong>two or more rigid sections linked by a flexible joint</strong>. This joint can be a permanent or semi-permanent coupling. It allows the vehicle to bend and turn more sharply. Examples: heavy equipment, buses, trams, trains, articulated dump trucks, wheel loaders. <strong>Heavy Tractor Vehicles:</strong> Encompass a wide range of machinery designed for hauling, construction, and other demanding tasks like moving heavy loads. Commonly operate in pairs either as tandem or as 'puller' and 'pusher.' Examples: tractor-trailers (semi-trucks), dump trucks, bulldozers, artillery tractors.</div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "All Classification Bases",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "All Classification Bases",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Just like how we classify animals (by what they eat, where they live, how they reproduce), engineers classify vehicles by multiple different features. Each classification tells you something specific and useful about that vehicle's design and purpose.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div><strong>A. On the Basis of Load:</strong> Heavy transport vehicle (HTV) or heavy motor vehicle (HMV); Light transport vehicle (LTV), Light motor vehicle (LMV) <strong>B. On the Basis of Wheels:</strong> Two-wheeler (e.g. motorcycle, scooter); Three-wheeler (e.g. auto rickshaw); Four-wheeler (e.g. car, jeep, truck, bus); Six-wheeler (e.g. big trucks with two gear axles) <strong>C. On the Basis of Fuel Used:</strong> Petrol vehicle (e.g. motorcycle, car); Diesel vehicle (e.g. trucks, buses); Electric vehicle (uses battery); Steam vehicle (uses steam engine); Gas vehicle (e.g. LPG and CNG vehicles) <strong>D. On the Basis of Body Style:</strong> Sedan, Hatchback, Coupe, Station wagon, Convertible, Van, Special purpose vehicle (e.g. ambulance, milk van) <strong>E. On the Basis of Transmission:</strong> Conventional (manual, e.g. car with 5 gears); Semi-automatic; Automatic (gears not changed manually) <strong>F. On the Basis of Drive:</strong> Left-hand drive; Right-hand drive <strong>G. On the Basis of Driving Axle:</strong> Front wheel drive; Rear wheel drive; All wheel drive <strong>H. On the Basis of Engine Position:</strong> Engine in Front (most cars); Engine in Rear (e.g. Nano car)</div>"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Confusing \"basis of drive\" (left-hand/right-hand referring to driver position) with \"basis of driving axle\" (front-wheel/rear-wheel/all-wheel drive referring to which wheels receive engine power). These are completely different classification criteria."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: A. On the Basis of Load.",
+                "answer": "<div><strong>A. On the Basis of Load:</strong> Heavy transport vehicle (HTV) or heavy motor vehicle (HMV); Light transport vehicle (LTV), Light motor vehicle (LMV) <strong>B. On the Basis of Wheels:</strong> Two-wheeler (e.g. motorcycle, scooter); Three-wheeler (e.g. auto rickshaw); Four-wheeler (e.g. car, jeep, truck, bus); Six-wheeler (e.g. big trucks with two gear axles) <strong>C. On the Basis of Fuel Used:</strong> Petrol vehicle (e.g. motorcycle, car); Diesel vehicle (e.g. trucks, buses); Electric vehicle (uses battery); Steam vehicle (uses steam engine); Gas vehicle (e.g. LPG and CNG vehicles) <strong>D. On the Basis of Body Style:</strong> Sedan, Hatchback, Coupe, Station wagon, Convertible, Van, Special purpose vehicle (e.g. ambulance, milk van) <strong>E. On the Basis of Transmission:</strong> Conventional (manual, e.g. car with 5 gears); Semi-automatic; Automatic (gears not changed manually) <strong>F. On the Basis of Drive:</strong> Left-hand drive; Right-hand drive <strong>G. On the Basis of Driving Axle:</strong> Front wheel drive; Rear wheel drive; All wheel drive <strong>H. On the Basis of Engine Position:</strong> Engine in Front (most cars); Engine in Rear (e.g. Nano car)</div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Origin of the Automobile",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "Origin of the Automobile",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>The automobile wasn't invented in one day — it evolved over decades, and Germany gets the credit for where it all began.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div><strong>Germany</strong> is the birthplace of the automobile. The first automobile was invented there and developed to a high level of technical maturity. <strong>German automobile pioneers:</strong> Nicholas Cugnot, August Otto, Carl Benz, Gottlieb Daimler, Wilhelm Maybach, Rudolf Diesel, and Ferdinand Porsche and Felix Wankel. <strong>Leading manufacturers:</strong> USA — General Motors, Ford Cars, Chrysler; Japan — Toyota, Nissan; West Germany — Volkswagen; Italy — Fiat; France — Renault; UK — B.L.M.C, Austin / Morris BL.</div>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: Germany.",
+                "answer": "<div><strong>Germany</strong> is the birthplace of the automobile. The first automobile was invented there and developed to a high level of technical maturity. <strong>German automobile pioneers:</strong> Nicholas Cugnot, August Otto, Carl Benz, Gottlieb Daimler, Wilhelm Maybach, Rudolf Diesel, and Ferdinand Porsche and Felix Wankel. <strong>Leading manufacturers:</strong> USA — General Motors, Ford Cars, Chrysler; Japan — Toyota, Nissan; West Germany — Volkswagen; Italy — Fiat; France — Renault; UK — B.L.M.C, Austin / Morris BL.</div>"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Automotive Engineering & Workshop"
+}

@@ -1,0 +1,149 @@
+{
+  "course": "ECE 220",
+  "week": 4,
+  "title": "Control Structures",
+  "subtitle": "Control structures are what make programs intelligent — they let your code make decisions and repeat actions. This week covers if/elif/else for decisions and for / while loops for repetition.",
+  "learningOutcome": "Control structures are what make programs intelligent — they let your code make decisions and repeat actions. This week covers if/elif/else for decisions and for / while loops for repetition.",
+  "metaChips": [
+    "ECE 220",
+    "Week 4"
+  ],
+  "tags": [
+    "if/else",
+    "elif",
+    "for loop",
+    "while loop",
+    "range()",
+    "Boolean",
+    "Indentation"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "if / elif / else",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "if / elif / else",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p><code>if</code> checks a condition. If true, runs the indented block. <code>elif</code> checks another condition. <code>else</code> is the fallback.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>score = float(input(\"Enter score: \")) if score &gt;= 70: print(\"A — Distinction\") elif score &gt;= 60: print(\"B — Credit\") elif score &gt;= 50: print(\"C — Merit\") elif score &gt;= 45: print(\"D — Pass\") else: print(\"F — Fail\")</pre>"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Forgetting the colon ( : ) at the end of if / elif / else lines. Also: Python uses indentation (spaces/tabs) to define blocks — inconsistent indentation causes IndentationError ."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Write a program using if/elif/else to grade a student based on their score.</li>",
+                "<li>Write a for loop that prints the squares of numbers 1 to 10.</li>",
+                "<li>What is the difference between a for loop and a while loop?</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"if / elif / else\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "for Loops",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "for Loops",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p><code>for</code> loops iterate over a sequence a known number of times. <code>range(1, 11)</code> generates numbers 1 to 10.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre># Print squares 1 to 10 for i in range(1, 11): print(i, \"squared =\", i ** 2) # Output: 1 squared = 1, 2 squared = 4, ... 10 squared = 100 # Loop through a list fruits = [\"mango\", \"orange\", \"banana\"] for fruit in fruits: print(fruit)</pre>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"for Loops\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "while Loops",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "while Loops",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p><code>while</code> loops repeat as long as a condition is true. Use when you don't know how many times in advance.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>count = 1 while count = 5: print(\"Count:\", count) count += 1 # Prints Count: 1 through Count: 5</pre>"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Infinite loop — forgetting to update the variable inside while . If count never changes, the loop runs forever."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1] Write a program that reads a number from the user and prints whether it is positive, negative, or zero.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] Write a for loop using range() that prints all even numbers from 2 to 20.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] Write a while loop that asks the user to guess a number between 1 and 10 until they get it right. Print how many attempts it took.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Introduction to Programming & Computations"
+}

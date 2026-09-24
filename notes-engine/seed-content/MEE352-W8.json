@@ -1,0 +1,442 @@
+{
+  "course": "MEE 352",
+  "week": 8,
+  "title": "Miscellaneous Sources & Merits/Demerits",
+  "subtitle": "Fuel Cells, Batteries, Energy Harvesting Technology",
+  "learningOutcome": "By the end of this week, you should be able to classify fuel cells by temperature and electrolyte type, explain battery energy efficiency, and describe innovative energy harvesting technology.",
+  "metaChips": [
+    "MEE 352",
+    "Week 8"
+  ],
+  "tags": [
+    "Fuel Cells",
+    "Batteries",
+    "Energy Harvesting",
+    "MHD",
+    "Conventional Merits",
+    "Non-Conventional Merits",
+    "HYDROX Cell"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Miscellaneous Sources",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Miscellaneous Sources",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Chemical Energy Sources include augmentation of efforts on the development of fuel cell and batteries. These have promise for: (i) Running small and light commercial vehicles. (ii) Rural electrification through rechargeable power batteries.</p>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Miscellaneous Sources\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "What are the key facts, figures, and definitions from Miscellaneous Sources?",
+          "answer": "<div>Review the notes above. Focus on: specific numerical values, definitions, classification schemes, and the logic connecting ideas in <strong>Miscellaneous Sources</strong>.</div>"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Fuel Cell",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Fuel Cell",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>A cell or combination of cells are capable to generate an electric current by converting the chemical energy of a fuel directly onto electricity. The chemical energy is the free energy of the reactant used. This conversion takes place at a constant temperature and pressure. As per the fuel used the fuel cell can be classified as:</p>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Hydrogen (H₂) fuel cell</li>",
+                "<li>Hydrazine (N₂H₄) fuel cell</li>",
+                "<li>Hydrocarbon fuel cell</li>",
+                "<li>Alcohol (Methanol) fuel cell</li>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>The main components of a hydrogen, oxygen (HYDROX) cell are: (i) A fuel electrode (anode) (ii) An oxidant or air electrode (Cathode) and (iii) An electrolyte</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Classification by Temperature:</strong></p>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Low temperature fuel cell — 20-100°C</li>",
+                "<li>Medium temperature fuel cell — 100-500°C</li>",
+                "<li>High temperature fuel cell — 500-1000°C</li>",
+                "<li>Very high temperature fuel cell — more than 1000°C</li>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Classification by Electrolyte:</strong></p>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Gas fuel cell — hydrogen low hydrocarbon</li>",
+                "<li>Liquid fuel cell — alcohols, hydrazine, higher hydrocarbon</li>",
+                "<li>Solid fuel cell — metals</li>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>The fuel cell can be used for: (a) Domestic purpose (b) Central power station (c) Automotive vehicles (d) Special application</p>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Fuel Cell\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "What are the key facts, figures, and definitions from Fuel Cell?",
+          "answer": "<div>Review the notes above. Focus on: specific numerical values, definitions, classification schemes, and the logic connecting ideas in <strong>Fuel Cell</strong>.</div>"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Batteries",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "Batteries",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>It is a combination of individual cell. It can also be called as a black-box containing electrical energy stored electrochemically and later recovered as electrical energy. It is of two types (a) Stored and (b) Charged cell.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>The battery can be of two types:</p>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Primary battery (non-chargeable) — chemical reactions are irreversible e.g., dry cell flash light batteries.</li>",
+                "<li>Secondary battery (solar, wind electrical energy storage) — the chemical reactions are reversible e. g., lead acid batteries.</li>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Energy efficiency of a battery formula:</strong></p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>η<sub>e</sub> = (E₁ × Amp. hour output) / (E₂ × Amp. hour input)</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>Where: I₁ = Battery discharge current, I₂ = Battery charged current, E₁ = Battery discharge terminal voltage, E₂ = Battery charged terminal voltage, θ₁ = Battery discharge time, θ₂ = Battery charging time.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>\"Cycle life\" is the number of times the battery can be charged/discharged under specified conditions. It vary greatly with depth of discharge/deep discharge tending to short cycle life.</p>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Batteries\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "What are the key facts, figures, and definitions from Batteries?",
+          "answer": "<div>Review the notes above. Focus on: specific numerical values, definitions, classification schemes, and the logic connecting ideas in <strong>Batteries</strong>.</div>"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Merits and Demerits of Energy Sources",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "4.1",
+          "title": "Merits and Demerits of Energy Sources",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Conventional Energy Sources — Merits:</strong></p>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Cheaper than non-conventional resources. Electricity costs: ₹2.20 from gas, 1.85 from hydro and ₹3.8 from nuclear source on the basic of per kwh.</li>",
+                "<li>Storage of raw materials is easy and convenient.</li>",
+                "<li>Technology is universally available.</li>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Conventional Energy Sources — Demerits:</strong></p>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Generate pollution — main pollutants are CO, CO₂, NOx, SOx, particulate matter and heat.</li>",
+                "<li>Can be used for the production of other chemical petrochemical, paraceutical and paint products. It is necessary to preserve this purposes.</li>",
+                "<li>Safety of nuclear plants is controversial — handling nuclear waste is dangerous, accidental leakage of radioactive materials, availability is limited, sophisticated technology is required.</li>",
+                "<li>Hydro-electric plants are cleanest but hydro reserver have following problem: ecological disturbances, affect wild life, dislocation of large population, rehabilitation problems.</li>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Non-conventional Energy Sources — Merits:</strong> Available in nature free of cost, environment friendly, inexhaustible, low gestation period.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Non-conventional Energy Sources — Demerits:</strong> Energy available in dilute form, cost of harnessing energy is generally high, initial cost is high, requires sophisticated equipment.</p>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Merits and Demerits of Energy Sources\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "What are the key facts, figures, and definitions from Merits and Demerits of Energy Sources?",
+          "answer": "<div>Review the notes above. Focus on: specific numerical values, definitions, classification schemes, and the logic connecting ideas in <strong>Merits and Demerits of Energy Sources</strong>.</div>"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "title": "Innovation Energy Harvesting Technology",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "5.1",
+          "title": "Innovation Energy Harvesting Technology",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>The scientists have developed an innovative energy harvesting technology which can capture human motion power to charge mobile/electronics devices such as smart phones, laptop, batteries etc.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>The energy harvesting and storage technology developed could reduce Reliance on the batteries in the mobile. Technology could enable a footwear embeded energy harvester which captures energy produced by human being while walking and it could be stored for later use.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>It could be especially useful for military, as soldiers currently carry heavy batteries to power their Radio, global positioning system (GPS) units, night vision goggles etc in the field.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>Human walking carries a lot of energy — theoretical estimates shows that can produce up to 10 watts of electrical power per shoe which is being wasted as heat. A total of 20 watts from walking is not a small thing, especially compared to the power requirements of the majority of the modern mobile device.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>The research work at the university of Wisconsin. Madison (U-W madison), U.S.A is in progress to enhance the rate of energy generation.</p>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Innovation Energy Harvesting Technology\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "What are the key facts, figures, and definitions from Innovation Energy Harvesting Technology?",
+          "answer": "<div>Review the notes above. Focus on: specific numerical values, definitions, classification schemes, and the logic connecting ideas in <strong>Innovation Energy Harvesting Technology</strong>.</div>"
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": [
+      {
+        "number": 1,
+        "question": "A fuel cell converts chemical energy of fuel directly into:",
+        "feedback": {
+          "correct": "✓ A fuel cell generates an electric current by converting the chemical energy of a fuel directly onto electricity.",
+          "wrong": "✗ A fuel cell generates an electric current by converting the chemical energy of a fuel directly onto electricity."
+        },
+        "topicRef": "1",
+        "type": "mcq",
+        "options": [
+          "Heat",
+          "Mechanical energy",
+          "Electrical energy",
+          "Light"
+        ],
+        "correct": "C"
+      },
+      {
+        "number": 2,
+        "question": "A High temperature fuel cell operates at:",
+        "feedback": {
+          "correct": "✓ High temperature fuel cell operates at 500-1000°C. Very high temperature is above 1000°C.",
+          "wrong": "✗ High temperature fuel cell operates at 500-1000°C. Very high temperature is above 1000°C."
+        },
+        "topicRef": "2",
+        "type": "mcq",
+        "options": [
+          "20-100°C",
+          "100-500°C",
+          "500-1000°C",
+          "Above 1000°C"
+        ],
+        "correct": "C"
+      },
+      {
+        "number": 3,
+        "question": "A primary battery (e.g. dry cell) has chemical reactions that are:",
+        "feedback": {
+          "correct": "✓ Primary battery (non-chargeable) — chemical reactions are irreversible, e.g., dry cell flash light batteries.",
+          "wrong": "✗ Primary battery (non-chargeable) — chemical reactions are irreversible, e.g., dry cell flash light batteries."
+        },
+        "topicRef": "3",
+        "type": "mcq",
+        "options": [
+          "Reversible",
+          "Irreversible",
+          "Partially reversible",
+          "Temperature-dependent"
+        ],
+        "correct": "B"
+      },
+      {
+        "number": 4,
+        "question": "Human walking can produce up to ________ watts per shoe.",
+        "feedback": {
+          "correct": "✓ Theoretical estimates show walking can produce up to 10 watts of electrical power per shoe.",
+          "wrong": "✗ Theoretical estimates show walking can produce up to 10 watts of electrical power per shoe."
+        },
+        "topicRef": "4",
+        "type": "fitb",
+        "acceptedAnswers": [
+          "10"
+        ]
+      },
+      {
+        "number": 5,
+        "question": "Which is the cathode in a HYDROX fuel cell?",
+        "feedback": {
+          "correct": "✓ The main components of a HYDROX cell: (i) Fuel electrode (anode), (ii) Oxidant or air electrode (Cathode), (iii) Electrolyte.",
+          "wrong": "✗ The main components of a HYDROX cell: (i) Fuel electrode (anode), (ii) Oxidant or air electrode (Cathode), (iii) Electrolyte."
+        },
+        "topicRef": "5",
+        "type": "mcq",
+        "options": [
+          "Fuel electrode",
+          "Oxidant/air electrode",
+          "Electrolyte",
+          "Membrane"
+        ],
+        "correct": "B"
+      },
+      {
+        "number": 6,
+        "question": "The 'cycle life' of a battery refers to:",
+        "feedback": {
+          "correct": "✓ 'Cycle life' is the number of times the battery can be charged/discharged under specified conditions.",
+          "wrong": "✗ 'Cycle life' is the number of times the battery can be charged/discharged under specified conditions."
+        },
+        "topicRef": "1",
+        "type": "mcq",
+        "options": [
+          "The time before it needs replacing",
+          "Number of charge/discharge cycles under specified conditions",
+          "The storage capacity",
+          "The operating temperature range"
+        ],
+        "correct": "B"
+      },
+      {
+        "number": 7,
+        "question": "Which of the following is a merit of conventional energy sources?",
+        "feedback": {
+          "correct": "✓ Technology is universally available is a merit of conventional sources. The others listed are merits of non-conventional sources.",
+          "wrong": "✗ Technology is universally available is a merit of conventional sources. The others listed are merits of non-conventional sources."
+        },
+        "topicRef": "2",
+        "type": "mcq",
+        "options": [
+          "Environment friendly",
+          "Inexhaustible",
+          "Technology universally available",
+          "Available free of cost"
+        ],
+        "correct": "C"
+      },
+      {
+        "number": 8,
+        "question": "The energy harvesting footwear technology research is conducted at:",
+        "feedback": {
+          "correct": "✓ The research work at the University of Wisconsin, Madison (U-W Madison), U.S.A is in progress.",
+          "wrong": "✗ The research work at the University of Wisconsin, Madison (U-W Madison), U.S.A is in progress."
+        },
+        "topicRef": "3",
+        "type": "mcq",
+        "options": [
+          "MIT, USA",
+          "Stanford University",
+          "University of Wisconsin-Madison",
+          "Cambridge University"
+        ],
+        "correct": "C"
+      }
+    ]
+  }
+}

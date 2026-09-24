@@ -1,0 +1,412 @@
+{
+  "course": "MEE 352",
+  "week": 6,
+  "title": "Renewable Energy Resources",
+  "subtitle": "Merits/Demerits, Obstacles, Prospects & World Energy Status",
+  "learningOutcome": "By the end of this week, you should be able to evaluate the merits and demerits of renewable energy, explain obstacles to implementation, and describe world fossil fuel reserves.",
+  "metaChips": [
+    "MEE 352",
+    "Week 6"
+  ],
+  "tags": [
+    "Renewable Resources",
+    "Merits",
+    "Demerits",
+    "Obstacles",
+    "Fossil Fuel Reserves",
+    "World Energy",
+    "Solar Prospects",
+    "Hydro Power"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Renewable Energy Resources",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Renewable Energy Resources",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>It includes both direct and indirect solar radiation. The direct solar radiation include interception by collectors <em>e.g,</em> solar and flat plate thermal cell. In the indirect solar energy wind, ocean hydropower and biomass are included. The biomass resources can be managed in the sustainable manner. Geothermal technologies have a finit life but considered as renewable for planning purpose. Traditional methods of using biomass and its derivatives viz, wood, and charcoal are highly insufficient in contrast with the modern techniques emphasing proper forest management sustained yield fuel, wood plantation and efficient production.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>There are three independent primary sources of energy provided to the earth (a) The sun (b) Geothermal forces and (c) Planetary motion in the solar system. In particular, the direct solar radiation represents an enormous resources for a modern technological civilization. However, the human capacity to harness these gigantic natural flow of energy to perform useful work depends largely on the (i) Economic feasibility (b) Technology development and (c) Efficient use.</p>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Renewable Energy Resources\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "What are the key facts, figures, and definitions from Renewable Energy Resources?",
+          "answer": "<div>Review the notes above. Focus on: specific numerical values, definitions, classification schemes, and the logic connecting ideas in <strong>Renewable Energy Resources</strong>.</div>"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Merits and Demerits of Renewable Energy",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Merits and Demerits of Renewable Energy",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Merits:</strong></p>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Indigenous resources available in considerable quantities.</li>",
+                "<li>Significant local regional/national economic impact.</li>",
+                "<li>Help in conserving foreign exchange.</li>",
+                "<li>Generate local employment.</li>",
+                "<li>Several options are financially and economical competitive.</li>",
+                "<li>Conversion technology flexible and modular.</li>",
+                "<li>Rapid deployed.</li>",
+                "<li>Large individual units easy in new capacity addition.</li>",
+                "<li>Lower interest on borrowed capital.</li>",
+                "<li>Shorter lead time, reduced transmission and distribution costs.</li>",
+                "<li>Rapid scientific/technological advantages are expected to expand the economic rage.</li>",
+                "<li>Time for scientific development is near 10–15 year.</li>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Demerits:</strong></p>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Economical not available for rural places.</li>",
+                "<li>No help from outside needed.</li>",
+                "<li>Not much employees needed.</li>",
+                "<li>No challenging competition.</li>",
+                "<li>Flexibility is limited to certain areas.</li>",
+                "<li>Economically not feaseable.</li>",
+                "<li>Borrowing amount is quite large.</li>",
+                "<li>Resources required are high.</li>",
+                "<li>In rural areas technology development and maintenance is practically impossible.</li>",
+                "<li>Time required for development is quite large.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Merits and Demerits of Renewable Energy\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "What are the key facts, figures, and definitions from Merits and Demerits of Renewable Energy?",
+          "answer": "<div>Review the notes above. Focus on: specific numerical values, definitions, classification schemes, and the logic connecting ideas in <strong>Merits and Demerits of Renewable Energy</strong>.</div>"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Obstacles in Implementation",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "Obstacles in Implementation",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Inadequate documentation and evaluation of past experience a paucity of validated field performance data and lack of clear priorities for future work.</li>",
+                "<li>In adequate donor or no information exchange for successful and unsuccessful projects.</li>",
+                "<li>Technical and economic uncertainties.</li>",
+                "<li>High economic and financial cost for some systems.</li>",
+                "<li>Skeptical attitude towards renewable energy systems.</li>",
+                "<li>Weak or non existent of institutions/policies to finance and commercialize.</li>",
+                "<li>Energy planning in the hand of completely uncoordinated organization are often responsible for promoting electricity, forestry, petroleum etc. (Conventional) sources of energy.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Obstacles in Implementation\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "What are the key facts, figures, and definitions from Obstacles in Implementation?",
+          "answer": "<div>Review the notes above. Focus on: specific numerical values, definitions, classification schemes, and the logic connecting ideas in <strong>Obstacles in Implementation</strong>.</div>"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Prospects of Renewable Energy Sources",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "4.1",
+          "title": "Prospects of Renewable Energy Sources",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>The total amount of solar energy absorbed by the earth and its atmosphere in one year (3.8 × 10²⁴ joules) is equivalent to nearly 25 times the amount of energy stored in all the world's reserves of fossil fuels. Unlike capital energy sources renewable can not be exhausted with limitation to the rate they are used. The question of depletion of any particular reservoir faster than its replenition does not arise.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>Some of the renewable energy has already taken a lead viz biomass contribute one seventh of all the fuel consumed: Hydro generates one quarter of the world electricity and sun contributes in space heating of all the structure.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>Reasons for more attention concentrating on renewable energy technologies are:</p>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Low transmission costs as unit can often be built on or closed to the site where energy is required.</li>",
+                "<li>They can match in scale of need.</li>",
+                "<li>They can deliver energy of the quality of requirement for a specific work.</li>",
+                "<li>They can be introduced quickly in large number with cost lead times (often 15 year or more).</li>",
+                "<li>Rapid planning and construction lower the unit cost and permits planner to respond quickly to changing patterns of demand.</li>",
+                "<li>The diversity of the systems available enhances flexibility and security of supply.</li>",
+                "<li>Unlike other sources of energy the renewable sources also suffers the risks associated with physical and environmental aspects. However, these are relatively modest in comparison with those associated with fossil fuels/nuclear power.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Prospects of Renewable Energy Sources\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "What are the key facts, figures, and definitions from Prospects of Renewable Energy Sources?",
+          "answer": "<div>Review the notes above. Focus on: specific numerical values, definitions, classification schemes, and the logic connecting ideas in <strong>Prospects of Renewable Energy Sources</strong>.</div>"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "title": "World Energy Status",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "5.1",
+          "title": "World Energy Status",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>The annual primary energy consumption of world was 500 EXA joules (equivalent to 138.8 × 10¹² kWh of the energy or average power of 1.5 × 10⁷ MW) fossil fuel use to provide about 90% of this energy and will continue to provide more than 8.80% of the total demand. Approximately 25% of this energy is consumed by transportation sector and remaining 75% by industries, domestic, agriculture and social consumer sectors. The energy demand will be increased by more than 50% in recent year. This growth is forecasted to continue at annual rate of 3.2%.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>If the world continues to consume fossil fuel at rate of 2006, the reserves of coal oil and gas may last for 200, 40 and 70 years respectively.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Table 2.10 — World's fossil fuel reserves as of 2006 (% share):</strong></p>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>North America: Oil 0.86, Coal 18.20, Gas 0.75 — Total 19.81%</li>",
+                "<li>Russia: Oil 1.93, Coal 18.27, Gas 5.57 — Total 23.77%</li>",
+                "<li>Middle East: Oil 10.81, Coal 0.00, Gas 7.07 — Total 17.88%</li>",
+                "<li>Africa: Oil 1.71, Coal 3.64, Gas 1.39 — Total 6.75%</li>",
+                "<li>India: Oil 0.11, Coal 6.46, Gas 0.11 — Total 6.25%</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"World Energy Status\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "What are the key facts, figures, and definitions from World Energy Status?",
+          "answer": "<div>Review the notes above. Focus on: specific numerical values, definitions, classification schemes, and the logic connecting ideas in <strong>World Energy Status</strong>.</div>"
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": [
+      {
+        "number": 1,
+        "question": "How many independent primary sources of energy does the earth receive?",
+        "feedback": {
+          "correct": "✓ Three independent primary sources: (a) The sun, (b) Geothermal forces, and (c) Planetary motion in the solar system.",
+          "wrong": "✗ Three independent primary sources: (a) The sun, (b) Geothermal forces, and (c) Planetary motion in the solar system."
+        },
+        "topicRef": "1",
+        "type": "mcq",
+        "options": [
+          "Two",
+          "Three",
+          "Four",
+          "Five"
+        ],
+        "correct": "B"
+      },
+      {
+        "number": 2,
+        "question": "Total solar energy absorbed by earth per year (3.8×10²⁴ joules) equals how many times world fossil fuel reserves?",
+        "feedback": {
+          "correct": "✓ Solar energy absorbed in one year is equivalent to nearly 25 times the energy stored in all world fossil fuel reserves.",
+          "wrong": "✗ Solar energy absorbed in one year is equivalent to nearly 25 times the energy stored in all world fossil fuel reserves."
+        },
+        "topicRef": "2",
+        "type": "mcq",
+        "options": [
+          "10 times",
+          "15 times",
+          "20 times",
+          "25 times"
+        ],
+        "correct": "D"
+      },
+      {
+        "number": 3,
+        "question": "At 2006 consumption rates, coal reserves are estimated to last how long?",
+        "feedback": {
+          "correct": "✓ At 2006 rates, coal may last 200 years, oil 40 years, and gas 70 years.",
+          "wrong": "✗ At 2006 rates, coal may last 200 years, oil 40 years, and gas 70 years."
+        },
+        "topicRef": "3",
+        "type": "mcq",
+        "options": [
+          "40 years",
+          "70 years",
+          "100 years",
+          "200 years"
+        ],
+        "correct": "D"
+      },
+      {
+        "number": 4,
+        "question": "The world's annual primary energy consumption was ________ EXA joules.",
+        "feedback": {
+          "correct": "✓ The annual primary energy consumption of the world was 500 EXA joules.",
+          "wrong": "✗ The annual primary energy consumption of the world was 500 EXA joules."
+        },
+        "topicRef": "4",
+        "type": "fitb",
+        "acceptedAnswers": [
+          "500"
+        ]
+      },
+      {
+        "number": 5,
+        "question": "World energy demand growth is forecasted to continue at what annual rate?",
+        "feedback": {
+          "correct": "✓ This growth is forecasted to continue at annual rate of 3.2%.",
+          "wrong": "✗ This growth is forecasted to continue at annual rate of 3.2%."
+        },
+        "topicRef": "5",
+        "type": "mcq",
+        "options": [
+          "1.5%",
+          "2.0%",
+          "3.2%",
+          "4.5%"
+        ],
+        "correct": "C"
+      },
+      {
+        "number": 6,
+        "question": "Which region has the largest share of total world fossil fuel reserves?",
+        "feedback": {
+          "correct": "✓ Russia has the largest share at 23.77% total (Oil 1.93, Coal 18.27, Gas 5.57).",
+          "wrong": "✗ Russia has the largest share at 23.77% total (Oil 1.93, Coal 18.27, Gas 5.57)."
+        },
+        "topicRef": "1",
+        "type": "mcq",
+        "options": [
+          "North America",
+          "Middle East",
+          "Russia",
+          "Africa"
+        ],
+        "correct": "C"
+      },
+      {
+        "number": 7,
+        "question": "What percentage of world energy is consumed by the transportation sector?",
+        "feedback": {
+          "correct": "✓ Approximately 25% of this energy is consumed by the transportation sector.",
+          "wrong": "✗ Approximately 25% of this energy is consumed by the transportation sector."
+        },
+        "topicRef": "2",
+        "type": "mcq",
+        "options": [
+          "10%",
+          "15%",
+          "25%",
+          "35%"
+        ],
+        "correct": "C"
+      },
+      {
+        "number": 8,
+        "question": "Biomass contributes one ________ of all fuel consumed worldwide.",
+        "feedback": {
+          "correct": "✓ Biomass contributes one seventh of all the fuel consumed; hydro generates one quarter of world electricity.",
+          "wrong": "✗ Biomass contributes one seventh of all the fuel consumed; hydro generates one quarter of world electricity."
+        },
+        "topicRef": "3",
+        "type": "fitb",
+        "acceptedAnswers": [
+          "seventh",
+          "7th"
+        ]
+      }
+    ]
+  }
+}

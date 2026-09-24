@@ -1,0 +1,210 @@
+{
+  "course": "MEE 202",
+  "week": 4,
+  "title": "Covalent & Metallic Bonds",
+  "subtitle": "Atoms bond to lower the energy of their electrons — that's the whole driving force. This week covers the two most engineered bonds: covalent (directional, strong, specific) and metallic (non-directional, sea of electrons). Both appear in almost every past paper.",
+  "learningOutcome": "Atoms bond to lower the energy of their electrons — that's the whole driving force. This week covers the two most engineered bonds: covalent (directional, strong, specific) and metallic (non-directional, sea of electrons). Both appear in almost every past paper.",
+  "metaChips": [
+    "MEE 202",
+    "Week 4"
+  ],
+  "tags": [
+    "Primary Bonds",
+    "Secondary Bonds",
+    "Covalent Bond",
+    "Metallic Bond",
+    "Hybridization",
+    "sp³ Hybrid",
+    "Overlapping Orbitals",
+    "Driving Force"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Introduction to Bonding",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Introduction to Bonding",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p><strong>The driving force behind the bonding of atoms is the decrease in the energy of electrons that results from the bonding.</strong> In most materials there are more than one type of bonds in operation. The different types of bond are the direct results of the electronic configuration of the atoms.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Bonds in materials may generally be classified into Primary bonds and Secondary bonds.</strong> Primary bonds are the bonds that hold the atoms together to form a group of atoms. Whereas secondary bonds are the bonds that hold one group of atoms to other group(s) of atoms. Primary bonds are therefore <em>inter-atomic or intra-molecular</em> while secondary bonds are <em>inter-molecular</em>. Primary bonds are much stronger than secondary bonds.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>The four principal chemical bonds are: Ionic, Covalent, Metallic, and Van der Waals.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "State the driving force behind the formation of bonds. Hence justify the fact that in non-directional bonds, atoms pack as closely as possible. (2021/22)",
+                "Describe the covalent bond and the metallic bond using wave mechanics terms. In a tabular form compare and contrast covalent bond and metallic bond. (2022/23, 2019/20, 2014/15, 2011/12)",
+                "Briefly state how hybridization in carbon is accounted for in wave mechanics. (2011/12)",
+                "What is the driving force behind the bonding of atoms? (All papers)"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Introduction to Bonding\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Covalent Bond",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Covalent Bond",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>A covalent bond is that type of bond that arises from <strong>equal sharing of electrons between two neighbouring atoms, each having incomplete outermost shells.</strong> It involves similar or dissimilar atoms having a deficiency of an equal number of electrons.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>For a covalent bond to form, it is necessary for each atom to have <strong>at least one half-filled orbital</strong>. The energy of the bonding is lowered because it is necessary for the covalent bond to have at least one half-filled orbital. The energy of the valence electrons may then be significantly lowered.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>There must be overlap of the orbitals of the two electrons. The strength of the covalent bond increases with an increase in the area of overlap of the two orbitals. The amount of overlap is limited by electrostatic repulsion and Pauli's principle.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>The bond is therefore <strong>directional</strong>. The direction of greatest overlap (see figure of p-orbitals) is the direction in which the bond is strongest. The bond is also discrete — the number of bonds (each pair of overlapping orbitals) can be counted.</p>"
+            },
+            {
+              "type": "diagram",
+              "caption": "Covalent Bond — Overlapping p-orbitals (Direction = A-A)",
+              "description": "Atom A · Atom B · Overlap · Region · A · A · The straight line A-A is the direction of the covalent bond",
+              "imageRef": null
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Hybridization in Carbon — Wave Mechanics</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "Carbon's atomic configuration: 1s² 2s² 2p² → Carbon should only have 2 covalent bonds (from 2p electrons). But carbon has been observed to form 4 equally strong directional bonds (e.g., in diamond). Explanation: An s electron is promoted to a p orbital. Carbon's excited state: 1s² 2s¹ 2p¹ₓ 2p¹ᵧ 2p¹_z The 2s¹ and 2p³ electrons are called sp³ hybrids — mathematically equivalent solutions to the Schrödinger equation for n=2. Each of the bonds formed by the overlap of sp³ orbitals is equally strong and directional."
+            },
+            {
+              "type": "insight",
+              "text": "⚠ Common Mistake Students say covalent bonds are always the strongest. Not always — the strength depends on overlap. Also, students confuse \"discrete\" with \"directional.\" Discrete means you can count the bonds (carbon has exactly 4 in sp³). Directional means the bond is strongest only along the overlap axis."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Covalent Bond\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Metallic Bond",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "Metallic Bond",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>The driving force behind the formation of the metallic bond is <strong>the decrease in the energy of the electron when it was brought closer to more than one nucleus.</strong></p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>Graphically the metallic bond may be viewed as a regular arrangement of metallic ion-cores in a sea of electrons arrangement. The electrons are free to wander around the ion-cores; no electron is permanently attached to any particular ion-core.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>The metallic bond is <strong>non-directional</strong>. The wave function of the valence (or outermost) electrons in metals are much more spread out in space than those in non-metals with the same principal quantum number n. This happens because the metallic atoms have less protons than the non-metallic atoms to attract the valence electrons.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>Unlike the covalent bond, the metallic bond <strong>cannot occur between only two atoms. It requires a large number of atoms to form the metallic bond.</strong></p>"
+            },
+            {
+              "type": "diagram",
+              "caption": "Metallic Bond — Sea of Electrons Model",
+              "description": "M⁺ · M⁺ · M⁺ · M⁺ · M⁺ · M⁺ · M⁺ · M⁺ · M⁺ · M⁺ · M⁺ · M⁺ · Ion core · ◅ e⁻ · Electrons are free to wander — non-directional bond",
+              "imageRef": null
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "Property",
+                "Covalent Bond",
+                "Metallic Bond",
+                "Directionality",
+                "Directional — along overlap axis",
+                "Non-directional",
+                "Discreteness",
+                "Discrete — bonds can be counted",
+                "Not discrete — electrons shared by all",
+                "Electrons",
+                "Shared between specific atoms",
+                "Free to wander among all ion-cores",
+                "Atoms required",
+                "Can occur between just 2 atoms",
+                "Requires a large number of atoms",
+                "Wave function",
+                "Localised between bonding atoms",
+                "Much more spread out in space",
+                "Driving force",
+                "Decrease in energy via orbital overlap",
+                "Decrease in energy — electrons closer to more than one nucleus",
+                "Examples",
+                "Carbon, Silicon, O₂, H₂O",
+                "Metals — Fe, Cu, Al, Au"
+              ]
+            },
+            {
+              "type": "insight",
+              "text": "The tabular comparison of covalent vs metallic bond appears in 5 out of 6 past papers. Memorise at least 4 rows. The examiners love the wave mechanics description — so know: \"the wave function of valence electrons in metals is much more spread out in space\" compared to non-metals."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Metallic Bond\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Science of Materials"
+}

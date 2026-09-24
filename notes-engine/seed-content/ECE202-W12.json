@@ -1,0 +1,79 @@
+{
+  "course": "ECE 202",
+  "week": 12,
+  "title": "Systems of First-Order ODEs via Eigenvalues & Vector Spaces",
+  "subtitle": "The course ends with two applications. First: solving coupled first-order differential equations using eigenvalues — the system is written in matrix form, eigenvalues and eigenvectors are found, and the general solution is a linear combination of exponential terms. Second: a brief introduction to vector spaces, linear algebra of matrices, and how it all connects to the rest of the course.",
+  "learningOutcome": "The course ends with two applications. First: solving coupled first-order differential equations using eigenvalues — the system is written in matrix form, eigenvalues and eigenvectors are found, and the general solution is a linear combination of exponential terms. Second: a brief introduction to vector spaces, linear algebra of matrices, and how it all connects to the rest of the course.",
+  "metaChips": [
+    "ECE 202",
+    "Week 12"
+  ],
+  "tags": [
+    "Coupled ODEs",
+    "System matrix P",
+    "General solution F(x)",
+    "Particular solution",
+    "Initial conditions",
+    "Linear Algebra of a matrix (LA of M)",
+    "Vector space",
+    "Subspace"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Systems of First-Order ODEs via Eigenvalues & Vector Spaces",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Systems of First-Order ODEs via Eigenvalues & Vector Spaces",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<strong>Key terms:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "Coupled ODEs",
+                "System matrix P",
+                "General solution F(x)",
+                "Particular solution",
+                "Initial conditions",
+                "Linear Algebra of a matrix (LA of M)",
+                "Vector space",
+                "Subspace"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "Solve the system f₁'(x) = 2f₁(x) − 5f₂(x), f₂'(x) = f₁(x) − 4f₂(x) where f₁(0)=1 and f₂(0)=0. (2019/2020 Q2, 20 marks)",
+                "Find the eigenvalues of the system matrix and use them to write the general solution as a sum of exponential vector terms.",
+                "Apply initial conditions to find the particular solution."
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Systems of First-Order ODEs via Eigenvalues & Vector Spaces\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Engineering Mathematics"
+}

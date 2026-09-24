@@ -1,0 +1,97 @@
+{
+  "course": "ECE 210",
+  "week": 3,
+  "title": "DC Machine Construction — Parts & Functions",
+  "subtitle": "Before understanding how DC machines work, you need to know what's physically inside them. Every part has a specific job. Questions here are usually definition or labelling — learn what each part DOES, not just its name.",
+  "learningOutcome": "Before understanding how DC machines work, you need to know what's physically inside them. Every part has a specific job. Questions here are usually definition or labelling — learn what each part DOES, not just its name.",
+  "metaChips": [
+    "ECE 210",
+    "Week 3"
+  ],
+  "tags": [
+    "Frame/Yoke",
+    "Field Poles",
+    "Armature",
+    "Commutator",
+    "Brush Gear",
+    "Interpoles",
+    "Laminations"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "The Eight Main Parts & What Each Does",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "The Eight Main Parts & What Each Does",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Every DC machine has a <strong>stator</strong> (stationary) and a <strong>rotor/armature</strong> (rotating), separated by an air gap through which flux crosses.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Parts and functions</strong>"
+            },
+            {
+              "type": "analogy",
+              "text": "Commutator analogy The commutator is a smart switch that flips connections every half revolution — always maintaining the same polarity at the terminals. It straightens the AC generated in the rotating coils into DC output."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam-ready — commutator function (full marks answer):</strong> <div>The commutator converts the alternating EMF induced in the rotating armature conductors into a unidirectional (DC) voltage at the external terminals by mechanically reversing the connections to the armature coils at the instant they pass through the magnetic neutral axis.</div>"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — The mistake that loses a mark every exam \"Laminations reduce hysteresis loss.\" WRONG. Laminations reduce eddy current loss . Hysteresis loss is reduced by using silicon steel . Different problem, different solution. Examiners test this every year."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>List and briefly describe four main parts of a DC machine. <span>Past Q</span></li>",
+                "<li>Explain the function of the commutator in a DC machine. <span>Past Q</span></li>",
+                "<li>Why are armature cores laminated?</li>",
+                "<li>What is the function of interpoles?</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "State the textbook definition — Exam-ready — commutator function (full marks answer).",
+                "answer": "<div>The commutator converts the alternating EMF induced in the rotating armature conductors into a unidirectional (DC) voltage at the external terminals by mechanically reversing the connections to the armature coils at the instant they pass through the magnetic neutral axis.</div>"
+              },
+              {
+                "type": "reveal",
+                "question": "[Q1] State the function of: (i) yoke (ii) commutator (iii) brush gear (iv) interpoles.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] Why is the armature core made of laminated silicon steel? Distinguish the two types of core loss this addresses.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] A DC generator and motor are physically identical. Explain how the same machine operates as each, stating the direction of energy flow and which equation (V=E-IaRa or V=E+IaRa) applies to each.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Electrical Machines & Circuits"
+}

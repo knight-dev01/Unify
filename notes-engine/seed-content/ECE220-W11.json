@@ -1,0 +1,158 @@
+{
+  "course": "ECE 220",
+  "week": 11,
+  "title": "Algorithms, Searching & Sorting",
+  "subtitle": "An algorithm is a step-by-step solution to a problem. This week covers linear search, bubble sort, and how to find min/max/sum in a list using loops. These are the kind of \"write the code from scratch\" questions that appear in Section B of the exam.",
+  "learningOutcome": "An algorithm is a step-by-step solution to a problem. This week covers linear search, bubble sort, and how to find min/max/sum in a list using loops. These are the kind of \"write the code from scratch\" questions that appear in Section B of the exam.",
+  "metaChips": [
+    "ECE 220",
+    "Week 11"
+  ],
+  "tags": [
+    "Algorithm",
+    "Linear Search",
+    "Bubble Sort",
+    "min / max",
+    "sum()",
+    "sorted()"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Linear Search",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Linear Search",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Linear search</strong> checks each element one by one from the beginning until it finds the target or reaches the end. Simple but works on any list (sorted or not).</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>def linear_search(lst, target): for i in range(len(lst)): if lst[i] == target: return i # return index where found return -1 # -1 means not found numbers = [14, 3, 27, 9, 42] target = int(input(\"Search for: \")) pos = linear_search(numbers, target) if pos != -1: print(f\"{target} found at index {pos}\") else: print(f\"{target} not in list\")</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Write a program that searches for a number in a list and prints its position (linear search). <span>Past Q</span></li>",
+                "<li>Write a bubble sort algorithm to sort a list of 5 numbers in ascending order.</li>",
+                "<li>Write a function that returns the largest and smallest numbers from a list without using built-in min()/max().</li>",
+                "<li>What is the difference between <code>sort()</code> and <code>sorted()</code>?</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Linear Search\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Bubble Sort",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Bubble Sort",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Bubble sort</strong> repeatedly compares adjacent pairs and swaps them if they're in the wrong order. After each pass, the largest unsorted element \"bubbles\" to its correct position.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>def bubble_sort(lst): n = len(lst) for i in range(n): # passes for j in range(n - i - 1): # comparisons per pass if lst[j] &gt; lst[j + 1]: # swap lst[j], lst[j + 1] = lst[j + 1], lst[j] return lst nums = [64, 25, 12, 22, 11] print(bubble_sort(nums)) # [11, 12, 22, 25, 64]</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Pass-by-pass trace for [64, 25, 12]</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "Start: [64, 25, 12] Pass 1: 64>25 → swap → [25, 64, 12]; 64>12 → swap → [25, 12, 64] Pass 2: 25>12 → swap → [12, 25, 64] Result: [12, 25, 64] ✓"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Bubble Sort\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Finding Min, Max & Sum Without Built-ins",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "Finding Min, Max & Sum Without Built-ins",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>The exam sometimes asks you to find max/min manually (without <code>max()</code>) to test whether you understand loops.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre># Manual max without using max() def find_max(lst): largest = lst[0] # assume first is largest for num in lst: if num &gt; largest: largest = num return largest scores = [72, 85, 61, 90, 78] print(find_max(scores)) # 90 # Python built-ins (know these too) print(max(scores)) # 90 print(min(scores)) # 61 print(sum(scores)) # 386 print(sorted(scores)) # [61, 72, 78, 85, 90] scores.sort() # modifies in place</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>sort() vs sorted():</strong> <div> <code>list.sort()</code> — modifies the original list in place, returns None <code>sorted(list)</code> — returns a NEW sorted list, original unchanged Use <code>sorted()</code> when you need both the original and sorted version. </div>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "State the textbook definition — sort() vs sorted().",
+                "answer": "<div> <code>list.sort()</code> — modifies the original list in place, returns None <code>sorted(list)</code> — returns a NEW sorted list, original unchanged Use <code>sorted()</code> when you need both the original and sorted version. </div>"
+              },
+              {
+                "type": "reveal",
+                "question": "[Q1] Write linear search for a list of names (strings). If the name is found, print \"Found at position X\". If not, print \"Not found\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] Trace bubble sort on the list [5, 1, 4, 2, 8]. Show each pass.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] Write a function that takes a list of student scores and returns: the average, the highest score, the lowest score, and the number of students who passed (score ≥ 50). Do not use built-in max/min/sum.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Introduction to Programming & Computations"
+}

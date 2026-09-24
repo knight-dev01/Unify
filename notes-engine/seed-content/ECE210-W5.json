@@ -1,0 +1,92 @@
+{
+  "course": "ECE 210",
+  "week": 5,
+  "title": "DC Generators — Types, Equations & Parallel Operation",
+  "subtitle": "DC generators convert mechanical rotation into DC electricity. The key differences between types are how they supply their own field current — this determines their voltage-load characteristics. Every type uses the same core equation V = E − IaRa.",
+  "learningOutcome": "DC generators convert mechanical rotation into DC electricity. The key differences between types are how they supply their own field current — this determines their voltage-load characteristics. Every type uses the same core equation V = E − IaRa.",
+  "metaChips": [
+    "ECE 210",
+    "Week 5"
+  ],
+  "tags": [
+    "Separately-Excited",
+    "Shunt Generator",
+    "Series Generator",
+    "Compound Generator",
+    "Terminal Voltage V",
+    "Generated EMF E",
+    "Ra"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Generator Types, Equations & Parallel Operation",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Generator Types, Equations & Parallel Operation",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Core equation for all generators: <strong>V = E − IaRa</strong>. Terminal voltage V is always less than generated EMF E because Ra drops some voltage.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Generator types — field connection and current equations</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam-ready — four conditions for parallel operation:</strong> <div>(1) Terminal voltages must be equal. (2) Polarities must be the same (+to+, −to−). (3) Prime movers must have similar stable speed-load characteristics. (4) The rate of change of voltage with load must be of the same order for all generators.</div>"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — In a shunt generator, Ia = IL + If (armature supplies both load AND field). Forgetting If makes Ra wrong. Always draw the circuit and identify all current branches before writing any equation."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Shunt generator: Rf=200Ω, output=120kW, V=500V, E=525V. Find Ra. <span>Past Q</span></li>",
+                "<li>Explain why terminal voltage of a shunt generator falls as load increases. <span>Past Q</span></li>",
+                "<li>State four conditions for parallel operation of DC generators.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "State the textbook definition — Exam-ready — four conditions for parallel operation.",
+                "answer": "<div>(1) Terminal voltages must be equal. (2) Polarities must be the same (+to+, −to−). (3) Prime movers must have similar stable speed-load characteristics. (4) The rate of change of voltage with load must be of the same order for all generators.</div>"
+              },
+              {
+                "type": "reveal",
+                "question": "[Q1] A shunt generator: V=220V, Rf=110Ω, Ra=0.1Ω, IL=50A. Find: (i) If (ii) Ia (iii) E.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] Explain the cascading voltage drop effect in a shunt generator as load increases. Why does this not occur in a separately-excited generator?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] A compound generator (long-shunt): V=240V, IL=80A, Rf=120Ω, Ra=0.05Ω, Rse=0.02Ω. Find E. Then explain why a cumulative compound generator maintains more constant voltage than a shunt generator.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Electrical Machines & Circuits"
+}

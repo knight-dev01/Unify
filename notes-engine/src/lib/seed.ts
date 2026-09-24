@@ -1,3 +1,6 @@
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { supabaseAdmin } from "./supabase";
 
 // Starter content: honest placeholder notes (not fake lectures) so every
@@ -110,7 +113,143 @@ export async function ensureSeeded(): Promise<void> {
       .upsert({ course: c.code, level: c.level, semester: c.semester }, { onConflict: "course,level" });
     if (lErr) throw lErr;
   }
-  // One-time backfill: legacy week-embedded topics -> topic_notes v1 rows.
+  // Real legacy content (seed-content/*.json, built by
+  // scripts/import-legacy.mjs from the archived Coursecontents).
+  // Insert-only and runs BEFORE the backfill + starters so real weeks,
+  // quizzes and course titles always win over placeholders.
+  await seedLegacyContent(sb);
+  // seed-content dir: works both under tsx (src/lib) and tsc (dist/src/lib).
+function findSeedDir(): string | null {
+  const candidates = [
+    join(__dirname, "..", "..", "seed-content"),
+    join(__dirname, "..", "..", "..", "seed-content"),
+  ];
+  for (const c of candidates) {
+    try {
+      if (existsSync(c) && existsSync(join(c, "_report.json"))) return c;
+    } catch {
+      // next candidate
+    }
+  }
+  // Fallback: any dir with week JSON in it (lets the importer rename freely).
+  for (const c of candidates) {
+    try {
+      if (existsSync(c)) return c;
+    } catch {
+      // next candidate
+    }
+  }
+  return null;
+}
+
+type SeedNote = {
+  course: string;
+  week: number;
+  title?: string;
+  subtitle?: string;
+  courseTitle?: string;
+  topics?: Record<string, unknown>[];
+} & Record<string, unknown>;
+
+// Loads converted legacy weeks: course rows (+ real titles over
+// placeholders), week shells (+ quiz fill over empty), v1 topic rows.
+// Everything is insert-only; authored content is never touched.
+async function seedLegacyContent(sb: SupabaseClient): Promise<void> {
+  const dir = findSeedDir();
+  if (!dir) return;
+  let files: string[];
+  try {
+    files = readdirSync(dir).filter((f) => f.endsWith(".json") && !f.startsWith("_"));
+  } catch {
+    return;
+  }
+  for (const f of files) {
+    let note: SeedNote;
+    try {
+      note = JSON.parse(readFileSync(join(dir, f), "utf8")) as SeedNote;
+    } catch {
+      continue;
+    }
+    if (!note || typeof note.course !== "string" || !Number.isInteger(note.week)) continue;
+    const code = note.course.toUpperCase();
+    const week = note.week;
+    const topics = Array.isArray(note.topics) ? note.topics : [];
+    const { data: cRow } = await sb.from("courses").select("code,title").eq("code", code).single();
+    if (!cRow) {
+      const { error: cErr } = await sb.from("courses").insert({
+        code,
+        title: typeof note.courseTitle === "string" && note.courseTitle ? note.courseTitle : code,
+      });
+      if (cErr) throw cErr;
+    } else if (
+      (cRow as { title?: string }).title === code &&
+      typeof note.courseTitle === "string" &&
+      note.courseTitle
+    ) {
+      const { error: tErr } = await sb.from("courses").update({ title: note.courseTitle }).eq("code", code);
+      if (tErr) throw tErr;
+    }
+    const { courseTitle: _dropTitle, topics: _dropTopics, ...rest } = note;
+    const shellJson = { ...rest, topics: [] as unknown[] };
+    const { data: shell } = await sb
+      .from("weeks")
+      .select("title,subtitle,note_json")
+      .eq("course", code)
+      .eq("week", week)
+      .single();
+    if (!shell) {
+      const { error: sErr } = await sb.from("weeks").insert({
+        course: code,
+        week,
+        author_id: null,
+        title: typeof note.title === "string" && note.title ? note.title : `Week ${week}`,
+        subtitle: typeof note.subtitle === "string" ? note.subtitle : "",
+        note_json: shellJson,
+      });
+      if (sErr) throw sErr;
+    } else {
+      const s = shell as { title?: string; subtitle?: string; note_json?: Record<string, unknown> };
+      const curEoq = (s.note_json as { eoq?: { questions?: unknown[] } } | undefined)?.eoq?.questions;
+      const newEoq = (shellJson as { eoq?: { questions?: unknown[] } }).eoq?.questions;
+      const patch: Record<string, unknown> = {};
+      if (s.subtitle === "Starter note") {
+        patch.title = typeof note.title === "string" && note.title ? note.title : `Week ${week}`;
+        patch.subtitle = typeof note.subtitle === "string" ? note.subtitle : "";
+        patch.note_json = shellJson;
+      } else if ((!Array.isArray(curEoq) || curEoq.length === 0) && Array.isArray(newEoq) && newEoq.length > 0) {
+        patch.note_json = { ...(s.note_json || {}), eoq: { questions: newEoq } };
+      }
+      if (Object.keys(patch).length) {
+        const { error: uErr } = await sb.from("weeks").update(patch).eq("course", code).eq("week", week);
+        if (uErr) throw uErr;
+      }
+    }
+    for (const t of topics) {
+      const num = Number((t as { number?: unknown }).number);
+      if (!Number.isInteger(num) || num < 1) continue;
+      const { data: ex } = await sb
+        .from("topic_notes")
+        .select("id")
+        .eq("course", code)
+        .eq("week", week)
+        .eq("topic", num)
+        .limit(1);
+      if ((ex as unknown[] | null)?.length) continue;
+      const { error: iErr } = await sb.from("topic_notes").insert({
+        course: code,
+        week,
+        topic: num,
+        version: 1,
+        title: typeof (t as { title?: unknown }).title === "string" ? ((t as { title?: string }).title as string) : "",
+        note_json: t,
+        author_id: null,
+      });
+      if (iErr) throw iErr;
+    }
+  }
+}
+
+// One-time backfill: legacy week-embedded topics -> topic_notes v1 rows.
   // Idempotent: only weeks that still carry embedded topics are touched,
   // and only topics with no version row yet. Embedded topics that migrate
   // are stripped from the shell so the versioned rows become canonical.

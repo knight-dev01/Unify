@@ -1,0 +1,275 @@
+{
+  "course": "ECE 210",
+  "week": 12,
+  "title": "Revision & Exam Prep",
+  "subtitle": "Every formula, every common mistake, every past question pattern from ECE 210 in one place. Magnetic circuits → DC machines → transformers → AC circuits → induction machines → rectifiers. Use this as your final-week checklist.",
+  "learningOutcome": "Every formula, every common mistake, every past question pattern from ECE 210 in one place. Magnetic circuits → DC machines → transformers → AC circuits → induction machines → rectifiers. Use this as your final-week checklist.",
+  "metaChips": [
+    "ECE 210",
+    "Week 12"
+  ],
+  "tags": [
+    "Formula Sheet",
+    "Past Questions",
+    "Common Mistakes",
+    "Exam Strategy"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Complete Formula Sheet — Weeks 1–11",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Complete Formula Sheet — Weeks 1–11",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<strong>Weeks 1–2 · Magnetic Circuits</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>B = φ/A (flux density, T)</div>",
+                "<div>H = NI/L (magnetising force, A/m)</div>",
+                "<div>B = μ₀μᵣH (B-H relationship)</div>",
+                "<div>ℛ = L/(μ₀μᵣA) (reluctance, A·t/Wb)</div>",
+                "<div>F = φℛ = NI (Ohm's Law for magnetics)</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "Air gap: H_gap = B/μ₀ = 7.96×10⁵ × B · μ₀ = 4π×10⁻⁷ H/m"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Weeks 3–6 · DC Machines</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>E = (φZNP) / (60A) (EMF equation)</div>",
+                "<div>T = (φZI_a × P) / (2πA) (torque)</div>",
+                "<div>Motor: V = E + I_aR_a Generator: V = E − I_aR_a</div>",
+                "<div>N ∝ (V − I_aR_a) / φ (speed equation)</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "Z = armature conductors · P = poles · A = parallel paths · N = speed (rpm) Lap winding: A = P · Wave winding: A = 2"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Weeks 7–8 · Transformers</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>k = N₁/N₂ = V₁/V₂ = I₂/I₁ (turns ratio)</div>",
+                "<div>Z₂' = k²Z₂ (refer secondary → primary)</div>",
+                "<div>Z₁' = Z₁/k² (refer primary → secondary)</div>",
+                "<div>η = V₂I₂cosφ / (V₂I₂cosφ + W_i + I₂²R_eq)</div>",
+                "<div>Max η when W_i = I²R_eq x_maxη = √(W_i / W_cu(FL))</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "OC test → iron loss W_i (LV side excited, HV open) SC test → copper loss W_cu (HV side excited, LV shorted)"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Week 9 · AC Circuits</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>V_rms = V_m/√2 = 0.707 V_m V_avg = 0.637 V_m</div>",
+                "<div>X_L = 2πfL X_C = 1/(2πfC) Z = √(R²+X²)</div>",
+                "<div>cosφ = R/Z P = VIcosφ Q = VIsinφ S = VI</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "Phasors: V = √(V_R²+V_L²) — do NOT add arithmetically"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Week 10 · Induction Motors</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>Ns = 120f/P s = (Ns−N)/Ns N = Ns(1−s)</div>",
+                "<div>f_r = s×f Rotor copper loss = s × P_ag</div>",
+                "<div>P_mech = (1−s) × P_ag Rotor η = N/Ns</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "P = total poles · f = 50Hz · s = 0 at synchronous, s = 1 at standstill"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Week 11 · Rectifiers</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>Half-wave: V_dc = 0.318 V_m V_rms = 0.5 V_m r ≈ 1.21</div>",
+                "<div>Full-wave: V_dc = 0.637 V_m V_rms = 0.707 V_m r ≈ 0.48</div>",
+                "<div>r = √[(V_rms/V_dc)² − 1] (ripple factor)</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "Full-wave ripple frequency = 2f = 100Hz · Lower r = smoother DC"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Complete Formula Sheet — Weeks 1–11\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Top Mistakes That Lose Exam Marks",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Top Mistakes That Lose Exam Marks",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "insight",
+              "text": "Common mistake — Magnetic circuits ① Confusing φ (Wb) with B (T). ② Using μᵣ alone instead of μ₀μᵣ in reluctance. ③ Using B-H curve for air — always use H_gap = B/μ₀. ④ P in Ns=120f/P is total poles, not pole pairs."
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — DC machines ① Back EMF sign: motor V = E + I_aR_a (back EMF opposes supply). Generator V = E − I_aR_a. ② Parallel paths A: lap → A=P, wave → A=2."
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Transformers ① LV→HV: multiply by k². HV→LV: divide by k². Never multiply in both directions. ② OC test on LV (iron loss). SC test on HV (copper loss). ③ Transformer never works on DC — Faraday's Law: dφ/dt=0 for DC → zero EMF."
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — AC circuits ① Power calculations always use V_rms, never V_m. ② V_R + V_L ≠ V_total. They are 90° apart — use V = √(V_R²+V_L²)."
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Induction motors ① Rotor never reaches Ns during motoring. ② Rotor copper loss = s×P_ag (not (1−s)×P_ag). ③ WRIM is not more efficient than SCIM during normal running."
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Rectifiers ① Output is pulsating DC, not smooth — capacitor filter needed. ② Ripple factor uses output V_rms, not mains V_rms. ③ Full-wave ripple frequency = 100Hz, not 50Hz."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Top Mistakes That Lose Exam Marks\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "High-Frequency Past Question Patterns",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "High-Frequency Past Question Patterns",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<strong>These question types appear almost every year</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam strategy:</strong> <div> 1. Read all questions first — do what you know cold first, then return to harder ones. 2. Show every step. Partial marks are awarded for correct method even if the final answer is wrong. 3. State your formula before substituting numbers — examiners reward structured working. 4. For definitions: be precise and concise. One correct sentence beats a vague paragraph. 5. Always write units on every answer. A number without a unit is incomplete. </div>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[] Magnetic Core with air gap: find current for a given flux. Method: B=φ/A → H from curve → H_gap=B/μ₀ → NI=ΣHL → I=NI/N",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[] Magnetic Sketch hysteresis loop. Label Bₘ, Bᵣ, Hc. Distinguish eddy current loss from hysteresis loss — cause and remedy for each.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[] Transformer Given kVA rating and winding resistances, find equivalent resistance referred to each side. Verify: R_eq(HV)/R_eq(LV) = k².",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[] Transformer State condition for maximum efficiency. Find load fraction at which it occurs given W_i and W_cu(FL).",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[] Transformer Why does a transformer not work on DC? Explain using Faraday's Law (dφ/dt=0 → e=0).",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[] AC RL series circuit: find Z, I, power factor, V_R and V_L. Verify: √(V_R²+V_L²) = V_supply.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[] Induction 3-phase IM: find synchronous speed, rotor speed at given slip, rotor frequency at given rpm.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[] Induction Why can an induction motor never reach synchronous speed? Define slip and state its extreme values.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[] Rectifier Derive ripple factor r = √[(V_rms/V_dc)²−1]. Calculate r for full-wave rectifier with given V_m.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[] Rectifier Draw full-wave bridge rectifier. Trace current through each half-cycle. Identify which diodes conduct.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "State the textbook definition — Exam strategy.",
+                "answer": "<div> 1. Read all questions first — do what you know cold first, then return to harder ones. 2. Show every step. Partial marks are awarded for correct method even if the final answer is wrong. 3. State your formula before substituting numbers — examiners reward structured working. 4. For definitions: be precise and concise. One correct sentence beats a vague paragraph. 5. Always write units on every answer. A number without a unit is incomplete. </div>"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Electrical Machines & Circuits"
+}

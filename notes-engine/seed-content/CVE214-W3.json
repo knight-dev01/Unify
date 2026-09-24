@@ -1,0 +1,166 @@
+{
+  "course": "CVE 214",
+  "week": 3,
+  "title": "Hydrometeorology — Temperature, Wind, Humidity & Air Pressure",
+  "subtitle": "Before you can understand precipitation and evaporation, you need to understand the atmosphere. This week covers the key meteorological elements that control how much water stays in the air, how fast it moves, and when it falls.",
+  "learningOutcome": "Before you can understand precipitation and evaporation, you need to understand the atmosphere. This week covers the key meteorological elements that control how much water stays in the air, how fast it moves, and when it falls.",
+  "metaChips": [
+    "CVE 214",
+    "Week 3"
+  ],
+  "tags": [
+    "Temperature",
+    "Wind speed",
+    "Humidity",
+    "Air pressure",
+    "Barometer",
+    "Thermometer",
+    "Anemometer"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Temperature",
+      "abbr": "CVE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Temperature",
+          "abbr": "CVE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam-ready definition (from textbook):</strong> <div>Temperature is a very important element of climate and weather. Simply put, it is the measure of the degree of hotness or coldness from place to place and season to season. The annual range of temperature is the difference between the temperature of the hottest month and that of the coolest month.</div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Temperature measurement & instruments</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>Instrument: Thermometer — a narrow glass tube filled with mercury or alcohol</div>",
+                "<div>Maximum temperature: recorded using the maximum thermometer</div>",
+                "<div>Minimum temperature: recorded using the minimum thermometer</div>",
+                "<div>Stevenson Screen: louvred box that holds max/min thermometers and wet/dry bulb thermometers</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "A temperature taken in open daylight is very high because it measures the direct insolation of the sun — it is described as \"temperature of the sun.\" The grass temperature is taken to assess possible damage done by ground frosts to crops in temperate latitudes."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>What is meteorology? Distinguish between climate and weather. <span>Exercise 3</span></li>",
+                "<li>Define absolute humidity and relative humidity. What instrument measures each?</li>",
+                "<li>Write short notes on: Temperature, Wind speed, Air pressure, Humidity.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "State the textbook definition — Exam-ready definition (from textbook).",
+                "answer": "<div>Temperature is a very important element of climate and weather. Simply put, it is the measure of the degree of hotness or coldness from place to place and season to season. The annual range of temperature is the difference between the temperature of the hottest month and that of the coolest month.</div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Wind Speed & Humidity",
+      "abbr": "CVE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Wind Speed & Humidity",
+          "abbr": "CVE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<strong>Wind speed (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>Wind is air in motion and has both direction and speed.</div>",
+                "<div>Instrument for direction: Wind vane (weather clock)</div>",
+                "<div>Instrument for speed: Anemometer (cup type — 3 cups on a vertical mast)</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "The concave side of the cups offers greater resistance to the wind; the horizontal spokes rotate, moving a central rod which transmits velocity to an electrically operated dial. To determine windspeed, the direction from which the wind is coming must first be determined."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Humidity definitions (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>Absolute Humidity — the actual amount of water vapour present in the air, expressed in grams per cubic metre.</div>",
+                "<div>Relative Humidity — the ratio between the actual amount of water vapour and the total amount the air can hold at a given temperature (expressed as a percentage).</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "Instrument for relative humidity: Hygrometer (comprises wet and dry bulb thermometers). The shade temperature (temperature recorded in the Stevenson screen) is used. The wet bulb always shows or indicates a low reading. The difference between the two thermometer readings is used to determine relative humidity."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Air Pressure (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>Air is an entity comprising a number of gases — it is a mixture and has weight. Therefore it exerts a pressure on the earth's surface which varies from place to place and time to time.</div>",
+                "<div>Pressure is the weight of the air on ground. This force presses on the surface of any object and can be fairly accurately measured.</div>",
+                "<div>Instrument: Barometer (mercury barometer — most common)</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "Mercury barometer: consists of a long glass tube, scaled at the upper end, open at the lower end and inverted in a bowl of mercury exposed to air. Variations in atmospheric pressure on the mercury surface are balanced by the column of mercury in the glass tube, allowing pressure to be read from the scale."
+            },
+            {
+              "type": "analogy",
+              "text": "When you hear on the news \"humidity is 90% in Lagos today\" — that's relative humidity. It means the air is holding 90% of the maximum water it can hold at that temperature. When it hits 100%, the air can't hold any more water and precipitation begins. That's literally how rain starts."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1] Define absolute humidity and relative humidity. Give the instrument used to measure each.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] Describe how a cup anemometer works.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] Why does temperature have a double effect on how much evaporation takes place? (Hint: think about what temperature does to water molecules and to air's capacity to hold vapour.)",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Engineering Hydrology"
+}

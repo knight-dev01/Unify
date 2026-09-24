@@ -1,0 +1,335 @@
+{
+  "course": "MEE 352",
+  "week": 5,
+  "title": "Coal, Nuclear & Natural Gas",
+  "subtitle": "Coal Reserves, Nuclear Energy Scenario, Natural Gas Allocation",
+  "learningOutcome": "By the end of this week, you should be able to describe India's coal reserve status, explain the three-stage nuclear power programme, and distinguish the three types of natural gas allocation.",
+  "metaChips": [
+    "MEE 352",
+    "Week 5"
+  ],
+  "tags": [
+    "Coal Reserves",
+    "Coal Gasification",
+    "IGCC",
+    "Nuclear Energy",
+    "PHWR",
+    "FBR",
+    "Natural Gas",
+    "NELP"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Coal Reserves and Production",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Coal Reserves and Production",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>The latest estimated coal reserves in India are placed at around 221 billions Tones. The provide indicated and inferred reserves are projected as 8499 and 38 billion tons respectively.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>Table 2.6 reveals that out of the proven of 84 billions tons 81% or nearly 68 billion tons are of non-coking while remaining 16 billions tons are only coking coal.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>Currently, the lignite reserves have been estimated at around 35 billions tons in Rajasthan, Gujarat, Kerala, Tamil Naidu, Jammu and Kashmir and Pondicherry. The characteristics of Indian coals are high ash content, low heating value and low sulphur content. Total 314 millions Tons of coal produced nearly 54% is consumed by railways, 23% by merry-Go-Round (MGR) systems and remaining by road and thermal power stations.</p>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Coal Reserves and Production\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "What are the key facts, figures, and definitions from Coal Reserves and Production?",
+          "answer": "<div>Review the notes above. Focus on: specific numerical values, definitions, classification schemes, and the logic connecting ideas in <strong>Coal Reserves and Production</strong>.</div>"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Sustainable Development Through Coal Gasification",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Sustainable Development Through Coal Gasification",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>For this purpose CSIR has recommended three prolonged approach:</p>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li><strong>Immediate:</strong> The immediate targets are to establish coal gasification and IGCC technologies for commercial application.</li>",
+                "<li><strong>Short Term:</strong> (a) To construct commercial scale IGCC plants of 250 mW capacity. (b) The conversion of existing thermal power plants to IGCC. (c) To synthise coal gas for production of chemicals, steel and fertilizers.</li>",
+                "<li><strong>Long Term:</strong> (i) Repacing natural gas with coal gas in the existing combined cycle power plants. (ii) Self Relience and security in the energy sector. (iii) Development of advanced technologies based on coal gas. (iv) Establishment of plants for coal to oil and coal to refinery in commercial scale. (v) Technology development for fuel cell. (vi) Substitution of exhaustible with renewable energy sources.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Sustainable Development Through Coal Gasification\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "What are the key facts, figures, and definitions from Sustainable Development Through Coal Gasification?",
+          "answer": "<div>Review the notes above. Focus on: specific numerical values, definitions, classification schemes, and the logic connecting ideas in <strong>Sustainable Development Through Coal Gasification</strong>.</div>"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Nuclear Energy Scenario",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "Nuclear Energy Scenario",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>The nuclear power program is based on Natural Uranium in the first stage and subsequent development to replace Uranium with Thorium in the second stage. The Uranium reserve can support a program of 10⁴ MW<sub>e</sub> power generation based on pressurised heavy water reactors (PHWR) technology. Fast breeder reactors (FBR) technology for power generation is under development. FBR technology would be fuelled by Plutorium recovered and reprocessed from the spent fuel of PHWR program. At present India has 14 operating nuclear power reactor 2 boiling water reactor (BWR) and remaing PHWR. It has total installed capacity of 2.72 MWe.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Three Stages of Nuclear Programme:</strong></p>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li><strong>Stage 1:</strong> PHWR using natural Uranium (0.77% U²³⁵ and 99.23% U²³⁸) as fuel and heavy water both as coolant and moderator. A PHWR is a thermal reactor which consumes only U²³⁵ part of natural Uranium and U²³⁸ is left as spent fuel.</li>",
+                "<li><strong>Stage 2:</strong> Construction of FBR, where the spent fuel U²³⁸ is converted into Plutonium (fissionable material), which is then used as a fuel in a thermal reactor.</li>",
+                "<li><strong>Stage 3:</strong> Thorium ²³² is converted to U²³³ in a fast breeder reactor (FBR). The energy generated in the second stage was 60 times more than that available from PHWR for the same amount of Uranium.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Nuclear Energy Scenario\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "What are the key facts, figures, and definitions from Nuclear Energy Scenario?",
+          "answer": "<div>Review the notes above. Focus on: specific numerical values, definitions, classification schemes, and the logic connecting ideas in <strong>Nuclear Energy Scenario</strong>.</div>"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Natural Gas Scenario",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "4.1",
+          "title": "Natural Gas Scenario",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Before large scale discoveries, the estimated reserves of the natural gas was 680 billion cubic meters (BCM). Nearly 60% of this reserves are in western offshore and remaing balance is spread over Gujarat, North East India and South region.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>The ministry of pollution and natural gas (MOPNG) made three type of allocation based on the recommendation of the gas linkage committee (GLC):</p>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li><strong>Firm Allocation:</strong> Made to consumers where the availability of gas is assured by the producers and consumers are fairly established. The contract would generally be subjected to an 80% consumed and/or pay arrangement requiring a minimum offtake or pay penalties.</li>",
+                "<li><strong>Fall Back Allocation:</strong> Made to consumers when availability of gas for supply is dependent on failure of consumers with firm allocation to draw the allocated gas.</li>",
+                "<li><strong>Principle Allocation:</strong> Made to consumers based on the projected availability of gas. In light of excess of the projected demand over production no in principle allocation are being made currently.</li>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>The nature gas has found much use in fertilizer and power sectors. Their requirement are nearly 35% and 38% respectively. The demand of natural gas has been estimated as 593 MMSCMD by 2019-20.</p>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Natural Gas Scenario\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "What are the key facts, figures, and definitions from Natural Gas Scenario?",
+          "answer": "<div>Review the notes above. Focus on: specific numerical values, definitions, classification schemes, and the logic connecting ideas in <strong>Natural Gas Scenario</strong>.</div>"
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": [
+      {
+        "number": 1,
+        "question": "India's total estimated coal reserves are approximately ________ billion tonnes.",
+        "feedback": {
+          "correct": "✓ The latest estimated coal reserves in India are placed at around 221 billion tonnes.",
+          "wrong": "✗ The latest estimated coal reserves in India are placed at around 221 billion tonnes."
+        },
+        "topicRef": "1",
+        "type": "fitb",
+        "acceptedAnswers": [
+          "221"
+        ]
+      },
+      {
+        "number": 2,
+        "question": "Out of 84 billion tons of proven coal, what percentage is non-coking coal?",
+        "feedback": {
+          "correct": "✓ 81% or nearly 68 billion tons of the proven 84 billion tons are non-coking coal.",
+          "wrong": "✗ 81% or nearly 68 billion tons of the proven 84 billion tons are non-coking coal."
+        },
+        "topicRef": "2",
+        "type": "mcq",
+        "options": [
+          "61%",
+          "71%",
+          "81%",
+          "91%"
+        ],
+        "correct": "C"
+      },
+      {
+        "number": 3,
+        "question": "IGCC plants of what capacity are targeted in the short-term coal gasification plan?",
+        "feedback": {
+          "correct": "✓ The short-term target is to construct commercial scale IGCC plants of 250 mW capacity.",
+          "wrong": "✗ The short-term target is to construct commercial scale IGCC plants of 250 mW capacity."
+        },
+        "topicRef": "3",
+        "type": "mcq",
+        "options": [
+          "100 mW",
+          "150 mW",
+          "200 mW",
+          "250 mW"
+        ],
+        "correct": "D"
+      },
+      {
+        "number": 4,
+        "question": "In Stage 1 of India's nuclear programme, which reactor type is used?",
+        "feedback": {
+          "correct": "✓ Stage 1 uses PHWR (Pressurised Heavy Water Reactor) with natural Uranium as fuel and heavy water as coolant/moderator.",
+          "wrong": "✗ Stage 1 uses PHWR (Pressurised Heavy Water Reactor) with natural Uranium as fuel and heavy water as coolant/moderator."
+        },
+        "topicRef": "4",
+        "type": "mcq",
+        "options": [
+          "BWR",
+          "FBR",
+          "PHWR",
+          "VVER"
+        ],
+        "correct": "C"
+      },
+      {
+        "number": 5,
+        "question": "In Stage 2, U²³⁸ is converted into which fissionable material?",
+        "feedback": {
+          "correct": "✓ In Stage 2, the spent fuel U²³⁸ from Stage 1 is converted into Plutonium in the FBR.",
+          "wrong": "✗ In Stage 2, the spent fuel U²³⁸ from Stage 1 is converted into Plutonium in the FBR."
+        },
+        "topicRef": "1",
+        "type": "mcq",
+        "options": [
+          "Thorium",
+          "Plutonium",
+          "U²³³",
+          "U²³⁵"
+        ],
+        "correct": "B"
+      },
+      {
+        "number": 6,
+        "question": "India's estimated natural gas reserves before large scale discoveries were ________ BCM.",
+        "feedback": {
+          "correct": "✓ The estimated reserves of natural gas was 680 billion cubic meters (BCM).",
+          "wrong": "✗ The estimated reserves of natural gas was 680 billion cubic meters (BCM)."
+        },
+        "topicRef": "2",
+        "type": "fitb",
+        "acceptedAnswers": [
+          "680"
+        ]
+      },
+      {
+        "number": 7,
+        "question": "Natural gas demand is estimated at 593 MMSCMD by which year?",
+        "feedback": {
+          "correct": "✓ The demand of natural gas has been estimated as 593 MMSCMD by 2019-20.",
+          "wrong": "✗ The demand of natural gas has been estimated as 593 MMSCMD by 2019-20."
+        },
+        "topicRef": "3",
+        "type": "mcq",
+        "options": [
+          "2015-16",
+          "2017-18",
+          "2019-20",
+          "2021-22"
+        ],
+        "correct": "C"
+      },
+      {
+        "number": 8,
+        "question": "Energy generated in Stage 2 of India's nuclear programme was how many times more than Stage 1?",
+        "feedback": {
+          "correct": "✓ The energy generated in Stage 2 was 60 times more than that available from PHWR for the same amount of Uranium.",
+          "wrong": "✗ The energy generated in Stage 2 was 60 times more than that available from PHWR for the same amount of Uranium."
+        },
+        "topicRef": "4",
+        "type": "mcq",
+        "options": [
+          "10 times",
+          "20 times",
+          "40 times",
+          "60 times"
+        ],
+        "correct": "D"
+      }
+    ]
+  }
+}

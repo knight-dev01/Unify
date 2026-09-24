@@ -1,0 +1,126 @@
+{
+  "course": "ECE 220",
+  "week": 9,
+  "title": "Dictionaries & Sets",
+  "subtitle": "Dictionaries store data as key-value pairs — the most powerful and flexible Python data structure. Unlike lists (index-based), dictionaries let you look up values by a meaningful name. Sets store unique items with no duplicates — useful for membership testing and set operations.",
+  "learningOutcome": "Dictionaries store data as key-value pairs — the most powerful and flexible Python data structure. Unlike lists (index-based), dictionaries let you look up values by a meaningful name. Sets store unique items with no duplicates — useful for membership testing and set operations.",
+  "metaChips": [
+    "ECE 220",
+    "Week 9"
+  ],
+  "tags": [
+    "dict{}",
+    "Key-Value Pairs",
+    "get()",
+    "keys() / values()",
+    "set{}",
+    "union / intersection"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Dictionaries — Key-Value Pairs",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Dictionaries — Key-Value Pairs",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>A <strong>dictionary</strong> is a collection of key-value pairs enclosed in <code>{}</code>. Each key maps to a value. Keys must be unique; values can be anything.</p>"
+            },
+            {
+              "type": "analogy",
+              "text": "A dictionary is like a real dictionary — you look up a word (key) to find its meaning (value). Instead of searching by position (like a list), you search by name."
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre># Creating a dictionary student = { \"name\": \"Amaka\", \"matric\": \"150201001\", \"level\": 200, \"gpa\": 3.75 } # Accessing values print(student[\"name\"]) # Amaka print(student[\"gpa\"]) # 3.75 # Safe access with .get() (no error if key missing) print(student.get(\"age\", \"Not found\")) # Not found # Adding and modifying student[\"age\"] = 20 # add new key student[\"gpa\"] = 3.90 # update existing # Looping through dictionary for key, value in student.items(): print(f\"{key}: {value}\")</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Key dictionary methods</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": ".keys() — all keys: dict([\"name\",\"level\",\"gpa\"]) .values() — all values .items() — all key-value pairs as tuples .get(key, default) — safe access, no KeyError key in dict — check if key exists (returns True/False) del dict[key] — remove a key-value pair"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Using dict[\"missing_key\"] raises a KeyError if the key doesn't exist. Always use dict.get(\"key\", default) when you're unsure if a key is present."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Create a student dictionary with keys: name, matric, level, gpa. Access and print each value.</li>",
+                "<li>Write a program that uses a dictionary to store course codes and their units, then compute total units.</li>",
+                "<li>What is the difference between a list and a dictionary? When would you use each?</li>",
+                "<li>Given two sets A = {1,2,3,4} and B = {3,4,5,6}, find A∪B, A∩B, and A−B.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Dictionaries — Key-Value Pairs\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Sets — Unique Collections",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Sets — Unique Collections",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>A <strong>set</strong> stores unique, unordered items. Duplicates are automatically removed. Useful for membership testing and mathematical set operations.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre># Creating sets A = {1, 2, 3, 4} B = {3, 4, 5, 6} print(A | B) # Union: {1, 2, 3, 4, 5, 6} print(A &amp; B) # Intersection: {3, 4} print(A - B) # Difference: {1, 2} print(A ^ B) # Symmetric diff: {1, 2, 5, 6} # Membership test (fast) print(3 in A) # True # Auto-removes duplicates nums = {1, 2, 2, 3, 3, 3} print(nums) # {1, 2, 3}</pre>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1] Create a dictionary of 5 courses and their credit units. Write a loop to print each course and its units, then compute the total units.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] What is the difference between student[\"gpa\"] and student.get(\"gpa\", 0) ? When does the difference matter?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] Write a program that reads 10 numbers from the user (using a loop) and stores them in a list. Then convert to a set to find unique numbers. Print both the original count and unique count.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Introduction to Programming & Computations"
+}

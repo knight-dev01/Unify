@@ -1,0 +1,130 @@
+{
+  "course": "ECE 220",
+  "week": 8,
+  "title": "Advanced Topics — Nested Loops, String Methods & Exam Patterns",
+  "subtitle": "This is the last teaching week before exam revision. It covers nested loops (patterns and tables), string methods (a favourite exam topic), and the kinds of multi-step programming problems that always appear in Q2 and Q4 of the paper.",
+  "learningOutcome": "This is the last teaching week before exam revision. It covers nested loops (patterns and tables), string methods (a favourite exam topic), and the kinds of multi-step programming problems that always appear in Q2 and Q4 of the paper.",
+  "metaChips": [
+    "ECE 220",
+    "Week 8"
+  ],
+  "tags": [
+    "Nested Loops",
+    "String Methods",
+    "upper/lower/strip",
+    "split/join",
+    "len()",
+    "Exam Patterns"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Nested Loops",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Nested Loops",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>A <strong>nested loop</strong> is a loop inside another loop. The inner loop completes all its iterations for each single iteration of the outer loop. Used for 2D patterns, tables, and matrix operations.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre># Multiplication table 1–5 for i in range(1, 6): # outer: rows for j in range(1, 6): # inner: columns print(i * j, end=\"\\t\") # \\t = tab spacing print() # newline after each row # Output: # 1 2 3 4 5 # 2 4 6 8 10 # 3 6 9 12 15 # 4 8 12 16 20 # 5 10 15 20 25</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre># Triangle star pattern for i in range(1, 6): print(\"* \" * i) # Output: # * # * * # * * * # * * * * # * * * * *</pre>"
+            },
+            {
+              "type": "analogy",
+              "text": "Tracing rule For every 1 outer iteration, the inner loop runs completely. So outer=5, inner=5 means 5×5 = 25 total executions of the innermost statement."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Write a program that prints a multiplication table (rows 1–5 × columns 1–5) using nested loops. <span>Past Q</span></li>",
+                "<li>What is the output of: <code>\" Hello World \".strip().lower().replace(\"world\",\"Python\")</code>?</li>",
+                "<li>Write a program that reads a sentence and counts how many words it contains.</li>",
+                "<li>Use string methods to check if a given string is a palindrome.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Nested Loops\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "String Methods",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "String Methods",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>String methods are built-in functions you call on a string using dot notation: <code>string.method()</code>. They don't change the original string — they return a new one.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Essential string methods for the exam</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": ".upper() — convert to uppercase: \"hello\".upper() → \"HELLO\" .lower() — convert to lowercase: \"HELLO\".lower() → \"hello\" .strip() — remove leading/trailing spaces: \" hi \".strip() → \"hi\" .replace(old, new) — swap substring: \"cat\".replace(\"c\",\"b\") → \"bat\" .split() — split into list of words: \"a b c\".split() → [\"a\",\"b\",\"c\"] .join(list) — join list into string: \"-\".join([\"a\",\"b\"]) → \"a-b\" len(s) — number of characters: len(\"hello\") → 5"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre># Chaining methods result = \" Hello World \".strip().lower().replace(\"world\", \"Python\") print(result) # hello Python # Count words in a sentence sentence = input(\"Enter sentence: \") words = sentence.split() print(f\"Word count: {len(words)}\") # Palindrome check word = input(\"Enter a word: \").lower().strip() if word == word[::-1]: print(f\"{word} is a palindrome\") else: print(f\"{word} is NOT a palindrome\")</pre>"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — String methods don't modify in place. name.upper() does NOT change name — you must assign: name = name.upper() . Strings in Python are immutable ."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1] What is the output of: s = \"Engineering\"; print(len(s), s[0], s[-1], s[3:7]) ?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] Write a program that reads a name and prints it in reverse, all uppercase.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] Write a nested loop program that prints a right-angle triangle of numbers where row n contains the digit n repeated n times (row 1: \"1\", row 2: \"22\", row 3: \"333\", etc.) up to row 5.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Introduction to Programming & Computations"
+}

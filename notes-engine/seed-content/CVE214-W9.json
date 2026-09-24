@@ -1,0 +1,186 @@
+{
+  "course": "CVE 214",
+  "week": 9,
+  "title": "Pan Evaporation, Soil Evaporation & Evapotranspiration",
+  "subtitle": "The most practical way to measure evaporation is with a pan. This week covers pan types, the pan coefficient, controlling evaporation, and the combined process of evapotranspiration (ET) — critical for irrigation design.",
+  "learningOutcome": "The most practical way to measure evaporation is with a pan. This week covers pan types, the pan coefficient, controlling evaporation, and the combined process of evapotranspiration (ET) — critical for irrigation design.",
+  "metaChips": [
+    "CVE 214",
+    "Week 9"
+  ],
+  "tags": [
+    "Pan evaporation",
+    "Pan coefficient",
+    "Sunken pan",
+    "Floating pan",
+    "Transpiration",
+    "Evapotranspiration",
+    "Lysimeter"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Pan Evaporation",
+      "abbr": "CVE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Pan Evaporation",
+          "abbr": "CVE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>A pan is a simple container of water placed in the open. By measuring how much water evaporates from it each day, you get an approximation of evaporation from larger water bodies like lakes and reservoirs. But pan evaporation is always higher than lake evaporation — that's why you need a correction factor called the pan coefficient.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Three types of evaporation pans (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>1. Sunken Pan — difficult to install, clean, repair; creates observational problems; leaks are not easily detected and the annual lake evaporation (pan coefficient) is quite consistent and does not vary excessively (0.92 in Britain). Also appreciable heat exchange takes place between the pan and the soil.</div>",
+                "<div>2. Floating Pan — evaporation from a pan floating in a lake or reservoir more nearly approximates evaporation from the lake or reservoir than other installations. Boundary effects are appreciable. Floating pans are prevalent but from the lake or reservoir the data may be unreliable. Also installation and operational expense is excessive.</div>",
+                "<div>3. Surface Pan — pans exposed above ground experience greater evaporation than sunken pans because the radiant energy intercepted by the sidewalls increases of sunken pans. The major advantages of surface pans are economy and ease of installation, operation and maintenance.</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Pan coefficient (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>Lake Evaporation = Pan Coefficient × Pan Evaporation</div>",
+                "<div>Pan coefficients range from 0.65 to 0.92. The US Weather Bureau class A pan coefficient is 0.75.</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "In Britain: standard pan 1.83m square and 610mm deep; rim projects 76mm above surrounding ground. In the USA the standard class A pan is circular, 1.22m diameter and 254mm deep, filled to a depth of 180mm, set on a timber grillage about 150mm above ground level."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>List the three types of evaporation pans. What are the advantages and disadvantages of surface pans? <span>Exercise 5</span></li>",
+                "<li>Define the pan coefficient. What is its typical value for a class A pan?</li>",
+                "<li>Define transpiration and evapotranspiration. How is evapotranspiration estimated?</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Pan Evaporation\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Control of Evaporation, Soil Evaporation & Evapotranspiration",
+      "abbr": "CVE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Control of Evaporation, Soil Evaporation & Evapotranspiration",
+          "abbr": "CVE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<strong>Control of evaporation (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>Small reservoirs are sometimes entirely covered to reduce evaporation losses. The use of floating covers and use of granular materials has also been advocated.</div>",
+                "<div>Windbreaks: effective only on very small reservoirs (25% reduction in wind speed will normally reduce evaporation by only about 9% on a sustained basis).</div>",
+                "<div>Cetyl alcohol: a small quantity can reduce evaporation from a small pan as much as 40%, but it is seldom possible to maintain more than 10–20% coverage over a reservoir on a continuing basis.</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>5.6 Soil Evaporation (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>The evaporation from a wet soil surface immediately after rain or escape of water molecules with more resistance when the water table lies within a metre from the ground is called soil evaporation. This expressed as a percentage of evaporation from free water surface is called evaporation opportunity.</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>5.7 Transpiration (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>Transpiration is the process whereby the moisture that has been absorbed by the roots of the trees and circulated through the plant body, returns back to the atmosphere as water vapour breathed out by the stomata of leaves. The amount of sunlight, available moisture, extent of plant growth and foliage and all the factors influencing evaporation have a bearing on the transpiration rates.</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>5.8 Evapotranspiration (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>Evapotranspiration (ET) sometimes called consumptive use (U) or total evaporation, describes the total water removed from an area by transpiration by the plants and evaporation from the soil, snow and water surfaces.</div>",
+                "<div>Potential evapotranspiration (Ept) is the evapotranspiration from the short green vegetation when the roots of a plant are supplied with unlimited water covering the soil. Usually expressed as depth (mm/interval).</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Methods of estimating evapotranspiration (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>(i) Tanks and lysimeter experiments</div>",
+                "<div>(ii) Field experimental plots</div>",
+                "<div>(iii) Soil moisture studies</div>",
+                "<div>(iv) Evapotranspiration equations as developed by Penman, Thornthwaite, Blaney-Criddle etc.</div>",
+                "<div>(v) Evaporation index method, i.e. from pan evaporation data.</div>"
+              ]
+            },
+            {
+              "type": "analogy",
+              "text": "In the dry season in northern Nigeria, irrigation engineers must account for evapotranspiration when deciding how much water to supply to crops. If they only account for how much the plant \"drinks\" (transpiration) and ignore evaporation from the surrounding soil, they will under-supply the field and the crop will wilt."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1] A pan records 8mm of evaporation per day. The pan coefficient is 0.75. Estimate the lake evaporation.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] Define evapotranspiration. How does it differ from transpiration alone?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] Why does a surface pan record higher evaporation than a sunken pan placed in the same location? What does this mean for the pan coefficient?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Engineering Hydrology"
+}

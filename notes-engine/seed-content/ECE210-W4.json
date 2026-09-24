@@ -1,0 +1,101 @@
+{
+  "course": "ECE 210",
+  "week": 4,
+  "title": "Armature Windings, Pitches & The EMF Equation",
+  "subtitle": "The armature winding generates EMF in a generator and experiences force in a motor. Understanding lap vs wave winding and the EMF equation is core exam material. You must be able to derive the EMF equation from first principles.",
+  "learningOutcome": "The armature winding generates EMF in a generator and experiences force in a motor. Understanding lap vs wave winding and the EMF equation is core exam material. You must be able to derive the EMF equation from first principles.",
+  "metaChips": [
+    "ECE 210",
+    "Week 4"
+  ],
+  "tags": [
+    "Lap Winding a=P",
+    "Wave Winding a=2",
+    "Back Pitch Yb",
+    "Front Pitch Yf",
+    "EMF Equation",
+    "Parallel Paths a"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Lap vs Wave & The EMF Equation",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Lap vs Wave & The EMF Equation",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Lap winding</strong>: parallel paths a = P (number of poles). More paths → more current capacity. <strong>High current, lower voltage</strong>. Used in large low-voltage machines.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Wave winding</strong>: parallel paths a = 2 always, regardless of poles. Two long series strings → higher voltage. <strong>High voltage, lower current</strong>. Used in high-voltage machines. No equalising connections needed.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Pitches</strong>: For simplex progressive lap winding: Yb − Yf = 2. Average pitch: (Yb+Yf)/2 = C/P, so Yb+Yf = 2C/P (C = total coil sides, P = poles).</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>EMF Equation — DC Generator</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>E_g = (φ × Z × N × P) / (60 × a)</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "φ = flux per pole (Wb) · Z = total armature conductors · N = speed (rpm) P = number of poles · a = parallel paths Lap: a = P Wave: a = 2 (always)"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Most common mistake in this topic Wrong value of a. For lap: a=P. For wave: a=2 ALWAYS — not 2P, not P/2, just 2. In an 8-pole machine this is a factor of 4 error. Also: Yb+Yf = 2C/P not C/P — the factor of 2 is easy to miss."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>6-pole lap: 720 conductors, φ=40mWb, N=400rpm. Find generated EMF. <span>Past Q</span></li>",
+                "<li>Find back and front pitch for 4-pole, 24-slot lap winding. <span>Past Q</span></li>",
+                "<li>8-pole wave: 1000 conductors, φ=35mWb. Find speed for 500V.</li>",
+                "<li>State two advantages of wave over lap winding.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1] State two advantages of wave winding over lap winding. When would you choose each?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] A 4-pole lap generator: Z=360, φ=20mWb, N=600rpm. Find E_g.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] Derive the EMF equation E_g = φZNP/60a from first principles using Faraday's law. State clearly what each variable represents and how the parallel paths a affects the result.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Electrical Machines & Circuits"
+}

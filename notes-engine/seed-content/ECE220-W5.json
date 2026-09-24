@@ -1,0 +1,187 @@
+{
+  "course": "ECE 220",
+  "week": 5,
+  "title": "Expressions Deep Dive: Lists, Tuples & Nested Expressions",
+  "subtitle": "Lists and tuples are Python's two main sequence types. The 2024/2025 exam directly asked students to compare them (Q1a). The nested expression in Q1d (the grading formula) is also this week's territory.",
+  "learningOutcome": "Lists and tuples are Python's two main sequence types. The 2024/2025 exam directly asked students to compare them (Q1a). The nested expression in Q1d (the grading formula) is also this week's territory.",
+  "metaChips": [
+    "ECE 220",
+    "Week 5"
+  ],
+  "tags": [
+    "List",
+    "Tuple",
+    "Mutable",
+    "Immutable",
+    "Indexing",
+    "Nested Expression",
+    "Conditional Expression"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Lists",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Lists",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>A list is a <strong>mutable, ordered collection</strong>. Created with square brackets <code>[]</code>. You can change, add, or remove elements.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>my_list = [7, 8, 10] my_list[0] = 99 # Change first element print(my_list) # [99, 8, 10] my_list.append(5) # Add to end print(my_list) # [99, 8, 10, 5]</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Compare and contrast between a Tuple and a List. <span>2024/2025 Q1a — 5 marks</span></li>",
+                "<li>Write a nested expression to compute: Final = (Test + 2×Assignment) / 3 + (5 if attendance ≥ 90 else 0). <span>2024/2025 Q1d</span></li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Lists\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Tuples",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Tuples",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>A tuple is an <strong>immutable, ordered collection</strong>. Created with parentheses <code>()</code>. Once created, cannot be changed.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>my_tuple = (7, 8, 10) print(my_tuple[0]) # 7 (indexing works) my_tuple[0] = 99 # TypeError! Cannot modify tuple</pre>"
+            },
+            {
+              "type": "analogy",
+              "text": "A list is like a shopping cart (you can add/remove items). A tuple is like a printed receipt (fixed forever after printing)."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Tuples\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "List vs Tuple Comparison — Exam Q1a",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "List vs Tuple Comparison — Exam Q1a",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Similarities:</strong> Both store multiple items. Both support indexing. Both can hold mixed data types. Both support <code>for</code> loops.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Differences (exam table)</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "Syntax: Lists use [] · Tuples use () Mutability: Lists are mutable (elements can change) · Tuples are immutable (cannot change after creation) Performance: Tuples are slightly faster (less overhead) Use case: Lists for data that changes · Tuples for fixed data (coordinates, RGB values)"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>my_list = [7, 8, 10] my_list[0] = 99 # Works! Now [99, 8, 10] my_tuple = (7, 8, 10) my_tuple[0] = 99 # TypeError! Cannot modify</pre>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"List vs Tuple Comparison — Exam Q1a\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Nested Expressions",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "4.1",
+          "title": "Nested Expressions",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>A <strong>nested expression</strong> is an expression inside another expression. Python evaluates the innermost part first.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>test_score = float(input(\"Test score (max 55): \")) assignment_score = float(input(\"Assignment (max 10): \")) attendance = float(input(\"Attendance %: \")) final_score = (test_score + (2 * assignment_score)) / 3 + (5 if attendance &gt;= 90 else 0) print(\"Final Score:\", final_score) # Example: test=45, assignment=8, attendance=92 # (45 + 16) / 3 + 5 = 61/3 + 5 = 20.33 + 5 = 25.33</pre>"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Confusing [] (list) with () (tuple). Also: the conditional expression (ternary) — write value_if_true if condition else value_if_false , not the other way round."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1] Create a list of 5 student names. Print the 3rd name. Change the 1st name. Print the updated list.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] Create a tuple for a student's info: (name, age, level). Try to change the age. What happens?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] Write the grading formula from Q1d as a nested expression. Walk through the evaluation step by step with: test=50, assignment=10, attendance=88.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Introduction to Programming & Computations"
+}

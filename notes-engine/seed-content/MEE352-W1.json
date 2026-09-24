@@ -1,0 +1,400 @@
+{
+  "course": "MEE 352",
+  "week": 1,
+  "title": "Energy Sources",
+  "subtitle": "General Concepts — Classifications and Types",
+  "learningOutcome": "By the end of this week, you should be able to classify energy sources into primary, secondary, and supplementary types, and distinguish between conventional and unconventional sources.",
+  "metaChips": [
+    "MEE 352",
+    "Week 1"
+  ],
+  "tags": [
+    "Primary Energy",
+    "Secondary Energy",
+    "Supplementary Energy",
+    "Conventional Sources",
+    "Unconventional Sources",
+    "Fossil Fuels",
+    "Renewable Energy"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "General Concept of Energy",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "General Concept of Energy",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>The energy is demand of human being for their survival. It is directly related with the population. As the population of the word is increasing everyday and so is demand of energy. It is required to sustain the industrial growth, transportation and human beings comfort. It is well known fact that the known sources of energy <em>i.e.,</em> \"Fossile Fuel\" is depleting very fast and by the turn of the century it may not exist at all. Due to this fact new sources of energy have found an encouraging demand. Energy sources available can be divided into the three type;</p>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Primary energy</li>",
+                "<li>Secondary energy</li>",
+                "<li>Supplementary energy</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"General Concept of Energy\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Primary Energy",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Primary Energy",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>It provides a net supply of energy. Their energy yield ratio is very high. The yield ratio is \"the energy feedback by the materials to the energy received from the environment.\" The primary sources can only accelerate the growth rate but their supply is limited. It becomes essential to use these fuels sparingly. It contributes considerably to the energy supply.</p>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Primary Energy\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Definition",
+          "question": "What is meant by the \"energy yield ratio\" of primary energy sources?",
+          "answer": "<div>The energy yield ratio is defined as <strong>\"the energy feedback by the materials to the energy received from the environment.\"</strong> For primary energy, this ratio is very high, meaning these sources return significantly more energy than is invested in harnessing them. However, their supply is limited, so they must be used sparingly.</div>"
+        },
+        {
+          "badge": "Application",
+          "question": "Why must primary energy sources be used sparingly despite contributing considerably to energy supply?",
+          "answer": "<div>Although primary energy sources have a high energy yield ratio and contribute considerably to energy supply, <strong>their supply is limited</strong>. They cannot be replenished at the rate they are consumed, making conservation essential to ensure long-term availability.</div>"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Secondary Energy",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "Secondary Energy",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>It produces net energy though it may be necessary for the economy, these may not yield net energy. Intensive agricultural is an example where in the terms of energy yield is less than the input.</p>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Secondary Energy\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Comparison",
+          "question": "How does secondary energy differ from primary energy in terms of energy yield?",
+          "answer": "<div><strong>Primary energy</strong> has a very high energy yield ratio — far more energy is returned than is invested. <strong>Secondary energy</strong> may produce net energy, but in some cases the energy yield is less than the input. Intensive agriculture is given as an example where the energy returned may not exceed what was invested in farming activities.</div>"
+        }
+      ],
+      "pulseCheck": {
+        "number": 3,
+        "questions": [
+          {
+            "type": "mcq",
+            "question": "Which type of energy has a net energy yield that is practically zero?",
+            "options": [
+              "Primary energy",
+              "Secondary energy",
+              "Supplementary energy",
+              "Conventional energy"
+            ],
+            "correctIndex": 2
+          },
+          {
+            "type": "fitb",
+            "question": "Coal, natural gas, oil and nuclear energy are classified as ________ sources. (Hint: Hint: these are also called unrenewable sources)",
+            "acceptedAnswers": [
+              "conventional",
+              "conventional sources"
+            ]
+          },
+          {
+            "type": "mcq",
+            "question": "Intensive agriculture is given as an example of which energy type?",
+            "options": [
+              "Primary energy",
+              "Secondary energy",
+              "Supplementary energy",
+              "Unconventional energy"
+            ],
+            "correctIndex": 1
+          }
+        ]
+      }
+    },
+    {
+      "number": 4,
+      "title": "Supplementary Energy",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "4.1",
+          "title": "Supplementary Energy",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>It is those whose net energy yield is practically zero. It requires highest investment in terms energy insulation.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>On the basis of above discussion it becomes apparent that the energy can be classified as shown in Fig. 2.1.</p>"
+            },
+            {
+              "type": "diagram",
+              "caption": "Fig. 2.1 Classification of energy sources",
+              "description": "Energy · Conventional sources/ · unrenewable source. · Unconventional sources/ · renewable source.",
+              "imageRef": null
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Supplementary Energy\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "title": "Conventional Sources",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "5.1",
+          "title": "Conventional Sources",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>These are energy sources which are naturally available <em>viz.,</em> coal, natural gas, oil and/or nuclear energy. These form the part of primary energy sources. It is also know as unrenewable sources.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Unconventional sources:</strong> The secondary sources <em>i.e.,</em> solar energy, wind energy, water energy, human energy etc. Categorized as secondary sources. Solar energy can be used through plants, solar cells, solar heater, solar drying and solar tower. These are some of the emerging technologies where solar energy are used. Solar heating/drying is economical application if passive methods are used. Another unconventional sources are wind, tide, wave, hydroelectric, geothermal, ocean thermal etc.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>As the unrenewable sources are depleting very fast the coming generation has to depend mostly on renewable sources of energy. It can be classified as:</p>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Solar energy</li>",
+                "<li>Wind energy</li>",
+                "<li>Energy from biomass</li>",
+                "<li>Geothermal energy</li>",
+                "<li>Ocean energy (OTEC)</li>",
+                "<li>Chemical engg. sources</li>",
+                "<li>Magneto hydrodynamic (MHD)</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Conventional Sources\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Definition",
+          "question": "What are conventional energy sources? Give four examples.",
+          "answer": "<div>Conventional energy sources are those which are <strong>naturally available</strong>. They form part of primary energy sources and are also known as <strong>unrenewable sources</strong>. Examples include: <strong>coal, natural gas, oil, and nuclear energy</strong>.</div>"
+        },
+        {
+          "badge": "Application",
+          "question": "List the seven classifications of renewable (unconventional) energy sources.",
+          "answer": "<div>The seven renewable energy classifications are: <strong>(1) Solar energy, (2) Wind energy, (3) Energy from biomass, (4) Geothermal energy, (5) Ocean energy (OTEC), (6) Chemical engineering sources, (7) Magneto hydrodynamic (MHD)</strong>.</div>"
+        },
+        {
+          "badge": "Comparison",
+          "question": "Distinguish between conventional and unconventional energy sources with examples.",
+          "answer": "<div><strong>Conventional sources</strong> are naturally available, finite (unrenewable) and form part of primary energy — e.g., coal, oil, natural gas, nuclear energy. <strong>Unconventional sources</strong> are secondary sources that are renewable — e.g., solar, wind, wave, hydroelectric, geothermal, ocean thermal energy. As conventional sources deplete, future generations must rely on unconventional sources.</div>"
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": [
+      {
+        "number": 1,
+        "question": "Energy demand is directly related to which of the following?",
+        "feedback": {
+          "correct": "✓ Energy demand is directly related to population growth — as population grows, so does energy demand.",
+          "wrong": "✗ Energy demand is directly related to population growth — as population grows, so does energy demand."
+        },
+        "topicRef": "1",
+        "type": "mcq",
+        "options": [
+          "Climate change",
+          "Population growth",
+          "Technological innovation",
+          "Political stability"
+        ],
+        "correct": "B"
+      },
+      {
+        "number": 2,
+        "question": "Which energy type requires the highest investment in terms of energy insulation and has a net yield of practically zero?",
+        "feedback": {
+          "correct": "✓ Supplementary energy has practically zero net yield and requires the highest investment in energy insulation.",
+          "wrong": "✗ Supplementary energy has practically zero net yield and requires the highest investment in energy insulation."
+        },
+        "topicRef": "2",
+        "type": "mcq",
+        "options": [
+          "Primary energy",
+          "Secondary energy",
+          "Supplementary energy",
+          "Conventional energy"
+        ],
+        "correct": "C"
+      },
+      {
+        "number": 3,
+        "question": "Primary energy sources have a very ________ energy yield ratio.",
+        "feedback": {
+          "correct": "✓ Primary energy sources have a very HIGH energy yield ratio — they return significantly more than is invested.",
+          "wrong": "✗ Primary energy sources have a very HIGH energy yield ratio — they return significantly more than is invested."
+        },
+        "topicRef": "3",
+        "type": "fitb",
+        "acceptedAnswers": [
+          "high",
+          "very high"
+        ]
+      },
+      {
+        "number": 4,
+        "question": "Which of the following is NOT an unconventional energy source?",
+        "feedback": {
+          "correct": "✓ Natural gas is a conventional/unrenewable source, not an unconventional source.",
+          "wrong": "✗ Natural gas is a conventional/unrenewable source, not an unconventional source."
+        },
+        "topicRef": "4",
+        "type": "mcq",
+        "options": [
+          "Solar energy",
+          "Natural gas",
+          "Wind energy",
+          "Geothermal energy"
+        ],
+        "correct": "B"
+      },
+      {
+        "number": 5,
+        "question": "According to the classification in Fig. 2.1, energy sources are broadly divided into:",
+        "feedback": {
+          "correct": "✓ Fig. 2.1 shows the broad division: Conventional/unrenewable sources and Unconventional/renewable sources.",
+          "wrong": "✗ Fig. 2.1 shows the broad division: Conventional/unrenewable sources and Unconventional/renewable sources."
+        },
+        "topicRef": "5",
+        "type": "mcq",
+        "options": [
+          "Primary, secondary, and supplementary",
+          "Conventional/unrenewable and unconventional/renewable",
+          "Fossil and non-fossil",
+          "Thermal and electrical"
+        ],
+        "correct": "B"
+      },
+      {
+        "number": 6,
+        "question": "The full abbreviation for the ocean energy classification is ________. (Hint: Hint: Ocean Thermal Energy Conversion)",
+        "feedback": {
+          "correct": "✓ OTEC stands for Ocean Thermal Energy Conversion.",
+          "wrong": "✗ OTEC stands for Ocean Thermal Energy Conversion."
+        },
+        "topicRef": "1",
+        "type": "fitb",
+        "acceptedAnswers": [
+          "otec",
+          "ocean thermal energy conversion"
+        ]
+      },
+      {
+        "number": 7,
+        "question": "Solar energy can be used through all of the following EXCEPT:",
+        "feedback": {
+          "correct": "✓ Nuclear fission is unrelated to solar energy. Solar energy uses plants, solar cells, solar heaters, solar drying, and solar towers.",
+          "wrong": "✗ Nuclear fission is unrelated to solar energy. Solar energy uses plants, solar cells, solar heaters, solar drying, and solar towers."
+        },
+        "topicRef": "2",
+        "type": "mcq",
+        "options": [
+          "Solar cells",
+          "Solar heater",
+          "Nuclear fission",
+          "Solar tower"
+        ],
+        "correct": "C"
+      },
+      {
+        "number": 8,
+        "question": "MHD stands for:",
+        "feedback": {
+          "correct": "✓ MHD stands for Magneto Hydro Dynamic.",
+          "wrong": "✗ MHD stands for Magneto Hydro Dynamic."
+        },
+        "topicRef": "3",
+        "type": "mcq",
+        "options": [
+          "Mechanical Heat Dissipation",
+          "Magneto Hydro Dynamic",
+          "Multi-Heat Distribution",
+          "Maximum Heat Density"
+        ],
+        "correct": "B"
+      }
+    ]
+  }
+}

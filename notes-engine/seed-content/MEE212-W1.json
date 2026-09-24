@@ -1,0 +1,121 @@
+{
+  "course": "MEE 212",
+  "week": 1,
+  "title": "Velocity of Points on Rigid Links",
+  "subtitle": "This week introduces kinematics — the study of motion without caring about forces. You'll learn how to find the velocity of any point on a moving link using equations and graphical methods. This is the starting point for everything in mechanisms.",
+  "learningOutcome": "This week introduces kinematics — the study of motion without caring about forces. You'll learn how to find the velocity of any point on a moving link using equations and graphical methods. This is the starting point for everything in mechanisms.",
+  "metaChips": [
+    "MEE 212",
+    "Week 1"
+  ],
+  "tags": [
+    "Kinematics",
+    "Velocity",
+    "Rigid links",
+    "Constant acceleration",
+    "Relative velocity"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "What is Kinematics? Velocity basics",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "What is Kinematics? Velocity basics",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Kinematics is the study of motion. It doesn't ask \"why is it moving?\" — it only asks \"how is it moving?\". Think of it like watching a car from above: you can see it speeding up, slowing down, turning — but you don't know or care about the engine inside.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Velocity</strong> is a characteristic of kinematics. When a rigid link rotates, every single point on it moves — but they all move at different speeds depending on how far they are from the centre of rotation.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Equations of motion — constant acceleration</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>v = u + at</div>",
+                "<div>v² = u² + 2as</div>",
+                "<div>s = ut + ½at²</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "v = final velocity (m/s) · u = initial velocity (m/s) · a = acceleration (m/s²) · t = time (s) · s = displacement (m)"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Velocity of a point on a rotating link</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>V_A = (O₁A) × ω₂</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "V_A = velocity of point A (m/s) · O₁A = distance from centre of rotation to point A (m) · ω₂ = angular velocity of the link (rad/s)"
+            },
+            {
+              "type": "diagram",
+              "caption": "Rotating link — velocity of a point",
+              "description": "O₁ (fixed) · A · V_A = ω × O₁A · r = O₁A · ω₂ · V always acts perpendicular to the link",
+              "imageRef": null
+            },
+            {
+              "type": "analogy",
+              "text": "Think of a ceiling fan. The centre (O₁) is fixed to the ceiling. Each blade tip is like point A. The longer the blade, the faster that tip moves — even though the whole fan rotates at the same ω. That's exactly what V_A = ω × r tells you."
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Students forget that V acts perpendicular to the link , not along it. If you draw your velocity arrow pointing along the rod, that's wrong. It must be at 90° to the link direction."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>State the equations of motion for constant acceleration and use them to find velocity or displacement.</li>",
+                "<li>Define velocity and state that it is a characteristic of kinematics.</li>",
+                "<li>Given a mechanism, find the velocity of a point using V = ω × r.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1] A link O₁A is 0.19m long and rotates at ω = 10 rad/s. Find the velocity of point A.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] Write the three equations of motion for constant acceleration. What does each variable represent?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] A point starts from rest and reaches 15 m/s in 5 seconds with constant acceleration. How far does it travel?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Theory of Machines"
+}

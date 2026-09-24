@@ -24,10 +24,12 @@ the Auth server.)
    Cloud, redirect `https://xyzcompany.supabase.co/auth/v1/callback`).
 4. **Authentication → URL Configuration**: Site URL + Redirect URLs +=
    `https://unify-virid.vercel.app/**`.
-5. **Schema — pick ONE path:**
-   - **A (recommended, automatic):** do nothing. Render applies
-     `notes-engine/prisma/migrations/0001_init` on first deploy. Then run
-     `supabase/seed.sql` once in **SQL Editor** for LASU + the per-level catalog.
+ 5. **Schema — pick ONE path:**
+    - **A (recommended, automatic):** do nothing. Render applies
+      `notes-engine/prisma/migrations/0001_init` on first deploy. Then run
+      `supabase/seed.sql` once in **SQL Editor** for LASU + the per-level catalog.
+      Legacy week notes seed themselves on boot from `notes-engine/seed-content/`
+      (built by `scripts/import-legacy.mjs` from the archived Coursecontents).
    - **B (manual):** run `supabase/schema.sql` then `supabase/seed.sql` in SQL
      Editor, and baseline Prisma after the first deploy:
      `npx prisma migrate resolve --applied 0001_init`.

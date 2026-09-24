@@ -1,0 +1,139 @@
+{
+  "course": "MEE 212",
+  "week": 7,
+  "title": "Prowell Governor & Performance Parameters",
+  "subtitle": "This week covers the loaded (gravity) governor analysis in detail, then finishes with the 6 key performance parameters every governor is judged on. These parameters are definition-heavy — expect them in exams.",
+  "learningOutcome": "This week covers the loaded (gravity) governor analysis in detail, then finishes with the 6 key performance parameters every governor is judged on. These parameters are definition-heavy — expect them in exams.",
+  "metaChips": [
+    "MEE 212",
+    "Week 7"
+  ],
+  "tags": [
+    "Load Prowell governor",
+    "Sensitiveness",
+    "Stability",
+    "Isochronism",
+    "Hunting",
+    "Governor effort",
+    "Power"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "6 Performance Parameters of a Governor",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "6 Performance Parameters of a Governor",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<strong>1. Sensitiveness (from notes)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>Sensitiveness = (N_max − N_min) / N_min</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "Definition: The ability of the governor to maintain constant speed of rotation. Can be obtained mathematically as the ratio (N_max − N_min)/N_min."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>2. Stability (from notes)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>A governor is stable when for each speed within the working range, there is only one radius of the governor balls at which the governor is in equilibrium.</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>3. Isochronism (from notes)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>A governor is said to be isochronous when the equilibrium speed is constant for all radii of rotation within the working range.</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>4. Hunting (from notes)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>Hunting is a condition in which the speed of the engine controlled by the governor fluctuates continuously above and below the mean speed.</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>5. Governor Effort (from notes)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>The effort of a governor is the force it can exert at the sleeve on the mechanism which controls the supply of fuel to the engine.</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>6. Power (from notes)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>Power is defined as the work done at the sleeve for a given percentage change of speed.</div>"
+              ]
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Confusing isochronism and stability. An isochronous governor has ONE equilibrium speed for ALL radii — this means it is infinitely sensitive, which actually makes it unstable (prone to hunting). Stable ≠ isochronous."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Define all 6 performance parameters of a governor. <span>Common exam Q</span></li>",
+                "<li>For a portal governor, find speed range given arm length, ball weight, sleeve weight, friction force and min/max radius.</li>",
+                "<li>State the formula for sensitiveness and explain why high sensitiveness can cause hunting.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1] Define all six governor performance parameters in one sentence each.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] Why is hunting undesirable in a governor?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] A governor is isochronous. Is it stable? Is it likely to hunt? Explain the contradiction.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Theory of Machines"
+}

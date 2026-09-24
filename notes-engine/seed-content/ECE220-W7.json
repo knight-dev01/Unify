@@ -1,0 +1,140 @@
+{
+  "course": "ECE 220",
+  "week": 7,
+  "title": "Program Planning / SDLC",
+  "subtitle": "Before writing a single line of code, professional developers follow a structured process called the Software Development Life Cycle (SDLC). The 2024/2025 exam asked directly for the 6 SDLC steps (Q1b, 5 marks). Know them in order.",
+  "learningOutcome": "Before writing a single line of code, professional developers follow a structured process called the Software Development Life Cycle (SDLC). The 2024/2025 exam asked directly for the 6 SDLC steps (Q1b, 5 marks). Know them in order.",
+  "metaChips": [
+    "ECE 220",
+    "Week 7"
+  ],
+  "tags": [
+    "SDLC",
+    "Feasibility Study",
+    "System Design",
+    "Implementation",
+    "Testing",
+    "Deployment",
+    "Maintenance",
+    "Pseudocode",
+    "Flowchart"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "The 6 Steps of the SDLC",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "The 6 Steps of the SDLC",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<strong>Step 1 — Feasibility Study</strong> Inspect how viable and achievable the project is. Check availability of requirements, resources, and personnel. Is the project worth doing?"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Step 2 — System Design</strong> Create a systematic design/blueprint after the feasibility study. This includes data structures, interfaces, and algorithms before any code is written."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Step 3 — Implementation (Coding)</strong> The actual coding phase. Developers write code based on the design document. This is where Python programs are written."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Step 4 — Testing</strong> Test the code to find errors/bugs. Three types: Unit Testing (test individual components), Integration Testing (test components working together), User-Interface Testing (test from the user's perspective)."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Step 5 — Deployment</strong> Release the code to the client. The developer must ensure the code is flexible, documented, and ready for use in the real environment."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Step 6 — Maintenance</strong> Annual or periodic checks on the program to protect, maintain, and improve it. Bug fixes, updates, and security patches."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam answer — write this verbatim:</strong> <div>The SDLC consists of 6 steps: (1) Feasibility Study — assess viability; (2) System Design — create a blueprint; (3) Implementation — write the code; (4) Testing — find and fix bugs; (5) Deployment — release to client; (6) Maintenance — ongoing support and improvement.</div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Briefly explain the steps involved in the software development life cycle. <span>2024/2025 Q1b — 5 marks</span></li>",
+                "<li>What is the difference between unit testing and integration testing?</li>",
+                "<li>What is pseudocode? Write pseudocode for a program that finds the larger of two numbers.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "State the textbook definition — Exam answer — write this verbatim.",
+                "answer": "<div>The SDLC consists of 6 steps: (1) Feasibility Study — assess viability; (2) System Design — create a blueprint; (3) Implementation — write the code; (4) Testing — find and fix bugs; (5) Deployment — release to client; (6) Maintenance — ongoing support and improvement.</div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Pseudocode",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Pseudocode",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Pseudocode is plain-English description of an algorithm — not actual Python syntax, but structured enough to be converted to code easily.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Example — Find the larger of two numbers</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "START INPUT number_a INPUT number_b IF number_a > number_b THEN OUTPUT \"number_a is larger\" ELSE OUTPUT \"number_b is larger\" END"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Listing only 4 or 5 SDLC steps — the full list is 6. Testing (step 4) is the one most students forget to split into unit/integration/UI. Also: confusing Deployment (release to client) with Maintenance (ongoing support after release)."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1] List and briefly explain all 6 steps of the SDLC in the correct order.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] Distinguish between unit testing, integration testing, and user-interface testing.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] You are building a Python calculator app for LASU. Walk through all 6 SDLC steps and describe what you would do at each stage specifically for this project.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Introduction to Programming & Computations"
+}

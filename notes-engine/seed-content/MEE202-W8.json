@@ -1,0 +1,186 @@
+{
+  "course": "MEE 202",
+  "week": 8,
+  "title": "Miller Indices & Crystal Defects",
+  "subtitle": "Miller indices are the coordinate system of crystals — how we name planes and directions. Crystal defects are the imperfections that make materials interesting (and sometimes weak). Both are high-yield exam topics.",
+  "learningOutcome": "Miller indices are the coordinate system of crystals — how we name planes and directions. Crystal defects are the imperfections that make materials interesting (and sometimes weak). Both are high-yield exam topics.",
+  "metaChips": [
+    "MEE 202",
+    "Week 8"
+  ],
+  "tags": [
+    "Miller Indices (hkl)",
+    "Crystallographic Planes",
+    "Directions [uvw]",
+    "Point Defects",
+    "Vacancy",
+    "Dislocation",
+    "Schottky Defect",
+    "Frenkel Defect"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Miller Indices — Planes",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Miller Indices — Planes",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>The numerical system used to describe the points, planes and directions in a crystal are called <strong>crystallographic indices</strong>. The indices l, m, and n are called <strong>Miller indices</strong>.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>6-Step procedure to find Miller indices of a plane:</strong></p>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Set up a right-handed x-y-z coordinate system. If the plane passes through the origin, take a new origin at an adjacent corner.</li>",
+                "<li>Find where the plane intersects each axis (in units of a, b, c). If parallel to an axis, intercept = ∞.</li>",
+                "<li>Take the reciprocals of these intercepts.</li>",
+                "<li>Multiply by the lowest common factor to get the smallest integers.</li>",
+                "<li>Enclose in parentheses (hkl) — no commas. Negative values get a bar over the number.</li>",
+                "<li>For a family of equivalent planes, use curly braces {hkl}.</li>"
+              ]
+            },
+            {
+              "type": "diagram",
+              "caption": "Key Crystallographic Planes in a Cubic Cell",
+              "description": "(100) · x=1, y=∞, z=∞ · → (1/1,1/∞,1/∞) = (100) · (110) · x=1, y=1, z=∞ · → (1,1,0) · (111) · x=1, y=1, z=1 · → (1,1,1) · [100] · Direction along x-axis · enclosed in [ ]",
+              "imageRef": null
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Families of Planes & Directions</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "Family of planes {hkl} — all crystallographically equivalent planes. {100} includes: (100), (010), (001), (1̄00), (01̄0), (001̄) — the six faces of a cube. Family of directions <uvw> — all equivalent directions. <110> includes: [110],[101],[011],[1̄10],[1̄01],[01̄1],[11̄0],[101̄],[011̄] — 12 directions Planar density = number of atoms centred on plane / area of plane in unit cell Linear density = number of atoms centred on direction / length of direction"
+            },
+            {
+              "type": "insight",
+              "text": "⚠ Common Mistake Planes use ( ) parentheses. Directions use [ ] square brackets. Families of planes use { } curly braces. Families of directions use < > angle brackets. Mixing these up costs marks. Also — a negative intercept is written as a bar OVER the number, not as a minus sign before it. You cannot write (-1,0,0); you write (1̄00)."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "Sketch (100),(101),(111),[100] and 011. Determine the atomic packing density of an FCC cell. (2022/23, 2019/20, 2015/16)",
+                "Write down 2 members of {101} and 2 members of <101>. In one sentence give why icosahedra are not packing polyhedral. (2021/22)",
+                "Define crystal defects. List all 4 types with their dimensions and an example of each. (2021/22, 2019/20, 2015/16)",
+                "Sketch a Schottky and a Frenkel defect. Which is more common and why? (2014/15)",
+                "Determine whether [123] and [2 0 1] will interact to produce another dislocation. (2021/22, 2019/20)",
+                "Discuss dislocations in detail — list 4 properties of an edge dislocation. (2021/22, 2019/20)"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Miller Indices — Planes\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Crystal Defects",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Crystal Defects",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>A <strong>crystalline defect</strong> is the lattice irregularity having one or more of its dimensions on the order of an atomic diameter. The imperfection or irregularity of the geometrical arrangement of atoms in a crystalline solid is called a crystalline defect.</p>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "Type",
+                "Dimensions",
+                "Definition",
+                "Example",
+                "Point Defect",
+                "0D (a point)",
+                "Interruption in the regularity of a crystal lattice at a point",
+                "Vacancy, Interstitial, Impurity",
+                "Line Defect",
+                "1D (a line)",
+                "Interruption in the regularity of a crystal lattice along a line",
+                "Edge dislocation, Screw dislocation",
+                "Surface Defect",
+                "2D (a surface)",
+                "Interruption in the regularity over an area",
+                "Grain boundary, Twin boundary",
+                "Volume Defect",
+                "3D (a volume)",
+                "Interruption in the regularity in some volume",
+                "Voids, Cracks, Inclusions"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Number of Vacancies — Equilibrium</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>N<sub>v</sub> = N · e<sup>−Q<sub>v</sub>/kT</sup></div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "N = total number of atomic sites (atoms/m³) · Q v = energy required for vacancy formation (eV) · k = Boltzmann's constant = 1.38 × 10⁻²³ J/(atom·K) or 8.62 × 10⁻⁵ eV/atom·K · T = temperature in Kelvin Example: Find equilibrium vacancies for copper at 1000°C T = 1273 K, Q v = 0.9 eV/atom, atomic weight = 63.5 g/mol, density = 8.4 g/cm³ N = (density × N A ) / atomic weight = (8.4 × 6.02×10²³) / 63.5 = 7.96 × 10²² atoms/cm³ N v = 7.96×10²² × e^(−0.9/8.62×10⁻⁵×1273) = 2.2 × 10¹⁸ vacancies/cm³"
+            },
+            {
+              "type": "diagram",
+              "caption": "Point Defects — Vacancy, Interstitial, Schottky & Frenkel",
+              "description": "Vacancy · empty · Interstitial · Schottky (ionic) · + · − · + · − · − · + · − · Both + and − vacancies · Frenkel (ionic) · + · − · + · − · + · − · Cat-ion moves to interstitial",
+              "imageRef": null
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Dislocation Interaction Rule</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "Two dislocations can interact to form a third if the reaction LOWERS energy. Criterion: |b₃|² < |b₁|² + |b₂|² (energy of resultant < energy of reactants) Example: Can [123] and [2 0 1] interact? b₃ = [123] + [201] = [3 2 4] |b₁|² = 1²+2²+3² = 14 · |b₂|² = 2²+0²+1² = 5 · |b₁|²+|b₂|² = 19 |b₃|² = 3²+2²+4² = 9+4+16 = 29 Since 29 > 19, interaction is NOT possible (would increase energy). Example: Can [1̄35] and [134] interact? b₃ = [-1+1, 3+3, 5+4] = [0 6 9] — check: 0+36+81=117 > (1+9+25)+(1+9+16)=61 → NOT possible."
+            },
+            {
+              "type": "insight",
+              "text": "Dislocation interaction questions have appeared in 2011, 2015, 2019 and 2021 papers. Always: (1) add the Burgers vectors to get b₃; (2) calculate |b|² for each; (3) compare sum of reactants to product. If product energy > sum of reactants → NOT possible. State what reaction IS possible if asked."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Crystal Defects\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Science of Materials"
+}

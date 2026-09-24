@@ -1,0 +1,202 @@
+{
+  "course": "CVE 214",
+  "week": 1,
+  "title": "Definition, Importance & Scope of Hydrology",
+  "subtitle": "This is the foundation week. You need to know what hydrology is, why engineers care about it, what questions it answers, and what its different branches cover. Definition questions from this chapter appear in almost every exam.",
+  "learningOutcome": "This is the foundation week. You need to know what hydrology is, why engineers care about it, what questions it answers, and what its different branches cover. Definition questions from this chapter appear in almost every exam.",
+  "metaChips": [
+    "CVE 214",
+    "Week 1"
+  ],
+  "tags": [
+    "Hydrology",
+    "Hydrometeorology",
+    "Hydrogeology",
+    "Scope",
+    "Engineering applications"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "What is Hydrology?",
+      "abbr": "CVE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "What is Hydrology?",
+          "abbr": "CVE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Hydrology is the science of water on Earth — where it comes from, where it goes, and how it behaves in every state (liquid, solid, vapour). It doesn't just look at rivers and rain. It tracks water through the air, over land surfaces, and through the underground layers of the earth.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam-ready definition (word-for-word from textbook):</strong> <div>Hydrology is the science that deals with the process governing the depletion and replenishment of the water resources on the earth i.e. over and within the surface of earth in any state of its existence. It is concerned with the origin, distribution and transportation of water through the air, over the ground surface and through the strata of the earth.</div>"
+            },
+            {
+              "type": "analogy",
+              "text": "Every time there's a flood in Lagos and engineers ask \"how much water can this drainage channel handle?\" — that's hydrology. Every dam, every water treatment plant, every irrigation scheme in Nigeria was designed using hydrological data. Without hydrology, engineers would be guessing."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Define hydrology. State its importance in engineering. <span>Exercise 1 Q1</span></li>",
+                "<li>Enumerate the four major branches (areas) of hydrology, stating the significance of each.</li>",
+                "<li>What is hydrometeorology? List the various components of a hydrometeorological station.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "State the textbook definition — Exam-ready definition (word-for-word from textbook).",
+                "answer": "<div>Hydrology is the science that deals with the process governing the depletion and replenishment of the water resources on the earth i.e. over and within the surface of earth in any state of its existence. It is concerned with the origin, distribution and transportation of water through the air, over the ground surface and through the strata of the earth.</div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Importance of Hydrology in Engineering",
+      "abbr": "CVE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Importance of Hydrology in Engineering",
+          "abbr": "CVE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Hydrology is not just a science — it's a tool. Engineers use it to design structures that deal with water. If you get the hydrology wrong, bridges wash away, dams overflow, and cities flood.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Engineering applications (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>1. Design and operation of hydraulic structures</div>",
+                "<div>2. Irrigation and flood control works</div>",
+                "<div>3. Power projects and hydroelectric schemes</div>",
+                "<div>4. Municipal and industrial water supply schemes</div>",
+                "<div>5. Navigational works</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "A knowledge of hydrology is of basic importance in practically all problems that involve the use and supply of water for any purpose whatsoever — including forestry, agriculture and other branches of natural science."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Typical questions a hydrologist answers (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>1. Is the flow of this stream sufficient to meet the needs of a city, industry, irrigation project, or power development?</div>",
+                "<div>2. Would a storage reservoir be required and if so, what reservoir capacity is needed?</div>",
+                "<div>3. In the design of a flood protection system, bridge, culvert or spillway for a dam — what is the maximum flood that may be expected to occur with any specified frequency?</div>",
+                "<div>4. What would be the effect of draining an upland area or a swampy region upon the flow of the stream?</div>",
+                "<div>5. How would certain changes in land use or the removal of forest affect the ground water level or stream flow?</div>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Importance of Hydrology in Engineering\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Areas (Branches) of Hydrology & Scope",
+      "abbr": "CVE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "Areas (Branches) of Hydrology & Scope",
+          "abbr": "CVE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<strong>Four areas of hydrology (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>1. Rainfall and other forms of precipitation — their causes, origin, occurrence, magnitude, distribution and variation.</div>",
+                "<div>2. Return of moisture to the atmosphere by evaporation, transpiration and sublimation. (Evaporation + transpiration = evapotranspiration)</div>",
+                "<div>3. Surface water hydrology — deals with run-off or stream flow and its variations, storage in ponds, lakes and reservoir, physical features of river and lake systems.</div>",
+                "<div>4. Sub-surface or ground water hydrology — considers origin, nature and occurrences of sub-surface water, its infiltration into the ground, passage or percolation through open formations and seepage.</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Scope of hydrology — what it helps us know (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>(i) The maximum probable flood that may occur at a given site and its frequency — required for safe design of drains, bridges, culverts, dams, reservoirs, channels and other flood control structures.</div>",
+                "<div>(ii) The water yield from a basin — its occurrence, quality and frequency — necessary for design of dams, municipal water supply, water power, river navigation.</div>",
+                "<div>(iii) The ground water development — knowledge of hydrogeology of the area, formation soil, recharge facilities like streams and reservoirs, rainfall pattern, climate, cropping pattern.</div>",
+                "<div>(iv) The maximum intensity of storm and its frequency for the design of a drainage project in the area.</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Hydrometeorology — definition (from textbook):</strong> <div>Hydrometeorology is the science which deals with the movement of water and water vapour in the atmosphere.</div>"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Students confuse hydrometeorology with hydrogeology. Hydrometeorology = water in the ATMOSPHERE (rain, clouds, humidity). Hydrogeology = water UNDERGROUND (aquifers, groundwater). They are related but different disciplines."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "State the textbook definition — Hydrometeorology — definition (from textbook).",
+                "answer": "<div>Hydrometeorology is the science which deals with the movement of water and water vapour in the atmosphere.</div>"
+              },
+              {
+                "type": "reveal",
+                "question": "[Q1] Define hydrology in your own words, then write the textbook definition.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] List four engineering projects where hydrology is essential.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] Distinguish between hydrometeorology, hydrogeology and hydrology. What does each study?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Engineering Hydrology"
+}

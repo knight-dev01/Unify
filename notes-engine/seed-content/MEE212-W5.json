@@ -1,0 +1,152 @@
+{
+  "course": "MEE 212",
+  "week": 5,
+  "title": "Flywheel — Fluctuation of Energy & Speed",
+  "subtitle": "This week is where the numbers come in. You'll calculate exactly how much energy the flywheel stores, how much the speed fluctuates, and how to size a flywheel for a given engine. The coefficient of fluctuation of energy and coefficient of fluctuation of speed are the two key numbers.",
+  "learningOutcome": "This week is where the numbers come in. You'll calculate exactly how much energy the flywheel stores, how much the speed fluctuates, and how to size a flywheel for a given engine. The coefficient of fluctuation of energy and coefficient of fluctuation of speed are the two key numbers.",
+  "metaChips": [
+    "MEE 212",
+    "Week 5"
+  ],
+  "tags": [
+    "ΔE",
+    "Coefficient of fluctuation of energy",
+    "Coefficient of fluctuation of speed",
+    "Moment of inertia",
+    "Radius of gyration"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Maximum Fluctuation of Energy (ΔE)",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Maximum Fluctuation of Energy (ΔE)",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>The turning moment diagram shows areas above and below the mean torque line. Areas above mean the engine is producing more than needed (storing energy in flywheel). Areas below mean the flywheel is releasing energy. The difference between the maximum and minimum energy levels during a cycle is called the maximum fluctuation of energy, ΔE.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Maximum fluctuation of energy</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>ΔE = E_max − E_min</div>",
+                "<div>ΔE = ½I(ω₁² − ω₂²) = Iω(ω₁ − ω₂) = Iω² · Cs</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "I = mass moment of inertia (kg·m²) · ω = mean angular speed (rad/s) · ω₁ = max speed · ω₂ = min speed · Cs = coefficient of fluctuation of speed"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Coefficient of fluctuation of speed (Cs)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>Cs = (N₁ − N₂) / [(N₁ + N₂)/2] [when given in rpm]</div>",
+                "<div>or Cs = 2(ω₁ − ω₂) / (ω₁ + ω₂) [when given in rad/s]</div>",
+                "<div>or Cs = 2(v₁ − v₂) / (v₁ + v₂) [when given as linear velocity]</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "N₁ = max speed (rpm) · N₂ = min speed (rpm) · Coefficient of Steadiness = 1/Cs"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Coefficient of fluctuation of energy (C_E)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>C_E = ΔE / (I · ω²) = ΔE / (T_max · θ)</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "ΔE = maximum fluctuation of energy · I·ω² = total work done per cycle"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Energy stored in flywheel & moment of inertia</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>E = ½Iω²</div>",
+                "<div>I = mk²</div>",
+                "<div>ΔE = mk²ω² · Cs = 2·E·Cs</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "m = mass of flywheel (kg) · k = radius of gyration (m) · I = mk² (kg·m²)"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Power of the engine</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>P = Tₘ · ω = Tₘ · 2πN/60</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "Tₘ = mean torque (N·m) · ω = angular speed (rad/s) · N = speed (rpm)"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — When tracking energy on the TMD, students forget that energy at A = 0 (set as reference). Energy ACCUMULATES as you add areas. Areas above mean line are positive (+), areas below are negative (−). Get one sign wrong and your ΔE is totally wrong."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Given a TMD with areas, find ΔE (max fluctuation of energy) and coefficient of fluctuation of energy C_E.</li>",
+                "<li>Calculate coefficient of fluctuation of speed C_s given N₁, N₂ or ω₁, ω₂.</li>",
+                "<li>Find the energy stored in a flywheel given mass and radius of gyration. <span>Common exam Q</span></li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1] A flywheel has m=36kg, k=0.15m, N=1800rpm. Calculate I and ω.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] Define coefficient of fluctuation of speed. What is the coefficient of steadiness?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] ΔE = 685J, I = 0.81 kg·m², ω = 188.5 rad/s. Find Cs and hence N₁ and N₂ if mean N = 1800 rpm.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Theory of Machines"
+}

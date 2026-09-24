@@ -1,0 +1,77 @@
+{
+  "course": "MEE 212",
+  "week": 12,
+  "title": "Belt Drive Analysis & Full Worked Examples",
+  "subtitle": "Final week. This is pure problem-solving — taking everything from Week 11 and applying it to find belt width, power, tensions, and speed. The full worked example from your notes (pump driven by electric motor) is walked through step by step.",
+  "learningOutcome": "Final week. This is pure problem-solving — taking everything from Week 11 and applying it to find belt width, power, tensions, and speed. The full worked example from your notes (pump driven by electric motor) is walked through step by step.",
+  "metaChips": [
+    "MEE 212",
+    "Week 12"
+  ],
+  "tags": [
+    "Belt width",
+    "Centrifugal tension",
+    "Power",
+    "Tension ratio",
+    "Worked example"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Full Belt Drive Problem — Step by Step",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Full Belt Drive Problem — Step by Step",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "analogy",
+              "text": "Belt drives are on almost every machine around you — the alternator belt in a car engine, the conveyor belt in a factory, the drive belt in a washing machine. Every time you calculate belt width b, you're essentially asking: \"How wide does this belt need to be to carry this much power without snapping?\" That's exactly what you just solved."
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Using μ_s×θ_s vs μ_L×θ_L — you must pick the combination that gives the smaller value of e^(μθ), because that's the condition where slip happens first. Students often just use μ_s×θ_s without checking both. Always compute both and use the smaller one."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Full belt drive problem: find angle of contact, belt velocity, centrifugal tension, tight/slack side tensions, and belt width. <span>Common exam Q</span></li>",
+                "<li>Apply T₁/T₂ = e^(μθ) correctly using the smaller pulley's angle.</li>",
+                "<li>Find belt width b from the mass-per-unit-length expression and power equation.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1] A belt drive has T₁=800N, T₂=300N, V=15m/s. Find the power transmitted.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] What is centrifugal tension Tc? Why does it reduce the effective tension available for power transmission?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] Two pulleys: D_s=400mm, D_L=800mm, C=1500mm. μ=0.3. Find θ_s in radians and the tension ratio T₁/T₂ for an open belt.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Theory of Machines"
+}

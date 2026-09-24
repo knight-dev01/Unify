@@ -1,0 +1,149 @@
+{
+  "course": "CVE 214",
+  "week": 4,
+  "title": "Precipitation — Definition, Forms & Types",
+  "subtitle": "Precipitation is any water that falls from the sky — not just rain. This week you learn the definition, all 10 forms of precipitation (rain, snow, hail, frost, fog, etc.) and the 4 mechanisms that cause precipitation to occur.",
+  "learningOutcome": "Precipitation is any water that falls from the sky — not just rain. This week you learn the definition, all 10 forms of precipitation (rain, snow, hail, frost, fog, etc.) and the 4 mechanisms that cause precipitation to occur.",
+  "metaChips": [
+    "CVE 214",
+    "Week 4"
+  ],
+  "tags": [
+    "Precipitation",
+    "Rain",
+    "Snow",
+    "Hail",
+    "Convectional",
+    "Orographic",
+    "Cyclonic",
+    "Frontal"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Definition & Forms of Precipitation",
+      "abbr": "CVE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Definition & Forms of Precipitation",
+          "abbr": "CVE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam-ready definition (from textbook):</strong> <div>Precipitation is falling moisture from the atmosphere to the earth as a result of air cooling and saturation.</div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>10 forms of precipitation (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>1. Drizzle — tiny liquid droplets usually with diameter between 0.1 and 0.5mm with such slow settling rates that they occasionally appear to float.</div>",
+                "<div>2. Rain — consists of water drops mostly larger than 0.5mm in diameter. Rainfall usually refers to amount of liquid precipitation. Three intensities: Light (rates of fall up to 2.5mm/hr), Moderate (2.8–7.6mm/hr), Heavy (rate of fall more than 7.6mm/hr).</div>",
+                "<div>3. Snow — precipitation in the form of ice crystals. Snow crystals can reach the ground but usually a number of them coalesce (unite) and fall as snow flakes.</div>",
+                "<div>4. Hail — precipitation in the form of balls or irregular lumps of ice over 5mm in diameter.</div>",
+                "<div>5. Sleet — raindrops frozen while falling. Also when rain falls through air below 32°F, smaller grains of ice known as sleet or ice pellets are formed.</div>",
+                "<div>6. Dew — moisture condensed from the atmosphere in small drops upon cool surfaces.</div>",
+                "<div>7. Glaze — freezing of drizzle or rain when they come in contact with cold objects.</div>",
+                "<div>8. Frost — a feathery deposit of ice formed on the ground or on the surface of exposed objects by dew or water vapour that has frozen.</div>",
+                "<div>9. Fog — a thin cloud formed by condensation of atmospheric water (interfering with visibility).</div>",
+                "<div>10. Mist — a very thin fog.</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Define precipitation. List and describe the forms of precipitation. <span>Ch. 4 Q</span></li>",
+                "<li>Explain with diagrams the four types of precipitation.</li>",
+                "<li>Distinguish between drizzle and rain. What are the three intensities of rain?</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "State the textbook definition — Exam-ready definition (from textbook).",
+                "answer": "<div>Precipitation is falling moisture from the atmosphere to the earth as a result of air cooling and saturation.</div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Types of Precipitation (by mechanism)",
+      "abbr": "CVE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Types of Precipitation (by mechanism)",
+          "abbr": "CVE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Precipitation doesn't just happen randomly — air has to be forced upward and cooled so it can't hold its moisture anymore. There are four main ways this happens:</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>4 types of precipitation (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>1. Convectional (Thermal/Convection) Precipitation — occurs in the form of local whirling thunderstorm and is typical of the tropics. The air close to the warm earth gets heated and rises due to its lower density; cools adiabatically to form a cauliflower-shaped cloud which finally bursts into a thunderstorm. Accompanied by destructive winds → called tornadoes.</div>",
+                "<div>2. Orographic Precipitation — results from mechanical lifting of air over a mountain barrier; causes heavy precipitation on the windward side.</div>",
+                "<div>3. Cyclonic Precipitation — results from lifting of moist air converging into a low pressure belt, i.e. due to pressure differences created by the unequal heating of the earth's surface.</div>",
+                "<div>4. Frontal Precipitation — caused when two air masses with contrasting temperatures and densities clash with each other and consequently condensation and precipitation occur. Surface of contact is called a front. Cold air drives out warm air → cold front; warm air replaces retreating cold air → warm front.</div>"
+              ]
+            },
+            {
+              "type": "diagram",
+              "caption": "Orographic precipitation — air lifted over mountains",
+              "description": "Mountain · Moist air → · 🌧 · Heavy rain · (windward) · Dry / Rain shadow · (leeward side) · Cloud forms",
+              "imageRef": null
+            },
+            {
+              "type": "analogy",
+              "text": "The heavy rainfall in western Nigeria (Lagos, Ibadan) compared to the drier north is partly orographic — moisture-laden winds from the Atlantic hit highland areas and dump their rain. The Jos Plateau gets much more rainfall than flat areas at the same latitude for exactly this reason."
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Confusing convectional with cyclonic precipitation. Convectional = LOCAL heating causes air to rise (thunderstorm scale). Cyclonic = large-scale LOW PRESSURE convergence forces air upward (weather system scale, hundreds of km wide). Tornadoes = convectional. Monsoon rains = often cyclonic."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1] List the 10 forms of precipitation. What distinguishes drizzle from rain?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] Describe orographic precipitation with the help of a sketch.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] A cold front approaches a warm, moist air mass. Describe what happens at the surface of contact and what type of precipitation results.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Engineering Hydrology"
+}

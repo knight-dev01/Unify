@@ -1,0 +1,138 @@
+{
+  "course": "MEE 212",
+  "week": 10,
+  "title": "Clutches",
+  "subtitle": "A clutch connects and disconnects power between two shafts. This week covers the definition, components, advantages/disadvantages, and the most important topic — calculating maximum pressure, minimum pressure and average pressure in a plate clutch under two theories: uniform wear and uniform pressure.",
+  "learningOutcome": "A clutch connects and disconnects power between two shafts. This week covers the definition, components, advantages/disadvantages, and the most important topic — calculating maximum pressure, minimum pressure and average pressure in a plate clutch under two theories: uniform wear and uniform pressure.",
+  "metaChips": [
+    "MEE 212",
+    "Week 10"
+  ],
+  "tags": [
+    "Clutch",
+    "Plate clutch",
+    "Uniform wear",
+    "Uniform pressure",
+    "Frictional torque",
+    "Mean radius"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Clutch — Definition, Components & Pressure Analysis",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Clutch — Definition, Components & Pressure Analysis",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam-ready definition (from notes):</strong> <div>A clutch is a mechanical device that connects and disconnects the rotating shaft enabling the interaction of power transmission between 2 rotating components and engages 2 gear-changing. They help distribute load evenly.</div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Components of a clutch (7)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>1. Clutch disk · 2. Pressure plate · 3. Flywheel · 4. Release bearing · 5. Spring · 6. (additional components per system)</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Advantages & Disadvantages (from notes)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>Advantages: Smooth engagement · Solid connection · User friendly & easy to engage · Transmits partial power</div>",
+                "<div>Disadvantages: Friction materials overheat · Burnout</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Plate clutch pressure analysis — Uniform Wear Theory</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>C_mi = P_max × r₂ (constant)</div>",
+                "<div>P_max = C_mi / r₂ = kl / [2π(r₁ − r₂) × r₂]</div>",
+                "<div>P_min = C_mi / r₁</div>",
+                "<div>P_ave = kl / [π(r₁² − r₂²)]</div>",
+                "<div>Mean radius R = (r₁ + r₂) / 2 [Uniform wear]</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "r₁ = outer radius (mm) · r₂ = inner radius (mm) · kl = total axial force (N) = F"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Frictional Torque</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>T = nμWR</div>",
+                "<div>Mean radius R = 2/3 × [(r₁³ − r₂³)/(r₁² − r₂²)] [Uniform pressure]</div>",
+                "<div>Mean radius R = (r₁ + r₂)/2 [Uniform wear]</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "n = number of pairs of friction surfaces · μ = coefficient of friction · W = total axial force · R = mean radius"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Using R = (r₁+r₂)/2 for uniform PRESSURE — that's wrong. R = (r₁+r₂)/2 is for uniform WEAR only. For uniform pressure, R = 2/3 × [(r₁³−r₂³)/(r₁²−r₂²)]. Mixing these up costs big marks."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Define a clutch. State its 7 components.</li>",
+                "<li>Find P_max, P_min, P_ave for a plate clutch given F, r₁, r₂.</li>",
+                "<li>Calculate frictional torque using T = nμWR. Distinguish uniform wear from uniform pressure theory.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "State the textbook definition — Exam-ready definition (from notes).",
+                "answer": "<div>A clutch is a mechanical device that connects and disconnects the rotating shaft enabling the interaction of power transmission between 2 rotating components and engages 2 gear-changing. They help distribute load evenly.</div>"
+              },
+              {
+                "type": "reveal",
+                "question": "[Q1] Define a clutch. List 4 components.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] For uniform wear theory, write the expressions for P_max, P_min and mean radius R.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] A clutch has r₁=120mm, r₂=60mm, F=5kN, μ=0.3, n=2 surfaces. Find frictional torque using uniform wear theory.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Theory of Machines"
+}

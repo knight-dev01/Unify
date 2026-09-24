@@ -1,0 +1,112 @@
+{
+  "course": "MEE 212",
+  "week": 2,
+  "title": "Relative Velocity Method",
+  "subtitle": "Here you learn how to find the velocity of a point by relating it to another known point. This \"relative velocity\" idea is the engine behind all graphical mechanism analysis. Master this and acceleration problems become much easier too.",
+  "learningOutcome": "Here you learn how to find the velocity of a point by relating it to another known point. This \"relative velocity\" idea is the engine behind all graphical mechanism analysis. Master this and acceleration problems become much easier too.",
+  "metaChips": [
+    "MEE 212",
+    "Week 2"
+  ],
+  "tags": [
+    "Relative velocity",
+    "Velocity diagram",
+    "4-bar mechanism",
+    "Angular velocity"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "The Relative Velocity Principle",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "The Relative Velocity Principle",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Here's the key idea: if you know the velocity of point A, you can find the velocity of point B by adding the velocity of B <em>relative to</em> A. It's like saying: \"I know how fast the bus is going. To find how fast someone running on the bus is going, I add their running speed to the bus speed.\"</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Relative velocity equations</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>V_BA = V_B − V_A</div>",
+                "<div>∴ V_B = V_A + V_BA</div>",
+                "<div>V_B = (O₂B) × ω_f</div>",
+                "<div>ω_f = V_B / (O₂B)</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "V_BA = velocity of B relative to A · V_A = absolute velocity of A · V_B = absolute velocity of B · ω_f = angular velocity of the link containing B · O₂B = length of that link"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Angular velocity of a link (from velocity diagram)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>ω_a = V_BA / (AB)</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "V_BA = length of the relative velocity vector in the diagram · AB = length of the actual link"
+            },
+            {
+              "type": "diagram",
+              "caption": "4-bar mechanism velocity diagram",
+              "description": "MECHANISM (space diagram) · O₁ · O₂ · A · B · ω₂ (input) · VELOCITY DIAGRAM · o (pole) · oa = V_A · ab = V_BA · ob = V_B",
+              "imageRef": null
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Not converting rev/min to rad/s before calculating. Always do: ω = 2πN/60. If N = 150 rpm → ω = 15.71 rad/s, NOT 150."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>From a given mechanism, determine velocity of a point and angular speed of a link using the relative velocity method.</li>",
+                "<li>Draw the velocity diagram for a 4-bar mechanism.</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1] Write the relative velocity equation. What does V_BA mean in plain language?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] A crank rotates at 100 rad/s. The crank length is 0.075m. Find V_A.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] In a 4-bar mechanism, V_A = 7.5 m/s and V_BA = 5.625 m/s (from diagram). If BC = 0.08m, find the angular velocity of link BC.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Theory of Machines"
+}

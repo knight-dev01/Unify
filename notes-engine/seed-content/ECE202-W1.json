@@ -1,0 +1,225 @@
+{
+  "course": "ECE 202",
+  "week": 1,
+  "title": "Simultaneous Linear Equations",
+  "subtitle": "A system of simultaneous equations means several equations that must all be satisfied at the same time. The key skill this week: writing any system as the matrix equation AX = C, and building the augmented matrix [A|C] you'll need for every elimination method.",
+  "learningOutcome": "A system of simultaneous equations means several equations that must all be satisfied at the same time. The key skill this week: writing any system as the matrix equation AX = C, and building the augmented matrix [A|C] you'll need for every elimination method.",
+  "metaChips": [
+    "ECE 202",
+    "Week 1"
+  ],
+  "tags": [
+    "Coefficient matrix A",
+    "Augmented matrix [A|C]",
+    "Unique solution",
+    "No solution",
+    "Infinite solutions",
+    "Permissible row operations"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Writing a System as AX = C",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Writing a System as AX = C",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Pull the coefficients into matrix A, the unknowns into column vector X, and the right-hand side into column vector C. Then append C to A to form the augmented matrix — this is the only thing you write when starting any elimination method.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<span>2019/2020 Q1c — Build the augmented matrix</span>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>01</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>The system</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>i₁ + 3i₂ - 2i₃ = 6 ... (equation 1) 4i₁ + 5i₂ + 2i₃ = 3 ... (equation 2) i₁ + 3i₂ + 4i₃ = 7 ... (equation 3)</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>02</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Extract coefficient matrix A — coefficients only, no constants</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>i₁ i₂ i₃ A = [ 1 3 -2 ] ← eq 1 [ 4 5 2 ] ← eq 2 [ 1 3 4 ] ← eq 3</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>03</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Build augmented matrix [A | C] — append the RHS constants</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>i₁ i₂ i₃ | RHS [A | C] = [ 1 3 -2 | 6 ] [ 4 5 2 | 3 ] [ 1 3 4 | 7 ]</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div>The vertical bar is just notation. Everything to its left came from A; everything to its right came from C.</div>"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Starting row operations on just A without the constants column. Every operation you do must be applied to the full row including the augmented column — otherwise your final answers will be wrong."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "Form A and A_b for: i₁+3i₂−2i₃=6, 4i₁+5i₂+2i₃=3, i₁+3i₂+4i₃=7. Find ranks and nature of solution. (2019/2020 Q1c, 12 marks)",
+                "State conditions for (i) no solution (ii) infinite solutions (iii) unique solution. (2019/2020 Q1b, 5 marks)"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Writing a System as AX = C\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Three Types of Solutions",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Three Types of Solutions",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Before solving, you can already tell what kind of solution you'll get just by comparing the ranks of A and [A|C].</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div> <div>Solution Conditions — based on Rank</div> <div> <div><div>Unique solution</div><div>rank(A) = rank([A|C]) = n (n = number of unknowns). Lines cross at one point.</div></div> <div><div>No solution</div><div>rank([A|C]) > rank(A). System is inconsistent — equations contradict each other. Parallel lines.</div></div> <div><div>Infinite solutions</div><div>rank(A) = rank([A|C]) n. Equations are not fully independent. Same line (one is a multiple of another).</div></div> </div> </div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<span>2019/2020 Q1c — Determine nature of solution using rank</span>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>01</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Row reduce A to find rank(A)</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>A = [ 1 3 -2 ] [ 4 5 2 ] [ 1 3 4 ] R₂ → R₂ - 4·R₁: [4-4, 5-12, 2+8] = [0, -7, 10] R₃ → R₃ - R₁: [1-1, 3-3, 4+2] = [0, 0, 6] A becomes: [ 1 3 -2 ] [ 0 -7 10 ] [ 0 0 6 ] ← 3 non-zero rows → rank(A) = 3</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>02</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Apply same operations to [A|C] to find rank([A|C])</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>[A|C] = [ 1 3 -2 | 6 ] [ 4 5 2 | 3 ] [ 1 3 4 | 7 ] R₂ → R₂ - 4·R₁: → [0, -7, 10, | -21] R₃ → R₃ - R₁: → [0, 0, 6, | 1] [A|C] becomes: [ 1 3 -2 | 6 ] [ 0 -7 10 | -21] [ 0 0 6 | 1 ] → rank([A|C]) = 3</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>03</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Compare and conclude</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>rank(A) = 3 rank([A|C]) = 3 n = 3 (unknowns: i₁, i₂, i₃) rank(A) = rank([A|C]) = n = 3</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div>∴ UNIQUE SOLUTION — the system has exactly one answer</div>"
+            },
+            {
+              "type": "insight",
+              "text": "2019/2020 Q1c is 12 marks. Correctly forming [A|C] and finding both ranks earns partial credit even if you don't solve the full system."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: this term.",
+                "answer": "<div> <div>Solution Conditions — based on Rank</div> <div> <div><div>Unique solution</div><div>rank(A) = rank([A|C]) = n (n = number of unknowns). Lines cross at one point.</div></div> <div><div>No solution</div><div>rank([A|C]) > rank(A). System is inconsistent — equations contradict each other. Parallel lines.</div></div> <div><div>Infinite solutions</div><div>rank(A) = rank([A|C]) n. Equations are not fully independent. Same line (one is a multiple of another).</div></div> </div> </div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Three Permissible Row Operations",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "Three Permissible Row Operations",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>These are the only operations you're allowed to do to a matrix. They don't change the solution — they just reorganise how the equations are written. Every Gaussian and Gauss-Jordan step is one of these three.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div> <div>Three Permissible Operations</div> <div> <div><div>Rᵢ ↔ Rⱼ</div><div>Swap rows i and j. The order of equations doesn't affect the solution.</div></div> <div><div>Rᵢ → k · Rᵢ</div><div>Multiply every entry in row i by a non-zero constant k. k must be non-zero — multiplying by 0 destroys the equation.</div></div> <div><div>Rᵢ → Rᵢ + k · Rⱼ</div><div>Add k times row j to every entry in row i. This is how you create zeros in specific columns.</div></div> </div> </div>"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — When doing R₂ → R₂ + k·R₁ , applying it to only the first few columns and forgetting the augmented constants column. Every entry in the row — including the constant after the vertical bar — must be updated."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: this term.",
+                "answer": "<div> <div>Three Permissible Operations</div> <div> <div><div>Rᵢ ↔ Rⱼ</div><div>Swap rows i and j. The order of equations doesn't affect the solution.</div></div> <div><div>Rᵢ → k · Rᵢ</div><div>Multiply every entry in row i by a non-zero constant k. k must be non-zero — multiplying by 0 destroys the equation.</div></div> <div><div>Rᵢ → Rᵢ + k · Rⱼ</div><div>Add k times row j to every entry in row i. This is how you create zeros in specific columns.</div></div> </div> </div>"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Engineering Mathematics"
+}

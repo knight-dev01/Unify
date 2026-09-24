@@ -1,0 +1,386 @@
+{
+  "course": "MEE 352",
+  "week": 9,
+  "title": "Solved Examples & Numerical Problems",
+  "subtitle": "Solar Calculations, Wind Power, Biogas, Tidal & Thermal Problems",
+  "learningOutcome": "By the end of this week, you should be able to solve numerical problems on solar time, beam radiation angles, wind power density, biogas digester design, and tidal energy generation.",
+  "metaChips": [
+    "MEE 352",
+    "Week 9"
+  ],
+  "tags": [
+    "Solar Time",
+    "Declination",
+    "Cooper Equation",
+    "Wind Power",
+    "Biogas Digester",
+    "Tidal Energy",
+    "Flat Plate Collector",
+    "Thermal Power"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Local Solar Time and Declination",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Local Solar Time and Declination",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Problem:</strong> Determine the local solar time (LST) and declination at a location latitude 23° 15'N, longitude 77° 30' E at 12.30 IST on June 19. Equation of time correction = – (1'01\") from standard table.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Solution:</strong> LST = IST – (Standard time longitude – Longitude of location) + Equation of time correction</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>LST = 12ʰ 30' – 4(82°30' – 77°30') – 1'01\" = 12ʰ 8ᵐ 59″</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>Declination from Cooper's equation: δ(in degree) = 23.45 sin{(360/365)(284 + n)}</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>Where n = days of the year. For June 19: n = 31+28+31+30+31+19 = 170 days</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>δ = 23.45 sin{(360/365)(284+170)} = 23.45 sin 86° = <strong>23.43°</strong></p>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Local Solar Time and Declination\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "What are the key facts, figures, and definitions from Local Solar Time and Declination?",
+          "answer": "<div>Review the notes above. Focus on: specific numerical values, definitions, classification schemes, and the logic connecting ideas in <strong>Local Solar Time and Declination</strong>.</div>"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Beam Radiation Angle on Flat Plate Collector",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Beam Radiation Angle on Flat Plate Collector",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Problem:</strong> Calculate the angle made by beam radiation with the normal to a flat plate collector on December 1, at 9.00 am, solar time for a location at 28°35'N. The collector is tilted to an angle of latitude plus 10° with the horizontal and is pointing due south.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Solution:</strong> cos θ_T = cos(φ – s) cos δ cos w + sin(φ + s) sin δ</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>Declination from Cooper equation on December 1, n = 335:</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>δ = 23.45 sin{(360/365)(284+335)} = 22.11°</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>Hour angle w corresponding to 9.00 am = 45°</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>cos θ_T = cos10° cos22.11° cos45° + sin22.11° sin10° = 0.71 ∴ θ_T = <strong>44.72°</strong></p>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Beam Radiation Angle on Flat Plate Collector\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "What are the key facts, figures, and definitions from Beam Radiation Angle on Flat Plate Collector?",
+          "answer": "<div>Review the notes above. Focus on: specific numerical values, definitions, classification schemes, and the logic connecting ideas in <strong>Beam Radiation Angle on Flat Plate Collector</strong>.</div>"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Wind Power Calculations",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "Wind Power Calculations",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Problem:</strong> Wind at atmospheric pressure and 15°C has velocity of 15 m/s. Turbine diameter = 120 m, operating speed = 40 r.p.m. Calculate: (a) Total power density, (b) Maximum obtainable power density, (c) Reasonable power density (η=35%), (d) Total power, (e) Torque and axial thrust.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Solution:</strong> Air density δ = P/RT = (1.01325 × 10⁵)/(287 × 288) = 1.226 Kg/m³</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>(a) Power density = (1/2gc) ρv₁³ = ½ × 1.226 × 15³ ≅ <strong>2069 W/m²</strong> (b) Max power density = (8/27gc) ρAv₁³ ≅ <strong>1226 W/m²</strong> (c) P/A = η × 2069 = 0.35 × 2069 = <strong>724 W/m²</strong> (d) Total power = 724 × (π/4) × (120)² = <strong>8184 kW</strong> (e) Torque at max efficiency ≅ <strong>55170 Newton</strong> Max axial thrust ≅ <strong>14 × 10⁵ Newton</strong></p>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Wind Power Calculations\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "What are the key facts, figures, and definitions from Wind Power Calculations?",
+          "answer": "<div>Review the notes above. Focus on: specific numerical values, definitions, classification schemes, and the logic connecting ideas in <strong>Wind Power Calculations</strong>.</div>"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Bio-gas Digester Design",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "4.1",
+          "title": "Bio-gas Digester Design",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Problem:</strong> Bio-gas digester for 5 cows. Retention time: 20 days, Temperature: 30°C, Dry matter consumed/day: 2 kg, Bio-gas yield: 0.24 m³/kg, Burner efficiency: 60%, CH₄ proportion: 0.8, Heat of combustion of CH₄: 28 MJ/m³, Density of slurry: 50 kg/m³.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Solution:</strong></p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>Mass of dry input: m₀ = 2 kg/day × 5 = 10 kg/day Fluid volume: V_f = m₀/ρ_m = 10/50 = 0.2 m³/day Digester volume: V_d = 0.2 × 20 = <strong>4.0 m³</strong> (Ans i) Volume of biogas: V_b = 0.24 × 10 = 2.4 m³/day Power = η × H_m × F_m × V_b = 0.6 × 28 × 0.8 × 2.4 = 32.25 MJ/day = <strong>8.8 kWh/day = 370 W</strong> (Ans ii)</p>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Bio-gas Digester Design\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "What are the key facts, figures, and definitions from Bio-gas Digester Design?",
+          "answer": "<div>Review the notes above. Focus on: specific numerical values, definitions, classification schemes, and the logic connecting ideas in <strong>Bio-gas Digester Design</strong>.</div>"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "title": "Tidal Power Plant",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "5.1",
+          "title": "Tidal Power Plant",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Problem:</strong> A tidal power plant of simple single basin type, has a basin area = 30 × 10⁶ m². The tide has a range of 12 m. Turbine stops operating when the head falls below 3 m. Calculate the energy generated in one filling/emptying process, if generating efficiency of turbine is 0.73.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Solution:</strong> The total theoretical work:</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>W = ½gρA(R² – r²) P_av = W/time = gρA(R² – r²)/44,700 = (1/44,700) × 9.8 × 1025 × 30×10⁶ (12² – 3²) watts = 3280.5 × 10⁶ kWh Energy generated = 3280.5 × 10⁶ × 0.73 = <strong>2395 × 10⁶ kWh</strong></p>"
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Tidal Power Plant\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        {
+          "badge": "Review",
+          "question": "What are the key facts, figures, and definitions from Tidal Power Plant?",
+          "answer": "<div>Review the notes above. Focus on: specific numerical values, definitions, classification schemes, and the logic connecting ideas in <strong>Tidal Power Plant</strong>.</div>"
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": [
+      {
+        "number": 1,
+        "question": "In Ex 2.1, what is the calculated LST for the June 19 problem?",
+        "feedback": {
+          "correct": "✓ LST = IST – 4(82°30'–77°30') – 1'01' = 12ʰ 8ᵐ 59″",
+          "wrong": "✗ LST = IST – 4(82°30'–77°30') – 1'01' = 12ʰ 8ᵐ 59″"
+        },
+        "topicRef": "1",
+        "type": "mcq",
+        "options": [
+          "12h 5m 30s",
+          "12h 8m 59s",
+          "12h 10m 0s",
+          "12h 15m 0s"
+        ],
+        "correct": "B"
+      },
+      {
+        "number": 2,
+        "question": "In Cooper's equation, n for June 19 = ________ days.",
+        "feedback": {
+          "correct": "✓ n = 31+28+31+30+31+19 = 170 days (Jan through June 19).",
+          "wrong": "✗ n = 31+28+31+30+31+19 = 170 days (Jan through June 19)."
+        },
+        "topicRef": "2",
+        "type": "fitb",
+        "acceptedAnswers": [
+          "170"
+        ]
+      },
+      {
+        "number": 3,
+        "question": "In Ex 2.3, air density at atmospheric pressure and 15°C is:",
+        "feedback": {
+          "correct": "✓ δ = P/RT = (1.01325×10⁵)/(287×288) = 1.226 Kg/m³",
+          "wrong": "✗ δ = P/RT = (1.01325×10⁵)/(287×288) = 1.226 Kg/m³"
+        },
+        "topicRef": "3",
+        "type": "mcq",
+        "options": [
+          "1.125 kg/m³",
+          "1.226 kg/m³",
+          "1.312 kg/m³",
+          "1.415 kg/m³"
+        ],
+        "correct": "B"
+      },
+      {
+        "number": 4,
+        "question": "In Ex 2.3, the total power density is approximately:",
+        "feedback": {
+          "correct": "✓ Power density = ½ρv₁³ = ½ × 1.226 × 15³ ≅ 2069 W/m²",
+          "wrong": "✗ Power density = ½ρv₁³ = ½ × 1.226 × 15³ ≅ 2069 W/m²"
+        },
+        "topicRef": "4",
+        "type": "mcq",
+        "options": [
+          "1226 W/m²",
+          "1500 W/m²",
+          "2069 W/m²",
+          "2500 W/m²"
+        ],
+        "correct": "C"
+      },
+      {
+        "number": 5,
+        "question": "In Ex 2.7, the digester volume for 5 cows is ________ m³.",
+        "feedback": {
+          "correct": "✓ V_d = Fluid volume × Retention time = 0.2 × 20 = 4.0 m³",
+          "wrong": "✗ V_d = Fluid volume × Retention time = 0.2 × 20 = 4.0 m³"
+        },
+        "topicRef": "5",
+        "type": "fitb",
+        "acceptedAnswers": [
+          "4",
+          "4.0"
+        ]
+      },
+      {
+        "number": 6,
+        "question": "In Ex 2.7, the power available from the biogas digester is:",
+        "feedback": {
+          "correct": "✓ Power = η × H_m × F_m × V_b = 0.6 × 28 × 0.8 × 2.4 = 32.25 MJ/day = 370 W",
+          "wrong": "✗ Power = η × H_m × F_m × V_b = 0.6 × 28 × 0.8 × 2.4 = 32.25 MJ/day = 370 W"
+        },
+        "topicRef": "1",
+        "type": "mcq",
+        "options": [
+          "200 W",
+          "300 W",
+          "370 W",
+          "450 W"
+        ],
+        "correct": "C"
+      },
+      {
+        "number": 7,
+        "question": "In Ex 2.9, the tidal basin area is:",
+        "feedback": {
+          "correct": "✓ The basin area = 30 × 10⁶ m² as stated in the problem.",
+          "wrong": "✗ The basin area = 30 × 10⁶ m² as stated in the problem."
+        },
+        "topicRef": "2",
+        "type": "mcq",
+        "options": [
+          "10 × 10⁶ m²",
+          "20 × 10⁶ m²",
+          "30 × 10⁶ m²",
+          "40 × 10⁶ m²"
+        ],
+        "correct": "C"
+      },
+      {
+        "number": 8,
+        "question": "In Ex 2.9, the energy generated = ________ × 10⁶ kWh.",
+        "feedback": {
+          "correct": "✓ Energy generated = 3280.5 × 10⁶ × 0.73 = 2395 × 10⁶ kWh",
+          "wrong": "✗ Energy generated = 3280.5 × 10⁶ × 0.73 = 2395 × 10⁶ kWh"
+        },
+        "topicRef": "3",
+        "type": "fitb",
+        "acceptedAnswers": [
+          "2395"
+        ]
+      }
+    ]
+  }
+}

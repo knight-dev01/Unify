@@ -1,0 +1,190 @@
+{
+  "course": "ECE 202",
+  "week": 5,
+  "title": "Homogeneous Equations & Rank of a Matrix",
+  "subtitle": "Rank tells you how many independent equations a system actually has. Three methods exist to find it: determinant, linear dependence, and row reduction. The notes ask you to use all three on the same matrix. Homogeneous systems (all RHS = 0) always have x = 0 as a solution — the real question is whether others exist.",
+  "learningOutcome": "Rank tells you how many independent equations a system actually has. Three methods exist to find it: determinant, linear dependence, and row reduction. The notes ask you to use all three on the same matrix. Homogeneous systems (all RHS = 0) always have x = 0 as a solution — the real question is whether others exist.",
+  "metaChips": [
+    "ECE 202",
+    "Week 5"
+  ],
+  "tags": [
+    "Homogeneous: AX = 0",
+    "Trivial solution x = 0",
+    "Rank",
+    "3 methods",
+    "Non-zero rows after reduction"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Homogeneous vs Non-Homogeneous",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Homogeneous vs Non-Homogeneous",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Homogeneous: all RHS constants = 0, written AX = 0. x = 0 always satisfies it (trivial solution). Non-trivial solutions exist only when det(A) = 0. Non-homogeneous: at least one RHS ≠ 0. No guarantee of any solution.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div> <div>Key Distinction</div> <div> <div><div>AX = 0</div><div>Always has x = 0. Non-trivial solutions exist only if rank(A) < n (equivalently: det(A) = 0).</div></div> <div><div>AX = b (b≠0)</div><div>Solution exists only if rank(A) = rank([A|b]). x = 0 is NOT a solution unless b happens to be 0.</div></div> </div> </div>"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — \"The homogeneous system has no solution.\" Wrong. AX = 0 always has x = 0. What you mean is: \"the only solution is the trivial solution x = 0.\" These are different and examiners penalise the incorrect phrasing."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "Find rank of A and A_b for 3×3 current system. Nature of solutions. (2019/2020 Q1c)",
+                "Find rank of A = [[2,4,6],[1,3,5],[9,10,11]] using all three methods.",
+                "Does AX = 0 always have a solution? Explain."
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: this term.",
+                "answer": "<div> <div>Key Distinction</div> <div> <div><div>AX = 0</div><div>Always has x = 0. Non-trivial solutions exist only if rank(A) < n (equivalently: det(A) = 0).</div></div> <div><div>AX = b (b≠0)</div><div>Solution exists only if rank(A) = rank([A|b]). x = 0 is NOT a solution unless b happens to be 0.</div></div> </div> </div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Three Methods for Rank — Applied to the Same Matrix",
+      "abbr": "ECE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Three Methods for Rank — Applied to the Same Matrix",
+          "abbr": "ECE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>We'll use A = [[2,4,6],[1,3,5],[9,10,11]] from the class notes and apply all three methods. All three must give the same answer.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<span>Method 1 — Determinant Method</span>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>01</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Try the full 3×3 determinant first</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>A = [ 2 4 6 ] [ 1 3 5 ] [ 9 10 11 ] det(A) = 2·(3·11 - 5·10) - 4·(1·11 - 5·9) + 6·(1·10 - 3·9) = 2·(33-50) - 4·(11-45) + 6·(10-27) = 2(-17) - 4(-34) + 6(-17) = -34 + 136 - 102 = 0 → rank ≠ 3</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>02</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Since det = 0, try the largest 2×2 submatrix</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>Take top-left 2×2: [ 2 4 ] [ 1 3 ] det = (2×3) - (4×1) = 6 - 4 = 2 ≠ 0 Non-zero 2×2 found → Rank exists at order 2</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div>Rank = 2</div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<span>Method 2 — Row Reduction (most reliable)</span>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>01</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Swap R₁ and R₂ to get 1 as the leading entry</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>[ 2 4 6 ] R₁ ↔ R₂ [ 1 3 5 ] [ 1 3 5 ] ──────── [ 2 4 6 ] [ 9 10 11 ] [ 9 10 11 ]</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>02</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Clear column 1 below pivot</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>R₂' = R₂ - 2·R₁: [2-2(1), 4-2(3), 6-2(5)] = [0, -2, -4] R₃' = R₃ - 9·R₁: [9-9(1), 10-9(3), 11-9(5)] = [0, -17, -34] [ 1 3 5 ] [ 0 -2 -4 ] [ 0 -17 -34 ]</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>03</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Divide R₂' by −2, then clear column 2</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>R₂'' = R₂' ÷ (-2): [0, 1, 2] R₃'' = R₃' - 17·R₂'': [0, -17-17(1)... wait: [0, -17+17(1), -34+17(2)] = [0, 0, 0] [ 1 3 5 ] [ 0 1 2 ] [ 0 0 0 ] ← zero row</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>04</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Count non-zero rows</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<pre>Non-zero rows: Row 1 and Row 2 → count = 2 Zero rows: Row 3 → count = 1</pre>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div>Rank = 2 (all three methods agree)</div>"
+            },
+            {
+              "type": "insight",
+              "text": "If an exam asks for all three methods, row reduction is the most reliable. Always count the number of non-zero rows after reducing, not the total number of rows."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Three Methods for Rank — Applied to the Same Matrix\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Engineering Mathematics"
+}

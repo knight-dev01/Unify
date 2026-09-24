@@ -1,0 +1,194 @@
+{
+  "course": "CVE 214",
+  "week": 7,
+  "title": "Precipitation Characteristics & Missing Records",
+  "subtitle": "Beyond just measuring rain, engineers need to characterise it — how intense is it? How often does it occur? Over what area? And what do you do when a gauge station has missing data? This week answers all of that.",
+  "learningOutcome": "Beyond just measuring rain, engineers need to characterise it — how intense is it? How often does it occur? Over what area? And what do you do when a gauge station has missing data? This week answers all of that.",
+  "metaChips": [
+    "CVE 214",
+    "Week 7"
+  ],
+  "tags": [
+    "Intensity",
+    "Frequency",
+    "Return period",
+    "Areal extent",
+    "IDF curve",
+    "Missing records",
+    "Normal ratio method"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Precipitation Characteristics",
+      "abbr": "CVE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Precipitation Characteristics",
+          "abbr": "CVE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<strong>4.10.1 Intensity (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>Intensity = amount of precipitation / duration</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "Rainfall intensity indicates the variation of precipitation with time. The result can be presented in the form of an intensity-duration graph."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>4.10.2 Frequency / Return Period (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>This is the average time period within which a rainfall of specific amount or intensity can be expected to occur once. This is known as the \"return period\" or the re-occurrence interval.</div>",
+                "<div>Re-occurrence interval = the average number of years in which a given event will be equalled or exceeded.</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>4.10.3 Areal Extent (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>This concerns the area over which a point's rainfall can be held to apply. Storm totals obviously vary considerably, so the scale of individual catchments determines its importance — for large systems (local thunderstorm, tropical disturbance or extra-tropical depression) and its rate of movement determines the areal extent.</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>4.10.4 Intensity-Duration Curve</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>The variation of intensity with time is described with the aid of an intensity-duration curve in which rainfall intensity in mm/hr is plotted against duration of rainfall in minutes.</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>4.10.5 Intensity-Duration-Frequency (IDF) Curve — General formula</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>i = KT^x / (t + a)^n [for duration 5–120 min]</div>",
+                "<div>For duration over 2 hours: i = c / t^n</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "i = average intensity (mm/hr) · T = return period (years) · t = duration of precipitation (minutes) · K, x, a, b, n = constants depending on locality"
+            },
+            {
+              "type": "diagram",
+              "caption": "IDF Curve — Intensity vs Duration for various return periods",
+              "description": "Duration (min) · Intensity (mm/hr) · T=50yr · T=25yr · T=10yr · 0 · 30 · 60 · 90 · 120 · Higher return period = Higher intensity for same duration",
+              "imageRef": null
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<li>Define: intensity, frequency (return period), areal extent of precipitation.</li>",
+                "<li>Use the Normal Ratio Method to estimate missing precipitation data. <span>Exercise 4</span></li>",
+                "<li>What is an IDF curve? Why is it important to engineers?</li>"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Precipitation Characteristics\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Methods of Estimating Missing Rainfall Records",
+      "abbr": "CVE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Methods of Estimating Missing Rainfall Records",
+          "abbr": "CVE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Sometimes a raingauge station breaks down or has gaps in its records. You need to estimate the missing data from surrounding stations. Two methods are used:</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Normal Ratio Method (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>P_x = (1/n) × [N_x/N_A × P_A + N_x/N_B × P_B + N_x/N_C × P_C]</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "P_x = estimated daily precipitation volume at the missing data station x (depth) · P_A, P_B, P_C = estimated daily precipitation volume at the adjacent stations A, B, C (depth) · N_x = the normal annual precipitation at the missing data station · N_A, N_B, N_C = average annual precipitation at the adjacent stations A, B, C · n = number of surrounding stations used"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>When to use which method (from textbook)</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>Use Arithmetic Average procedure when the normal annual precipitations at A, B, C are within 10% of that for station X.</div>",
+                "<div>Use Normal Ratio method when the variation is more than 10%.</div>",
+                "<div>Check: if N_A/N_x, N_B/N_x, N_C/N_x are all within 1.145 (i.e. within 10%), use arithmetic average.</div>"
+              ]
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Always check the 10% rule BEFORE choosing a method. Students jump straight to the Normal Ratio formula without checking. If ALL surrounding stations are within 10% of N_x, the simple arithmetic average is sufficient and faster."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "[Q1] Define intensity, return period and areal extent of precipitation.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Q2] What is the 10% rule? When do you use Normal Ratio vs Arithmetic Average for missing records?",
+                "answer": "No written answer in the source note — work it from the topic above."
+              },
+              {
+                "type": "reveal",
+                "question": "[Hard] Station S has N_S = 900mm. Adjacent stations P, Q, R have N = 850, 980, 920mm and recorded 30, 45, 38mm respectively during a storm when S was inoperative. Estimate storm precipitation at S.",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Engineering Hydrology"
+}

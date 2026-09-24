@@ -1,0 +1,159 @@
+{
+  "course": "MEE 202",
+  "week": 11,
+  "title": "Phase Diagrams",
+  "subtitle": "Phase diagrams are maps that tell you which phases exist at any given temperature and composition. Dr Obasa's module. The Gibbs phase rule, lever rule, and reading binary diagrams are all heavily tested. Every paper from 2011 to 2023 has a phase diagram question worth 25 marks.",
+  "learningOutcome": "Phase diagrams are maps that tell you which phases exist at any given temperature and composition. Dr Obasa's module. The Gibbs phase rule, lever rule, and reading binary diagrams are all heavily tested. Every paper from 2011 to 2023 has a phase diagram question worth 25 marks.",
+  "metaChips": [
+    "MEE 202",
+    "Week 11"
+  ],
+  "tags": [
+    "Phase",
+    "Component",
+    "Gibbs Phase Rule",
+    "Degrees of Freedom",
+    "Lever Rule",
+    "Tie Line",
+    "Liquidus",
+    "Solidus",
+    "Isomorphous"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Definitions & Gibbs Phase Rule",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Definitions & Gibbs Phase Rule",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Phase:</strong> A portion of a system with distinct uniform physical and chemical characteristics and are separated from each other by definite phase boundaries. (e.g. water and ice, water and oil)</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>Note: A phase may contain one or more components.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Component:</strong> Chemically recognizable species (Fe and C in carbon steel, H₂O and Sucrose in sugar solution in water).</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Phase diagram</strong> is a graphical representation of all the equilibrium phases as a function of temperature, pressure, and composition. It is a stability map that tells us the phases that are stable at a given pressure, temperature composition.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Equilibrium</strong> is a state of reversible dynamic system with no net reaction. This means that the properties are invariant over time.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p>There are 3 types of phase diagrams: Unary (one component), Binary (two components), Ternary (three components).</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Gibbs Phase Rule</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "<div>P + F = C + 2 (general form)</div>",
+                "<div>P + F = C + 1 (condensed — constant pressure)</div>"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "P = number of phases present · F = degrees of freedom (number of independent variables) · C = number of components Degrees of freedom refers to the number of independent variables (e.g. pressure, temperature) that can be varied individually to effect changes in a system. H₂O unary system (C=1): Single phase: F = 1−1+2 = 2 (two degrees of freedom — area on diagram) Two phases: F = 1−2+2 = 1 (one degree of freedom — line on diagram) Three phases (triple point): F = 1−3+2 = 0 (no degrees of freedom — single point)"
+            },
+            {
+              "type": "diagram",
+              "caption": "Unary Phase Diagram — H₂O (Water)",
+              "description": "Pressure (P) · Temperature (T) · Ice · (Solid) · Water · (Liquid) · Steam · (Gas) · Triple Point · T=0.01°C, P=0.006atm · F = 0 (invariant) · Critical Point · T=374°C · T_tp · T_c · P_tp",
+              "imageRef": null
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "Define a phase. When is a phase said to have transformed to another phase? Explain what a solid solution is. (2021/22)",
+                "Using a suitable well-labelled phase diagram, derive the lever rule. (2021/22, 2019/20, 2014/15, 2011/12)",
+                "According to Gibbs phase rule, what is the important property that defines invariant points? Further discuss this property. (2022/23)",
+                "Give examples of invariant points in (i) a unary system and (ii) a binary system. Illustrate with sketches. (2022/23)",
+                "On the phase diagram given, determine: phases at equilibrium at 750°C for alloy A-25%B; composition of each phase; percentage of each phase; draw cooling curve. (2021/22)"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Definitions & Gibbs Phase Rule\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Binary Phase Diagrams & The Lever Rule",
+      "abbr": "MEE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Binary Phase Diagrams & The Lever Rule",
+          "abbr": "MEE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>A binary phase diagram represents two component phases in equilibrium. For most systems, pressure is constant, thus the independently variable parameters are temperature and composition. Two component systems are classified based on extent of mutual solid solubility: completely soluble in both liquid and solid phases (isomorphous system, e.g., Cu-Ni), or completely soluble in liquid phase but limited solubility in solid state (polymorphous/eutectic system).</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<p><strong>Tie-line (isotherm/UV):</strong> A horizontal line drawn across a two-phase region at constant temperature intersecting the region boundaries. From the intersections, perpendiculars are dropped to the composition axis — U' represents the composition of the liquid phase and V' represents the composition of the solid phase.</p>"
+            },
+            {
+              "type": "diagram",
+              "caption": "Isomorphous Binary System — Lever Rule Derivation",
+              "description": "Temperature · Composition (wt% B) · A · B · Liquid · Solid (α) · α + Liquid · Liquidus · Solidus · C L · C o · C α · ← Tie Line → · T · Lever Rule · W L = (C α −C o )/(C α −C L ) · W α = (C o −C L )/(C α −C L ) · W L + W α = 1 · W = mass fraction",
+              "imageRef": null
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Lever Rule Derivation</strong>"
+            },
+            {
+              "type": "paragraph",
+              "text": "All material must be in one phase or the other: W α + W L = 1 Mass of component B must balance: W α ·C α + W L ·C L = C o Solving simultaneously: W L = (C α − C o ) / (C α − C L ) W α = (C o − C L ) / (C α − C L ) Memory trick: \"lever\" — the overall composition is the fulcrum. The weight of each phase is proportional to the length of the tie-line on the opposite side."
+            },
+            {
+              "type": "insight",
+              "text": "⚠ Common Mistake Students flip the lever rule fractions. Remember: to find the fraction of liquid (W L ), use the distance from C o to the solidus (C α ) side — not the liquidus side. The lever balances: longer arm on the liquid side means less liquid. It's counterintuitive. Derive it from the mass balance equations rather than memorising."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "In your own words, explain \"Binary Phase Diagrams & The Lever Rule\".",
+                "answer": "No written answer in the source note — work it from the topic above."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Science of Materials"
+}

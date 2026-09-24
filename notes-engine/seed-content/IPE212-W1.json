@@ -1,0 +1,172 @@
+{
+  "course": "IPE 212",
+  "week": 1,
+  "title": "Introduction to Automotive Engineering",
+  "subtitle": "This week introduces the automobile as a self-propelled vehicle, covering its definition, key components, the basis of its motion, and its physical construction — from frame to chassis to body.",
+  "learningOutcome": "This week introduces the automobile as a self-propelled vehicle, covering its definition, key components, the basis of its motion, and its physical construction — from frame to chassis to body.",
+  "metaChips": [
+    "IPE 212",
+    "Week 1"
+  ],
+  "tags": [
+    "Automobile",
+    "Self-propelled vehicle",
+    "Frame",
+    "Chassis",
+    "Body",
+    "Frictional contact",
+    "Propulsion"
+  ],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Definition of an Automobile",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "title": "Definition of an Automobile",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Imagine a box that can move on its own without being pushed or pulled. That's basically what an automobile is — a machine with its own engine that moves itself. \"Auto\" means self and \"mobile\" means movable, so automobile literally means \"self-movable.\" It's different from a boat (marine vehicle) or a plane (aeronautical vehicle) because it moves on the ground.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div><strong>Automobile:</strong> A self-propelled vehicle which contains the power source for its propulsion and is used for carrying passengers and goods on the ground, such as car, bus, trucks, etc.</div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div><strong>Automobile (Module 1 Definition):</strong> A <strong>self-propelled vehicle</strong> used for transportation of goods and passengers on the ground. Automobiles or Automotive means a vehicle which can move by itself.</div>"
+            },
+            {
+              "type": "analogy",
+              "text": "A Toyota Camry, a Mack truck, and a delivery van are all automobiles — each has its own engine providing the power to move itself. They differ from aircraft (which fly) and boats (which sail on water)."
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Students often confuse \"automobile\" with any vehicle. Remember: an automobile specifically uses a self-contained power source and moves on the ground. A bicycle is not an automobile (no engine). A ship is not an automobile (water-borne)."
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Exam focus:</strong>"
+            },
+            {
+              "type": "bullets",
+              "items": [
+                "Define the term \"automobile\" and explain the basis of its motion.",
+                "Distinguish between frame, chassis, and body. How are they related?",
+                "List the five main components of an automobile and state the function of each.",
+                "What is the difference between an automobile and an aeronautical vehicle?"
+              ]
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: Automobile.",
+                "answer": "<div><strong>Automobile:</strong> A self-propelled vehicle which contains the power source for its propulsion and is used for carrying passengers and goods on the ground, such as car, bus, trucks, etc.</div>"
+              },
+              {
+                "type": "reveal",
+                "question": "Define: Automobile (Module 1 Definition).",
+                "answer": "<div><strong>Automobile (Module 1 Definition):</strong> A <strong>self-propelled vehicle</strong> used for transportation of goods and passengers on the ground. Automobiles or Automotive means a vehicle which can move by itself.</div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Components of an Automobile",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "2.1",
+          "title": "Components of an Automobile",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>Think of an automobile like a team where every player has a specific job. The frame is the skeleton, the engine is the heart, the transmission passes the power to the wheels, and the body is the outer skin everyone sees.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div>The main components of an automobile are: <strong>Frame</strong> (supporting the body), <strong>Engine</strong> (supplies the power), <strong>Power transmitting units</strong>, <strong>Tyres and wheels</strong> (through the springs and axles), and <strong>Body</strong>.</div>"
+            },
+            {
+              "type": "diagram",
+              "caption": "Figure",
+              "description": "Frame · Skeleton / Support · Engine · Power Source · Transmission · Power Transfer Units · Wheels/Tyres · Via springs & axles · Body · Outer structure",
+              "imageRef": null
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: Frame.",
+                "answer": "<div>The main components of an automobile are: <strong>Frame</strong> (supporting the body), <strong>Engine</strong> (supplies the power), <strong>Power transmitting units</strong>, <strong>Tyres and wheels</strong> (through the springs and axles), and <strong>Body</strong>.</div>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Basis of Motion & Vehicle Construction",
+      "abbr": "IPE",
+      "subtopics": [
+        {
+          "number": "3.1",
+          "title": "Basis of Motion & Vehicle Construction",
+          "abbr": "IPE",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "<p>How does a car actually move? The engine creates power, but it's the friction between the tyres and the road that actually pushes the car forward. If there were no friction (like on perfectly smooth ice), the wheels would just spin in place. The vehicle's structure goes from the inside out: Frame + Base components = Chassis. Chassis + Body = Vehicle.</p>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div>The automobile is <strong>propelled through the frictional contact between the road and the wheels</strong>. The various units are held together in proper arrangement on the frame. The protection and comfort is provided by the body of the vehicle.</div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<div><strong>Frame:</strong> The skeleton of the vehicle. It serves as the main foundation and base for alignment for the chassis. Types: Conventional frame, Semi integral frame, Integral or unitised frame. <strong>Chassis:</strong> If the frame contains the base components it is called the chassis. Components include engine, radiator, clutch, gearbox, silencer, road wheels, fuel tank, wirings, differential units, etc. <strong>Body:</strong> The superstructure of the vehicle bolted to the chassis. Types: Car, Truck, Tractor, Delivery van, Jeep, Bus.</div>"
+            },
+            {
+              "type": "paragraph",
+              "text": "<strong>Construction Equation</strong>"
+            },
+            {
+              "type": "insight",
+              "text": "Common mistake — Students say \"the chassis IS the frame.\" Wrong — the frame is just the skeleton. The chassis includes the frame PLUS all base mechanical components (engine, gearbox, wheels, etc.). Think of the frame as the bones and the chassis as the bones plus all the organs."
+            }
+          ],
+          "miniCheck": {
+            "questions": [
+              {
+                "type": "reveal",
+                "question": "Define: propelled through the frictional contact between the road and the wheels.",
+                "answer": "<div>The automobile is <strong>propelled through the frictional contact between the road and the wheels</strong>. The various units are held together in proper arrangement on the frame. The protection and comfort is provided by the body of the vehicle.</div>"
+              },
+              {
+                "type": "reveal",
+                "question": "Define: Frame.",
+                "answer": "<div><strong>Frame:</strong> The skeleton of the vehicle. It serves as the main foundation and base for alignment for the chassis. Types: Conventional frame, Semi integral frame, Integral or unitised frame. <strong>Chassis:</strong> If the frame contains the base components it is called the chassis. Components include engine, radiator, clutch, gearbox, silencer, road wheels, fuel tank, wirings, differential units, etc. <strong>Body:</strong> The superstructure of the vehicle bolted to the chassis. Types: Car, Truck, Tractor, Delivery van, Jeep, Bus.</div>"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "eoq": {
+    "questions": []
+  },
+  "courseTitle": "Automotive Engineering & Workshop"
+}
