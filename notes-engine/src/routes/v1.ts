@@ -816,6 +816,57 @@ router.get("/progress", requireAuth, async (req: Request, res: Response) => {
   }
 });
 
+// Authed author: impact stats for the author dashboard (topics published,
+// students enrolled, completions and quizzes on own courses).
+// Courses = union of teaching enrollments + authored topic rows.
+router.get("/author/stats", requireAuth, requireAuthor, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  try {
+    const sb = supabaseAdmin();
+    const [teaching, authored, mine] = await Promise.all([
+      sb.from("enrollments").select("course").eq("user_id", userId).eq("kind", "teaching"),
+      sb.from("topic_notes").select("course").eq("author_id", userId),
+      sb.from("topic_notes").select("course,week,topic,version").eq("author_id", userId),
+    ]);
+    const courses = [
+      ...new Set([
+        ...(((teaching.data ?? []) as { course: string }[]).map((r) => r.course)),
+        ...(((authored.data ?? []) as { course: string }[]).map((r) => r.course)),
+      ]),
+    ];
+    const rows = ((mine.data ?? []) as { course: string; week: number; topic: number; version: number }[]);
+    const topics = new Set(rows.map((r) => `${r.course}|${r.week}|${r.topic}`)).size;
+    let students = 0;
+    let completions = 0;
+    let quizzesTaken = 0;
+    let quizAvg = 0;
+    if (courses.length) {
+      const [enr, prog, qa] = await Promise.all([
+        sb.from("enrollments").select("user_id").eq("kind", "taking").in("course", courses).limit(2000),
+        sb.from("topic_progress").select("course").in("course", courses).limit(2000),
+        sb.from("quiz_attempts").select("score,total").in("course", courses).limit(1000),
+      ]);
+      students = new Set((((enr.data ?? []) as { user_id: string }[]).map((r) => r.user_id))).size;
+      completions = ((prog.data ?? []) as unknown[]).length;
+      const attempts = ((qa.data ?? []) as { score: number; total: number }[]).filter((r) => r.total > 0);
+      quizzesTaken = attempts.length;
+      quizAvg = attempts.length
+        ? Math.round((attempts.reduce((s, r) => s + r.score / r.total, 0) / attempts.length) * 100)
+        : 0;
+    }
+    res.json({
+      courses: courses.length,
+      topics,
+      versions: rows.length,
+      students,
+      completions,
+      quizzesTaken,
+      quizAvg,
+    });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
 // Authed: topic versions this user published (author dashboard lists own
 // notes with version numbers + delete).
 router.get("/authored", requireAuth, async (req: Request, res: Response) => {
