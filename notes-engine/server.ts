@@ -338,7 +338,7 @@ app.listen(PORT, () => {
       databaseUrl: Boolean(process.env.DATABASE_URL),
       directUrl: Boolean(process.env.DIRECT_URL),
       cors: process.env.CORS_ORIGIN || "open (dev only)",
-      aiProvider: process.env.AI_PROVIDER || "anthropic",
+      aiProvider: process.env.AI_PROVIDER || "gemini",
       anthropicKey: Boolean(process.env.ANTHROPIC_API_KEY),
       geminiKey: Boolean(process.env.GEMINI_API_KEY),
     },
@@ -346,16 +346,30 @@ app.listen(PORT, () => {
   console.log(`Unify API running at http://localhost:${PORT}`);
 });
 
-// Reference seed + default admin (both idempotent). Never blocks boot;
-// failures land in the logs.
+// Reference seed + default admin (both idempotent). Retried because the
+// first attempt can hit transient faults (e.g. DB clock skew at deploy).
+// Never blocks boot; failures land in the logs.
+function bootJob(label, fn, delays) {
+  const attempt = (left) => {
+    Promise.resolve()
+      .then(() => fn())
+      .then(() => logger.info(label + " done"))
+      .catch((e) => {
+        if (!left.length) return logger.warn(label + " skipped", { message: e && e.message });
+        setTimeout(() => attempt(left.slice(1)), left[0]);
+      });
+  };
+  try {
+    attempt(delays || [5000, 15000]);
+  } catch (e) {
+    logger.warn(label + " skipped", { message: e && e.message });
+  }
+}
+
 try {
   const seed = require("./src/lib/seed");
-  seed.ensureSeeded()
-    .then(() => logger.info("seed check done"))
-    .catch((e) => logger.warn("seed skipped", { message: e && e.message }));
-  seed.ensureDefaultAdmin()
-    .then(() => logger.info("default admin check done"))
-    .catch((e) => logger.warn("default admin skipped", { message: e && e.message }));
+  bootJob("seed check", () => seed.ensureSeeded());
+  bootJob("default admin check", () => seed.ensureDefaultAdmin());
 } catch (e) {
   logger.warn("seed skipped", { message: e && e.message });
 }

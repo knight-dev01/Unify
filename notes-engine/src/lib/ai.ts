@@ -43,9 +43,11 @@ async function gemini(system: string, user: string, model: string, apiKey: strin
   const response = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+    // No system_instruction field: several models reject it ("Developer
+    // instruction is not enabled"). The system prompt ships as the first
+    // content block instead — accepted by every generateContent model.
     body: JSON.stringify({
-      system_instruction: { parts: [{ text: system }] },
-      contents: [{ parts: [{ text: user }] }],
+      contents: [{ parts: [{ text: `${system}\n\n---\n\n${user}` }] }],
       generationConfig: {
         responseMimeType: "application/json",
         maxOutputTokens: MAX_TOKENS,
@@ -161,6 +163,15 @@ function isRateLimit(e: unknown): boolean {
   return /RESOURCE_EXHAUSTED|quota|rate.?limit|429|not.?found/i.test(msg);
 }
 
+// 400s that mean "this model can't do that" (capability mismatch), as opposed
+// to bad auth (401/403 fail fast) or malformed requests.
+function isCapabilityError(e: unknown): boolean {
+  const status = (e as { status?: number })?.status;
+  if (status !== 400) return false;
+  const msg = e instanceof Error ? e.message : String(e);
+  return /developer instruction|interactions api|not supported|not available|not enabled|not found/i.test(msg);
+}
+
 export async function generateStructuredNote(args: {
   system: string;
   user: string;
@@ -182,9 +193,15 @@ export async function generateStructuredNote(args: {
     // AI_ROTATION=off restricts to primary + explicitly configured models.
     const rotate = (process.env.AI_ROTATION || "on").toLowerCase() !== "off";
     const rows = rotate ? await readRegistry() : [];
+    const previewPenalty = (m: string) => (/preview|experimental/i.test(m) ? 1 : 0);
     const healthy = rows
       .filter((r) => r.failures < MAX_FAILURES)
-      .sort((a, b) => a.failures - b.failures || (a.model < b.model ? -1 : 1))
+      .sort(
+        (a, b) =>
+          a.failures - b.failures ||
+          previewPenalty(a.model) - previewPenalty(b.model) ||
+          (a.model < b.model ? -1 : 1)
+      )
       .map((r) => r.model);
     const seen = new Set<string>([primary]);
     const chain = [primary, ...configured, ...healthy]
@@ -202,12 +219,9 @@ export async function generateStructuredNote(args: {
         return { text, provider, model };
       } catch (e) {
         lastErr = e;
-        if (!isRateLimit(e)) {
-          await recordModel(model, false);
-          throw e;
-        }
         await recordModel(model, false);
-        console.warn(`Gemini ${model} unavailable or rate-limited, trying next model`);
+        if (!isRateLimit(e) && !isCapabilityError(e)) throw e;
+        console.warn(`Gemini ${model} failed, trying next model`);
       }
     }
     throw lastErr instanceof Error ? lastErr : new Error("All Gemini models unavailable");

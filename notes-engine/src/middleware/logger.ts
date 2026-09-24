@@ -16,16 +16,22 @@ export function log(levelName: Level, msg: string, fields: Record<string, unknow
   else console.log(line);
 }
 
-// One JSON line per request: method, path, status, duration. Slow (>1s)
+// One JSON line per request: method, path, status, duration. Slow (>2.5s)
 // requests and 4xx/5xx are escalated so they stand out in Render logs.
+// Health checks log at debug so keep-alive pings never bury real traffic.
 export function requestLogger(req: Request, res: Response, next: NextFunction): void {
   const start = Date.now();
+  const quiet = req.path === "/healthz";
   res.on("finish", () => {
     const ms = Date.now() - start;
     const base = { method: req.method, path: req.path, status: res.statusCode, ms };
+    if (quiet) {
+      log("debug", "request", base);
+      return;
+    }
     if (res.statusCode >= 500) log("error", "request", base);
     else if (res.statusCode >= 400) log("warn", "request", base);
-    else if (ms > 1000) log("warn", "slow request", base);
+    else if (ms > 2500) log("warn", "slow request", base);
     else log("info", "request", base);
   });
   next();
