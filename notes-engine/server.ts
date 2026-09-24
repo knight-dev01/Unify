@@ -195,6 +195,96 @@ app.get("/api/sample", (req, res) => {
   res.status(404).json({ error: "Sample note not found." });
 });
 
+// 1b. Copy-paste prompt pack for EXTERNAL AI (lecturer's own ChatGPT /
+// Claude / Gemini app). Same schema + hard rules as the built-in converter,
+// so pasted-back JSON imports identically while spending zero server AI
+// tokens. Public like /api/sample (no secrets, no side effects).
+const FORMAT_PACK = `You turn messy lecture notes into Unify study JSON.
+
+HOW TO USE
+1. Paste this whole prompt AND your raw lecture notes into the chat below.
+2. The AI replies with JSON only. Copy that JSON (nothing else).
+3. In Unify Studio choose "External AI", paste it, Import, Review, Publish.
+
+HARD RULES (the app validates every one of these — break one and import warns):
+- Top-level fields, all required: course (string), week (integer), title,
+  subtitle, learningOutcome, metaChips (string[]), tags (string[]),
+  topics (array, at least 1), eoq (object with questions array).
+- Every topic: number (integer), title, abbr (short slug), subtopics
+  (at least 1), activeRecall (at least 1 card), pulseCheck (EXACTLY 3
+  questions in this order: MCQ, MCQ, FITB).
+- Every subtopic: number (string like "1.1"), abbr, title, content
+  (array, may be empty), miniCheck.questions (at least 1).
+- Mini-check question types: mcq {question, options[2..4], correctIndex},
+  fitb {question with ________ blank, acceptedAnswers (at least 1)},
+  reveal {question, answer}. Never put the same type twice in a row.
+- Active recall card: {badge, question, answer}. Badge is one of:
+  Definition | Mechanism | Comparison | Application.
+- EOQ (end-of-week quiz): EXACTLY 10 questions — 8 mcq + 2 fitb. Every
+  question needs: number, question, feedback {correct, wrong}, topicRef
+  (topic number as string, e.g. "2"). MCQ needs options + correct (letter
+  "A"/"B"/"C"/"D"); FITB needs acceptedAnswers.
+- Math goes in LaTeX inside \\\\[ ... \\\\] (display) or \\\\( ... \\\\) (inline).
+- Output ONLY valid JSON matching the schema below. No preamble, no
+  markdown fences, no commentary.
+
+SCHEMA:
+${SCHEMA_SPEC}
+
+MINI EXAMPLE (shape reference — your note must still satisfy every rule above,
+including exactly-3 pulse checks and exactly-10 EOQ):
+{
+  "course": "CVE 214",
+  "week": 6,
+  "title": "Averaging Precipitation over an Area",
+  "subtitle": "Three methods engineers use",
+  "learningOutcome": "Describe the three averaging methods and their limits.",
+  "metaChips": ["CVE 214", "Week 6"],
+  "tags": ["Thiessen", "Isohyetal"],
+  "topics": [
+    {
+      "number": 1,
+      "title": "Three Methods",
+      "abbr": "METHODS",
+      "subtopics": [
+        {
+          "number": "1.1",
+          "abbr": "METHODS",
+          "title": "Arithmetic Average",
+          "content": [
+            { "type": "paragraph", "text": "Averages every gauge equally." },
+            { "type": "bullets", "items": ["Simple", "Fails on hilly terrain"] }
+          ],
+          "miniCheck": {
+            "questions": [
+              { "type": "mcq", "question": "Which method averages gauges equally?", "options": ["Arithmetic", "Thiessen"], "correctIndex": 0 },
+              { "type": "fitb", "question": "Thiessen weights gauges by ________.", "acceptedAnswers": ["area", "polygon area"] }
+            ]
+          }
+        }
+      ],
+      "activeRecall": [
+        { "badge": "Definition", "question": "What is the arithmetic average method?", "answer": "Mean of all gauge readings." }
+      ],
+      "pulseCheck": {
+        "number": 1,
+        "questions": [
+          { "type": "mcq", "question": "Q1?", "options": ["A", "B"], "correctIndex": 0 },
+          { "type": "mcq", "question": "Q2?", "options": ["A", "B"], "correctIndex": 1 },
+          { "type": "fitb", "question": "Q3 ________?", "acceptedAnswers": ["x"] }
+        ]
+      }
+    }
+  ],
+  "eoq": { "questions": [ { "number": 1, "type": "mcq", "question": "Q?", "options": ["A", "B"], "correct": "A", "feedback": { "correct": "Well done.", "wrong": "Review topic 1." }, "topicRef": "1" } ] }
+}
+(Reminder: a real note needs all 10 EOQ questions, not the 1 shown here.)
+`;
+
+app.get("/api/format", (req, res) => {
+  res.json({ prompt: FORMAT_PACK });
+});
+
 // 2. Validate JSON note
 app.post("/api/validate", (req, res) => {
   const result = validateUnifyNote(req.body);
