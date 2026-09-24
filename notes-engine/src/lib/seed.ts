@@ -251,7 +251,33 @@ async function seedLegacyContent(
       }
       if (Object.keys(patch).length) {
         const { error: uErr } = await sb.from("weeks").update(patch).eq("course", code).eq("week", week);
-        if (uErr) throw uErr;
+  if (uErr) throw uErr;
+  // Hygiene: purge blank/orphan rows (empty codes break week lookups and
+  // render as blank courses; they were never legitimate data). Cascades
+  // clear their weeks/notes too — unreachable junk only.
+  try {
+    const { data: allCourses } = await sb.from("courses").select("code");
+    const valid = new Set(((allCourses ?? []) as { code: string }[]).map((r) => r.code));
+    for (const c of [...valid]) {
+      if (!c || !c.trim()) {
+        await sb.from("course_levels").delete().eq("course", c);
+        await sb.from("courses").delete().eq("code", c);
+        valid.delete(c);
+      }
+    }
+    const { data: allEnr } = await sb.from("enrollments").select("user_id,course");
+    const validUpper = new Set([...valid].map((c) => c.toUpperCase()));
+    for (const r of ((allEnr ?? []) as { user_id: string; course: string }[])) {
+      if (!r.course || !r.course.trim() || !validUpper.has(r.course.toUpperCase())) {
+        await sb.from("enrollments").delete().eq("user_id", r.user_id).eq("course", r.course);
+      }
+    }
+    await sb.from("resume_state").delete().eq("course", "");
+    await sb.from("topic_progress").delete().eq("course", "");
+    await sb.from("quiz_attempts").delete().eq("course", "");
+  } catch (e) {
+    fail("hygiene", e);
+  }
         if (!("title" in patch)) stats.eoqFilled += 1;
       }
     }

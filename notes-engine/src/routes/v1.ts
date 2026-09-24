@@ -10,6 +10,14 @@ router.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 200, standardHeaders: true
 
 const TOPIC_XP = 10;
 
+// Course codes are user-typed in several places: normalize once (trim +
+// upper) and treat blank as invalid. Without this, a whitespace-only code
+// sails through min(1) validation and poisons lookups with invisible rows.
+function cleanCode(raw: unknown): string | null {
+  const s = String(raw ?? "").trim().toUpperCase();
+  return s ? s : null;
+}
+
 const LEVEL_ORDER = ["100 Level", "200 Level", "300 Level", "400 Level", "500 Level"];
 const SEMESTERS = ["First Semester", "Second Semester"] as const;
 
@@ -161,7 +169,11 @@ router.post("/enrollments", requireAuth, async (req: Request, res: Response) => 
     return;
   }
   const userId = (req as AuthedRequest).userId as string;
-  const code = parsed.data.course.trim().toUpperCase();
+  const code = cleanCode(parsed.data.course);
+  if (!code) {
+    res.status(400).json({ error: "Invalid course" });
+    return;
+  }
   try {
     const sb = supabaseAdmin();
     const { data: courseRow } = await sb.from("courses").select("code").eq("code", code).single();
@@ -202,13 +214,18 @@ router.post("/resume", requireAuth, async (req: Request, res: Response) => {
     return;
   }
   const userId = (req as AuthedRequest).userId as string;
+  const course = cleanCode(parsed.data.course);
+  if (!course) {
+    res.status(400).json({ error: "Invalid course" });
+    return;
+  }
   try {
     const { error } = await supabaseAdmin()
       .from("resume_state")
       .upsert(
         {
           user_id: userId,
-          course: parsed.data.course.trim().toUpperCase(),
+          course,
           week: parsed.data.week,
           topic: parsed.data.topic,
           updated_at: new Date().toISOString(),
@@ -307,7 +324,7 @@ router.post("/onboarding", requireAuth, async (req: Request, res: Response) => {
     // Enrollments: full replace (taking for students, teaching for authors).
     if (d.courses && d.courses.length) {
       const sb2 = supabaseAdmin();
-      const codes = [...new Set(d.courses.map((c) => String(c).toUpperCase()))];
+      const codes = [...new Set(d.courses.map((c) => String(c).trim().toUpperCase()).filter(Boolean))];
       const { data: known } = await sb2.from("courses").select("code").in("code", codes);
       const valid = new Set(((known ?? []) as { code: string }[]).map((r) => r.code));
       const kind = d.role === "student" ? "taking" : "teaching";
@@ -340,7 +357,9 @@ router.get("/courses", async (req: Request, res: Response) => {
       if (!e.levels.includes(l.level)) e.levels.push(l.level);
       if (l.semester && !e.semesters.includes(l.semester)) e.semesters.push(l.semester);
     }
-    let out = ((courses ?? []) as { code: string; title: string }[]).map((c) => ({
+    let out = ((courses ?? []) as { code: string; title: string }[])
+      .filter((c) => c.code && c.code.trim())
+      .map((c) => ({
       ...c,
       levels: (byCourse[c.code]?.levels || []).sort(),
       semesters: (byCourse[c.code]?.semesters || []).sort(),
@@ -429,8 +448,12 @@ function groupTopics(rows: TopicNoteRow[]): { topics: unknown[]; meta: TopicMeta
 }
 
 router.get("/courses/:code/weeks/:week", async (req: Request, res: Response) => {
-  const code = decodeURIComponent(req.params.code).toUpperCase();
+  const code = cleanCode(decodeURIComponent(req.params.code));
   const week = Number(req.params.week);
+  if (!code) {
+    res.status(400).json({ error: "Invalid course" });
+    return;
+  }
   if (!Number.isInteger(week) || week < 1) {
     res.status(400).json({ error: "Invalid week" });
     return;
@@ -479,8 +502,12 @@ router.get("/courses/:code/weeks/:week", async (req: Request, res: Response) => 
 
 // Public: per-topic version lists for a week (reader badges + author tools).
 router.get("/courses/:code/weeks/:week/topics", async (req: Request, res: Response) => {
-  const code = decodeURIComponent(req.params.code).toUpperCase();
+  const code = cleanCode(decodeURIComponent(req.params.code));
   const week = Number(req.params.week);
+  if (!code) {
+    res.status(400).json({ error: "Invalid course" });
+    return;
+  }
   if (!Number.isInteger(week) || week < 1) {
     res.status(400).json({ error: "Invalid week" });
     return;
@@ -571,7 +598,11 @@ router.post("/progress", requireAuth, async (req: Request, res: Response) => {
   }
   const userId = (req as AuthedRequest).userId as string;
   const { week, topic } = parsed.data;
-  const course = parsed.data.course.trim();
+  const course = cleanCode(parsed.data.course);
+  if (!course) {
+    res.status(400).json({ error: "Invalid course" });
+    return;
+  }
   try {
     const sb = supabaseAdmin();
     const { error: upErr } = await sb.from("topic_progress").upsert(
@@ -642,7 +673,11 @@ router.post("/publish", requireAuth, requireAuthor, async (req: Request, res: Re
   }
   const { course, week, noteJson } = parsed.data;
   const userId = (req as AuthedRequest).userId as string;
-  const code = course.toUpperCase();
+  const code = cleanCode(course);
+  if (!code) {
+    res.status(400).json({ error: "Invalid course" });
+    return;
+  }
   const note = noteJson as { title?: unknown; subtitle?: unknown; topics?: unknown };
   const topics = Array.isArray(note.topics) ? (note.topics as Record<string, unknown>[]) : [];
   try {
@@ -715,7 +750,11 @@ router.post("/topics/publish", requireAuth, requireAuthor, async (req: Request, 
   }
   const { course, week, topic, noteJson } = parsed.data;
   const userId = (req as AuthedRequest).userId as string;
-  const code = course.toUpperCase();
+  const code = cleanCode(course);
+  if (!code) {
+    res.status(400).json({ error: "Invalid course" });
+    return;
+  }
   const single = noteJson as { title?: unknown };
   try {
     const sb = supabaseAdmin();
@@ -797,7 +836,7 @@ router.get("/stats", requireAuth, async (req: Request, res: Response) => {
 // Authed: completed topic indices for one week (client holds nothing locally).
 router.get("/progress", requireAuth, async (req: Request, res: Response) => {
   const userId = (req as AuthedRequest).userId as string;
-  const course = String(req.query.course || "").toUpperCase();
+  const course = String(req.query.course || "").trim().toUpperCase();
   const week = Number(req.query.week);
   if (!course || !Number.isInteger(week) || week < 1) {
     res.status(400).json({ error: "Invalid course/week" });
@@ -890,7 +929,11 @@ router.get("/authored", requireAuth, async (req: Request, res: Response) => {
 
 // Public: week list for a course (titles for pickers + student week lists).
 router.get("/courses/:code/weeks", async (req: Request, res: Response) => {
-  const code = decodeURIComponent(req.params.code).toUpperCase();
+  const code = cleanCode(decodeURIComponent(req.params.code));
+  if (!code) {
+    res.status(400).json({ error: "Invalid course" });
+    return;
+  }
   try {
     const sb = supabaseAdmin();
     const variants = [...new Set([code, code.replace(/\s/g, "")])];
@@ -1121,7 +1164,11 @@ router.post("/admin/courses", requireAuth, async (req: Request, res: Response) =
     res.status(400).json({ error: "Invalid body", details: parsed.error.flatten() });
     return;
   }
-  const code = parsed.data.code.toUpperCase();
+  const code = cleanCode(parsed.data.code);
+  if (!code) {
+    res.status(400).json({ error: "Invalid course" });
+    return;
+  }
   try {
     const sb = supabaseAdmin();
     const { error: cErr } = await sb.from("courses").upsert({ code, title: parsed.data.title }, { onConflict: "code" });
@@ -1142,7 +1189,11 @@ router.delete("/admin/courses/:code", requireAuth, async (req: Request, res: Res
   if (!adminId) return;
   try {
     const sb = supabaseAdmin();
-    const code = decodeURIComponent(req.params.code).toUpperCase();
+    const code = cleanCode(decodeURIComponent(req.params.code));
+    if (!code) {
+      res.status(400).json({ error: "Invalid course" });
+      return;
+    }
     await sb.from("course_levels").delete().eq("course", code);
     const { error } = await sb.from("courses").delete().eq("code", code);
     if (error) throw error;
@@ -1257,10 +1308,15 @@ router.post("/quiz/attempt", requireAuth, async (req: Request, res: Response) =>
     return;
   }
   const userId = (req as AuthedRequest).userId as string;
+  const course = cleanCode(parsed.data.course);
+  if (!course) {
+    res.status(400).json({ error: "Invalid course" });
+    return;
+  }
   try {
     const { error } = await supabaseAdmin().from("quiz_attempts").insert({
       user_id: userId,
-      course: parsed.data.course.trim().toUpperCase(),
+      course,
       week: parsed.data.week,
       score: parsed.data.score,
       total: parsed.data.total,
