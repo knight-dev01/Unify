@@ -707,4 +707,52 @@ router.post("/quiz/attempt", requireAuth, async (req: Request, res: Response) =>
   }
 });
 
+// ---- Admin: AI model registry health ----
+router.get("/admin/models", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  try {
+    if (req.query.refresh) {
+      const { syncModelsOnce } = await import("../lib/ai");
+      await syncModelsOnce().catch(() => {});
+    }
+    const { data, error } = await supabaseAdmin()
+      .from("ai_models")
+      .select("model,failures,last_ok")
+      .order("failures")
+      .order("model");
+    if (error) throw error;
+    res.json({
+      provider: (process.env.AI_PROVIDER || "gemini").toLowerCase(),
+      default: process.env.GEMINI_MODEL || "gemini-3.6-flash",
+      models: data ?? [],
+    });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+router.post("/admin/models/reset", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  const parsed = z.object({ model: z.string().max(120).optional() }).safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid body" });
+    return;
+  }
+  try {
+    const sb = supabaseAdmin();
+    if (parsed.data.model) {
+      const { error } = await sb.from("ai_models").update({ failures: 0 }).eq("model", parsed.data.model);
+      if (error) throw error;
+    } else {
+      const { error } = await sb.from("ai_models").update({ failures: 0 }).neq("model", "");
+      if (error) throw error;
+    }
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
 export default router;
