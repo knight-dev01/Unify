@@ -368,7 +368,9 @@ function bootJob(label, fn, delays) {
 
 try {
   const seed = require("./src/lib/seed");
-  bootJob("seed check", () => seed.ensureSeeded());
+  // Seed carries ~90 files / hundreds of rows on first boot: give slow
+  // free-tier boots a long retry tail before giving up for this boot.
+  bootJob("seed check", () => seed.ensureSeeded(), [5000, 15000, 60000, 300000]);
   bootJob("default admin check", () => seed.ensureDefaultAdmin());
 } catch (e) {
   logger.warn("seed skipped", { message: e && e.message });

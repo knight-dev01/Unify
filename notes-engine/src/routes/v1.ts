@@ -892,9 +892,11 @@ router.get("/admin/stats", requireAuth, async (req: Request, res: Response) => {
   if (!adminId) return;
   try {
     const sb = supabaseAdmin();
-    const [users, weeks, xp] = await Promise.all([
+    const [users, weeks, topics, courses, xp] = await Promise.all([
       sb.from("profiles").select("id,role", { count: "exact" }),
       sb.from("weeks").select("course", { count: "exact" }),
+      sb.from("topic_notes").select("id", { count: "exact", head: true }),
+      sb.from("courses").select("code", { count: "exact", head: true }),
       sb.from("xp_events").select("amount"),
     ]);
     const rows = ((users.data ?? []) as { role?: string }[]);
@@ -908,6 +910,8 @@ router.get("/admin/stats", requireAuth, async (req: Request, res: Response) => {
       users: users.count ?? rows.length,
       byRole,
       weeks: weeks.count ?? 0,
+      topics: topics.count ?? 0,
+      courses: courses.count ?? 0,
       xpTotal: xpRows.reduce((s, r) => s + (r.amount || 0), 0),
     });
   } catch (e) {
