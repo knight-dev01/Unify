@@ -255,26 +255,36 @@ async function seedLegacyContent(
   // Hygiene: purge blank/orphan rows (empty codes break week lookups and
   // render as blank courses; they were never legitimate data). Cascades
   // clear their weeks/notes too — unreachable junk only.
+  // FAIL-CLOSED: orphan deletion runs only after a PROVEN course read.
+  // A failed/empty read must never wipe enrollments (that failure mode
+  // once emptied dashboards — never again).
   try {
-    const { data: allCourses } = await sb.from("courses").select("code");
+    // Unconditional: blank codes are never legitimate anywhere.
+    await sb.from("resume_state").delete().eq("course", "");
+    await sb.from("topic_progress").delete().eq("course", "");
+    await sb.from("quiz_attempts").delete().eq("course", "");
+    await sb.from("enrollments").delete().eq("course", "");
+    await sb.from("course_levels").delete().eq("course", "");
+    await sb.from("courses").delete().eq("code", "");
+    // Orphan purge runs ONLY after a proven course read (fail-closed).
+    const { data: allCourses, error: cErr } = await sb.from("courses").select("code");
+    if (cErr) throw cErr;
     const valid = new Set(((allCourses ?? []) as { code: string }[]).map((r) => r.code));
     for (const c of [...valid]) {
-      if (!c || !c.trim()) {
+      if (!c.trim()) {
         await sb.from("course_levels").delete().eq("course", c);
         await sb.from("courses").delete().eq("code", c);
         valid.delete(c);
       }
     }
-    const { data: allEnr } = await sb.from("enrollments").select("user_id,course");
     const validUpper = new Set([...valid].map((c) => c.toUpperCase()));
+    const { data: allEnr, error: eErr } = await sb.from("enrollments").select("user_id,course");
+    if (eErr) throw eErr;
     for (const r of ((allEnr ?? []) as { user_id: string; course: string }[])) {
       if (!r.course || !r.course.trim() || !validUpper.has(r.course.toUpperCase())) {
         await sb.from("enrollments").delete().eq("user_id", r.user_id).eq("course", r.course);
       }
     }
-    await sb.from("resume_state").delete().eq("course", "");
-    await sb.from("topic_progress").delete().eq("course", "");
-    await sb.from("quiz_attempts").delete().eq("course", "");
   } catch (e) {
     fail("hygiene", e);
   }
