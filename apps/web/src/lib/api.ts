@@ -49,9 +49,35 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}, retries 
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 30000);
   try {
-    const res = await fetch(`${API_URL}${path}`, { ...init, headers, signal: ctrl.signal });
-    if (res.status === 401) {
-      // Session dead (expired/revoked): clear it and send the user to sign in.
+    let response = await fetch(`${API_URL}${path}`, { ...init, headers, signal: ctrl.signal });
+    if (response.status === 401) {
+      // Might be a transient multi-tab refresh race, not a dead session:
+      // re-read the session once and retry before giving up.
+      log.warn("api", `← 401 ${path} (retrying once with fresh session)`);
+      try {
+        const sb = supabaseBrowser();
+        if (sb) {
+          await sb.auth.getSession();
+          const fresh = await sessionToken();
+          if (fresh && fresh !== token) {
+            const retryRes = await fetch(`${API_URL}${path}`, {
+              ...init,
+              headers: { ...headers, Authorization: `Bearer ${fresh}` },
+              signal: ctrl.signal,
+            });
+            if (retryRes.ok) {
+              log.info("api", `← ${retryRes.status} ${path} (retry ok, ${Date.now() - started}ms)`);
+              return (await retryRes.json()) as T;
+            }
+            response = retryRes;
+          }
+        }
+      } catch {
+        // fall through to dead-session handling below
+      }
+    }
+    if (response.status === 401) {
+      // Session truly dead (expired/revoked): clear it and send the user to sign in.
       // Public endpoints never 401, so this only fires for authed calls.
       log.warn("api", `← 401 ${path} (session dead, signing out)`);
       try {
@@ -63,6 +89,7 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}, retries 
         window.location.assign('/auth');
       }
     }
+    const res = response;
     if (!res.ok) {
       let detail = "";
       try {
@@ -123,7 +150,7 @@ export type AdminUser = {
 
 export const api = {
   universities: () => apiFetch<University[]>("/v1/universities"),
-  me: () => apiFetch<{ onboarded: boolean; profile: Profile | null; isAdmin: boolean }>("/v1/me"),
+  me: () => apiFetch<{ onboarded: boolean; profile: Profile | null; isAdmin: boolean; courses: string[] }>("/v1/me"),
   onboarding: (payload: Record<string, unknown>) =>
     apiFetch<{ ok: boolean; profile: Profile }>("/v1/onboarding", {
       method: "POST",
@@ -197,8 +224,13 @@ export const api = {
     apiFetch<{ ok: boolean }>('/v1/admin/models/reset', { method: 'POST', body: JSON.stringify(model ? { model } : {}) }),
   adminInvite: (email: string, role: string) =>
     apiFetch<{ ok: boolean }>('/v1/admin/users/invite', { method: 'POST', body: JSON.stringify({ email, role }) }),
-  courses: (level = '') =>
-    apiFetch<{ code: string; title: string; levels: string[] }[]>(`/v1/courses${level ? `?level=${encodeURIComponent(level)}` : ''}`),
+  courses: (level = '', semester = '') => {
+    const p = new URLSearchParams();
+    if (level) p.set('level', level);
+    if (semester) p.set('semester', semester);
+    const q = p.toString();
+    return apiFetch<{ code: string; title: string; levels: string[]; semesters: string[] }[]>(`/v1/courses${q ? `?${q}` : ''}`);
+  },
   adminCreateUni: (name: string, short_name?: string) =>
     apiFetch<{ ok: boolean }>('/v1/admin/universities', { method: 'POST', body: JSON.stringify({ name, short_name }) }),
   adminDeleteUni: (id: string) => apiFetch<{ ok: boolean }>(`/v1/admin/universities/${id}`, { method: 'DELETE' }),

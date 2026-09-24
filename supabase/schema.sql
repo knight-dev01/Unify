@@ -18,6 +18,7 @@ create table if not exists profiles (
   faculty text,
   department text,
   level text,
+  semester text,
   university_id uuid references universities(id),
   grad_target numeric,
   role text not null default 'student',
@@ -35,9 +36,20 @@ create table if not exists courses (
 create table if not exists course_levels (
   course text not null references courses(code) on delete cascade,
   level text not null,
+  semester text not null default 'First Semester',
   primary key (course, level)
 );
 create index if not exists course_levels_level_idx on course_levels (level);
+
+create table if not exists enrollments (
+  user_id uuid not null,
+  course text not null references courses(code) on delete cascade,
+  kind text not null default 'taking',
+  created_at timestamptz not null default now(),
+  primary key (user_id, course)
+);
+create index if not exists enrollments_user_idx on enrollments (user_id);
+alter table enrollments enable row level security;
 alter table course_levels enable row level security;
 
 create table if not exists weeks (

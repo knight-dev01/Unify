@@ -24,6 +24,28 @@ export async function ensureSeeded(): Promise<void> {
     .from("courses")
     .upsert({ code: "MEE 352", title: "Unify Learn" }, { onConflict: "code" });
   if (cErr) throw cErr;
+  // Catalog test data (legacy course codes; levels by numbering convention).
+  const catalog: { code: string; level: string }[] = [
+    { code: "CVE 214", level: "200 Level" },
+    { code: "ECE 202", level: "200 Level" },
+    { code: "ECE 210", level: "200 Level" },
+    { code: "ECE 220", level: "200 Level" },
+    { code: "IPE 212", level: "200 Level" },
+    { code: "MEE 202", level: "200 Level" },
+    { code: "MEE 212", level: "200 Level" },
+  ];
+  for (const c of catalog) {
+    const { error: ccErr } = await sb.from("courses").upsert({ code: c.code, title: c.code }, { onConflict: "code" });
+    if (ccErr) throw ccErr;
+    const { error: lErr } = await sb
+      .from("course_levels")
+      .upsert({ course: c.code, level: c.level, semester: "First Semester" }, { onConflict: "course,level" });
+    if (lErr) throw lErr;
+  }
+  const { error: meeLevelErr } = await sb
+    .from("course_levels")
+    .upsert({ course: "MEE 352", level: "300 Level", semester: "First Semester" }, { onConflict: "course,level" });
+  if (meeLevelErr) throw meeLevelErr;
   const { error: wErr } = await sb.from("weeks").upsert(
     {
       course: "MEE 352",

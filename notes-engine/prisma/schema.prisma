@@ -30,6 +30,7 @@ model Profile {
   faculty       String?
   department    String?
   level         String?
+  semester      String?
   universityId  String?     @map("university_id") @db.Uuid
   universityRef University? @relation(fields: [universityId], references: [id])
   gradTarget    Decimal?    @map("grad_target") @db.Decimal
@@ -54,6 +55,7 @@ model Course {
 model CourseLevel {
   course    String
   level     String
+  semester  String   @default("First Semester")
   courseRef Course @relation(fields: [course], references: [code], onDelete: Cascade)
 
   @@id([course, level])
@@ -104,6 +106,16 @@ model AiModel {
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@map("ai_models")
+}
+
+model Enrollment {
+  userId    String   @map("user_id") @db.Uuid
+  course    String
+  kind      String   @default("taking")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@id([userId, course])
+  @@map("enrollments")
 }
 
 model QuizAttempt {

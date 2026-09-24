@@ -22,6 +22,8 @@ const onboardingSchema = z.object({
   universityId: z.string().uuid().max(80).optional(),
   gradTarget: z.number().min(0).max(5).optional(),
   role: z.enum(["student", "lecturer", "collaborator"]).default("student"),
+  semester: z.string().min(1).max(40).optional(),
+  courses: z.array(z.string().min(1).max(20)).max(30).optional(),
 });
 
 const profileSchema = onboardingSchema.partial();
@@ -92,7 +94,12 @@ router.get("/me", requireAuth, async (req: Request, res: Response) => {
         }
       }
     }
-    res.json({ onboarded, profile: data, isAdmin });
+    const { data: enrolled } = await supabaseAdmin()
+      .from("enrollments")
+      .select("course")
+      .eq("user_id", userId);
+    const courses = ((enrolled ?? []) as { course: string }[]).map((r) => r.course);
+    res.json({ onboarded, profile: data, isAdmin, courses });
   } catch (e) {
     res.status(500).json(dbError(e));
   }
@@ -172,6 +179,7 @@ router.post("/onboarding", requireAuth, async (req: Request, res: Response) => {
           university_id: d.universityId ?? null,
           grad_target: d.gradTarget ?? null,
           role: d.role,
+          semester: d.semester ?? null,
           updated_at: new Date().toISOString(),
         },
         { onConflict: "id" }
@@ -179,30 +187,49 @@ router.post("/onboarding", requireAuth, async (req: Request, res: Response) => {
       .select("*")
       .single();
     if (error) throw error;
+    // Enrollments: full replace (taking for students, teaching for authors).
+    if (d.courses && d.courses.length) {
+      const sb2 = supabaseAdmin();
+      const codes = [...new Set(d.courses.map((c) => String(c).toUpperCase()))];
+      const { data: known } = await sb2.from("courses").select("code").in("code", codes);
+      const valid = new Set(((known ?? []) as { code: string }[]).map((r) => r.code));
+      const kind = d.role === "student" ? "taking" : "teaching";
+      await sb2.from("enrollments").delete().eq("user_id", userId);
+      const rows = codes.filter((c) => valid.has(c)).map((course) => ({ user_id: userId, course, kind }));
+      if (rows.length) {
+        const { error: eErr } = await sb2.from("enrollments").insert(rows);
+        if (eErr) throw eErr;
+      }
+    }
     res.json({ ok: true, profile: data });
   } catch (e) {
     res.status(500).json(dbError(e));
   }
 });
 
-// Public: course list, each with its levels. ?level= filters to a level.
+// Public: course list with levels + semesters. ?level= / ?semester= filter.
 router.get("/courses", async (req: Request, res: Response) => {
   const level = String(req.query.level || "");
+  const semester = String(req.query.semester || "");
   try {
     const sb = supabaseAdmin();
     const { data: courses, error } = await sb.from("courses").select("code,title").order("code");
     if (error) throw error;
-    const { data: links, error: linkErr } = await sb.from("course_levels").select("course,level");
+    const { data: links, error: linkErr } = await sb.from("course_levels").select("course,level,semester");
     if (linkErr) throw linkErr;
-    const byCourse: Record<string, string[]> = {};
-    for (const l of ((links ?? []) as { course: string; level: string }[])) {
-      (byCourse[l.course] = byCourse[l.course] || []).push(l.level);
+    const byCourse: Record<string, { levels: string[]; semesters: string[] }> = {};
+    for (const l of ((links ?? []) as { course: string; level: string; semester: string }[])) {
+      const e = (byCourse[l.course] = byCourse[l.course] || { levels: [], semesters: [] });
+      if (!e.levels.includes(l.level)) e.levels.push(l.level);
+      if (l.semester && !e.semesters.includes(l.semester)) e.semesters.push(l.semester);
     }
     let out = ((courses ?? []) as { code: string; title: string }[]).map((c) => ({
       ...c,
-      levels: (byCourse[c.code] || []).sort(),
+      levels: (byCourse[c.code]?.levels || []).sort(),
+      semesters: (byCourse[c.code]?.semesters || []).sort(),
     }));
     if (level) out = out.filter((c) => c.levels.includes(level));
+    if (semester) out = out.filter((c) => c.semesters.includes(semester));
     res.json(out);
   } catch (e) {
     res.status(500).json(dbError(e));

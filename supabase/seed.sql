@@ -15,6 +15,28 @@ values (
 )
 on conflict (course, week) do nothing;
 
+-- Catalog test data (legacy codes; levels by numbering convention).
+insert into courses (code, title) values
+  ('CVE 214', 'CVE 214'),
+  ('ECE 202', 'ECE 202'),
+  ('ECE 210', 'ECE 210'),
+  ('ECE 220', 'ECE 220'),
+  ('IPE 212', 'IPE 212'),
+  ('MEE 202', 'MEE 202'),
+  ('MEE 212', 'MEE 212')
+on conflict (code) do nothing;
+
+insert into course_levels (course, level, semester) values
+  ('MEE 352', '300 Level', 'First Semester'),
+  ('CVE 214', '200 Level', 'First Semester'),
+  ('ECE 202', '200 Level', 'First Semester'),
+  ('ECE 210', '200 Level', 'First Semester'),
+  ('ECE 220', '200 Level', 'First Semester'),
+  ('IPE 212', '200 Level', 'First Semester'),
+  ('MEE 202', '200 Level', 'First Semester'),
+  ('MEE 212', '200 Level', 'First Semester')
+on conflict (course, level) do nothing;
+
 -- Default platform admin. Email: unify.admin@unify.learn / Password: unify.admin
 -- CHANGE THE PASSWORD right after first login (Supabase > Auth > Users > ... > Send reset).
 -- Idempotent: does nothing if the account already exists (never resets your password).
