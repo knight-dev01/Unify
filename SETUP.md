@@ -24,7 +24,20 @@ the Auth server.)
    Cloud, redirect `https://xyzcompany.supabase.co/auth/v1/callback`).
 4. **Authentication → URL Configuration**: Site URL + Redirect URLs +=
    `https://unify-virid.vercel.app/**`.
- 5. **Schema — pick ONE path:**
+5. **Authentication → Emails → SMTP Settings (custom sender via Brevo):**
+   - Brevo → Settings → SMTP & API → **SMTP** tab → create an **SMTP key**
+     (`xsmtpsib-...`). The Brevo **API key** (`xkeysib-...`) does NOT work
+     for SMTP — this mismatch is the classic `500` on signup.
+   - Brevo → Senders & IP → **Senders**: add and verify the exact From
+     address (e.g. `notes@unify.learn`). Unverified sender → Brevo rejects →
+     Supabase signup returns `500`. New Brevo accounts must also be
+     activated (no "activate your account" banner) before anything sends.
+   - Supabase SMTP form: host `smtp-relay.brevo.com`, port `587`,
+     username = Brevo login email, password = the SMTP key. Click
+     **Send test email** — if it fails, fix this before touching anything
+     else. If signup still 500s after a green test, check
+     Logs → Auth for the inner error (template/redirect), not Edge.
+  6. **Schema — pick ONE path:**
     - **A (recommended, automatic):** do nothing. Render applies
       `notes-engine/prisma/migrations/0001_init` on first deploy. Then run
       `supabase/seed.sql` once in **SQL Editor** for LASU + the per-level catalog.
@@ -82,5 +95,6 @@ Settings → Environment Variables (Production + Preview):
 | `CORS error` | `CORS_ORIGIN` must exactly match the Vercel URL. |
 | `401 Invalid session` | Google provider off, or user signed in pre-cutover — re-register. |
 | Prisma `P1001 can't reach DB` | `DIRECT_URL` must be `:5432` direct with correct password. |
+| Signup `POST /auth/v1/signup → 500` | Custom SMTP: use the SMTP key (`xsmtpsib-`), verify the sender in Brevo, then **Send test email** in Supabase. |
 | Prisma re-creates existing tables | You used path B already — run the baseline command from 1.5. |
 | `/v1/universities` returns `[]` | Seed not run yet — run `supabase/seed.sql`. |

@@ -109,10 +109,10 @@ router.get("/me", requireAuth, async (req: Request, res: Response) => {
       email?: string;
       email_confirmed?: boolean;
     };
-    // Students need a university; lecturers/collaborators stop after name.
+    // Students need a university; lecturers/collaborators/admins stop after name.
     const onboarded =
       Boolean(p.university) ||
-      ((p.role === "lecturer" || p.role === "collaborator") && Boolean(p.first_name));
+      ((p.role === "lecturer" || p.role === "collaborator" || p.role === "admin") && Boolean(p.first_name));
     // One-time backfill (then only while unconfirmed): email + confirmation
     // from Auth, so publish notifications can reach confirmed inboxes.
     if (!p.email || !p.email_confirmed) {
@@ -135,7 +135,9 @@ router.get("/me", requireAuth, async (req: Request, res: Response) => {
         // notify targeting degrades gracefully without it
       }
     }
-    let isAdmin = Boolean(p.is_admin);
+    // Effective admin: the is_admin flag, ADMIN_EMAILS, or the admin role.
+    // (Admin is a first-class role now; the flag stays for older accounts.)
+    let isAdmin = Boolean(p.is_admin) || p.role === "admin";
     if (!isAdmin) {
       const adminEmails = (process.env.ADMIN_EMAILS || "")
         .split(",")
@@ -1121,8 +1123,9 @@ async function requireAdminUser(req: Request, res: Response): Promise<string | n
   }
   try {
     const sb = supabaseAdmin();
-    const { data } = await sb.from("profiles").select("is_admin").eq("id", userId).single();
-    if ((data as { is_admin?: boolean } | null)?.is_admin) return userId;
+    const { data } = await sb.from("profiles").select("is_admin,role").eq("id", userId).single();
+    const prof = data as { is_admin?: boolean; role?: string } | null;
+    if (prof?.is_admin || prof?.role === "admin") return userId;
     const adminEmails = (process.env.ADMIN_EMAILS || "")
       .split(",")
       .map((s) => s.trim().toLowerCase())
@@ -1171,6 +1174,56 @@ router.get("/admin/stats", requireAuth, async (req: Request, res: Response) => {
   }
 });
 
+// ---- Admin: full content tree (every course → weeks → topics/versions).
+// Lets an admin browse all notes without enrolling in anything.
+router.get("/admin/content", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  try {
+    const sb = supabaseAdmin();
+    const [coursesRes, levelsRes, weeksRes, notesRes] = await Promise.all([
+      sb.from("courses").select("code,title").order("code").limit(500),
+      sb.from("course_levels").select("course,level,semester").limit(2000),
+      sb.from("weeks").select("course,week,title").order("course").order("week").limit(5000),
+      sb.from("topic_notes").select("course,week,topic,version,title").order("course").order("week").order("topic").order("version").limit(5000),
+    ]);
+    const err = coursesRes.error || levelsRes.error || weeksRes.error || notesRes.error;
+    if (err) throw err;
+    const levelByCourse = new Map<string, { level: string; semester: string }>();
+    for (const r of ((levelsRes.data ?? []) as { course: string; level: string; semester: string }[])) {
+      if (!levelByCourse.has(r.course)) levelByCourse.set(r.course, { level: r.level, semester: r.semester });
+    }
+    const topicsByWeek = new Map<string, { topic: number; versions: number; title: string }[]>();
+    for (const n of ((notesRes.data ?? []) as { course: string; week: number; topic: number; version: number; title: string }[])) {
+      const key = `${n.course}::${n.week}`;
+      const list = topicsByWeek.get(key) || [];
+      const last = list[list.length - 1];
+      if (last && last.topic === n.topic) {
+        last.versions = Math.max(last.versions, n.version);
+        if (!last.title && n.title) last.title = n.title;
+      } else {
+        list.push({ topic: n.topic, versions: n.version, title: n.title || "" });
+      }
+      topicsByWeek.set(key, list);
+    }
+    const weeksByCourse = new Map<string, { week: number; title: string; topics: { topic: number; versions: number; title: string }[] }[]>();
+    for (const w of ((weeksRes.data ?? []) as { course: string; week: number; title: string }[])) {
+      const list = weeksByCourse.get(w.course) || [];
+      list.push({ week: w.week, title: w.title || "", topics: topicsByWeek.get(`${w.course}::${w.week}`) || [] });
+      weeksByCourse.set(w.course, list);
+    }
+    const courses = (((coursesRes.data ?? []) as { code: string; title: string }[])).map((c) => {
+      const lv = levelByCourse.get(c.code);
+      const weeks = weeksByCourse.get(c.code) || [];
+      const topicCount = weeks.reduce((n, w) => n + w.topics.length, 0);
+      return { code: c.code, title: c.title, level: lv?.level || "", semester: lv?.semester || "", weeks, weekCount: weeks.length, topicCount };
+    });
+    res.json({ courses });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
 router.get("/admin/users", requireAuth, async (req: Request, res: Response) => {
   const adminId = await requireAdminUser(req, res);
   if (!adminId) return;
@@ -1183,7 +1236,7 @@ router.get("/admin/users", requireAuth, async (req: Request, res: Response) => {
       .select("id,first_name,email,university,faculty,department,level,role,is_admin,created_at")
       .order("created_at", { ascending: false })
       .limit(limit);
-    if (role === "student" || role === "lecturer" || role === "collaborator") {
+    if (role === "student" || role === "lecturer" || role === "collaborator" || role === "admin") {
       query = query.eq("role", role);
     }
     const { data, error } = await query;
@@ -1203,7 +1256,7 @@ router.get("/admin/users", requireAuth, async (req: Request, res: Response) => {
 });
 
 const adminUserSchema = z.object({
-  role: z.enum(["student", "lecturer", "collaborator"]).optional(),
+  role: z.enum(["student", "lecturer", "collaborator", "admin"]).optional(),
   is_admin: z.boolean().optional(),
   level: z
     .string()
@@ -1223,6 +1276,10 @@ router.patch("/admin/users/:id", requireAuth, async (req: Request, res: Response
   }
   if (req.params.id === adminId && parsed.data.is_admin === false) {
     res.status(403).json({ error: "You cannot remove your own admin flag" });
+    return;
+  }
+  if (req.params.id === adminId && parsed.data.role && parsed.data.role !== "admin") {
+    res.status(403).json({ error: "You cannot demote your own admin role" });
     return;
   }
   try {
@@ -1368,7 +1425,7 @@ router.post("/admin/users/invite", requireAuth, async (req: Request, res: Respon
   const parsed = z
     .object({
       email: z.string().email().max(120),
-      role: z.enum(["student", "lecturer", "collaborator"]).default("student"),
+  role: z.enum(["student", "lecturer", "collaborator", "admin"]).default("student"),
     })
     .safeParse(req.body);
   if (!parsed.success) {
