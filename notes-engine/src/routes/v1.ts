@@ -2,7 +2,7 @@ import { Router, type Request, type Response } from "express";
 import rateLimit from "express-rate-limit";
 import { z } from "zod";
 import { supabaseAdmin } from "../lib/supabase";
-import { notifyCoursePublished } from "../lib/email";
+import { notifyCoursePublished, notifyInAppNewNote } from "../lib/email";
 import { requireAuth, type AuthedRequest } from "../middleware/requireAuth";
 import { requireAuthor } from "../middleware/requireAuthor";
 
@@ -354,6 +354,56 @@ router.put("/me", requireAuth, async (req: Request, res: Response) => {
   }
 });
 
+// Authed: latest notifications + unread count (the bell badge polls this).
+router.get("/notifications", requireAuth, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  const limit = Math.min(Math.max(Number(req.query.limit) || 20, 1), 50);
+  try {
+    const sb = supabaseAdmin();
+    const { data, error } = await sb
+      .from("notifications")
+      .select("id,type,title,body,course,week,topic,link,read,created_at")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(limit);
+    if (error) throw error;
+    const { count, error: cErr } = await sb
+      .from("notifications")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .eq("read", false);
+    if (cErr) throw cErr;
+    res.json({ notifications: data ?? [], unread: count ?? 0 });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// Authed: mark notifications read (explicit ids, or all:true).
+router.post("/notifications/read", requireAuth, async (req: Request, res: Response) => {
+  const parsed = z
+    .object({ ids: z.array(z.string().uuid()).max(50).optional(), all: z.boolean().optional() })
+    .safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid body", details: parsed.error.flatten() });
+    return;
+  }
+  if (!parsed.data.ids?.length && !parsed.data.all) {
+    res.status(400).json({ error: "Provide ids or all:true" });
+    return;
+  }
+  const userId = (req as AuthedRequest).userId as string;
+  try {
+    const query = supabaseAdmin().from("notifications").update({ read: true }).eq("user_id", userId);
+    if (parsed.data.ids?.length) query.in("id", parsed.data.ids);
+    const { error } = await query;
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
 // Authed: complete onboarding (server-validated — replaces client Firestore write).
 router.post("/onboarding", requireAuth, async (req: Request, res: Response) => {
   const parsed = onboardingSchema.safeParse(req.body);
@@ -364,6 +414,7 @@ router.post("/onboarding", requireAuth, async (req: Request, res: Response) => {
   const userId = (req as AuthedRequest).userId as string;
   const d = parsed.data;
   // Roles are immutable: new profiles may set one, existing ones keep theirs.
+  let isNewProfile = true;
   try {
     const { data: existing } = await supabaseAdmin()
       .from("profiles")
@@ -375,8 +426,10 @@ router.post("/onboarding", requireAuth, async (req: Request, res: Response) => {
       res.status(403).json({ error: "Role cannot be changed once assigned" });
       return;
     }
+    isNewProfile = !current;
   } catch {
     // No existing profile (or lookup failed) -> treat as new, continue.
+    isNewProfile = true;
   }
   try {
     const { data, error } = await supabaseAdmin()
@@ -412,6 +465,23 @@ router.post("/onboarding", requireAuth, async (req: Request, res: Response) => {
       if (rows.length) {
         const { error: eErr } = await sb2.from("enrollments").insert(rows);
         if (eErr) throw eErr;
+      }
+    }
+    // First onboarding ever: drop a welcome notification (re-saves skip it).
+    if (isNewProfile) {
+      try {
+        const student = d.role === "student";
+        await supabaseAdmin().from("notifications").insert({
+          user_id: userId,
+          type: "welcome",
+          title: "Welcome to Unify Learn",
+          body: student
+            ? "Your courses are set. Open Week 1 of any course and mark your first topic complete."
+            : "Your author account is ready. Open the Studio to publish your first topic.",
+          link: student ? "/course" : "/studio",
+        });
+      } catch {
+        // onboarding must never fail on a nicety
       }
     }
     res.json({ ok: true, profile: data });
@@ -809,6 +879,7 @@ router.post("/publish", requireAuth, requireAuthor, async (req: Request, res: Re
     // Notify enrolled students (fire-and-forget; never blocks publish).
     if (versions.length) {
       void notifyCoursePublished(code, week, versions).catch(() => {});
+      void notifyInAppNewNote(code, week, versions).catch(() => {});
     }
   } catch (e) {
     res.status(500).json(dbError(e));
@@ -882,6 +953,7 @@ router.post("/topics/publish", requireAuth, requireAuthor, async (req: Request, 
     res.json({ ok: true, id: (ins as { id: string }).id, version });
     // Notify enrolled students (fire-and-forget; never blocks publish).
     void notifyCoursePublished(code, week, [{ topic, version }]).catch(() => {});
+    void notifyInAppNewNote(code, week, [{ topic, version }]).catch(() => {});
   } catch (e) {
     res.status(500).json(dbError(e));
   }
@@ -1369,6 +1441,43 @@ router.post("/admin/users/promote", requireAuth, async (req: Request, res: Respo
       else promoted += 1;
     }
     res.json({ ok: true, promoted, graduated });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// ---- Admin: broadcast an announcement to every user (in-app bell) ----
+router.post("/admin/announce", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  const parsed = z
+    .object({
+      title: z.string().min(1).max(120),
+      body: z.string().min(1).max(500),
+      link: z.string().max(300).optional(),
+    })
+    .safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid body", details: parsed.error.flatten() });
+    return;
+  }
+  try {
+    const sb = supabaseAdmin();
+    const { data, error } = await sb.from("profiles").select("id").limit(5000);
+    if (error) throw error;
+    const ids = ((data ?? []) as { id: string }[]).map((r) => r.id);
+    const rows = ids.map((user_id) => ({
+      user_id,
+      type: "announce",
+      title: parsed.data.title,
+      body: parsed.data.body,
+      link: parsed.data.link || "/dashboard",
+    }));
+    for (let i = 0; i < rows.length; i += 200) {
+      const { error: iErr } = await sb.from("notifications").insert(rows.slice(i, i + 200));
+      if (iErr) throw iErr;
+    }
+    res.json({ ok: true, reached: ids.length });
   } catch (e) {
     res.status(500).json(dbError(e));
   }

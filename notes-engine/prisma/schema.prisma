@@ -168,3 +168,20 @@ model ResumeState {
 
   @@map("resume_state")
 }
+
+model Notification {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  type      String   @default("new_note")
+  title     String   @default("")
+  body      String   @default("")
+  course    String?
+  week      Int?
+  topic     Int?
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([userId, createdAt(sort: Desc)], map: "notifications_user_idx")
+  @@map("notifications")
+}

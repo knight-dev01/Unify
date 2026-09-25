@@ -91,6 +91,42 @@ export async function sendNewNoteEmails(opts: {
   return { sent, skipped: list.length - sent };
 }
 
+// In-app twin of the email above: bell-badge rows for every enrolled
+// student (no confirmed-email requirement — it lives in the app).
+export async function notifyInAppNewNote(
+  course: string,
+  week: number,
+  topics: { topic: number; version: number }[]
+): Promise<void> {
+  try {
+    const sb = supabaseAdmin();
+    const { data } = await sb
+      .from("enrollments")
+      .select("user_id")
+      .eq("course", course)
+      .eq("kind", "taking")
+      .limit(2000);
+    const ids = [...new Set(((data ?? []) as { user_id: string }[]).map((r) => r.user_id))];
+    if (!ids.length) return;
+    const topicLine = topics.map((t) => `Topic ${t.topic} (v${t.version})`).join(" · ") || "fresh content";
+    const rows = ids.map((user_id) => ({
+      user_id,
+      type: "new_note",
+      title: `${course} · Week ${week} is live`,
+      body: topicLine,
+      course,
+      week,
+      topic: topics[0]?.topic ?? null,
+      link: `/learn/${encodeURIComponent(course)}/week/${week}`,
+    }));
+    for (let i = 0; i < rows.length; i += 200) {
+      const { error } = await sb.from("notifications").insert(rows.slice(i, i + 200));
+      if (error) throw error;
+    }
+  } catch (e) {
+    console.warn("[notify] in-app failed", e instanceof Error ? e.message : e);
+  }
+}
 // Recipients: students taking this course with a confirmed email who did
 // not opt out. Pure reads; safe to fire-and-forget from publish handlers.
 export async function notifyCoursePublished(
