@@ -36,6 +36,8 @@ model Profile {
   gradTarget    Decimal?    @map("grad_target") @db.Decimal
   role          String      @default("student")
   isAdmin       Boolean     @default(false) @map("is_admin")
+  notifyNewNotes Boolean    @default(true) @map("notify_new_notes")
+  emailConfirmed Boolean    @default(false) @map("email_confirmed")
   createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt     DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 

@@ -2,6 +2,7 @@ import { Router, type Request, type Response } from "express";
 import rateLimit from "express-rate-limit";
 import { z } from "zod";
 import { supabaseAdmin } from "../lib/supabase";
+import { notifyCoursePublished } from "../lib/email";
 import { requireAuth, type AuthedRequest } from "../middleware/requireAuth";
 import { requireAuthor } from "../middleware/requireAuthor";
 
@@ -53,7 +54,7 @@ const onboardingSchema = z.object({
   courses: z.array(z.string().min(1).max(20)).max(30).optional(),
 });
 
-const profileSchema = onboardingSchema.partial();
+const profileSchema = onboardingSchema.partial().extend({ notifyNewNotes: z.boolean().optional() });
 
 const progressSchema = z.object({
   course: z.string().min(1).max(20),
@@ -100,11 +101,40 @@ router.get("/me", requireAuth, async (req: Request, res: Response) => {
       res.json({ onboarded: false, profile: null });
       return;
     }
-    const p = data as { university?: string; role?: string; first_name?: string; is_admin?: boolean };
+    const p = data as {
+      university?: string;
+      role?: string;
+      first_name?: string;
+      is_admin?: boolean;
+      email?: string;
+      email_confirmed?: boolean;
+    };
     // Students need a university; lecturers/collaborators stop after name.
     const onboarded =
       Boolean(p.university) ||
       ((p.role === "lecturer" || p.role === "collaborator") && Boolean(p.first_name));
+    // One-time backfill (then only while unconfirmed): email + confirmation
+    // from Auth, so publish notifications can reach confirmed inboxes.
+    if (!p.email || !p.email_confirmed) {
+      try {
+        const uRes = await supabaseAdmin().auth.admin.getUserById(userId);
+        const u = (uRes.data as { user?: { email?: string; email_confirmed_at?: string } } | null)?.user;
+        if (u?.email) {
+          await supabaseAdmin()
+            .from("profiles")
+            .update({
+              email: u.email.toLowerCase(),
+              email_confirmed: Boolean(u.email_confirmed_at),
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", userId);
+          p.email = u.email.toLowerCase();
+          p.email_confirmed = Boolean(u.email_confirmed_at);
+        }
+      } catch {
+        // notify targeting degrades gracefully without it
+      }
+    }
     let isAdmin = Boolean(p.is_admin);
     if (!isAdmin) {
       const adminEmails = (process.env.ADMIN_EMAILS || "")
@@ -310,6 +340,7 @@ router.put("/me", requireAuth, async (req: Request, res: Response) => {
           university_id: d.universityId,
           grad_target: d.gradTarget,
           // role is immutable: never updated via PUT (see POST lock above)
+          ...(typeof d.notifyNewNotes === "boolean" ? { notify_new_notes: d.notifyNewNotes } : {}),
           updated_at: new Date().toISOString(),
         },
         { onConflict: "id" }
@@ -775,6 +806,10 @@ router.post("/publish", requireAuth, requireAuthor, async (req: Request, res: Re
       versions.push({ topic: num, version, id: (ins as { id: string }).id });
     }
     res.json({ ok: true, course: code, week, versions });
+    // Notify enrolled students (fire-and-forget; never blocks publish).
+    if (versions.length) {
+      void notifyCoursePublished(code, week, versions).catch(() => {});
+    }
   } catch (e) {
     res.status(500).json(dbError(e));
   }
@@ -845,6 +880,8 @@ router.post("/topics/publish", requireAuth, requireAuthor, async (req: Request, 
       .single();
     if (insErr) throw insErr;
     res.json({ ok: true, id: (ins as { id: string }).id, version });
+    // Notify enrolled students (fire-and-forget; never blocks publish).
+    void notifyCoursePublished(code, week, [{ topic, version }]).catch(() => {});
   } catch (e) {
     res.status(500).json(dbError(e));
   }

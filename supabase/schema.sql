@@ -23,6 +23,8 @@ create table if not exists profiles (
   grad_target numeric,
   role text not null default 'student',
   is_admin boolean not null default false,
+  notify_new_notes boolean not null default true,
+  email_confirmed boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
