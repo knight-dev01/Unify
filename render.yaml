@@ -39,7 +39,7 @@ services:
         value: gemini-3.6-flash
       - key: GEMINI_MODELS
         value: '' # optional explicit fallbacks only; never auto-downgrades
-      - key: RESEND_API_KEY
-        sync: false # optional: enables new-note email notifications (Resend); unset = log-only
+      - key: BREVO_API_KEY
+        sync: false # optional: enables new-note email notifications (Brevo); unset = log-only
       - key: EMAIL_FROM
-        value: 'Unify Learn <notes@unify.learn>' # must be a verified Resend sender/domain
+        value: 'Unify Learn <notes@unify.learn>' # must be a verified Brevo sender

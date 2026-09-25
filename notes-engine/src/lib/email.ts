@@ -1,8 +1,8 @@
 import { supabaseAdmin } from "./supabase";
 
 // New-note email notifications (Duolingo-style nudges, event-driven).
-// Provider: Resend over HTTPS (no extra deps). Without RESEND_API_KEY the
-// sender logs what it WOULD send and reports skipped — safe in dev and
+// Provider: Brevo SMTP API over HTTPS (no extra deps). Without BREVO_API_KEY
+// the sender logs what it WOULD send and reports skipped — safe in dev and
 // harmless until the owner wires a key in Render.
 
 type Recipient = { email: string; firstName?: string };
@@ -43,28 +43,33 @@ export async function sendNewNoteEmails(opts: {
 }): Promise<{ sent: number; skipped: number }> {
   const list = (opts.recipients || []).filter((r) => r.email).slice(0, 200);
   if (!list.length) return { sent: 0, skipped: 0 };
-  const key = process.env.RESEND_API_KEY || "";
-  const from = process.env.EMAIL_FROM || "Unify Learn <notes@unify.learn>";
+  const key = process.env.BREVO_API_KEY || "";
+  const fromRaw = process.env.EMAIL_FROM || "Unify Learn <notes@unify.learn>";
+  const sender = (() => {
+    const m = fromRaw.match(/^(.*)<([^<>]+)>$/);
+    if (m) return { name: (m[1].trim() || "Unify Learn"), email: m[2].trim() };
+    return { name: "Unify Learn", email: fromRaw.trim() };
+  })();
   if (!key) {
-    console.info(`[email] RESEND_API_KEY unset — would notify ${list.length} about ${opts.course} week ${opts.week}`);
+    console.info(`[email] BREVO_API_KEY unset — would notify ${list.length} about ${opts.course} week ${opts.week}`);
     return { sent: 0, skipped: list.length };
   }
   const url = `${appBaseUrl().replace(/\/$/, "")}/learn/${encodeURIComponent(opts.course)}/week/${opts.week}`;
   const subject = `New in ${opts.course}: Week ${opts.week} is live`;
   let sent = 0;
-  // chunks of 10 concurrent posts (Resend free tier is rate-limited)
+  // chunks of 10 concurrent posts (Brevo free tier is rate-limited)
   for (let i = 0; i < list.length; i += 10) {
     const chunk = list.slice(i, i + 10);
     const results = await Promise.allSettled(
       chunk.map((r) =>
-        fetch("https://api.resend.com/emails", {
+        fetch("https://api.brevo.com/v3/smtp/email", {
           method: "POST",
-          headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+          headers: { "api-key": key, "Content-Type": "application/json", Accept: "application/json" },
           body: JSON.stringify({
-            from,
-            to: [r.email],
+            sender,
+            to: [{ email: r.email, name: r.firstName || undefined }],
             subject,
-            html: noteHtml({
+            htmlContent: noteHtml({
               firstName: r.firstName || "",
               course: opts.course,
               week: opts.week,
@@ -73,7 +78,7 @@ export async function sendNewNoteEmails(opts: {
             }),
           }),
         }).then((res) => {
-          if (!res.ok) throw new Error(`resend ${res.status}`);
+          if (!res.ok) throw new Error(`brevo ${res.status}`);
         })
       )
     );
