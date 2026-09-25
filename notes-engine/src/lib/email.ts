@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "./supabase";
+import { newNoteEmail } from "./email-templates";
 
 // New-note email notifications (Duolingo-style nudges, event-driven).
 // Provider: Brevo SMTP API over HTTPS (no extra deps). Without BREVO_API_KEY
@@ -55,32 +56,32 @@ export async function sendNewNoteEmails(opts: {
     return { sent: 0, skipped: list.length };
   }
   const url = `${appBaseUrl().replace(/\/$/, "")}/learn/${encodeURIComponent(opts.course)}/week/${opts.week}`;
-  const subject = `New in ${opts.course}: Week ${opts.week} is live`;
   let sent = 0;
   // chunks of 10 concurrent posts (Brevo free tier is rate-limited)
   for (let i = 0; i < list.length; i += 10) {
     const chunk = list.slice(i, i + 10);
     const results = await Promise.allSettled(
-      chunk.map((r) =>
-        fetch("https://api.brevo.com/v3/smtp/email", {
+      chunk.map((r) => {
+        const built = newNoteEmail({
+          firstName: r.firstName || "",
+          course: opts.course,
+          week: opts.week,
+          topics: opts.topics,
+          url,
+        });
+        return fetch("https://api.brevo.com/v3/smtp/email", {
           method: "POST",
           headers: { "api-key": key, "Content-Type": "application/json", Accept: "application/json" },
           body: JSON.stringify({
             sender,
             to: [{ email: r.email, name: r.firstName || undefined }],
-            subject,
-            htmlContent: noteHtml({
-              firstName: r.firstName || "",
-              course: opts.course,
-              week: opts.week,
-              topics: opts.topics,
-              url,
-            }),
+            subject: built.subject,
+            htmlContent: built.html,
           }),
         }).then((res) => {
           if (!res.ok) throw new Error(`brevo ${res.status}`);
-        })
-      )
+        });
+      })
     );
     for (const r of results) {
       if (r.status === "fulfilled") sent += 1;
