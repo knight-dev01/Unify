@@ -1114,6 +1114,33 @@ router.get("/courses/:code/weeks", async (req: Request, res: Response) => {
   }
 });
 
+// ---- Content browsing: admins see everything; authors see the tree too
+// (clients scope authors to their contributing level). ----
+async function requireContentViewer(req: Request, res: Response): Promise<string | null> {
+  const userId = (req as AuthedRequest).userId;
+  if (!userId) {
+    res.status(401).json({ error: "Missing session" });
+    return null;
+  }
+  try {
+    const sb = supabaseAdmin();
+    const { data } = await sb.from("profiles").select("is_admin,role").eq("id", userId).single();
+    const prof = data as { is_admin?: boolean; role?: string } | null;
+    if (
+      prof?.is_admin ||
+      prof?.role === "admin" ||
+      prof?.role === "lecturer" ||
+      prof?.role === "collaborator"
+    ) {
+      return userId;
+    }
+  } catch {
+    // deny below
+  }
+  res.status(403).json({ error: "Admins and authors only" });
+  return null;
+}
+
 // ---- Admin (platform owner): stats, user management ----
 async function requireAdminUser(req: Request, res: Response): Promise<string | null> {
   const userId = (req as AuthedRequest).userId;
@@ -1175,9 +1202,10 @@ router.get("/admin/stats", requireAuth, async (req: Request, res: Response) => {
 });
 
 // ---- Admin: full content tree (every course → weeks → topics/versions).
-// Lets an admin browse all notes without enrolling in anything.
+// Authors are admitted too and scope themselves to their level client-side.
+// Lets staff browse all notes without enrolling in anything.
 router.get("/admin/content", requireAuth, async (req: Request, res: Response) => {
-  const adminId = await requireAdminUser(req, res);
+  const adminId = await requireContentViewer(req, res);
   if (!adminId) return;
   try {
     const sb = supabaseAdmin();
