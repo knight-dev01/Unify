@@ -5,7 +5,7 @@
 //   npx tsx scripts/dump-email-templates.ts
 const fs = require("fs");
 const path = require("path");
-const { SUPABASE_TEMPLATES, newNoteEmail, welcomeEmail } = require("../src/lib/email-templates");
+const { SUPABASE_TEMPLATES, newNoteEmail } = require("../src/lib/email-templates");
 
 export {};
 
@@ -26,10 +26,6 @@ const files = [
       ],
       url: "https://unify-virid.vercel.app/learn/CVE%20214/week/1",
     }),
-  },
-  {
-    name: "welcome",
-    ...welcomeEmail({ firstName: "Ada", url: "https://unify-virid.vercel.app/dashboard" }),
   },
 ];
 

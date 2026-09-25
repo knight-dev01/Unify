@@ -99,25 +99,11 @@ export function newNoteEmail(opts: {
   return { subject, html };
 }
 
-export function welcomeEmail(opts: { firstName: string; url: string }): { subject: string; html: string } {
-  const name = opts.firstName ? ` ${opts.firstName}` : "";
-  return {
-    subject: "Welcome to Unify Learn — let's build",
-    html: wrap(
-      "Your account is ready",
-      [
-        `<div style="text-align:center;">${MASCOT_SVG}</div>`,
-        `<p>Hi${name}, and welcome aboard.</p>`,
-        `<p>Pick your courses, open Week 1, and mark your first topic complete &mdash; your streak starts today.</p>`,
-        button(opts.url, "Open my dashboard"),
-      ].join(""),
-      footer("Questions? Reply to this email and a human will answer.")
-    ),
-  };
-}
-
 // ---- Supabase Auth templates (paste into Dashboard > Authentication >
-// Email Templates). Supabase fills {{ .ConfirmationURL }} etc. at send. ----
+// Email Templates). Only the three flows the app actually uses:
+// signup verification, admin invites, password reset. Supabase fills
+// {{ .ConfirmationURL }} etc. at send. Everything else stays on Supabase
+// defaults so there's nothing extra to maintain. ----
 function authMail(subtitle: string, body: string): string {
   return wrap(
     subtitle,
@@ -162,122 +148,6 @@ export const SUPABASE_TEMPLATES: { name: string; subject: string; html: string }
         `<p>Someone (hopefully you) asked to reset the password for {{ .Email }}. This link works once and expires soon:</p>`,
         button("{{ .ConfirmationURL }}", "Reset my password"),
         `<p style="font-size:12px;color:#777777;">Button not working? Paste this link:<br/>{{ .ConfirmationURL }}</p>`,
-      ].join("")
-    ),
-  },
-  {
-    name: "email-change",
-    subject: "Confirm your new Unify Learn email",
-    html: authMail(
-      "Confirm the switch",
-      [
-        `<p>Tap below to confirm your new address. Your notes, XP and streaks move with you automatically:</p>`,
-        button("{{ .ConfirmationURL }}", "Confirm new email"),
-        `<p style="font-size:12px;color:#777777;">Button not working? Paste this link:<br/>{{ .ConfirmationURL }}</p>`,
-      ].join("")
-    ),
-  },
-  {
-    name: "magic-link",
-    subject: "Your Unify Learn sign-in link",
-    html: authMail(
-      "Password-free entry",
-      [
-        `<div style="text-align:center;">${MASCOT_SVG}</div>`,
-        `<p>Tap below to sign in instantly. The link works once and expires soon:</p>`,
-        button("{{ .ConfirmationURL }}", "Sign me in"),
-        `<p style="font-size:12px;color:#777777;">Button not working? Paste this link:<br/>{{ .ConfirmationURL }}</p>`,
-      ].join("")
-    ),
-  },
-  {
-    name: "reauthentication",
-    subject: "Confirm it's really you",
-    html: authMail(
-      "Quick identity check",
-      [
-        `<p>Unify Learn needs you to confirm your identity before continuing. Enter this code where asked (it expires in minutes):</p>`,
-        `<div style="font-size:32px;font-weight:800;letter-spacing:8px;text-align:center;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:16px;margin:16px 0;">{{ .Token }}</div>`,
-      ].join("")
-    ),
-  },
-  {
-    name: "password-changed",
-    subject: "Your Unify Learn password was changed",
-    html: authMail(
-      "Heads up on your account",
-      [
-        `<p>Your password for {{ .Email }} was just changed. If this was you, nothing to do.</p>`,
-        button("{{ .SiteURL }}/auth", "Review my account"),
-        `<p style="font-size:12px;color:#777777;">If this was NOT you, open the app and reset your password immediately.</p>`,
-      ].join("")
-    ),
-  },
-  {
-    name: "email-changed",
-    subject: "Your Unify Learn email was changed",
-    html: authMail(
-      "Heads up on your account",
-      [
-        `<p>The sign-in email on your account was just changed. If this was you, nothing to do &mdash; your notes, XP and streaks moved with you.</p>`,
-        `<p style="font-size:12px;color:#777777;">If this was NOT you, contact support right away.</p>`,
-      ].join("")
-    ),
-  },
-  {
-    name: "phone-changed",
-    subject: "Your Unify Learn phone number was changed",
-    html: authMail(
-      "Heads up on your account",
-      [
-        `<p>The phone number on your account was just changed. If this was you, nothing to do.</p>`,
-        `<p style="font-size:12px;color:#777777;">If this was NOT you, contact support right away.</p>`,
-      ].join("")
-    ),
-  },
-  {
-    name: "method-linked",
-    subject: "A new sign-in method was linked",
-    html: authMail(
-      "Heads up on your account",
-      [
-        `<div style="text-align:center;">${MASCOT_SVG}</div>`,
-        `<p>A new sign-in method was just linked to {{ .Email }}. If this was you, nothing to do.</p>`,
-        `<p style="font-size:12px;color:#777777;">If this was NOT you, reset your password immediately.</p>`,
-      ].join("")
-    ),
-  },
-  {
-    name: "method-removed",
-    subject: "A sign-in method was removed",
-    html: authMail(
-      "Heads up on your account",
-      [
-        `<p>A sign-in method was just removed from {{ .Email }}. If this was you, nothing to do.</p>`,
-        `<p style="font-size:12px;color:#777777;">If this was NOT you, reset your password immediately.</p>`,
-      ].join("")
-    ),
-  },
-  {
-    name: "mfa-added",
-    subject: "Two-factor authentication was turned on",
-    html: authMail(
-      "Extra lock on your account",
-      [
-        `<div style="text-align:center;">${MASCOT_SVG}</div>`,
-        `<p>Two-factor authentication was just enabled for {{ .Email }}. Nice &mdash; your notes and streaks are safer now.</p>`,
-        `<p style="font-size:12px;color:#777777;">If this was NOT you, reset your password immediately.</p>`,
-      ].join("")
-    ),
-  },
-  {
-    name: "mfa-removed",
-    subject: "Two-factor authentication was turned off",
-    html: authMail(
-      "Heads up on your account",
-      [
-        `<p>Two-factor authentication was just removed from {{ .Email }}. If this was you, nothing to do.</p>`,
-        `<p style="font-size:12px;color:#777777;">If this was NOT you, reset your password immediately.</p>`,
       ].join("")
     ),
   },
