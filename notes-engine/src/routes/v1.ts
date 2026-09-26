@@ -756,6 +756,14 @@ router.post("/progress", requireAuth, async (req: Request, res: Response) => {
   }
   try {
     const sb = supabaseAdmin();
+    // XP + progress + streaks are students-only. Authors/admins reading
+    // outside preview record nothing (their taps must never mint XP or
+    // pollute student stats).
+    const { data: prof } = await sb.from("profiles").select("role").eq("id", userId).single();
+    if ((prof as { role?: string } | null)?.role && (prof as { role?: string }).role !== "student") {
+      res.json({ ok: true, xp: 0, streak: 0, awarded: 0 });
+      return;
+    }
     const { error: upErr } = await sb.from("topic_progress").upsert(
       { user_id: userId, course, week, topic, done: true, completed_at: new Date().toISOString() },
       { onConflict: "user_id,course,week,topic" }
@@ -1252,6 +1260,25 @@ router.get("/admin/content", requireAuth, async (req: Request, res: Response) =>
   }
 });
 
+// ---- Admin: recent activity for the oversight dashboard (latest
+// signups + latest published note versions). ----
+router.get("/admin/activity", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  try {
+    const sb = supabaseAdmin();
+    const [users, notes] = await Promise.all([
+      sb.from("profiles").select("first_name,email,role,created_at").order("created_at", { ascending: false }).limit(5),
+      sb.from("topic_notes").select("course,week,topic,version,title,created_at").order("created_at", { ascending: false }).limit(5),
+    ]);
+    if (users.error) throw users.error;
+    if (notes.error) throw notes.error;
+    res.json({ recentUsers: users.data ?? [], recentNotes: notes.data ?? [] });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
 router.get("/admin/users", requireAuth, async (req: Request, res: Response) => {
   const adminId = await requireAdminUser(req, res);
   if (!adminId) return;
@@ -1593,6 +1620,13 @@ router.post("/quiz/attempt", requireAuth, async (req: Request, res: Response) =>
     return;
   }
   try {
+    // Quiz stats are student metrics — authors/admins testing a quiz
+    // record nothing.
+    const { data: prof } = await supabaseAdmin().from("profiles").select("role").eq("id", userId).single();
+    if ((prof as { role?: string } | null)?.role && (prof as { role?: string }).role !== "student") {
+      res.json({ ok: true, recorded: false });
+      return;
+    }
     const { error } = await supabaseAdmin().from("quiz_attempts").insert({
       user_id: userId,
       course,
