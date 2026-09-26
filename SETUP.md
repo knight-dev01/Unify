@@ -96,5 +96,6 @@ Settings → Environment Variables (Production + Preview):
 | `401 Invalid session` | Google provider off, or user signed in pre-cutover — re-register. |
 | Prisma `P1001 can't reach DB` | `DIRECT_URL` must be `:5432` direct with correct password. |
 | Signup `POST /auth/v1/signup → 500` | Custom SMTP: use the SMTP key (`xsmtpsib-`), verify the sender in Brevo, then **Send test email** in Supabase. |
+| Push notifications silent | Render needs `VAPID_PUBLIC_KEY` + `VAPID_PRIVATE_KEY` + `VAPID_SUBJECT` (generate: `npx web-push generate-vapid-keys` in `notes-engine`). Without them the backend logs and skips. Users opt in from Profile → Appearance. |
 | Prisma re-creates existing tables | You used path B already — run the baseline command from 1.5. |
 | `/v1/universities` returns `[]` | Seed not run yet — run `supabase/seed.sql`. |

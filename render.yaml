@@ -43,3 +43,9 @@ services:
         sync: false # optional: enables new-note email notifications (Brevo); unset = log-only
       - key: EMAIL_FROM
         value: 'Unify Learn <notes@unify.learn>' # must be a verified Brevo sender
+      - key: VAPID_PUBLIC_KEY
+        sync: false # web-push public key (generate: npx web-push generate-vapid-keys)
+      - key: VAPID_PRIVATE_KEY
+        sync: false # web-push private key (never commit)
+      - key: VAPID_SUBJECT
+        value: 'mailto:notes@unify.learn'

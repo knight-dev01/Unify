@@ -185,3 +185,15 @@ model Notification {
   @@index([userId, createdAt(sort: Desc)], map: "notifications_user_idx")
   @@map("notifications")
 }
+
+model PushSubscription {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([userId], map: "push_subscriptions_user_idx")
+  @@map("push_subscriptions")
+}

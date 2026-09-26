@@ -3,6 +3,7 @@ import rateLimit from "express-rate-limit";
 import { z } from "zod";
 import { supabaseAdmin } from "../lib/supabase";
 import { notifyCoursePublished, notifyInAppNewNote } from "../lib/email";
+import { pushNewNote, pushAnnounce, pushToUser } from "../lib/push";
 import { requireAuth, type AuthedRequest } from "../middleware/requireAuth";
 import { requireAuthor } from "../middleware/requireAuthor";
 
@@ -406,6 +407,56 @@ router.post("/notifications/read", requireAuth, async (req: Request, res: Respon
   }
 });
 
+// ---- Web Push subscriptions (browser push, third notify leg) ----
+const pushSubSchema = z.object({
+  endpoint: z.string().url().max(1000),
+  keys: z.object({ p256dh: z.string().min(1).max(300), auth: z.string().min(1).max(200) }),
+});
+
+router.post("/push/subscribe", requireAuth, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  const parsed = pushSubSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid body", details: parsed.error.flatten() });
+    return;
+  }
+  try {
+    const { error } = await supabaseAdmin().from("push_subscriptions").upsert(
+      {
+        user_id: userId,
+        endpoint: parsed.data.endpoint,
+        p256dh: parsed.data.keys.p256dh,
+        auth: parsed.data.keys.auth,
+      },
+      { onConflict: "endpoint" }
+    );
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+router.post("/push/unsubscribe", requireAuth, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  const parsed = z.object({ endpoint: z.string().max(1000).optional() }).safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid body", details: parsed.error.flatten() });
+    return;
+  }
+  try {
+    const sb = supabaseAdmin();
+    if (parsed.data.endpoint) {
+      await sb.from("push_subscriptions").delete().eq("user_id", userId).eq("endpoint", parsed.data.endpoint);
+    } else {
+      await sb.from("push_subscriptions").delete().eq("user_id", userId);
+    }
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
 // Authed: complete onboarding (server-validated — replaces client Firestore write).
 router.post("/onboarding", requireAuth, async (req: Request, res: Response) => {
   const parsed = onboardingSchema.safeParse(req.body);
@@ -502,6 +553,14 @@ router.get("/courses", async (req: Request, res: Response) => {
     if (error) throw error;
     const { data: links, error: linkErr } = await sb.from("course_levels").select("course,level,semester");
     if (linkErr) throw linkErr;
+    // Week counts ride along so catalog screens never fan out into one
+    // request per course (that N+1 is what melts the server in a pilot).
+    const { data: weekRows, error: weekErr } = await sb.from("weeks").select("course").limit(5000);
+    if (weekErr) throw weekErr;
+    const weeksByCourse: Record<string, number> = {};
+    for (const w of ((weekRows ?? []) as { course: string }[])) {
+      weeksByCourse[w.course] = (weeksByCourse[w.course] || 0) + 1;
+    }
     const byCourse: Record<string, { levels: string[]; semesters: string[] }> = {};
     for (const l of ((links ?? []) as { course: string; level: string; semester: string }[])) {
       const e = (byCourse[l.course] = byCourse[l.course] || { levels: [], semesters: [] });
@@ -514,6 +573,7 @@ router.get("/courses", async (req: Request, res: Response) => {
       ...c,
       levels: (byCourse[c.code]?.levels || []).sort(),
       semesters: (byCourse[c.code]?.semesters || []).sort(),
+      weeks: weeksByCourse[c.code] || 0,
     }));
     if (level) out = out.filter((c) => c.levels.includes(level));
     if (semester) out = out.filter((c) => c.semesters.includes(semester));
@@ -890,6 +950,7 @@ router.post("/publish", requireAuth, requireAuthor, async (req: Request, res: Re
     if (versions.length) {
       void notifyCoursePublished(code, week, versions).catch(() => {});
       void notifyInAppNewNote(code, week, versions).catch(() => {});
+      void pushNewNote(code, week, versions).catch(() => {});
     }
   } catch (e) {
     res.status(500).json(dbError(e));
@@ -964,6 +1025,7 @@ router.post("/topics/publish", requireAuth, requireAuthor, async (req: Request, 
     // Notify enrolled students (fire-and-forget; never blocks publish).
     void notifyCoursePublished(code, week, [{ topic, version }]).catch(() => {});
     void notifyInAppNewNote(code, week, [{ topic, version }]).catch(() => {});
+    void pushNewNote(code, week, [{ topic, version }]).catch(() => {});
   } catch (e) {
     res.status(500).json(dbError(e));
   }
@@ -1401,18 +1463,21 @@ router.patch("/admin/users/:id", requireAuth, async (req: Request, res: Response
     if (error) throw error;
     if (roleChanged) {
       const label = roleChanged.charAt(0).toUpperCase() + roleChanged.slice(1);
+      const link = roleChanged === "student" ? "/course" : roleChanged === "admin" ? "/admin" : "/studio";
+      const body =
+        roleChanged === "student"
+          ? "You now learn with guided paths, XP and streaks."
+          : roleChanged === "admin"
+            ? "You now manage the whole platform: users, courses, content and announcements."
+            : "You now author notes. Open the Studio and pick your contributing level.";
       await supabaseAdmin().from("notifications").insert({
         user_id: req.params.id,
         type: "role",
         title: `Your role is now ${label}`,
-        body:
-          roleChanged === "student"
-            ? "You now learn with guided paths, XP and streaks."
-            : roleChanged === "admin"
-              ? "You now manage the whole platform: users, courses, content and announcements."
-              : "You now author notes. Open the Studio and pick your contributing level.",
-        link: roleChanged === "student" ? "/course" : roleChanged === "admin" ? "/admin" : "/studio",
+        body,
+        link,
       });
+      void pushToUser(req.params.id, { title: `Your role is now ${label}`, body, url: link }).catch(() => {});
     }
     res.json({ ok: true, profile: data });
   } catch (e) {
@@ -1658,6 +1723,7 @@ router.post("/admin/announce", requireAuth, async (req: Request, res: Response) 
       const { error: iErr } = await sb.from("notifications").insert(rows.slice(i, i + 200));
       if (iErr) throw iErr;
     }
+    void pushAnnounce(parsed.data.title, parsed.data.body, parsed.data.link).catch(() => {});
     res.json({ ok: true, reached: ids.length });
   } catch (e) {
     res.status(500).json(dbError(e));
