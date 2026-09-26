@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Unify Learn — Product Documentation v1.6.0</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 20mm 16mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, Helvetica, sans-serif; color: #1f2937; font-size: 11pt; line-height: 1.6; }
+  .cover { page-break-after: always; display: flex; flex-direction: column; justify-content: center; min-height: 240mm; text-align: center; }
+  .cover .brand { font-size: 15pt; font-weight: 800; color: #059669; letter-spacing: 1px; }
+  .cover h1 { font-size: 34pt; font-weight: 800; margin: 10px 0 6px; color: #111827; }
+  .cover h1 span { color: #10b981; }
+  .cover .tag { font-size: 13pt; color: #6b7280; font-style: italic; }
+  .cover .meta { margin-top: 28px; font-size: 10.5pt; color: #6b7280; }
+  .cover .pill { display: inline-block; margin-top: 14px; background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; font-weight: 800; padding: 6px 18px; border-radius: 9999px; font-size: 11pt; }
+  h2 { font-size: 17pt; color: #111827; border-bottom: 3px solid #10b981; padding-bottom: 4px; margin: 26px 0 10px; page-break-after: avoid; }
+  h3 { font-size: 12.5pt; color: #065f46; margin: 14px 0 6px; page-break-after: avoid; }
+  p, li { margin-bottom: 5px; }
+  ul, ol { padding-left: 20px; }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0 14px; font-size: 10pt; page-break-inside: avoid; }
+  th { background: #065f46; color: #fff; text-align: left; padding: 7px 9px; }
+  td { border: 1px solid #d1d5db; padding: 6px 9px; vertical-align: top; }
+  tr:nth-child(even) td { background: #f9fafb; }
+  code { background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 4px; padding: 0 4px; font-size: 9.5pt; }
+  .note { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 8px 12px; margin: 10px 0; font-size: 10pt; }
+  .ok { background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 8px 12px; margin: 10px 0; font-size: 10pt; }
+  .warn { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 8px 12px; margin: 10px 0; font-size: 10pt; }
+  .toc a { color: #065f46; text-decoration: none; }
+  .toc li { margin-bottom: 3px; }
+  .foot { margin-top: 30px; text-align: center; font-size: 9.5pt; color: #9ca3af; }
+  section { page-break-inside: avoid; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="brand">UNIFY LEARN</div>
+  <h1>Product <span>Documentation</span></h1>
+  <div class="tag">Guided 12-week paths, XP, streaks and notes that fit your courses.</div>
+  <div><span class="pill">Version 1.6.0 · 26 September 2026</span></div>
+  <div class="meta">
+    Mobile-first learning platform for the Faculty of Engineering, Lagos State University.<br/>
+    Covers: current features · roles &amp; journeys · notifications · sessions &amp; security ·<br/>
+    design system · architecture · pilot readiness · multi-tenant roadmap.
+  </div>
+</div>
+
+<h2>Contents</h2>
+<ol class="toc">
+  <li><a href="#s1">1 · Product overview</a></li>
+  <li><a href="#s2">2 · Roles &amp; access matrix</a></li>
+  <li><a href="#s3">3 · Student journey</a></li>
+  <li><a href="#s4">4 · Author journey (lecturers &amp; collaborators)</a></li>
+  <li><a href="#s5">5 · Admin journey</a></li>
+  <li><a href="#s6">6 · Notifications (in-app · email · push)</a></li>
+  <li><a href="#s7">7 · Sessions, security &amp; XP economy</a></li>
+  <li><a href="#s8">8 · Reader: story notes &amp; quizzes</a></li>
+  <li><a href="#s9">9 · Design system (Classic / Story, dark mode)</a></li>
+  <li><a href="#s10">10 · Versioning scheme</a></li>
+  <li><a href="#s11">11 · Architecture &amp; data model</a></li>
+  <li><a href="#s12">12 · Pilot readiness: the 500-user verdict</a></li>
+  <li><a href="#s13">13 · Multi-tenant production plan</a></li>
+  <li><a href="#s14">14 · Roadmap (“later”)</a></li>
+  <li><a href="#s15">15 · Appendix: environments &amp; operations</a></li>
+</ol>
+
+<h2 id="s1">1 · Product overview</h2>
+<p>Unify Learn is a mobile-first web application that turns lecture material into guided, interactive weekly notes for engineering students. Authors publish versioned topics; students read, attempt quizzes, earn XP and keep streaks; admins run the whole platform from an oversight dashboard.</p>
+<ul>
+  <li><strong>Frontend:</strong> Vite + React + TypeScript, served on Vercel (<code>unify-virid.vercel.app</code>).</li>
+  <li><strong>Backend:</strong> Express + TypeScript + Prisma on Render (<code>unify-api-z4zm</code>).</li>
+  <li><strong>Data &amp; auth:</strong> Supabase Postgres + Supabase Auth.</li>
+  <li><strong>Email:</strong> Brevo (SMTP for auth mail, API for note notifications).</li>
+  <li><strong>Push:</strong> Web Push (VAPID) to browsers, third notify leg.</li>
+  <li><strong>Content seed:</strong> 158 mined courses, 90 legacy weeks converted to topic-level notes.</li>
+</ul>
+
+<h2 id="s2">2 · Roles &amp; access matrix</h2>
+<table>
+  <tr><th>Capability</th><th>Student</th><th>Lecturer</th><th>Collaborator</th><th>Admin (role)</th></tr>
+  <tr><td>Learn paths (My Courses, Explore, reader)</td><td>Yes (enrolled only)</td><td>No</td><td>No</td><td>No (reads via All content)</td></tr>
+  <tr><td>XP, streaks, quizzes recorded</td><td>Yes</td><td>No</td><td>No</td><td>No</td></tr>
+  <tr><td>Studio authoring + preview</td><td>No</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+  <tr><td>Level-scoped note browser</td><td>—</td><td>Teaching level</td><td>Contributing level</td><td>All content</td></tr>
+  <tr><td>Admin panel (users, courses, analytics)</td><td>No</td><td>No</td><td>No</td><td>Yes (role or legacy flag)</td></tr>
+  <tr><td>Role assignment</td><td colspan="4">Immutable after onboarding; changed only by an admin (recipient is notified).</td></tr>
+</table>
+<div class="note">The bootstrap <code>unify.admin</code> account is flag-based (<code>collaborator</code> + <code>is_admin</code>), so the flag permanently counts as admin — the main account can never be locked out. Other admins inherit full rights via the <code>admin</code> role.</div>
+
+<h2 id="s3">3 · Student journey</h2>
+<ol>
+  <li><strong>Auth:</strong> email sign-up (verification mail), sign-in, Google (coming soon), forgot-password reset, resend verification. Remember-me is opt-in.</li>
+  <li><strong>Onboarding (8 steps):</strong> role → name → university → faculty → department → level → courses (own level + active semester) → graduation target.</li>
+  <li><strong>Dashboard:</strong> greeting, daily line, XP / streak / target / courses, Continue-Learning resume card (exact course·week·topic), quiz stats, enrolled courses.</li>
+  <li><strong>My Courses:</strong> enrolled courses with week counts. <strong>Explore:</strong> enroll-only catalog for own level + active semester (single bulk call).</li>
+  <li><strong>Reader:</strong> story hero, segmented chapter bar, topics, recalls, quizzes, read-aloud, resume tracking.</li>
+  <li><strong>Notifications:</strong> bell badge + list page; unread auto-opens on fresh entry. Email + push per profile prefs.</li>
+  <li><strong>Profile:</strong> inline edit, email change, notify prefs, appearance (Classic/Story, light/dark, push toggle), version footer, guarded logout.</li>
+</ol>
+
+<h2 id="s4">4 · Author journey</h2>
+<ol>
+  <li><strong>Onboarding (lecturer 6 steps / collaborator 3):</strong> both pick the level they teach / contribute to; courses selected enroll as <em>teaching</em>.</li>
+  <li><strong>Studio:</strong> three methods — AI generate (Gemini, rate-limited), manual visual builder (no raw JSON), external-AI format pack.</li>
+  <li><strong>Versioning:</strong> every publish stacks v1, v2, v3… per topic; authors delete own versions, admins any. Reader shows version badges + picker.</li>
+  <li><strong>Dashboard:</strong> Notes / Courses / Students / Done stats, own published list with preview links, level-scoped Browse entry.</li>
+  <li><strong>Contributing level:</strong> saved at onboarding, changeable later in Profile; scopes the Browse tree.</li>
+</ol>
+
+<h2 id="s5">5 · Admin journey</h2>
+<ul>
+  <li><strong>Oversight dashboard:</strong> platform totals (users, courses, weeks, topics), latest signups, latest published notes. Main admin (role) gets the panel link; flag admins get view-only notes.</li>
+  <li><strong>Admin panel modules:</strong> Analytics (roles donut, 14-day signups/notes/XP charts), AI models, Universities, Courses per level (search), Academic session + promote-all, Announce, Users &amp; roles (search, invite, role/level edit, self-lock).</li>
+  <li><strong>All content browser:</strong> every course → weeks → topic/version chips with read-only preview links.</li>
+  <li><strong>Academic control:</strong> active-semester toggle (students only ever see that semester), one-click promotion (500 Level graduates, enrollments reset).</li>
+  <li><strong>Safety:</strong> own role locked (UI + 403 server-side), self-demotion blocked, every destructive/broadcast action uses the designed confirm sheet.</li>
+</ul>
+
+<h2 id="s6">6 · Notifications (in-app · email · push)</h2>
+<table>
+  <tr><th>Event</th><th>In-app bell</th><th>Email (Brevo)</th><th>Push</th></tr>
+  <tr><td>New note published</td><td>Enrolled students</td><td>Confirmed + opted-in takers</td><td>Subscribed takers</td></tr>
+  <tr><td>Admin announcement</td><td>All users</td><td>—</td><td>All subscribed</td></tr>
+  <tr><td>Welcome (first onboarding)</td><td>New user</td><td>— (auth mail covers it)</td><td>—</td></tr>
+  <tr><td>Role promoted / demoted</td><td>Recipient</td><td>—</td><td>Recipient</td></tr>
+</table>
+<p>Auth mail (signup verify, invite, password reset) uses three branded Supabase templates; everything else stays on Supabase defaults. Push needs VAPID keys on Render and per-device opt-in from Profile → Appearance.</p>
+
+<h2 id="s7">7 · Sessions, security &amp; XP economy</h2>
+<ul>
+  <li><strong>Independent per-tab sessions</strong> (sessionStorage); Remember-me restores tokens across restarts (localStorage, opt-in).</li>
+  <li><strong>30-minute sliding inactivity TTL</strong> persisted across app close; expiry signs out with an explanatory message. Applies to remembered sessions too.</li>
+  <li><strong>XP:</strong> +10 per completed topic, students only (server-enforced; staff reads record nothing). Quizzes record stats, award no XP. Streaks count consecutive UTC days with XP events.</li>
+  <li><strong>Guards:</strong> enrolled-only learning (fail-open on flakes), role gates on every route, admin-only APIs via <code>requireAdminUser</code>, no 4xx retries, rate limits, log-only mode without keys.</li>
+</ul>
+
+<h2 id="s8">8 · Reader: story notes &amp; quizzes</h2>
+<ul>
+  <li>Dark story hero (eyebrow, serif title, outcome box, chips incl. XP earned), segmented chapter bar (done/current, tap-to-jump), scroll-reveal story beats, Back/Next auto-scroll, back-to-top landing on the topic head, print stylesheet.</li>
+  <li>Tap-to-reveal recall deck with Got-it / Review-again self-grading and progress; key phrases highlighted via <code>&lt;mark&gt;</code>; designed fill-in-the-gap fields; read-aloud mode (device voice, per-part progress).</li>
+  <li>End-of-week exam card: progress dots, instant verdicts with author feedback, topic-ref review chips, mascot pass/fail score screen with exact retry list.</li>
+  <li>XP bursts on completion (+10 XP) and week-complete celebration; reduced-motion respected throughout.</li>
+</ul>
+
+<h2 id="s9">9 · Design system</h2>
+<ul>
+  <li><strong>Classic (default):</strong> the previous look — white surfaces, Nunito, emerald.</li>
+  <li><strong>Story (opt-in):</strong> the MEE352 foundation — warm paper, Playfair Display + DM Sans, editorial hero. Adopted from the original <code>mee352-week2</code> source.</li>
+  <li><strong>Dark mode</strong> re-skins either design; persisted, no flash on return. Toggle lives in Profile → Appearance with the design switch and push toggle.</li>
+  <li>Confirmations everywhere use the designed bottom-sheet modal — zero browser popups.</li>
+</ul>
+
+<h2 id="s10">10 · Versioning scheme</h2>
+<p>Semantic versioning <code>MAJOR.MINOR.PATCH</code>, shown in Profile (currently <strong>v1.6.0</strong>):</p>
+<ul>
+  <li><strong>MAJOR</strong> — platform generation (1 = current app).</li>
+  <li><strong>MINOR</strong> — feature batch (new screens, flows, capabilities).</li>
+  <li><strong>PATCH</strong> — bugfix/hotfix push with no new surface.</li>
+</ul>
+
+<h2 id="s11">11 · Architecture &amp; data model</h2>
+<table>
+  <tr><th>Layer</th><th>Tech</th><th>Notes</th></tr>
+  <tr><td>Web</td><td>Vite 5 · React 18 · TS 5 · Router 6 · KaTeX</td><td>Static on Vercel; offline worker (shell v4, push-enabled)</td></tr>
+  <tr><td>API</td><td>Express 4 · TS · Prisma (DDL only)</td><td>Render; <code>prisma migrate deploy</code> on every build</td></tr>
+  <tr><td>Data/Auth</td><td>Supabase Postgres + Auth</td><td>Service-role reads via API; pooler :6543, direct :5432 for migrate</td></tr>
+  <tr><td>Mail/Push/AI</td><td>Brevo · Web Push (VAPID) · Gemini 3.6-flash</td><td>All log-and-skip without keys</td></tr>
+</table>
+<h3>Core tables</h3>
+<p><code>profiles</code> (role, level, is_admin, prefs) · <code>enrollments</code> (taking/teaching) · <code>courses</code> + <code>course_levels</code> · <code>weeks</code> (shells) · <code>topic_notes</code> (versioned content) · <code>topic_progress</code> · <code>xp_events</code> · <code>quiz_attempts</code> · <code>resume_state</code> · <code>notifications</code> · <code>push_subscriptions</code> · <code>app_settings</code> (semester) · <code>ai_models</code> · <code>universities</code></p>
+<h3>API map (v1)</h3>
+<p>Auth/profile: <code>/me</code> · <code>PUT /me</code> · <code>/onboarding</code> · <code>/settings</code> · <code>/stats</code> · <code>/resume</code> · enrollments (+repair) · universities · courses (+weeks counts) · course weeks/week detail · progress · quiz/attempt · authored · author/stats · notes get/delete · notifications (+read) · push subscribe/unsubscribe · publish ×2 · admin: stats, activity, trends, content, announce, users, promote, courses, unis, semester, models.</p>
+
+<h2 id="s12">12 · Pilot readiness: the 500-user verdict</h2>
+<div class="ok"><strong>Verdict: YES for a 500-tester pilot — with two paid switches and one code fix (done).</strong> 500 registered testers using the app normally will fit; 500 <em>simultaneous</em> users on the free tier will not.</div>
+<table>
+  <tr><th>Layer</th><th>Free-tier limit</th><th>500-tester pilot</th></tr>
+  <tr><td>Vercel (static frontend + CDN)</td><td>Generous bandwidth</td><td>Fine as-is.</td></tr>
+  <tr><td>Render free API (512 MB, shared CPU, sleeps)</td><td>~20–50 concurrent, 30–60 s cold starts</td><td><strong>Upgrade to Starter ($7/mo)</strong>: no sleep, 1 GB RAM.</td></tr>
+  <tr><td>Supabase free (500 MB DB, 5 GB bandwidth, pooled conns)</td><td>Fine for hundreds of MAU</td><td>Fine as-is; keep the :6543 pooler. Pro ($25) only if you outgrow it.</td></tr>
+  <tr><td>App N+1 (Explore fired ~160 requests/visit)</td><td>Would melt Render in a pilot</td><td><strong>Fixed (v1.6.0):</strong> bulk week counts, one request per catalog.</td></tr>
+</table>
+<h3>Pilot runbook</h3>
+<ol>
+  <li>Render Starter; confirm <code>/healthz</code> warm; set VAPID + Brevo + Gemini keys.</li>
+  <li>Seed + promote: run <code>seed.sql</code>, verify catalog, set active semester, create the admin.</li>
+  <li>Invite in waves (e.g. 5 × 100) with Supabase Auth logs + Render metrics open.</li>
+  <li>Watch: p95 latency, 5xx rate, Supabase connection count, Brevo daily quota (300/day free).</li>
+  <li>Success bar: signup → onboarding → first week → first quiz → Day-2 return for the cohort.</li>
+</ol>
+<div class="warn"><strong>Do not pilot on Render free:</strong> cold starts alone will read as “the app is broken” to testers, and a class-wide signup surge will cascade into timeouts.</div>
+
+<h2 id="s13">13 · Multi-tenant production plan (many universities)</h2>
+<p>Target: one deployment serving LASU + other universities, each isolated, each brandable, centrally billed. Recommended path — <strong>single database, tenant-scoped rows</strong> (not a DB per school):</p>
+<ol>
+  <li><strong>Tenant key:</strong> add <code>tenants</code> table (subdomain, name, logo, colors, sender email); add <code>tenant_id</code> to profiles, courses, weeks, notes, enrollments, settings. Every query scopes by tenant (one middleware + RLS policies).</li>
+  <li><strong>Routing:</strong> <code>lasu.unify.learn</code>, <code>unilag.unify.learn</code> → tenant resolver; keep path fallback (<code>?t=</code>) for testing.</li>
+  <li><strong>Auth:</strong> email-domain rules per tenant (e.g. <code>@lasu.edu.ng</code> auto-joins LASU); invites carry tenant; one user can belong to two tenants (student here, lecturer there).</li>
+  <li><strong>Content:</strong> shared starter catalog cloned per tenant on provisioning; each school curates its own weeks/notes/semesters.</li>
+  <li><strong>Admin:</strong> tenant admins (current panel, scoped) + super-admins (cross-tenant analytics, provisioning, billing).</li>
+  <li><strong>Mail/push:</strong> per-tenant sender identities (Brevo subaccounts/domains), per-tenant VAPID subjects.</li>
+  <li><strong>Infra:</strong> Render Standard+ (or autoscaling host), Supabase Pro (backups, connection headroom, PITR), read-replica if analytics bite; per-tenant rate limits + quotas.</li>
+  <li><strong>Migration:</strong> backfill all existing rows to the LASU tenant; dual-run; cut over per school. Estimated: 3–5 focused batches (schema → scoping → routing → admin → infra).</li>
+</ol>
+
+<h2 id="s14">14 · Roadmap (“later”)</h2>
+<ul>
+  <li>Multi-tenant universities (plan above).</li>
+  <li>Full offline packs (download a course, learn on zero data).</li>
+  <li>Native-feel install prompts + iOS push parity notes.</li>
+  <li>AI tutor over mastered topics; spaced-repetition scheduling from recall grades.</li>
+  <li>Leaderboards, study groups, lecturer analytics per topic.</li>
+  <li>Certificates + transcript export for departments.</li>
+</ul>
+
+<h2 id="s15">15 · Appendix: environments &amp; operations</h2>
+<h3>Render (backend)</h3>
+<p><code>SUPABASE_URL · SUPABASE_PUBLISHABLE_KEY · SUPABASE_SECRET_KEY · DATABASE_URL (:6543) · DIRECT_URL (:5432) · CORS_ORIGIN · ADMIN_EMAILS · GEMINI_API_KEY · BREVO_API_KEY · EMAIL_FROM · VAPID_PUBLIC_KEY · VAPID_PRIVATE_KEY · VAPID_SUBJECT</code></p>
+<h3>Vercel (frontend)</h3>
+<p><code>SUPABASE_URL · SUPABASE_PUBLISHABLE_KEY · API_URL · USE_BACKEND=1 · VITE_VAPID_PUBLIC_KEY</code> (optional override)</p>
+<h3>Supabase dashboard</h3>
+<p>Custom SMTP (Brevo SMTP key, verified sender, test mail) · URL config (<code>unify-virid.vercel.app/**</code>) · three branded templates (Confirm signup, Invite, Reset password) · Auth logs for signup 500s.</p>
+<h3>Repos &amp; deploys</h3>
+<p>Full app: <code>knight-dev01/Unify</code> (Render builds backend, migrates DB). Frontend mirror: <code>DIBBLS/Unify</code> (Vercel) synced by <code>scripts/Sync-Frontend.ps1</code>. Every push: tsc both sides → commit → push → sync → Vercel auto-build; Render auto-build migrates.</p>
+
+<div class="foot">Unify Learn · Product Documentation v1.6.0 · Generated 26 September 2026</div>
+
+</body>
+</html>
