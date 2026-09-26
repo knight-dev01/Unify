@@ -1381,6 +1381,17 @@ router.patch("/admin/users/:id", requireAuth, async (req: Request, res: Response
     return;
   }
   try {
+    // Role changes notify the recipient (promotion or demotion).
+    let roleChanged: string | null = null;
+    if (parsed.data.role) {
+      const { data: before } = await supabaseAdmin()
+        .from("profiles")
+        .select("role,first_name")
+        .eq("id", req.params.id)
+        .single();
+      const oldRole = (before as { role?: string } | null)?.role;
+      if (oldRole && oldRole !== parsed.data.role) roleChanged = parsed.data.role;
+    }
     const { data, error } = await supabaseAdmin()
       .from("profiles")
       .update({ ...parsed.data, updated_at: new Date().toISOString() })
@@ -1388,6 +1399,21 @@ router.patch("/admin/users/:id", requireAuth, async (req: Request, res: Response
       .select("*")
       .single();
     if (error) throw error;
+    if (roleChanged) {
+      const label = roleChanged.charAt(0).toUpperCase() + roleChanged.slice(1);
+      await supabaseAdmin().from("notifications").insert({
+        user_id: req.params.id,
+        type: "role",
+        title: `Your role is now ${label}`,
+        body:
+          roleChanged === "student"
+            ? "You now learn with guided paths, XP and streaks."
+            : roleChanged === "admin"
+              ? "You now manage the whole platform: users, courses, content and announcements."
+              : "You now author notes. Open the Studio and pick your contributing level.",
+        link: roleChanged === "student" ? "/course" : roleChanged === "admin" ? "/admin" : "/studio",
+      });
+    }
     res.json({ ok: true, profile: data });
   } catch (e) {
     res.status(500).json(dbError(e));
