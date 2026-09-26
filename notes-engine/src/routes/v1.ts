@@ -1279,6 +1279,49 @@ router.get("/admin/activity", requireAuth, async (req: Request, res: Response) =
   }
 });
 
+// ---- Admin: 14-day trends for the analytics charts (signups,
+// published note versions, XP earned). Small tables, grouped in code. ----
+router.get("/admin/trends", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  try {
+    const sb = supabaseAdmin();
+    const since = new Date(Date.now() - 14 * 86400000).toISOString();
+    const [users, notes, xp] = await Promise.all([
+      sb.from("profiles").select("created_at").gte("created_at", since).limit(5000),
+      sb.from("topic_notes").select("created_at").gte("created_at", since).limit(5000),
+      sb.from("xp_events").select("amount,created_at").gte("created_at", since).limit(10000),
+    ]);
+    if (users.error) throw users.error;
+    if (notes.error) throw notes.error;
+    if (xp.error) throw xp.error;
+    const days: string[] = [];
+    for (let i = 13; i >= 0; i--) {
+      days.push(new Date(Date.now() - i * 86400000).toISOString().slice(0, 10));
+    }
+    const bucket = (rows: { created_at: string }[]) => {
+      const counts = Object.fromEntries(days.map((d) => [d, 0]));
+      for (const r of rows) {
+        const d = String(r.created_at || "").slice(0, 10);
+        if (d in counts) counts[d] += 1;
+      }
+      return days.map((d) => ({ day: d.slice(5), count: counts[d] }));
+    };
+    const xpByDay = Object.fromEntries(days.map((d) => [d, 0]));
+    for (const r of ((xp.data ?? []) as { amount: number; created_at: string }[])) {
+      const d = String(r.created_at || "").slice(0, 10);
+      if (d in xpByDay) xpByDay[d] += r.amount || 0;
+    }
+    res.json({
+      signups: bucket((users.data ?? []) as { created_at: string }[]),
+      notes: bucket((notes.data ?? []) as { created_at: string }[]),
+      xp: days.map((d) => ({ day: d.slice(5), count: xpByDay[d] })),
+    });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
 router.get("/admin/users", requireAuth, async (req: Request, res: Response) => {
   const adminId = await requireAdminUser(req, res);
   if (!adminId) return;
