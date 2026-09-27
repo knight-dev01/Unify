@@ -741,6 +741,15 @@ router.post("/share", requireAuth, async (req: Request, res: Response) => {
     return;
   }
   try {
+    // Sharing is an author/admin act (lecturers, collaborators, admins).
+    // Students read shared links; they don't mint them.
+    const { data: prof } = await supabaseAdmin().from("profiles").select("role,is_admin").eq("id", userId).single();
+    const p = prof as { role?: string; is_admin?: boolean } | null;
+    const canShare = Boolean(p?.is_admin || (p?.role && ["lecturer", "collaborator", "admin"].includes(p.role)));
+    if (!canShare) {
+      res.status(403).json({ error: "Only authors and admins can share notes" });
+      return;
+    }
     // Only share weeks that actually exist.
     const assembled = await assembleWeek(course, parsed.data.week);
     if (!assembled) {
