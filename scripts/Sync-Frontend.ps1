@@ -18,6 +18,12 @@ try {
     $s = Join-Path $root $f
     if (Test-Path -LiteralPath $s) { Copy-Item -Path $s -Destination (Join-Path $tmp $f) -Force }
   }
+  # Serverless functions (Vercel picks /api at the project root):
+  # share-link OG unfurls live here, not in apps/web.
+  $apiSrc = Join-Path $root "api"
+  if (Test-Path -LiteralPath $apiSrc) {
+    robocopy $apiSrc (Join-Path $tmp "api") /MIR /NJH /NJS /NDL /NFL /NP | Out-Null
+  }
 
   # Drop backend leftovers + local-only files if present upstream
   foreach ($d in @("notes-engine", "supabase", "render.yaml", "SETUP.md", "COLLAB.md", "messages.unify.txt")) {
