@@ -670,42 +670,183 @@ router.get("/courses/:code/weeks/:week", async (req: Request, res: Response) => 
     return;
   }
   try {
-    const sb = supabaseAdmin();
-    let shell: { course: string; week: number; title: string; subtitle: string; note_json: unknown } | null = null;
-    for (const v of courseVariants(code)) {
-      const { data, error } = await sb
-        .from("weeks")
-        .select("course,week,title,subtitle,note_json")
-        .eq("course", v)
-        .eq("week", week)
-        .single();
-      if (!error && data) {
-        shell = data as { course: string; week: number; title: string; subtitle: string; note_json: unknown };
-        break;
-      }
-    }
-    const rows = await topicRowsFor(code, week);
-    if (!shell && rows.length === 0) {
+    const assembled = await assembleWeek(code, week);
+    if (!assembled) {
       res.status(404).json({ error: "Week not found" });
       return;
     }
-    if (rows.length === 0 && shell) {
-      res.json({ ...shell, topicMeta: [] });
+    res.json(assembled);
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// Shared assembly (reader + public share links): shell + latest topics.
+async function assembleWeek(
+  code: string,
+  week: number
+): Promise<{ course: string; week: number; title: string; subtitle: string; note_json: unknown; topicMeta: TopicMeta[] } | null> {
+  const sb = supabaseAdmin();
+  let shell: { course: string; week: number; title: string; subtitle: string; note_json: unknown } | null = null;
+  for (const v of courseVariants(code)) {
+    const { data, error } = await sb
+      .from("weeks")
+      .select("course,week,title,subtitle,note_json")
+      .eq("course", v)
+      .eq("week", week)
+      .single();
+    if (!error && data) {
+      shell = data as { course: string; week: number; title: string; subtitle: string; note_json: unknown };
+      break;
+    }
+  }
+  const rows = await topicRowsFor(code, week);
+  if (!shell && rows.length === 0) return null;
+  if (rows.length === 0 && shell) {
+    return { ...shell, topicMeta: [] };
+  }
+  const { topics, meta } = groupTopics(rows);
+  const shellNote = ((shell?.note_json ?? {}) as Record<string, unknown>) || {};
+  const course = shell?.course ?? rows[0].course;
+  const title = shell?.title || (typeof shellNote.title === "string" ? shellNote.title : `Week ${week}`);
+  const subtitle = shell?.subtitle || (typeof shellNote.subtitle === "string" ? shellNote.subtitle : "");
+  return {
+    course,
+    week,
+    title,
+    subtitle,
+    note_json: { ...shellNote, course, week, title, subtitle, topics },
+    topicMeta: meta,
+  };
+}
+
+// ---- Expiring share links (/s/:token): any signed-in user shares a
+// week; recipients read free until expiry, no account needed. ----
+const shareCreateSchema = z.object({
+  course: z.string().min(1).max(20),
+  week: z.number().int().min(1).max(52),
+  ttlHours: z.number().int().min(1).max(720).default(168),
+});
+
+router.post("/share", requireAuth, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  const parsed = shareCreateSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid body", details: parsed.error.flatten() });
+    return;
+  }
+  const course = cleanCode(parsed.data.course);
+  if (!course) {
+    res.status(400).json({ error: "Invalid course" });
+    return;
+  }
+  try {
+    // Only share weeks that actually exist.
+    const assembled = await assembleWeek(course, parsed.data.week);
+    if (!assembled) {
+      res.status(404).json({ error: "Week not found" });
       return;
     }
-    const { topics, meta } = groupTopics(rows);
-    const shellNote = ((shell?.note_json ?? {}) as Record<string, unknown>) || {};
-    const course = shell?.course ?? rows[0].course;
-    const title = shell?.title || (typeof shellNote.title === "string" ? shellNote.title : `Week ${week}`);
-    const subtitle = shell?.subtitle || (typeof shellNote.subtitle === "string" ? shellNote.subtitle : "");
-    res.json({
+    const { randomBytes } = await import("node:crypto");
+    const token = randomBytes(9).toString("base64url");
+    const expires_at = new Date(Date.now() + parsed.data.ttlHours * 3600000).toISOString();
+    const { error } = await supabaseAdmin().from("share_links").insert({
+      token,
+      user_id: userId,
       course,
-      week,
-      title,
-      subtitle,
-      note_json: { ...shellNote, course, week, title, subtitle, topics },
-      topicMeta: meta,
+      week: parsed.data.week,
+      expires_at,
     });
+    if (error) throw error;
+    res.json({ ok: true, token, expires_at, views: 0 });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// Public: resolve a share link (no session needed). 404 unknown, 410
+// expired. Views count up; content is always the live latest version.
+router.get("/share/:token", async (req: Request, res: Response) => {
+  const token = String(req.params.token || "").slice(0, 64);
+  if (!token) {
+    res.status(400).json({ error: "Invalid token" });
+    return;
+  }
+  try {
+    const sb = supabaseAdmin();
+    const { data, error } = await sb
+      .from("share_links")
+      .select("course,week,expires_at,views")
+      .eq("token", token)
+      .single();
+    if (error || !data) {
+      res.status(404).json({ error: "Link not found" });
+      return;
+    }
+    const row = data as { course: string; week: number; expires_at: string; views: number };
+    if (new Date(row.expires_at).getTime() <= Date.now()) {
+      res.status(410).json({ error: "This link expired" });
+      return;
+    }
+    const assembled = await assembleWeek(row.course, row.week);
+    if (!assembled) {
+      res.status(404).json({ error: "Week not found" });
+      return;
+    }
+    await sb
+      .from("share_links")
+      .update({ views: (row.views || 0) + 1 })
+      .eq("token", token);
+    res.json({ ...assembled, share: { token, expires_at: row.expires_at, views: (row.views || 0) + 1 } });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// Authed: my links (manage + revoke expired ones).
+router.get("/share/mine", requireAuth, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  try {
+    const { data, error } = await supabaseAdmin()
+      .from("share_links")
+      .select("token,course,week,expires_at,views,created_at")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(50);
+    if (error) throw error;
+    res.json({ links: data ?? [] });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+router.delete("/share/:token", requireAuth, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  try {
+    const sb = supabaseAdmin();
+    const { data: existing } = await sb
+      .from("share_links")
+      .select("user_id")
+      .eq("token", req.params.token)
+      .single();
+    if (!existing) {
+      res.status(404).json({ error: "Link not found" });
+      return;
+    }
+    const owner = (existing as { user_id: string }).user_id === userId;
+    let admin = owner;
+    if (!owner) {
+      const { data: prof } = await sb.from("profiles").select("is_admin,role").eq("id", userId).single();
+      const p = prof as { is_admin?: boolean; role?: string } | null;
+      admin = Boolean(p?.is_admin || p?.role === "admin");
+    }
+    if (!admin) {
+      res.status(403).json({ error: "Not your link" });
+      return;
+    }
+    const { error } = await sb.from("share_links").delete().eq("token", req.params.token);
+    if (error) throw error;
+    res.json({ ok: true });
   } catch (e) {
     res.status(500).json(dbError(e));
   }

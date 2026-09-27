@@ -176,3 +176,17 @@ create table if not exists push_subscriptions (
 );
 create index if not exists push_subscriptions_user_idx on push_subscriptions (user_id);
 alter table push_subscriptions enable row level security;
+
+create table if not exists share_links (
+  id uuid primary key default gen_random_uuid(),
+  token text not null unique,
+  user_id uuid not null references profiles(id) on delete cascade,
+  course text not null,
+  week int not null,
+  expires_at timestamptz not null,
+  views int not null default 0,
+  created_at timestamptz not null default now()
+);
+create index if not exists share_links_user_idx on share_links (user_id);
+create index if not exists share_links_token_idx on share_links (token);
+alter table share_links enable row level security;
