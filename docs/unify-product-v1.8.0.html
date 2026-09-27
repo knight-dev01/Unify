@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Unify Learn — Product Documentation v1.6.0</title>
+<title>Unify Learn — Product Documentation v1.8.0</title>
 <style>
   @page { size: A4; margin: 18mm 16mm 20mm 16mm; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -38,7 +38,7 @@
   <div class="brand">UNIFY LEARN</div>
   <h1>Product <span>Documentation</span></h1>
   <div class="tag">Guided 12-week paths, XP, streaks and notes that fit your courses.</div>
-  <div><span class="pill">Version 1.6.0 · 26 September 2026</span></div>
+  <div><span class="pill">Version 1.8.0 · 27 September 2026</span></div>
   <div class="meta">
     Mobile-first learning platform for the Faculty of Engineering, Lagos State University.<br/>
     Covers: current features · roles &amp; journeys · notifications · sessions &amp; security ·<br/>
@@ -63,6 +63,7 @@
   <li><a href="#s13">13 · Multi-tenant production plan</a></li>
   <li><a href="#s14">14 · Roadmap (“later”)</a></li>
   <li><a href="#s15">15 · Appendix: environments &amp; operations</a></li>
+  <li><a href="#s16">16 · v1.7–v1.8 additions</a></li>
 </ol>
 
 <h2 id="s1">1 · Product overview</h2>
@@ -224,7 +225,34 @@
 <h3>Repos &amp; deploys</h3>
 <p>Full app: <code>knight-dev01/Unify</code> (Render builds backend, migrates DB). Frontend mirror: <code>DIBBLS/Unify</code> (Vercel) synced by <code>scripts/Sync-Frontend.ps1</code>. Every push: tsc both sides → commit → push → sync → Vercel auto-build; Render auto-build migrates.</p>
 
-<div class="foot">Unify Learn · Product Documentation v1.6.0 · Generated 26 September 2026</div>
+<h2 id="s16">16 · v1.7–v1.8 additions</h2>
+<h3>Expiring share links (viral loop)</h3>
+<ul>
+  <li>Authors and admins mint <code>/s/:token</code> links per week (lifetimes 8/16/24h, default 24h); students consume, never mint (403 server-side).</li>
+  <li>Recipients read the full week free — hero, topics, recalls, exam, read-aloud — then hit expiry and a join screen. Views counted; owner/admin can revoke.</li>
+  <li>WhatsApp/Telegram unfurls via a serverless OG page (<code>/api/share/:token</code>) with title, topics, countdown and cover; edge-cached 5 minutes.</li>
+</ul>
+<h3>XP-gated perks</h3>
+<ul>
+  <li>Save/Print PDF unlocks at <strong>300 XP</strong> (30 completed topics); staff bypass. Gate truthfully re-checks (retry + refocus, never a fake 0).</li>
+  <li>Framework in <code>lib/xp.ts</code> (<code>XP_GATES</code>) for future locks: longer share lifetimes, early content, themes.</li>
+</ul>
+<h3>Nigerian reading voice</h3>
+<ul>
+  <li>Read-aloud auto-picks an <code>en-NG</code> device voice when present (many Androids ship Google's English (Nigeria)), with a manual voice picker and per-device memory.</li>
+  <li>Honest limit: the accent must exist in the OS/browser TTS engine — the app cannot invent one. Android users download it under Settings → Language → Text-to-speech.</li>
+</ul>
+<h3>Design toggle &amp; fonts</h3>
+<ul>
+  <li>Profile → Appearance switches <strong>Classic</strong> (previous look, default) and <strong>Story</strong> (MEE editorial) across the whole app, headings included.</li>
+  <li>Theme and design are per-device (localStorage), cross-tab synced, never synced across browsers.</li>
+</ul>
+<h3>Push permission prompt</h3>
+<ul>
+  <li>Designed bottom sheet ~3s after first entry (7-day snooze), plus a browser-denied guide (site settings → allow; iPhone Home-Screen note).</li>
+</ul>
+
+<div class="foot">Unify Learn · Product Documentation v1.8.0 · Generated 27 September 2026</div>
 
 </body>
 </html>
