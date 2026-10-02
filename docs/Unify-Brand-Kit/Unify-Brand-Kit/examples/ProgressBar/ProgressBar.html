@@ -1,0 +1,15 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="../../tokens.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500&display=swap">
+<style>
+  body{margin:0;background:var(--bg);padding:24px;font-family:var(--font-sans);color:var(--text)}
+  .wrap{display:grid;gap:16px;max-width:420px}
+  .lbl{display:flex;justify-content:space-between;font:500 13px/18px var(--font-sans);margin-bottom:6px}
+  .lbl span:last-child{color:var(--text-muted);font-variant-numeric:tabular-nums}
+  .track{height:6px;background:var(--border);border-radius:var(--radius-sm);overflow:hidden}
+  .fill{height:100%;background:var(--green);border-radius:var(--radius-sm)}
+</style></head>
+<body><div class="wrap">
+  <div><div class="lbl"><span>ECE 303 · Week 1</span><span>3 of 5 topics</span></div><div class="track" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"><div class="fill" style="width:60%"></div></div></div>
+  <div><div class="lbl"><span>Semester</span><span>11 of 14 weeks</span></div><div class="track" role="progressbar" aria-valuenow="79" aria-valuemin="0" aria-valuemax="100"><div class="fill" style="width:79%"></div></div></div>
+</div></body></html>

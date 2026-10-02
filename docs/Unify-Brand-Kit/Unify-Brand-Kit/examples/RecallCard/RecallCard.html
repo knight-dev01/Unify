@@ -1,0 +1,24 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="../../tokens.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;600&display=swap">
+<style>
+  body{margin:0;background:var(--bg);padding:24px;font-family:var(--font-sans);color:var(--text)}
+  .rc{max-width:640px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);padding:20px;display:grid;gap:12px}
+  .eyebrow{font:600 10px/14px var(--font-sans);letter-spacing:.2em;text-transform:uppercase;color:var(--text-muted);margin:0}
+  .q{font:700 17px/22px var(--font-display);margin:0}
+  .ans{background:var(--surface-2);border-radius:var(--radius-md);padding:14px 16px;font:400 15px/22px var(--font-sans);margin:0}
+  .btn{justify-self:start;font:600 14px/20px var(--font-sans);padding:10px 20px;border-radius:var(--radius-md);background:transparent;color:var(--text);border:1px solid var(--border-strong);cursor:pointer}
+  .btn:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+</style></head>
+<body>
+  <section class="rc">
+    <p class="eyebrow">Topic active recall · Mechanism</p>
+    <p class="q">How does the Laplace transform handle boundary conditions compared to standard ODE methods?</p>
+    <p class="ans" id="ans" hidden>It builds them in from the beginning, instead of applying them to a general solution at the end.</p>
+    <button class="btn" id="rev" type="button" aria-expanded="false" aria-controls="ans">Reveal answer</button>
+  </section>
+<script>
+  const a=document.getElementById('ans'),b=document.getElementById('rev');
+  b.addEventListener('click',()=>{a.hidden=!a.hidden;b.textContent=a.hidden?'Reveal answer':'Hide answer';b.setAttribute('aria-expanded',String(!a.hidden));});
+</script>
+</body></html>

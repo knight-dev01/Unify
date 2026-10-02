@@ -1,0 +1,23 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="../../tokens.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@600&display=swap">
+<style>
+  body{margin:0;background:var(--bg);padding:24px;font-family:var(--font-sans)}
+  .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  .btn{font:600 14px/20px var(--font-sans);padding:12px 24px;border-radius:var(--radius-md);cursor:pointer;border:1px solid transparent}
+  .primary{background:var(--text);color:var(--bg)}
+  .secondary{background:transparent;color:var(--text);border-color:var(--border-strong)}
+  .cta{background:var(--green);color:var(--on-green);font-weight:700}
+  .btn:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+  .btn[disabled]{background:var(--surface-2);color:var(--text-muted);border-color:var(--border);cursor:not-allowed}
+  .cap{font-size:12px;color:var(--text-muted);margin:16px 0 0}
+</style></head>
+<body>
+  <div class="row">
+    <button class="btn primary" type="button">Mark topic complete</button>
+    <button class="btn secondary" type="button">Download for offline</button>
+    <button class="btn cta" type="button">Join the contributor team</button>
+    <button class="btn" type="button" disabled>Next</button>
+  </div>
+  <p class="cap">Primary, secondary, green call to action, disabled.</p>
+</body></html>

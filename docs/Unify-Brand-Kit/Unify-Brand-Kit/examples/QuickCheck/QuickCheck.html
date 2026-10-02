@@ -1,0 +1,42 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="../../tokens.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap">
+<style>
+  body{margin:0;background:var(--bg);padding:24px;font-family:var(--font-sans);color:var(--text)}
+  .qc{max-width:640px;background:var(--surface-2);border-radius:var(--radius-lg);padding:20px;display:grid;gap:12px}
+  .eyebrow{font:600 10px/14px var(--font-sans);letter-spacing:.2em;text-transform:uppercase;color:var(--text-muted);margin:0}
+  .q{font:700 17px/22px var(--font-display);margin:0}
+  .opts{display:grid;gap:8px;list-style:none;padding:0;margin:0}
+  .opt{display:flex;gap:12px;align-items:center;width:100%;text-align:left;font:400 15px/22px var(--font-sans);color:var(--text);background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--radius-md);padding:12px 14px;cursor:pointer}
+  .opt:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+  .key{font:600 12px/16px var(--font-sans);width:24px;height:24px;display:grid;place-items:center;border-radius:var(--radius-pill);background:var(--surface-2);color:var(--text-muted);flex:none}
+  .opt[data-state="right"]{background:var(--green-tint);border-color:var(--green-text)}
+  .opt[data-state="right"] .key{background:var(--green);color:var(--on-green)}
+  .opt[data-state="wrong"]{border-color:var(--text);border-style:dashed}
+  .fb{font:500 14px/20px var(--font-sans);margin:0;color:var(--text)}
+  .fb b{color:var(--green-text)}
+</style></head>
+<body>
+  <section class="qc" aria-label="Quick check">
+    <p class="eyebrow">Quick check · 1 question</p>
+    <p class="q">What is the main advantage of using Laplace transforms to solve differential equations?</p>
+    <ul class="opts" id="opts">
+      <li><button class="opt" type="button" data-a="0"><span class="key">A</span>It removes the need for integration</button></li>
+      <li><button class="opt" type="button" data-a="1"><span class="key">B</span>It converts differential equations into algebraic ones</button></li>
+      <li><button class="opt" type="button" data-a="0"><span class="key">C</span>It only works for second-order equations</button></li>
+    </ul>
+    <p class="fb" id="fb" aria-live="polite"></p>
+  </section>
+<script>
+  const fb=document.getElementById('fb');
+  function pick(b){
+    document.querySelectorAll('.opt').forEach(o=>o.removeAttribute('data-state'));
+    const right=b.dataset.a==='1';
+    b.dataset.state=right?'right':'wrong';
+    if(!right) document.querySelector('.opt[data-a="1"]').dataset.state='right';
+    fb.innerHTML=right?'<b>Correct.</b> Boundary conditions go in from the start, so you solve algebra, not calculus.':'Not quite. The right answer is B: the transform turns calculus into algebra.';
+  }
+  document.querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>pick(b)));
+  pick(document.querySelector('.opt[data-a="1"]'));
+</script>
+</body></html>

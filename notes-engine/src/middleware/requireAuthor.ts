@@ -23,7 +23,7 @@ async function isPlatformAdmin(userId: string): Promise<boolean> {
 }
 
 // Authoring gate: lecturers + collaborators + platform admins. Admins pass
-// even with a student role so the owner is never locked out of the studio.
+// by flag OR by role, so a granted admin is never locked out of the studio.
 export async function requireAuthor(req: Request, res: Response, next: NextFunction): Promise<void> {
   const userId = (req as AuthedRequest).userId;
   if (!userId) {
@@ -37,7 +37,7 @@ export async function requireAuthor(req: Request, res: Response, next: NextFunct
       .eq("id", userId)
       .single();
     const role = (data as { role?: string } | null)?.role;
-    if (!error && role && AUTHOR_ROLES.includes(role)) {
+    if (!error && role && (AUTHOR_ROLES.includes(role) || role === "admin")) {
       next();
       return;
     }

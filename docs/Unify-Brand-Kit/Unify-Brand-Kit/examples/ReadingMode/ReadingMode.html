@@ -1,0 +1,57 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="../../tokens.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap">
+<style>
+  body{margin:0;background:var(--surface-2);padding:24px;font-family:var(--font-sans);color:var(--text)}
+  .phone{width:390px;max-width:100%;margin:0 auto;background:var(--bg);border:1px solid var(--border);border-radius:28px;overflow:hidden;display:flex;flex-direction:column;height:760px}
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);background:var(--bg)}
+  .bar span{font:500 13px/18px var(--font-sans);color:var(--text)}
+  .bar .mid{flex:1}
+  .track{height:4px;border-radius:var(--radius-sm);background:var(--border);overflow:hidden}
+  .fill{height:100%;width:40%;background:var(--green)}
+  .scroll{flex:1;overflow:auto;display:grid;gap:32px;align-content:start;padding-bottom:24px}
+  .head{background:var(--invert-bg);color:var(--invert-text);padding:24px 16px;display:grid;gap:8px}
+  .eye{font:600 10px/14px var(--font-sans);letter-spacing:2px;text-transform:uppercase;margin:0;color:var(--invert-accent)}
+  .title{font:900 32px/36px var(--font-display);letter-spacing:-1px;margin:0}
+  .tags{display:flex;gap:6px;flex-wrap:wrap}
+  .tags span{font:500 11px/14px var(--font-sans);padding:4px 10px;border-radius:var(--radius-pill);border:1px solid var(--invert-border);color:var(--invert-muted)}
+  .col{padding:0 16px;display:grid;gap:32px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);padding:20px;display:grid;gap:14px}
+  .hrow{display:flex;gap:10px;align-items:center}
+  .num{font:600 11px/16px var(--font-sans);padding:3px 8px;border-radius:var(--radius-pill);background:var(--green-tint);color:var(--green-text)}
+  .h{font:700 22px/28px var(--font-display);letter-spacing:-.5px;margin:0}
+  .body{font:400 16px/28px var(--font-sans);margin:0}
+  .body b{font-weight:600}
+  .panel{background:var(--surface-2);border-radius:var(--radius-lg);padding:16px;display:grid;gap:6px}
+  .pt{font:700 17px/22px var(--font-display);margin:0}
+  .formula{font:italic 400 20px/28px var(--font-display);text-align:center;margin:4px 0}
+  .pn{font:400 14px/22px var(--font-sans);color:var(--text-muted);margin:0}
+</style></head>
+<body>
+  <div class="phone">
+    <div class="bar"><span>← Back</span><div class="mid"><div class="track"><div class="fill"></div></div></div><span>Offline ↓</span></div>
+    <div class="scroll">
+      <header class="head">
+        <p class="eye">ECE 303 · Week 1 · Topic 1 of 3</p>
+        <p class="title">Laplace Transformation</p>
+        <div class="tags"><span>Differential equations</span><span>Control theory</span></div>
+      </header>
+      <div class="col">
+        <article class="card">
+          <div class="hrow"><span class="num">1.1</span><p class="h">Solving ODEs the hard way</p></div>
+          <p class="body">A linear ODE with constant coefficients is usually solved by finding a general solution, then applying <b>boundary conditions</b> to find the constants.</p>
+          <p class="body">The Laplace transform turns the ODE into an <b>algebraic equation</b>, and builds the boundary conditions in from the start.</p>
+        </article>
+        <article class="card">
+          <div class="hrow"><span class="num">1.2</span><p class="h">Definition</p></div>
+          <p class="body">The transform of <b>f(t)</b> is a semi-infinite integral. The parameter <b>s</b> is taken as positive so it converges.</p>
+          <div class="panel">
+            <p class="pt">Laplace transform definition</p>
+            <p class="formula">L{f(t)} = ∫₀^∞ f(t) e^(−st) dt</p>
+            <p class="pn">Converges when the real part of s is large enough.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+</body></html>

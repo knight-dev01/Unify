@@ -1,0 +1,52 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="../../tokens.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,900;1,400&family=DM+Sans:wght@500;600;700;800&display=swap">
+<style>
+  body{margin:0;background:var(--surface-2);padding:24px;font-family:var(--font-sans)}
+  .wrap{width:540px;height:540px;max-width:100%;margin:0 auto;position:relative;overflow:hidden;border:1px solid var(--border)}
+  .post{width:1080px;height:1080px;transform:scale(.5);transform-origin:0 0;position:absolute;inset:0;background:var(--off-white);color:var(--near-black);font-family:var(--font-sans)}
+  .bar{position:absolute;top:0;right:0;width:72px;height:660px;background:var(--green)}
+  .lock{position:absolute;top:40px;left:40px}
+  .wm{font:900 36px/1 var(--font-display);letter-spacing:-1px;margin:0}
+  .wm i{font-style:normal;color:var(--green)}
+  .tg{font:600 11px/14px var(--font-display);letter-spacing:.2em;text-transform:uppercase;margin:8px 0 0}
+  .quote{position:absolute;top:150px;left:40px;width:560px}
+  .q{font:italic 400 46px/50px var(--font-display);letter-spacing:-1.5px;margin:0}
+  .q.g{color:var(--green-deep)}
+  .stat{position:absolute;top:330px;left:40px}
+  .n{font:800 180px/162px var(--font-sans);letter-spacing:-7px;color:var(--green);margin:0}
+  .hl{font:800 72px/76px var(--font-sans);letter-spacing:-3px;margin:6px 0 0}
+  .sub{font:700 42px/46px var(--font-sans);letter-spacing:-1.5px;margin:0}
+  .sub span{color:var(--green-deep)}
+  .card{position:absolute;left:40px;bottom:96px;width:560px;background:var(--near-black);border-radius:var(--radius-xl);padding:22px 28px;color:var(--off-white)}
+  .grid{display:grid;grid-template-columns:1fr 1fr}
+  .it{display:flex;align-items:center;gap:12px;padding:10px 0;font:600 18px/24px var(--font-sans)}
+  .it:nth-child(-n+2){border-bottom:1px solid var(--invert-border)}
+  .ck{width:28px;height:28px;border-radius:var(--radius-pill);background:var(--green);color:var(--on-green);display:grid;place-items:center;font:800 14px/1 var(--font-sans);flex:none}
+  .cta{margin-top:16px;background:var(--green);color:var(--on-green);border-radius:10px;padding:16px 24px;font:800 22px/26px var(--font-sans);letter-spacing:-.5px;text-transform:uppercase}
+  .boy{position:absolute;right:0;bottom:52px;width:470px;height:560px;border:3px dashed var(--near-black);opacity:.35;display:grid;place-items:center;font:600 22px/1 var(--font-sans);letter-spacing:3px;text-transform:uppercase}
+  .strip{position:absolute;left:0;right:0;bottom:0;height:52px;background:var(--near-black);color:var(--off-white);display:flex;align-items:center;padding:0 40px;font:500 11px/14px var(--font-sans);letter-spacing:3px;text-transform:uppercase}
+  .cap{font:400 12px/18px var(--font-sans);color:var(--text-muted);text-align:center;margin:12px 0 0}
+</style></head>
+<body>
+  <div class="wrap" data-theme="light">
+    <div class="post">
+      <div class="bar"></div>
+      <div class="boy">Box Boy cut-out</div>
+      <div class="lock"><p class="wm">Unify<i>.</i></p><p class="tg">Built for the ones who build.</p></div>
+      <div class="quote"><p class="q">The knowledge was always in there.</p><p class="q g">Nobody gave you the key.</p></div>
+      <div class="stat"><p class="n">221</p><p class="hl">Students.</p><p class="sub">Used Unify <span>in one day.</span></p></div>
+      <div class="card">
+        <div class="grid">
+          <div class="it"><span class="ck">✓</span>Faster revision</div>
+          <div class="it"><span class="ck">✓</span>Clearer understanding</div>
+          <div class="it"><span class="ck">✓</span>Less exam pressure</div>
+          <div class="it"><span class="ck">✓</span>Built for students</div>
+        </div>
+        <div class="cta">Finish strong with Unify Learn →</div>
+      </div>
+      <div class="strip">Own your academic journey</div>
+    </div>
+  </div>
+  <p class="cap">Fixed: green bar, lockup top-left, footer strip, Box Boy bottom-right. Posts always render on the light palette.</p>
+</body></html>

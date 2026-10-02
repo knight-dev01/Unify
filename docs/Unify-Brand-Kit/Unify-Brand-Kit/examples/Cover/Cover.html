@@ -1,0 +1,42 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="../../tokens.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;900&display=swap">
+<style>
+  html,body{margin:0;background:var(--bg)}
+  .cover{position:relative;width:960px;height:300px;overflow:hidden;background:var(--bg)}
+  svg{position:absolute;inset:0}
+  .ink{fill:var(--text)}
+  .green{fill:var(--green)}
+  .amber{fill:var(--amber)}
+  .tint{fill:var(--green-deep)}
+  .rule{stroke:var(--border-strong);stroke-width:1}
+  .r-lg{rx:var(--radius-lg)}
+  .r-sm{rx:var(--radius-sm)}
+  .text{position:absolute;left:40px;bottom:36px;max-width:440px}
+  .name{font-family:var(--font-display);font-weight:900;font-size:88px;line-height:.95;letter-spacing:-3px;color:var(--text);margin:0}
+  .name i{font-style:normal;color:var(--green)}
+  .tag{font-family:var(--font-display);font-weight:600;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-muted);margin:16px 0 0}
+</style></head>
+<body>
+<div class="cover">
+  <svg width="960" height="300" viewBox="0 0 960 300" aria-hidden="true">
+    <!--
+      blocks: text (ink slab 240x200, radius-lg), green (stripe 64 wide, full height), green-deep (100x140, radius-lg, bleeds right; surface-2 vanished on bg), amber (48x48, radius-sm)
+      arrangement: one tall ink slab with a green stripe bleeding top and bottom, as in the contributor flyer's stripe; tint and amber as satellites
+      pattern: editorial serif system with a restrained palette, so three hairline rules in border-strong cross the blocks at space-8 pitch
+      scales: space-6 gaps (24), space-8 rule pitch (32), space-12 insets (48), radius-lg 12, radius-sm 4
+    -->
+    <rect class="ink r-lg" x="520" y="48" width="240" height="200"/>
+    <rect class="green" x="784" y="0" width="64" height="300"/>
+    <rect class="tint r-lg" x="872" y="48" width="100" height="140"/>
+    <rect class="amber r-sm" x="872" y="212" width="48" height="48"/>
+    <line class="rule" x1="480" y1="116" x2="960" y2="116"/>
+    <line class="rule" x1="480" y1="148" x2="960" y2="148"/>
+    <line class="rule" x1="480" y1="180" x2="960" y2="180"/>
+  </svg>
+  <div class="text">
+    <p class="name">Unify<br>Brand Kit</p>
+    <p class="tag">Built for the ones who build.</p>
+  </div>
+</div>
+</body></html>

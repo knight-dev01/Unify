@@ -6,6 +6,7 @@ import { notifyCoursePublished, notifyInAppNewNote } from "../lib/email";
 import { pushNewNote, pushAnnounce, pushToUser } from "../lib/push";
 import { requireAuth, type AuthedRequest } from "../middleware/requireAuth";
 import { requireAuthor } from "../middleware/requireAuthor";
+import { requireCourseAccess } from "../middleware/requireCourseAccess";
 
 const router = Router();
 router.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 200, standardHeaders: true, legacyHeaders: false }));
@@ -658,7 +659,7 @@ function groupTopics(rows: TopicNoteRow[]): { topics: unknown[]; meta: TopicMeta
   return { topics, meta };
 }
 
-router.get("/courses/:code/weeks/:week", async (req: Request, res: Response) => {
+router.get("/courses/:code/weeks/:week", requireAuth, requireCourseAccess, async (req: Request, res: Response) => {
   const code = cleanCode(decodeURIComponent(req.params.code));
   const week = Number(req.params.week);
   if (!code) {
@@ -862,7 +863,7 @@ router.delete("/share/:token", requireAuth, async (req: Request, res: Response) 
 });
 
 // Public: per-topic version lists for a week (reader badges + author tools).
-router.get("/courses/:code/weeks/:week/topics", async (req: Request, res: Response) => {
+router.get("/courses/:code/weeks/:week/topics", requireAuth, requireCourseAccess, async (req: Request, res: Response) => {
   const code = cleanCode(decodeURIComponent(req.params.code));
   const week = Number(req.params.week);
   if (!code) {
@@ -882,7 +883,7 @@ router.get("/courses/:code/weeks/:week/topics", async (req: Request, res: Respon
 });
 
 // Public: one published topic version (for viewing older v1, v2...).
-router.get("/notes/:id", async (req: Request, res: Response) => {
+router.get("/notes/:id", requireAuth, requireCourseAccess, async (req: Request, res: Response) => {
   try {
     const { data, error } = await supabaseAdmin()
       .from("topic_notes")
@@ -1034,7 +1035,7 @@ async function nextTopicVersion(course: string, week: number, topic: number): Pr
   return (rows[0]?.version || 0) + 1;
 }
 
-router.post("/publish", requireAuth, requireAuthor, async (req: Request, res: Response) => {
+router.post("/publish", requireAuth, requireAuthor, requireCourseAccess, async (req: Request, res: Response) => {
   const parsed = publishSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: "Invalid body", details: parsed.error.flatten() });
@@ -1117,7 +1118,7 @@ const topicPublishSchema = z.object({
   noteJson: z.object({}).passthrough(),
 });
 
-router.post("/topics/publish", requireAuth, requireAuthor, async (req: Request, res: Response) => {
+router.post("/topics/publish", requireAuth, requireAuthor, requireCourseAccess, async (req: Request, res: Response) => {
   const parsed = topicPublishSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: "Invalid body", details: parsed.error.flatten() });
@@ -1307,7 +1308,7 @@ router.get("/authored", requireAuth, async (req: Request, res: Response) => {
 });
 
 // Public: week list for a course (titles for pickers + student week lists).
-router.get("/courses/:code/weeks", async (req: Request, res: Response) => {
+router.get("/courses/:code/weeks", requireAuth, requireCourseAccess, async (req: Request, res: Response) => {
   const code = cleanCode(decodeURIComponent(req.params.code));
   if (!code) {
     res.status(400).json({ error: "Invalid course" });
@@ -1422,13 +1423,27 @@ router.get("/admin/stats", requireAuth, async (req: Request, res: Response) => {
 });
 
 // ---- Admin: full content tree (every course → weeks → topics/versions).
-// Authors are admitted too and scope themselves to their level client-side.
-// Lets staff browse all notes without enrolling in anything.
+// Collaborators see ONLY their assigned (teaching) courses, enforced here
+// — clients must not be trusted with the filter (BUG-001).
 router.get("/admin/content", requireAuth, async (req: Request, res: Response) => {
   const adminId = await requireContentViewer(req, res);
   if (!adminId) return;
   try {
     const sb = supabaseAdmin();
+    const { data: meProf } = await sb.from("profiles").select("role,is_admin").eq("id", adminId).single();
+    const me = meProf as { role?: string; is_admin?: boolean } | null;
+    let allowed: Set<string> | null = null;
+    if (me?.role === "collaborator" && !me?.is_admin) {
+      const { data: mine } = await sb
+        .from("enrollments")
+        .select("course")
+        .eq("user_id", adminId)
+        .eq("kind", "teaching")
+        .limit(100);
+      allowed = new Set(
+        ((mine ?? []) as { course: string }[]).map((r) => (r.course || "").toUpperCase().trim()).filter(Boolean)
+      );
+    }
     const [coursesRes, levelsRes, weeksRes, notesRes] = await Promise.all([
       sb.from("courses").select("code,title").order("code").limit(500),
       sb.from("course_levels").select("course,level,semester").limit(2000),
@@ -1460,7 +1475,9 @@ router.get("/admin/content", requireAuth, async (req: Request, res: Response) =>
       list.push({ week: w.week, title: w.title || "", topics: topicsByWeek.get(`${w.course}::${w.week}`) || [] });
       weeksByCourse.set(w.course, list);
     }
-    const courses = (((coursesRes.data ?? []) as { code: string; title: string }[])).map((c) => {
+    const courses = (((coursesRes.data ?? []) as { code: string; title: string }[]))
+      .filter((c) => !allowed || allowed.has((c.code || "").toUpperCase().trim()))
+      .map((c) => {
       const lv = levelByCourse.get(c.code);
       const weeks = weeksByCourse.get(c.code) || [];
       const topicCount = weeks.reduce((n, w) => n + w.topics.length, 0);
@@ -1529,6 +1546,57 @@ router.get("/admin/trends", requireAuth, async (req: Request, res: Response) => 
       notes: bucket((notes.data ?? []) as { created_at: string }[]),
       xp: days.map((d) => ({ day: d.slice(5), count: xpByDay[d] })),
     });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// ---- Admin: assign teaching courses to an author (BUG-001). The
+// collaborator's reachable set IS this list — gates enforce it server-side.
+router.get("/admin/users/:id/courses", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  try {
+    const { data, error } = await supabaseAdmin()
+      .from("enrollments")
+      .select("course,kind")
+      .eq("user_id", req.params.id);
+    if (error) throw error;
+    res.json({ courses: (data ?? []) as { course: string; kind: string }[] });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+router.put("/admin/users/:id/courses", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  const parsed = z.object({ courses: z.array(z.string().min(1).max(20)).max(10) }).safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid body", details: parsed.error.flatten() });
+    return;
+  }
+  try {
+    const sb = supabaseAdmin();
+    const codes = [...new Set(parsed.data.courses.map((c) => String(c).trim().toUpperCase()).filter(Boolean))];
+    // Only real catalog courses can be assigned (typos fail loudly).
+    const { data: known } = await sb.from("courses").select("code").in("code", codes.length ? codes : ["__none__"]);
+    const valid = new Set(((known ?? []) as { code: string }[]).map((r) => r.code));
+    const bad = codes.filter((c) => !valid.has(c));
+    if (bad.length) {
+      res.status(400).json({ error: `Unknown course codes: ${bad.join(", ")}` });
+      return;
+    }
+    const { data: prof } = await sb.from("profiles").select("role").eq("id", req.params.id).single();
+    const kind = (prof as { role?: string } | null)?.role === "student" ? "taking" : "teaching";
+    await sb.from("enrollments").delete().eq("user_id", req.params.id).eq("kind", kind);
+    if (codes.length) {
+      const { error } = await sb
+        .from("enrollments")
+        .insert(codes.map((course) => ({ user_id: req.params.id, course, kind })));
+      if (error) throw error;
+    }
+    res.json({ ok: true, courses: codes });
   } catch (e) {
     res.status(500).json(dbError(e));
   }

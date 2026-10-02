@@ -1,0 +1,29 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="../../tokens.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap">
+<style>
+  body{margin:0;background:var(--bg);padding:24px;font-family:var(--font-sans);color:var(--text)}
+  .card{max-width:640px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);padding:20px;display:grid;gap:16px}
+  .eyebrow{font:600 10px/14px var(--font-sans);letter-spacing:.2em;text-transform:uppercase;color:var(--text-muted);margin:0}
+  .head{display:flex;align-items:center;gap:10px;margin:0}
+  .num{font:600 11px/16px var(--font-sans);padding:3px 8px;border-radius:var(--radius-pill);background:var(--green-tint);color:var(--green-text)}
+  h2{font:700 22px/28px var(--font-display);letter-spacing:-.5px;margin:0;text-wrap:balance}
+  p{font:400 16px/28px var(--font-sans);margin:0;max-width:68ch}
+  b{font-weight:600}
+  .panel{background:var(--surface-2);border-radius:var(--radius-lg);padding:16px 20px;display:grid;gap:8px}
+  .ptitle{font:700 17px/22px var(--font-display);margin:0}
+  .formula{font:italic 400 20px/28px var(--font-display);text-align:center;padding:8px 0;margin:0}
+  .note{font:400 14px/22px var(--font-sans);color:var(--text-muted);margin:0}
+</style></head>
+<body>
+  <article class="card">
+    <p class="eyebrow">Topic 1 · Introduction to Laplace Transformation</p>
+    <div class="head"><span class="num">1.2</span><h2>Definition of Laplace Transform</h2></div>
+    <p>The Laplace transform of a function <b>f(t)</b> is defined as a <b>semi-infinite integral</b>. The parameter <b>s</b> is assumed positive so the integral converges.</p>
+    <div class="panel">
+      <p class="ptitle">Laplace Transform Definition</p>
+      <p class="formula">L{f(t)} = ∫₀^∞ f(t) e^(−st) dt</p>
+      <p class="note">The integral converges when the real part of s is large enough and positive.</p>
+    </div>
+  </article>
+</body></html>
