@@ -1072,16 +1072,16 @@ router.post("/progress", requireAuth, async (req: Request, res: Response) => {
   }
 });
 
-// Authed author: publish a week of notes. Each topic is stored as a NEW
-// version row (v1, v2, v3...) — publishing never overwrites, so re-testing
-// Week 1 stacks a new version instead of killing the previous note.
-// Identical content still stacks (explicit product choice).
+// Authed author: publish a week of notes. Occupied weeks NEVER stack
+// silently (BUG-007): without an explicit mode the API answers 409 and the
+// Studio asks Replace / Add as new version / Cancel.
 const publishSchema = z.object({
   course: z.string().min(1).max(20),
   week: z.number().int().min(1).max(52),
   title: z.string().max(200).optional(),
   subtitle: z.string().max(300).optional(),
   noteJson: z.object({}).passthrough(),
+  mode: z.enum(["add", "replace"]).optional(),
 });
 
 async function nextTopicVersion(course: string, week: number, topic: number): Promise<number> {
@@ -1114,6 +1114,33 @@ router.post("/publish", requireAuth, requireAuthor, requireCourseAccess, async (
   const topics = Array.isArray(note.topics) ? (note.topics as Record<string, unknown>[]) : [];
   try {
     const sb = supabaseAdmin();
+    // Occupied-week guard: stack only on explicit "add", wipe on "replace".
+    const { data: existing } = await sb
+      .from("topic_notes")
+      .select("topic,version,title")
+      .eq("course", code)
+      .eq("week", week)
+      .limit(100);
+    const occupied = ((existing ?? []) as { topic: number; version: number; title: string }[]);
+    if (occupied.length && parsed.data.mode !== "add" && parsed.data.mode !== "replace") {
+      res.status(409).json({
+        error: `Week ${week} already has ${occupied.length} published topic version(s).`,
+        code: "WEEK_OCCUPIED",
+        existing: {
+          topics: [...new Set(occupied.map((r) => r.topic))].sort((a, b) => a - b),
+          versions: occupied.length,
+          titles: [...new Set(occupied.map((r) => r.title).filter(Boolean))].slice(0, 5),
+        },
+      });
+      return;
+    }
+    if (parsed.data.mode === "replace" && occupied.length) {
+      // Replace: remove the old rows (and their student progress, which
+      // points at deleted topics) before inserting fresh v1s.
+      const { error: delErr } = await sb.from("topic_notes").delete().eq("course", code).eq("week", week);
+      if (delErr) throw delErr;
+      await sb.from("topic_progress").delete().eq("course", code).eq("week", week);
+    }
     // Safety: a course deleted mid-authoring must not FK-fail the publish.
     // Insert-only so admin-customized titles are never overwritten.
     const { data: courseRow } = await sb.from("courses").select("code").eq("code", code).single();
@@ -1170,14 +1197,15 @@ router.post("/publish", requireAuth, requireAuthor, requireCourseAccess, async (
   }
 });
 
-// Authed author: publish ONE topic (new version v1, v2, v3...).
-// Creates the week shell when missing so the week appears in lists.
+// Authed author: publish ONE topic. Occupied topics NEVER stack silently
+// (BUG-007): without an explicit mode the API answers 409.
 const topicPublishSchema = z.object({
   course: z.string().min(1).max(20),
   week: z.number().int().min(1).max(52),
   topic: z.number().int().min(1).max(100),
   title: z.string().max(200).optional(),
   noteJson: z.object({}).passthrough(),
+  mode: z.enum(["add", "replace"]).optional(),
 });
 
 router.post("/topics/publish", requireAuth, requireAuthor, requireCourseAccess, async (req: Request, res: Response) => {
@@ -1196,6 +1224,33 @@ router.post("/topics/publish", requireAuth, requireAuthor, requireCourseAccess, 
   const single = noteJson as { title?: unknown };
   try {
     const sb = supabaseAdmin();
+    const { data: existing } = await sb
+      .from("topic_notes")
+      .select("version,title")
+      .eq("course", code)
+      .eq("week", week)
+      .eq("topic", topic)
+      .order("version", { ascending: false })
+      .limit(10);
+    const occupied = ((existing ?? []) as { version: number; title: string }[]);
+    if (occupied.length && parsed.data.mode !== "add" && parsed.data.mode !== "replace") {
+      res.status(409).json({
+        error: `Topic ${topic} already has v${occupied[0].version} published.`,
+        code: "TOPIC_OCCUPIED",
+        existing: { versions: occupied.map((r) => r.version), title: occupied[0].title || "" },
+      });
+      return;
+    }
+    if (parsed.data.mode === "replace" && occupied.length) {
+      const { error: delErr } = await sb
+        .from("topic_notes")
+        .delete()
+        .eq("course", code)
+        .eq("week", week)
+        .eq("topic", topic);
+      if (delErr) throw delErr;
+      await sb.from("topic_progress").delete().eq("course", code).eq("week", week).eq("topic", topic);
+    }
     const { data: courseRow } = await sb.from("courses").select("code").eq("code", code).single();
     if (!courseRow) {
       const { error: cErr } = await sb.from("courses").insert({ code, title: code });
