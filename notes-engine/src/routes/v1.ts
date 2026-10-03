@@ -565,6 +565,28 @@ router.get("/courses", async (req: Request, res: Response) => {
     for (const w of ((weekRows ?? []) as { course: string }[])) {
       weeksByCourse[w.course] = (weeksByCourse[w.course] || 0) + 1;
     }
+    // BUG-012: lecturer names ride the catalog too (dashboard cards show
+    // who teaches each course). Two batched queries, no per-course fan-out.
+    const lecturersByCourse: Record<string, string[]> = {};
+    try {
+      const { data: teaching } = await sb.from("enrollments").select("course,user_id").eq("kind", "teaching").limit(2000);
+      const ids = [...new Set(((teaching ?? []) as { course: string; user_id: string }[]).map((t) => t.user_id))].slice(0, 500);
+      if (ids.length) {
+        const { data: profs } = await sb.from("profiles").select("id,first_name").in("id", ids);
+        const nameById: Record<string, string> = {};
+        for (const p of ((profs ?? []) as { id: string; first_name: string }[])) {
+          if (p.first_name) nameById[p.id] = p.first_name;
+        }
+        for (const t of ((teaching ?? []) as { course: string; user_id: string }[])) {
+          const nm = nameById[t.user_id];
+          if (!nm) continue;
+          const list = (lecturersByCourse[t.course] = lecturersByCourse[t.course] || []);
+          if (!list.includes(nm) && list.length < 2) list.push(nm);
+        }
+      }
+    } catch {
+      // names stay empty; cards fall back to code-only
+    }
     const byCourse: Record<string, { levels: string[]; semesters: string[] }> = {};
     for (const l of ((links ?? []) as { course: string; level: string; semester: string }[])) {
       const e = (byCourse[l.course] = byCourse[l.course] || { levels: [], semesters: [] });
@@ -578,6 +600,7 @@ router.get("/courses", async (req: Request, res: Response) => {
       levels: (byCourse[c.code]?.levels || []).sort(),
       semesters: (byCourse[c.code]?.semesters || []).sort(),
       weeks: weeksByCourse[c.code] || 0,
+      lecturers: lecturersByCourse[c.code] || [],
     }));
     if (level) out = out.filter((c) => c.levels.includes(level));
     if (semester) out = out.filter((c) => c.semesters.includes(semester));
@@ -1445,14 +1468,20 @@ router.get("/authored", requireAuth, async (req: Request, res: Response) => {
   try {
     const { data, error } = await supabaseAdmin()
       .from("topic_notes")
-      .select("id,course,week,topic,version,title,created_at")
+      .select("id,course,week,topic,lecture_no,version,title,created_at")
       .eq("author_id", userId)
       .order("course")
       .order("week")
+      .order("lecture_no")
       .order("topic")
       .order("version", { ascending: false });
     if (error) throw error;
-    res.json({ notes: data ?? [] });
+    res.json({
+      notes: ((data ?? []) as { lecture_no?: number; [k: string]: unknown }[]).map((r) => ({
+        ...r,
+        lecture: r.lecture_no || 1,
+      })),
+    });
   } catch (e) {
     res.status(500).json(dbError(e));
   }
