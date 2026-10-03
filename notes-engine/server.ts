@@ -579,6 +579,43 @@ async function runConvertJob(
         }
         return q;
       });
+      // BUG-010: the week quiz must be exactly 10 questions (8 MCQ + 2
+      // FITB). Models often return 5–8. One automatic repair pass asks for
+      // a fresh full bank instead of shipping a short quiz to review.
+      const bank = merged.eoq.questions as { type?: unknown }[];
+      const mcq = bank.filter((q) => q.type === "mcq").length;
+      const fitb = bank.filter((q) => q.type === "fitb").length;
+      if (bank.length !== 10 || mcq !== 8 || fitb !== 2) {
+        warnings.push(`Quiz came back with ${bank.length} questions (${mcq} MCQ + ${fitb} FITB) — requesting a full 10-question bank automatically.`);
+        try {
+          const repair = await convertPart({
+            system: ctx.system,
+            user: `The week covered these topics:\n${outlines.join("\n")}\n\nThe quiz you just wrote had ${bank.length} questions. FORGET it. Output ONLY a JSON array (no fences, no commentary) of EXACTLY 10 end-of-week quiz questions for the topics above: 8 with "type": "mcq" (options ["A","B","C","D"], "correct" letter, feedback {correct, wrong}) followed by 2 with "type": "fitb" (question with ________ blank, acceptedAnswers, feedback {correct, wrong}). Every item needs "number" (1..10), "question", "feedback" and "topicRef" (the topic number string it tests, 1..${merged.topics.length}).`,
+            apiKeyOverride: ctx.headerKey,
+          });
+          const cleaned = repair.text.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/\s*```$/i, "").trim();
+          const fresh = JSON.parse(cleaned);
+          const arr = Array.isArray(fresh) ? fresh : (fresh as { questions?: unknown }).questions;
+          if (Array.isArray(arr) && arr.length === 10) {
+            const fmcq = (arr as { type?: unknown }[]).filter((q) => q.type === "mcq").length;
+            const ffitb = (arr as { type?: unknown }[]).filter((q) => q.type === "fitb").length;
+            if (fmcq === 8 && ffitb === 2) {
+              merged.eoq.questions = (arr as { topicRef?: unknown }[]).map((q, qi) => {
+                const ref = Number((q as { topicRef?: unknown }).topicRef);
+                const clamped = Math.min(Math.max(Number.isInteger(ref) ? (ref as number) : 1, 1), Math.max(merged.topics.length, 1));
+                return { ...(q as object), number: qi + 1, topicRef: String(clamped) };
+              });
+              warnings.push("Quiz repaired automatically to 10 questions (8 MCQ + 2 FITB). Skim it in review.");
+            } else {
+              warnings.push(`Quiz repair returned the wrong mix (${fmcq} MCQ + ${ffitb} FITB) — kept the original bank. Regenerate or top up in Edit content.`);
+            }
+          } else {
+            warnings.push("Quiz repair did not return 10 questions — kept the original bank. Regenerate or top up in Edit content.");
+          }
+        } catch {
+          warnings.push("Quiz repair call failed — kept the original bank. Regenerate or top up in Edit content.");
+        }
+      }
     }
     if (isLast) {
       if (typeof noteJson.title === "string" && noteJson.title && !merged.title) merged.title = noteJson.title;
