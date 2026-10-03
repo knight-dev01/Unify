@@ -387,6 +387,7 @@ ${chunkText}
   try {
     // BUG-004: large inputs split automatically (sequential parts, merged
     // below). Small inputs take the exact same single-shot path as before.
+    // Long jobs run ASYNC (see below): this only plans the split.
     const parts = splitInput(rawNotesText);
     if (!parts) {
       return res.status(413).json({
@@ -396,129 +397,245 @@ ${chunkText}
         code: "INPUT_TOO_LARGE",
       });
     }
-    const multi = parts.length > 1;
-    const merged = {
-      course: course || "Unspecified",
-      week: Number(week) || 1,
-      title: title || "",
-      subtitle: subtitle || "",
-      learningOutcome: learningOutcome || "",
-      metaChips: [],
-      tags: Array.isArray(tags) ? tags : [],
-      topics: [] as unknown[],
-      eoq: { questions: [] as unknown[] },
-    };
-    const partReports: { index: number; topics: number; model: string; attempts: number }[] = [];
-    const warnings: string[] = [];
-    let provider = "";
-    // Earlier parts' outlines ride into the final part so its 10-question
-    // EOQ can reference the whole week, not just the last chunk.
-    const outlines: string[] = [];
-    for (let pi = 0; pi < parts.length; pi++) {
-      const isLast = pi === parts.length - 1;
-      const offset = merged.topics.length;
-      const partSuffix = multi
-        ? isLast
-          ? `PART ${pi + 1} OF ${parts.length} (FINAL). Earlier parts covered: ${outlines.join(" | ") || "nothing yet"}. Output topics for THIS part only, continuing numbering after topic ${offset}. Then output the full end-of-week quiz: EXACTLY 10 questions (8 mcq + 2 fitb) covering the WHOLE week, with topicRef pointing at the final merged numbering (1..${offset}+yours).`
-          : `PART ${pi + 1} OF ${parts.length}. Output topics for THIS part only, numbered from 1. Set eoq.questions to an EMPTY array (the final part writes the one week quiz).`
-        : "";
-      let text: string;
-      let model = "";
-      try {
-        const r = await convertPart({
-          system: SYSTEM_PROMPT,
-          user: userPromptForPart(parts[pi]),
-          apiKeyOverride: typeof headerKey === "string" ? headerKey : undefined,
-          partSuffix,
-        });
-        text = r.text;
-        model = r.model;
-        provider = r.provider;
-        partReports.push({ index: pi + 1, topics: 0, model, attempts: r.attempts });
-      } catch (e) {
-        const mapped = toConvertError(e);
-        return res.status(mapped.status).json({
-          error: mapped.message,
-          message: `${mapped.message} (part ${pi + 1} of ${parts.length})`,
-          hint: mapped.hint,
-          code: mapped.code,
-        });
-      }
-
-      // Clean any accidental markdown fences ```json ... ```
-      const jsonText = text.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/\s*```$/i, "").trim();
-
-      let noteJson: Record<string, unknown>;
-      try {
-        noteJson = JSON.parse(jsonText);
-      } catch {
-        return res.status(502).json({
-          error: "The AI returned invalid JSON.",
-          message: `Part ${pi + 1} of ${parts.length} came back unparseable after automatic retries.`,
-          hint: "Press Generate again. If it persists, split the input smaller or simplify formatting.",
-          code: "BAD_OUTPUT",
-        });
-      }
-      const partTopics = Array.isArray(noteJson.topics) ? (noteJson.topics as unknown[]) : [];
-      // Renumber sequentially across parts; remap topicRefs positionally
-      // when the part obeyed continued numbering, else clamp + warn.
-      const remap = new Map<number, number>();
-      partTopics.forEach((t, i) => {
-        const rawNum = Number((t as { number?: unknown })?.number);
-        const newNum = offset + i + 1;
-        if (Number.isInteger(rawNum) && rawNum >= 1) remap.set(rawNum, newNum);
-        (t as { number?: unknown }).number = newNum;
-      });
-      merged.topics.push(...partTopics);
-      partReports[partReports.length - 1].topics = partTopics.length;
-      outlines.push(
-        partTopics
-          .map((t) => {
-            const tt = t as { number?: unknown; title?: unknown };
-            return `T${tt.number}: ${String(tt.title || "").slice(0, 80)}`;
-          })
-          .join("; ")
-      );
-      const partEoq = (noteJson.eoq as { questions?: unknown[] } | undefined)?.questions;
-      if (isLast && Array.isArray(partEoq)) {
-        merged.eoq.questions = (partEoq as { topicRef?: unknown }[]).map((q, qi) => {
-          const ref = Number((q as { topicRef?: unknown }).topicRef);
-          if (!Number.isInteger(ref) || ref < 1 || ref > merged.topics.length) {
-            const clamped = Math.min(Math.max(Number.isInteger(ref) ? (ref as number) : 1, 1), Math.max(merged.topics.length, 1));
-            warnings.push(`Quiz Q${qi + 1} pointed at missing topic ${String((q as { topicRef?: unknown }).topicRef)} — moved to topic ${clamped}. Verify in review.`);
-            return { ...(q as object), topicRef: String(clamped) };
-          }
-          return q;
-        });
-      }
-      if (isLast) {
-        if (typeof noteJson.title === "string" && noteJson.title && !merged.title) merged.title = noteJson.title;
-        if (typeof noteJson.subtitle === "string" && noteJson.subtitle && !merged.subtitle) merged.subtitle = noteJson.subtitle;
-        if (typeof noteJson.learningOutcome === "string" && noteJson.learningOutcome && !merged.learningOutcome) merged.learningOutcome = noteJson.learningOutcome;
-      }
-    }
-
-    // Validate quality rules
-    const validation = validateUnifyNote(merged);
-    if (!validation.valid) {
-      console.warn("AI output failed validation warnings:", validation.errors);
-    }
-
-    res.json({
-      success: true,
-      note: merged,
-      validation,
-      provider,
-      model: partReports.length ? partReports[partReports.length - 1].model : "",
-      split: multi,
-      parts: partReports,
-      warnings,
+    const job = createConvertJob(parts.length);
+    // Kick off without awaiting: the client polls GET /api/convert/:jobId.
+    // The request returns in ms no matter how many parts follow.
+    void runConvertJob(job, {
+      system: SYSTEM_PROMPT,
+      userPromptForPart,
+      parts,
+      headerKey: typeof headerKey === "string" ? headerKey : undefined,
+      meta: {
+        course: course || "Unspecified",
+        week: Number(week) || 1,
+        title: title || "",
+        subtitle: subtitle || "",
+        learningOutcome: learningOutcome || "",
+        tags: Array.isArray(tags) ? tags : [],
+      },
+    }).catch((err) => {
+      console.error("Conversion job failed:", job.id, err);
+      job.status = "error";
+      const mapped = decodeJobError(err);
+      job.error = { message: mapped.message, hint: mapped.hint, code: mapped.code };
+      job.updatedAt = Date.now();
     });
+    res.status(202).json({ jobId: job.id, parts: parts.length, split: parts.length > 1 });
   } catch (err) {
     console.error("Conversion error:", err);
     const mapped = toConvertError(err);
     res.status(mapped.status).json({ error: mapped.message, message: mapped.message, hint: mapped.hint, code: mapped.code });
   }
+});
+
+// Async conversion jobs (BUG-004 speed concern): multi-part generations
+// take minutes, far past safe request timeouts. The POST above returns
+// instantly; this worker runs detached while the client polls status.
+// Single-instance assumption (Render free/starter): jobs live in memory and
+// are evicted an hour after finishing. Multi-instance would need a table.
+type ConvertJob = {
+  id: string;
+  status: "working" | "done" | "error";
+  partsTotal: number;
+  partsDone: number;
+  currentModel: string;
+  result?: {
+    note: unknown;
+    validation: unknown;
+    provider: string;
+    model: string;
+    split: boolean;
+    parts: { index: number; topics: number; model: string; attempts: number }[];
+    warnings: string[];
+  };
+  error?: { message: string; hint: string; code: string };
+  updatedAt: number;
+};
+const convertJobs = new Map<string, ConvertJob>();
+
+function createConvertJob(partsTotal: number): ConvertJob {
+  // Evict finished jobs older than an hour; cap the map.
+  const now = Date.now();
+  for (const [id, j] of convertJobs) {
+    if (j.updatedAt < now - 3600000) convertJobs.delete(id);
+  }
+  while (convertJobs.size > 50) {
+    const oldest = [...convertJobs.entries()].sort((a, b) => a[1].updatedAt - b[1].updatedAt)[0];
+    if (!oldest) break;
+    convertJobs.delete(oldest[0]);
+  }
+  const { randomUUID } = require("node:crypto");
+  const job: ConvertJob = {
+    id: randomUUID(),
+    status: "working",
+    partsTotal,
+    partsDone: 0,
+    currentModel: "",
+    updatedAt: now,
+  };
+  convertJobs.set(job.id, job);
+  return job;
+}
+
+async function runConvertJob(
+  job: ConvertJob,
+  ctx: {
+    system: string;
+    userPromptForPart: (chunk: string) => string;
+    parts: string[];
+    headerKey?: string;
+    meta: { course: string; week: number; title: string; subtitle: string; learningOutcome: string; tags: unknown[] };
+  }
+): Promise<void> {
+  const { convertPart, toConvertError } = require("./src/lib/ai");
+  const { validateUnifyNote } = require("./src/schema");
+  const multi = ctx.parts.length > 1;
+  const merged = {
+    course: ctx.meta.course,
+    week: ctx.meta.week,
+    title: ctx.meta.title,
+    subtitle: ctx.meta.subtitle,
+    learningOutcome: ctx.meta.learningOutcome,
+    metaChips: [],
+    tags: ctx.meta.tags,
+    topics: [] as unknown[],
+    eoq: { questions: [] as unknown[] },
+  };
+  const partReports: { index: number; topics: number; model: string; attempts: number }[] = [];
+  const warnings: string[] = [];
+  let provider = "";
+  // Earlier parts' outlines ride into the final part so its 10-question
+  // EOQ can reference the whole week, not just the last chunk.
+  const outlines: string[] = [];
+  for (let pi = 0; pi < ctx.parts.length; pi++) {
+    const isLast = pi === ctx.parts.length - 1;
+    const offset = merged.topics.length;
+    const partSuffix = multi
+      ? isLast
+        ? `PART ${pi + 1} OF ${ctx.parts.length} (FINAL). Earlier parts covered: ${outlines.join(" | ") || "nothing yet"}. Output topics for THIS part only, continuing numbering after topic ${offset}. Then output the full end-of-week quiz: EXACTLY 10 questions (8 mcq + 2 fitb) covering the WHOLE week, with topicRef pointing at the final merged numbering (1..${offset}+yours).`
+        : `PART ${pi + 1} OF ${ctx.parts.length}. Output topics for THIS part only, numbered from 1. Set eoq.questions to an EMPTY array (the final part writes the one week quiz).`
+      : "";
+    let text: string;
+    let model = "";
+    try {
+      const r = await convertPart({
+        system: ctx.system,
+        user: ctx.userPromptForPart(ctx.parts[pi]),
+        apiKeyOverride: ctx.headerKey,
+        partSuffix,
+      });
+      text = r.text;
+      model = r.model;
+      provider = r.provider;
+      partReports.push({ index: pi + 1, topics: 0, model, attempts: r.attempts });
+    } catch (e) {
+      const mapped = toConvertError(e);
+      throw Object.assign(new Error(`${mapped.message} (part ${pi + 1} of ${ctx.parts.length})|${mapped.hint}|${mapped.code}|${mapped.status}`), {
+        status: mapped.status,
+      });
+    }
+
+    // Clean any accidental markdown fences ```json ... ```
+    const jsonText = text.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/\s*```$/i, "").trim();
+
+    let noteJson: Record<string, unknown>;
+    try {
+      noteJson = JSON.parse(jsonText);
+    } catch {
+      throw Object.assign(
+        new Error(
+          `Part ${pi + 1} of ${ctx.parts.length} came back unparseable after automatic retries.|Press Generate again. If it persists, split the input smaller or simplify formatting.|BAD_OUTPUT|502`
+        ),
+        { status: 502 }
+      );
+    }
+    const partTopics = Array.isArray(noteJson.topics) ? (noteJson.topics as unknown[]) : [];
+    // Renumber sequentially across parts; clamp out-of-range EOQ refs + warn.
+    partTopics.forEach((t, i) => {
+      (t as { number?: unknown }).number = offset + i + 1;
+    });
+    merged.topics.push(...partTopics);
+    partReports[partReports.length - 1].topics = partTopics.length;
+    outlines.push(
+      partTopics
+        .map((t) => {
+          const tt = t as { number?: unknown; title?: unknown };
+          return `T${tt.number}: ${String(tt.title || "").slice(0, 80)}`;
+        })
+        .join("; ")
+    );
+    const partEoq = (noteJson.eoq as { questions?: unknown[] } | undefined)?.questions;
+    if (isLast && Array.isArray(partEoq)) {
+      merged.eoq.questions = (partEoq as { topicRef?: unknown }[]).map((q, qi) => {
+        const ref = Number((q as { topicRef?: unknown }).topicRef);
+        if (!Number.isInteger(ref) || ref < 1 || ref > merged.topics.length) {
+          const clamped = Math.min(Math.max(Number.isInteger(ref) ? (ref as number) : 1, 1), Math.max(merged.topics.length, 1));
+          warnings.push(`Quiz Q${qi + 1} pointed at missing topic ${String((q as { topicRef?: unknown }).topicRef)} — moved to topic ${clamped}. Verify in review.`);
+          return { ...(q as object), topicRef: String(clamped) };
+        }
+        return q;
+      });
+    }
+    if (isLast) {
+      if (typeof noteJson.title === "string" && noteJson.title && !merged.title) merged.title = noteJson.title;
+      if (typeof noteJson.subtitle === "string" && noteJson.subtitle && !merged.subtitle) merged.subtitle = noteJson.subtitle;
+      if (typeof noteJson.learningOutcome === "string" && noteJson.learningOutcome && !merged.learningOutcome)
+        merged.learningOutcome = noteJson.learningOutcome;
+    }
+    job.partsDone = pi + 1;
+    job.currentModel = model;
+    job.updatedAt = Date.now();
+  }
+
+  // Validate quality rules
+  const validation = validateUnifyNote(merged);
+  if (!validation.valid) {
+    console.warn("AI output failed validation warnings:", validation.errors);
+  }
+
+  job.result = {
+    note: merged,
+    validation,
+    provider,
+    model: partReports.length ? partReports[partReports.length - 1].model : "",
+    split: multi,
+    parts: partReports,
+    warnings,
+  };
+  job.status = "done";
+  job.updatedAt = Date.now();
+}
+
+// Job errors thrown above encode mapped fields after a "|" separator.
+function decodeJobError(e: unknown): { message: string; hint: string; code: string; status: number } {
+  const { toConvertError } = require("./src/lib/ai");
+  if (e instanceof Error && e.message.includes("|")) {
+    const [message, hint, code, status] = e.message.split("|");
+    const s = Number(status);
+    if (message && hint && code && Number.isInteger(s)) return { message, hint, code, status: s };
+  }
+  const mapped = toConvertError(e);
+  return { message: mapped.message, hint: mapped.hint, code: mapped.code, status: mapped.status };
+}
+
+app.get("/api/convert/:jobId", async (req, res) => {
+  const job = convertJobs.get(String(req.params.jobId || ""));
+  if (!job) {
+    return res.status(404).json({ error: "Unknown or expired job. Press Generate again." });
+  }
+  if (job.status === "working") {
+    return res.json({
+      status: "working",
+      partsTotal: job.partsTotal,
+      partsDone: job.partsDone,
+      currentModel: job.currentModel,
+    });
+  }
+  if (job.status === "error") {
+    const err = job.error || { message: "Conversion failed.", hint: "Press Generate again.", code: "CONVERT_FAILED" };
+    return res.status(400).json({ error: err.message, message: err.message, hint: err.hint, code: err.code });
+  }
+  return res.json({ status: "done", ...(job.result || {}) });
 });
 
 // Unknown routes -> JSON (not HTML) so API clients get a clean 404.
