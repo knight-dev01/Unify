@@ -190,3 +190,33 @@ create table if not exists share_links (
 create index if not exists share_links_user_idx on share_links (user_id);
 create index if not exists share_links_token_idx on share_links (token);
 alter table share_links enable row level security;
+
+-- Author-uploaded note diagrams (public read, signed-in write).
+insert into storage.buckets (id, name, public)
+values ('diagrams', 'diagrams', true)
+on conflict (id) do nothing;
+
+do $$ begin
+  create policy "Public read diagrams"
+    on storage.objects for select using (bucket_id = 'diagrams');
+exception when duplicate_object then null;
+end $$;
+
+do $$ begin
+  create policy "Signed-in upload diagrams"
+    on storage.objects for insert
+    with check (bucket_id = 'diagrams' and auth.role() = 'authenticated');
+exception when duplicate_object then null;
+end $$;
+
+do $$ begin
+  create policy "Signed-in manage diagrams"
+    on storage.objects for update using (bucket_id = 'diagrams' and auth.role() = 'authenticated');
+exception when duplicate_object then null;
+end $$;
+
+do $$ begin
+  create policy "Signed-in delete diagrams"
+    on storage.objects for delete using (bucket_id = 'diagrams' and auth.role() = 'authenticated');
+exception when duplicate_object then null;
+end $$;
