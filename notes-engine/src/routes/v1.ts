@@ -584,6 +584,68 @@ router.get("/courses", async (req: Request, res: Response) => {
   }
 });
 
+// Public: course search across code, title AND aliases (BUG-006: "ME 352"
+// finds "MEE 352"). Level-scoped when given; spans both semesters with
+// badges so nothing hides — enrollment stays the student's choice.
+router.get("/courses/search", async (req: Request, res: Response) => {
+  const q = String(req.query.q || "").trim();
+  const level = String(req.query.level || "");
+  if (q.length < 2) {
+    res.status(400).json({ error: "Type at least 2 characters to search." });
+    return;
+  }
+  try {
+    const sb = supabaseAdmin();
+    const like = `%${q.replace(/[%_,]/g, "")}%`;
+    const [coursesRes, aliasRes, linksRes, weeksRes] = await Promise.all([
+      sb.from("courses").select("code,title").or(`code.ilike.${like},title.ilike.${like}`).limit(30),
+      sb.from("course_aliases").select("alias,course").ilike("alias", like).limit(30),
+      sb.from("course_levels").select("course,level,semester").limit(2000),
+      sb.from("weeks").select("course").limit(5000),
+    ]);
+    const err = coursesRes.error || aliasRes.error || linksRes.error || weeksRes.error;
+    if (err) throw err;
+    const byCode = new Map<string, { code: string; title: string; viaAlias?: string }>();
+    for (const c of ((coursesRes.data ?? []) as { code: string; title: string }[])) {
+      if (c.code) byCode.set(c.code, { code: c.code, title: c.title });
+    }
+    const aliasTargets = (((aliasRes.data ?? []) as { alias: string; course: string }[]))
+      .map((a) => a.course)
+      .filter((code) => code && !byCode.has(code));
+    if (aliasTargets.length) {
+      const { data: extra } = await sb.from("courses").select("code,title").in("code", aliasTargets);
+      for (const c of ((extra ?? []) as { code: string; title: string }[])) {
+        if (c.code) byCode.set(c.code, { code: c.code, title: c.title });
+      }
+    }
+    const aliasByCourse = new Map<string, string>();
+    for (const a of ((aliasRes.data ?? []) as { alias: string; course: string }[])) {
+      if (byCode.has(a.course) && !aliasByCourse.has(a.course)) aliasByCourse.set(a.course, a.alias);
+    }
+    const byCourse: Record<string, { levels: string[]; semesters: string[] }> = {};
+    for (const l of ((linksRes.data ?? []) as { course: string; level: string; semester: string }[])) {
+      const e = (byCourse[l.course] = byCourse[l.course] || { levels: [], semesters: [] });
+      if (!e.levels.includes(l.level)) e.levels.push(l.level);
+      if (l.semester && !e.semesters.includes(l.semester)) e.semesters.push(l.semester);
+    }
+    const weeksByCourse: Record<string, number> = {};
+    for (const w of ((weeksRes.data ?? []) as { course: string }[])) {
+      weeksByCourse[w.course] = (weeksByCourse[w.course] || 0) + 1;
+    }
+    let out = [...byCode.values()].map((c) => ({
+      ...c,
+      levels: (byCourse[c.code]?.levels || []).sort(),
+      semesters: (byCourse[c.code]?.semesters || []).sort(),
+      weeks: weeksByCourse[c.code] || 0,
+      matchedAlias: aliasByCourse.get(c.code) || null,
+    }));
+    if (level) out = out.filter((c) => c.levels.includes(level));
+    res.json(out);
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
 // Public: one week of a course. Topics assemble from the latest version
 // of each topic_note (v1, v2, v3...); the weeks row is only the shell
 // (title/subtitle/eoq). Legacy week-embedded topics still work until the

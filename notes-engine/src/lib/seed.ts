@@ -556,6 +556,16 @@ async function seedLegacyContent(
   } catch (e) {
     fail("mee352 title cleanup", e);
   }
+  // Course aliases (BUG-006): alternate codes students actually type.
+  // Idempotent; skipped silently when the target course is absent.
+  try {
+    const { data: mee } = await sb.from("courses").select("code").eq("code", "MEE 352").single();
+    if (mee) {
+      await sb.from("course_aliases").upsert({ alias: "ME 352", course: "MEE 352" }, { onConflict: "alias" });
+    }
+  } catch (e) {
+    fail("course aliases", e);
+  }
   console.info(
     `[seed] done: ${stats.courses} courses, ${stats.shells} shells, ${stats.topics} topics, ` +
       `eoq filled ${stats.eoqFilled}, titles upgraded ${stats.titlesUpgraded}, errors ${stats.errors.length}`

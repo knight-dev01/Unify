@@ -191,6 +191,13 @@ create index if not exists share_links_user_idx on share_links (user_id);
 create index if not exists share_links_token_idx on share_links (token);
 alter table share_links enable row level security;
 
+create table if not exists course_aliases (
+  alias text primary key,
+  course text not null references courses(code) on delete cascade
+);
+create index if not exists course_aliases_course_idx on course_aliases (course);
+alter table course_aliases enable row level security;
+
 -- Author-uploaded note diagrams (public read, signed-in write).
 insert into storage.buckets (id, name, public)
 values ('diagrams', 'diagrams', true)

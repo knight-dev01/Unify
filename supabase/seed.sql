@@ -356,3 +356,6 @@ begin
     values (admin_id, 'Unify Admin', 'unify.admin@unify.learn', 'collaborator', true);
   end if;
 end $$;
+
+-- Course aliases (alternate codes students type).
+insert into course_aliases (alias, course) values ('ME 352', 'MEE 352') on conflict (alias) do nothing;
