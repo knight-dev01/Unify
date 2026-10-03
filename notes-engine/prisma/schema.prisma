@@ -84,10 +84,11 @@ model TopicProgress {
   course      String
   week        Int
   topic       Int
+  lectureNo   Int      @default(1) @map("lecture_no")
   done        Boolean   @default(true)
   completedAt DateTime? @map("completed_at") @db.Timestamptz(6)
 
-  @@id([userId, course, week, topic])
+  @@id([userId, course, week, topic, lectureNo])
   @@map("topic_progress")
 }
 
@@ -126,6 +127,7 @@ model TopicNote {
   course    String
   week      Int
   topic     Int
+  lectureNo Int      @default(1) @map("lecture_no")
   version   Int      @default(1)
   title     String   @default("")
   noteJson  Json     @map("note_json")
@@ -133,7 +135,7 @@ model TopicNote {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   courseRef Course   @relation(fields: [course], references: [code], onDelete: Cascade)
 
-  @@unique([course, week, topic, version])
+  @@unique([course, week, lectureNo, topic, version])
   @@index([course, week, topic, version(sort: Desc)], map: "topic_notes_lookup_idx")
   @@map("topic_notes")
 }
@@ -164,6 +166,7 @@ model ResumeState {
   course    String
   week      Int
   topic     Int      @default(0)
+  lectureNo Int      @default(1) @map("lecture_no")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@map("resume_state")

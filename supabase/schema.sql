@@ -74,14 +74,16 @@ create table if not exists topic_notes (
   course text not null references courses(code) on delete cascade,
   week int not null,
   topic int not null,
+  lecture_no int not null default 1,
   version int not null default 1,
   title text not null default '',
   note_json jsonb not null default '{}'::jsonb,
   author_id uuid,
   created_at timestamptz not null default now(),
-  unique (course, week, topic, version)
+  unique (course, week, lecture_no, topic, version)
 );
 create index if not exists topic_notes_lookup_idx on topic_notes (course, week, topic, version desc);
+create index if not exists topic_notes_lecture_idx on topic_notes (course, week, lecture_no, topic);
 create index if not exists topic_notes_author_idx on topic_notes (author_id);
 
 create table if not exists topic_progress (
@@ -89,9 +91,10 @@ create table if not exists topic_progress (
   course text not null,
   week int not null,
   topic int not null,
+  lecture_no int not null default 1,
   done boolean not null default true,
   completed_at timestamptz,
-  primary key (user_id, course, week, topic)
+  primary key (user_id, course, week, topic, lecture_no)
 );
 
 create table if not exists xp_events (
@@ -145,6 +148,7 @@ create table if not exists resume_state (
   course text not null,
   week int not null,
   topic int not null default 0,
+  lecture_no int not null default 1,
   updated_at timestamptz not null default now()
 );
 create index if not exists resume_state_user_idx on resume_state (user_id);

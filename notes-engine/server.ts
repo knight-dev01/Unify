@@ -65,6 +65,7 @@ const SCHEMA_SPEC = `
   "topics": [
     {
       "number": 1,
+      "lecture": 1,
       "title": "string",
       "abbr": "short-slug",
       "subtopics": [
@@ -138,6 +139,9 @@ ${SCHEMA_SPEC}
 Where the rules describe an HTML structure to copy (Mini Check divs, recall-card, pulse-check, eoq-question), instead populate the corresponding JSON fields — the app's template handles all markup and styling.
 
 Where the raw notes contain a figure/diagram reference, and the admin has NOT tagged it with a [FIGURE: id | caption: ...] placeholder, generate a "diagram" content block with your best caption/description from context but leave "imageRef" null. If the admin HAS tagged it, carry the id through as "imageRef" and never invent, describe, or alter the image itself.
+
+LECTURE SPLITTING (BUG-009 — a week is Lecture 1/2/3, never one long topic list):
+Every topic carries "lecture" (1, 2 or 3). When the raw notes clearly contain separate taught sessions (headings like Lecture 1 / Lecture 2, Part A/B, Day 1/2, or distinct class dates), group the topics under the matching lecture and number topics from 1 within EACH lecture. When the input is a single session with no such split, put every topic in lecture 1. The week EOQ stays one bank for the whole week (it is shown after the final lecture).
 `;
 
 // Health check (Render healthCheckPath + client warmup ping)

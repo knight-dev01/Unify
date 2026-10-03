@@ -62,6 +62,7 @@ const progressSchema = z.object({
   course: z.string().min(1).max(20),
   week: z.number().int().min(1).max(52),
   topic: z.number().int().min(0).max(100),
+  lectureNo: z.number().int().min(1).max(3).default(1),
 });
 
 function dbError(e: unknown): { error: string; message: string } {
@@ -165,24 +166,24 @@ router.get("/me", requireAuth, async (req: Request, res: Response) => {
       .filter((c) => c && c.trim());
     // Resume: live position if tracked, else the most recently completed
     // topic (pre-tracking progress still resumes somewhere sensible).
-    let resume: { course: string; week: number; topic: number } | null = null;
+    let resume: { course: string; week: number; topic: number; lecture: number } | null = null;
     const { data: saved } = await supabaseAdmin()
       .from("resume_state")
-      .select("course,week,topic")
+      .select("course,week,topic,lecture_no")
       .eq("user_id", userId)
       .single();
     if (saved) {
-      const r = saved as { course: string; week: number; topic: number };
-      if (r.course) resume = { course: r.course, week: r.week, topic: r.topic };
+      const r = saved as { course: string; week: number; topic: number; lecture_no?: number };
+      if (r.course) resume = { course: r.course, week: r.week, topic: r.topic, lecture: r.lecture_no || 1 };
     } else {
       const { data: last } = await supabaseAdmin()
         .from("topic_progress")
-        .select("course,week,topic")
+        .select("course,week,topic,lecture_no")
         .eq("user_id", userId)
         .order("completed_at", { ascending: false })
         .limit(1);
-      const row = ((last ?? []) as { course: string; week: number; topic: number }[])[0];
-      if (row && row.course) resume = { course: row.course, week: row.week, topic: row.topic };
+      const row = ((last ?? []) as { course: string; week: number; topic: number; lecture_no?: number }[])[0];
+      if (row && row.course) resume = { course: row.course, week: row.week, topic: row.topic, lecture: row.lecture_no || 1 };
     }
     res.json({ onboarded, profile: data, isAdmin, courses, resume });
   } catch (e) {
@@ -289,6 +290,7 @@ router.post("/resume", requireAuth, async (req: Request, res: Response) => {
       course: z.string().min(1).max(20),
       week: z.number().int().min(1).max(52),
       topic: z.number().int().min(0).max(100),
+      lectureNo: z.number().int().min(1).max(3).default(1),
     })
     .safeParse(req.body);
   if (!parsed.success) {
@@ -310,6 +312,7 @@ router.post("/resume", requireAuth, async (req: Request, res: Response) => {
           course,
           week: parsed.data.week,
           topic: parsed.data.topic,
+          lecture_no: parsed.data.lectureNo,
           updated_at: new Date().toISOString(),
         },
         { onConflict: "user_id" }
@@ -655,6 +658,7 @@ type TopicNoteRow = {
   course: string;
   week: number;
   topic: number;
+  lecture_no?: number;
   version: number;
   title: string;
   note_json: unknown;
@@ -664,6 +668,7 @@ type TopicNoteRow = {
 
 type TopicMeta = {
   topic: number;
+  lecture: number;
   version: number;
   id: string;
   title: string;
@@ -681,9 +686,10 @@ async function topicRowsFor(course: string, week: number): Promise<TopicNoteRow[
   for (const v of courseVariants(course)) {
     const { data, error } = await sb
       .from("topic_notes")
-      .select("id,course,week,topic,version,title,note_json,author_id,created_at")
+      .select("id,course,week,topic,lecture_no,version,title,note_json,author_id,created_at")
       .eq("course", v)
       .eq("week", week)
+      .order("lecture_no")
       .order("topic")
       .order("version", { ascending: false });
     if (error) throw error;
@@ -692,20 +698,37 @@ async function topicRowsFor(course: string, week: number): Promise<TopicNoteRow[
   return out;
 }
 
-function groupTopics(rows: TopicNoteRow[]): { topics: unknown[]; meta: TopicMeta[] } {
-  const byTopic = new Map<number, TopicNoteRow[]>();
+function groupTopics(rows: TopicNoteRow[]): { topics: unknown[]; meta: TopicMeta[]; lectures: number[] } {
+  const byKey = new Map<string, TopicNoteRow[]>();
   for (const r of rows) {
-    const list = byTopic.get(r.topic) || [];
+    const lecture = r.lecture_no || 1;
+    const key = `${lecture}::${r.topic}`;
+    const list = byKey.get(key) || [];
     list.push(r);
-    byTopic.set(r.topic, list);
+    byKey.set(key, list);
   }
   const topics: unknown[] = [];
   const meta: TopicMeta[] = [];
-  for (const [num, list] of [...byTopic.entries()].sort((a, b) => a[0] - b[0])) {
+  const lectureSet = new Set<number>();
+  const sortedKeys = [...byKey.keys()].sort((a, b) => {
+    const [la, ta] = a.split("::").map(Number);
+    const [lb, tb] = b.split("::").map(Number);
+    return la - lb || ta - tb;
+  });
+  for (const key of sortedKeys) {
+    const list = byKey.get(key) as TopicNoteRow[];
+    const [lecture, num] = key.split("::").map(Number);
+    lectureSet.add(lecture);
     const sorted = [...list].sort((a, b) => b.version - a.version);
-    topics.push(sorted[0].note_json);
+    const payload = sorted[0].note_json;
+    topics.push(
+      payload && typeof payload === "object" && !Array.isArray(payload)
+        ? { ...(payload as Record<string, unknown>), lecture }
+        : payload
+    );
     meta.push({
       topic: num,
+      lecture,
       version: sorted[0].version,
       id: sorted[0].id,
       title: sorted[0].title,
@@ -718,7 +741,7 @@ function groupTopics(rows: TopicNoteRow[]): { topics: unknown[]; meta: TopicMeta
       })),
     });
   }
-  return { topics, meta };
+  return { topics, meta, lectures: [...lectureSet].sort((a, b) => a - b) };
 }
 
 router.get("/courses/:code/weeks/:week", requireAuth, requireCourseAccess, async (req: Request, res: Response) => {
@@ -748,7 +771,7 @@ router.get("/courses/:code/weeks/:week", requireAuth, requireCourseAccess, async
 async function assembleWeek(
   code: string,
   week: number
-): Promise<{ course: string; week: number; title: string; subtitle: string; note_json: unknown; topicMeta: TopicMeta[] } | null> {
+): Promise<{ course: string; week: number; title: string; subtitle: string; note_json: unknown; topicMeta: TopicMeta[]; lectures: number[] } | null> {
   const sb = supabaseAdmin();
   let shell: { course: string; week: number; title: string; subtitle: string; note_json: unknown } | null = null;
   for (const v of courseVariants(code)) {
@@ -766,9 +789,9 @@ async function assembleWeek(
   const rows = await topicRowsFor(code, week);
   if (!shell && rows.length === 0) return null;
   if (rows.length === 0 && shell) {
-    return { ...shell, topicMeta: [] };
+    return { ...shell, topicMeta: [], lectures: [1] };
   }
-  const { topics, meta } = groupTopics(rows);
+  const { topics, meta, lectures } = groupTopics(rows);
   const shellNote = ((shell?.note_json ?? {}) as Record<string, unknown>) || {};
   const course = shell?.course ?? rows[0].course;
   const title = shell?.title || (typeof shellNote.title === "string" ? shellNote.title : `Week ${week}`);
@@ -780,6 +803,7 @@ async function assembleWeek(
     subtitle,
     note_json: { ...shellNote, course, week, title, subtitle, topics },
     topicMeta: meta,
+    lectures,
   };
 }
 
@@ -1038,8 +1062,8 @@ router.post("/progress", requireAuth, async (req: Request, res: Response) => {
       return;
     }
     const { error: upErr } = await sb.from("topic_progress").upsert(
-      { user_id: userId, course, week, topic, done: true, completed_at: new Date().toISOString() },
-      { onConflict: "user_id,course,week,topic" }
+      { user_id: userId, course, week, topic, lecture_no: parsed.data.lectureNo, done: true, completed_at: new Date().toISOString() },
+      { onConflict: "user_id,course,week,topic,lecture_no" }
     );
     if (upErr) throw upErr;
     // Keep the Resume card on the just-completed position.
@@ -1049,6 +1073,7 @@ router.post("/progress", requireAuth, async (req: Request, res: Response) => {
         course,
         week,
         topic,
+        lecture_no: parsed.data.lectureNo,
         updated_at: new Date().toISOString(),
       },
       { onConflict: "user_id" }
@@ -1056,7 +1081,7 @@ router.post("/progress", requireAuth, async (req: Request, res: Response) => {
     await sb.from("xp_events").insert({
       user_id: userId,
       amount: TOPIC_XP,
-      reason: `topic_complete:${course}:w${week}:t${topic}`,
+      reason: `topic_complete:${course}:w${week}:l${parsed.data.lectureNo}:t${topic}`,
     });
     const { data: xpRows } = await sb
       .from("xp_events")
@@ -1084,13 +1109,14 @@ const publishSchema = z.object({
   mode: z.enum(["add", "replace"]).optional(),
 });
 
-async function nextTopicVersion(course: string, week: number, topic: number): Promise<number> {
+async function nextTopicVersion(course: string, week: number, topic: number, lectureNo = 1): Promise<number> {
   const { data } = await supabaseAdmin()
     .from("topic_notes")
     .select("version")
     .eq("course", course)
     .eq("week", week)
     .eq("topic", topic)
+    .eq("lecture_no", lectureNo)
     .order("version", { ascending: false })
     .limit(1);
   const rows = (data ?? []) as { version: number }[];
@@ -1164,17 +1190,20 @@ router.post("/publish", requireAuth, requireAuthor, requireCourseAccess, async (
       { onConflict: "course,week" }
     );
     if (shellErr) throw shellErr;
-    const versions: { topic: number; version: number; id: string }[] = [];
+    const versions: { topic: number; lecture: number; version: number; id: string }[] = [];
     for (const t of topics) {
       const num = Number(t.number);
       if (!Number.isInteger(num) || num < 1 || num > 100) continue;
-      const version = await nextTopicVersion(code, week, num);
+      const clsRaw = Number((t as { lecture?: unknown }).lecture);
+      const cls = clsRaw === 2 || clsRaw === 3 ? clsRaw : 1;
+      const version = await nextTopicVersion(code, week, num, cls);
       const { data: ins, error: insErr } = await sb
         .from("topic_notes")
         .insert({
           course: code,
           week,
           topic: num,
+          lecture_no: cls,
           version,
           title: typeof t.title === "string" ? t.title : "",
           note_json: t,
@@ -1183,7 +1212,7 @@ router.post("/publish", requireAuth, requireAuthor, requireCourseAccess, async (
         .select("id")
         .single();
       if (insErr) throw insErr;
-      versions.push({ topic: num, version, id: (ins as { id: string }).id });
+      versions.push({ topic: num, lecture: cls, version, id: (ins as { id: string }).id });
     }
     res.json({ ok: true, course: code, week, versions });
     // Notify enrolled students (fire-and-forget; never blocks publish).
@@ -1206,6 +1235,7 @@ const topicPublishSchema = z.object({
   title: z.string().max(200).optional(),
   noteJson: z.object({}).passthrough(),
   mode: z.enum(["add", "replace"]).optional(),
+  lectureNo: z.number().int().min(1).max(3).default(1),
 });
 
 router.post("/topics/publish", requireAuth, requireAuthor, requireCourseAccess, async (req: Request, res: Response) => {
@@ -1224,12 +1254,14 @@ router.post("/topics/publish", requireAuth, requireAuthor, requireCourseAccess, 
   const single = noteJson as { title?: unknown };
   try {
     const sb = supabaseAdmin();
+    const lecture = parsed.data.lectureNo;
     const { data: existing } = await sb
       .from("topic_notes")
       .select("version,title")
       .eq("course", code)
       .eq("week", week)
       .eq("topic", topic)
+      .eq("lecture_no", lecture)
       .order("version", { ascending: false })
       .limit(10);
     const occupied = ((existing ?? []) as { version: number; title: string }[]);
@@ -1247,7 +1279,8 @@ router.post("/topics/publish", requireAuth, requireAuthor, requireCourseAccess, 
         .delete()
         .eq("course", code)
         .eq("week", week)
-        .eq("topic", topic);
+        .eq("topic", topic)
+        .eq("lecture_no", lecture);
       if (delErr) throw delErr;
       await sb.from("topic_progress").delete().eq("course", code).eq("week", week).eq("topic", topic);
     }
@@ -1273,13 +1306,14 @@ router.post("/topics/publish", requireAuth, requireAuthor, requireCourseAccess, 
       });
       if (shellErr) throw shellErr;
     }
-    const version = await nextTopicVersion(code, week, topic);
+    const version = await nextTopicVersion(code, week, topic, lecture);
     const { data: ins, error: insErr } = await sb
       .from("topic_notes")
       .insert({
         course: code,
         week,
         topic,
+        lecture_no: lecture,
         version,
         title:
           parsed.data.title ?? (typeof single.title === "string" ? single.title : `Topic ${topic}`),
@@ -1342,12 +1376,12 @@ router.get("/progress", requireAuth, async (req: Request, res: Response) => {
   try {
     const { data, error } = await supabaseAdmin()
       .from("topic_progress")
-      .select("topic")
+      .select("topic,lecture_no")
       .eq("user_id", userId)
       .eq("course", course)
       .eq("week", week);
     if (error) throw error;
-    res.json({ done: ((data ?? []) as { topic: number }[]).map((r) => r.topic) });
+    res.json({ done: ((data ?? []) as { topic: number; lecture_no?: number }[]).map((r) => ({ topic: r.topic, lecture: r.lecture_no || 1 })) });
   } catch (e) {
     res.status(500).json(dbError(e));
   }
@@ -1363,7 +1397,7 @@ router.get("/author/stats", requireAuth, requireAuthor, async (req: Request, res
     const [teaching, authored, mine] = await Promise.all([
       sb.from("enrollments").select("course").eq("user_id", userId).eq("kind", "teaching"),
       sb.from("topic_notes").select("course").eq("author_id", userId),
-      sb.from("topic_notes").select("course,week,topic,version").eq("author_id", userId),
+      sb.from("topic_notes").select("course,week,topic,lecture_no,version").eq("author_id", userId),
     ]);
     const courses = [
       ...new Set([
@@ -1371,8 +1405,8 @@ router.get("/author/stats", requireAuth, requireAuthor, async (req: Request, res
         ...(((authored.data ?? []) as { course: string }[]).map((r) => r.course)),
       ]),
     ];
-    const rows = ((mine.data ?? []) as { course: string; week: number; topic: number; version: number }[]);
-    const topics = new Set(rows.map((r) => `${r.course}|${r.week}|${r.topic}`)).size;
+    const rows = ((mine.data ?? []) as { course: string; week: number; topic: number; lecture_no?: number; version: number }[]);
+    const topics = new Set(rows.map((r) => `${r.course}|${r.week}|${r.lecture_no || 1}|${r.topic}`)).size;
     let students = 0;
     let completions = 0;
     let quizzesTaken = 0;
@@ -1565,7 +1599,7 @@ router.get("/admin/content", requireAuth, async (req: Request, res: Response) =>
       sb.from("courses").select("code,title").order("code").limit(500),
       sb.from("course_levels").select("course,level,semester").limit(2000),
       sb.from("weeks").select("course,week,title").order("course").order("week").limit(5000),
-      sb.from("topic_notes").select("course,week,topic,version,title").order("course").order("week").order("topic").order("version").limit(5000),
+      sb.from("topic_notes").select("course,week,topic,lecture_no,version,title").order("course").order("week").order("lecture_no").order("topic").order("version").limit(5000),
     ]);
     const err = coursesRes.error || levelsRes.error || weeksRes.error || notesRes.error;
     if (err) throw err;
@@ -1573,20 +1607,21 @@ router.get("/admin/content", requireAuth, async (req: Request, res: Response) =>
     for (const r of ((levelsRes.data ?? []) as { course: string; level: string; semester: string }[])) {
       if (!levelByCourse.has(r.course)) levelByCourse.set(r.course, { level: r.level, semester: r.semester });
     }
-    const topicsByWeek = new Map<string, { topic: number; versions: number; title: string }[]>();
-    for (const n of ((notesRes.data ?? []) as { course: string; week: number; topic: number; version: number; title: string }[])) {
+    const topicsByWeek = new Map<string, { topic: number; lecture: number; versions: number; title: string }[]>();
+    for (const n of ((notesRes.data ?? []) as { course: string; week: number; topic: number; lecture_no?: number; version: number; title: string }[])) {
+      const lecture = n.lecture_no || 1;
       const key = `${n.course}::${n.week}`;
       const list = topicsByWeek.get(key) || [];
       const last = list[list.length - 1];
-      if (last && last.topic === n.topic) {
+      if (last && last.topic === n.topic && last.lecture === lecture) {
         last.versions = Math.max(last.versions, n.version);
         if (!last.title && n.title) last.title = n.title;
       } else {
-        list.push({ topic: n.topic, versions: n.version, title: n.title || "" });
+        list.push({ topic: n.topic, lecture, versions: n.version, title: n.title || "" });
       }
       topicsByWeek.set(key, list);
     }
-    const weeksByCourse = new Map<string, { week: number; title: string; topics: { topic: number; versions: number; title: string }[] }[]>();
+    const weeksByCourse = new Map<string, { week: number; title: string; topics: { topic: number; lecture: number; versions: number; title: string }[] }[]>();
     for (const w of ((weeksRes.data ?? []) as { course: string; week: number; title: string }[])) {
       const list = weeksByCourse.get(w.course) || [];
       list.push({ week: w.week, title: w.title || "", topics: topicsByWeek.get(`${w.course}::${w.week}`) || [] });
