@@ -11,6 +11,12 @@ const MAX_TOKENS = 8192;
 const MAX_FAILURES = 3;
 const CHAIN_CAP = 8;
 
+// BUG-004: large-input handling. ~4 chars per token; a part stays small
+// enough for reliable single-shot generation with headroom for output.
+export const CONVERT_PART_CHARS = 20000;
+export const CONVERT_MAX_PARTS = 3;
+export const CONVERT_HARD_CHARS = CONVERT_PART_CHARS * CONVERT_MAX_PARTS;
+
 async function anthropic(system: string, user: string, model: string, apiKey: string): Promise<string> {
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -170,6 +176,98 @@ function isCapabilityError(e: unknown): boolean {
   if (status !== 400) return false;
   const msg = e instanceof Error ? e.message : String(e);
   return /developer instruction|interactions api|not supported|not available|not enabled|not found/i.test(msg);
+}
+
+// Transient failures worth an automatic retry (whole chain re-runs):
+// 5xx/overloaded/timeouts/empty output. 4xx (except rate/capability) fail fast.
+function isTransient(e: unknown): boolean {
+  const status = (e as { status?: number })?.status;
+  if (status === 429 || (status !== undefined && status >= 500 && status < 600)) return true;
+  const msg = e instanceof Error ? e.message : String(e);
+  return /overloaded|try again|timeout|timed out|ECONNRESET|ETIMEDOUT|ENOTFOUND|socket|no text|empty/i.test(msg);
+}
+
+async function withRetry<T>(label: string, fn: () => Promise<T>, attempts = 3): Promise<{ value: T; attempts: number }> {
+  const delays = [2000, 6000, 15000];
+  let lastErr: unknown = null;
+  for (let a = 1; a <= attempts; a++) {
+    try {
+      const value = await fn();
+      return { value, attempts: a };
+    } catch (e) {
+      lastErr = e;
+      if (a >= attempts || !isTransient(e)) throw e;
+      console.warn(`[ai] ${label} attempt ${a} failed (${e instanceof Error ? e.message.slice(0, 120) : e}), retrying…`);
+      await new Promise((r) => setTimeout(r, delays[Math.min(a - 1, delays.length - 1)]));
+    }
+  }
+  throw lastErr instanceof Error ? lastErr : new Error("AI unavailable");
+}
+
+// Split raw notes on blank lines into parts <= PART_CHARS (max N parts).
+// Returns null when even splitting can't fit (caller refuses with 413).
+export function splitInput(text: string): string[] | null {
+  if (text.length <= CONVERT_PART_CHARS) return [text];
+  const paras = text.split(/\n\s*\n/);
+  const parts: string[] = [];
+  let cur = "";
+  for (const p of paras) {
+    const add = (cur ? "\n\n" : "") + p;
+    if ((cur + add).length > CONVERT_PART_CHARS && cur) {
+      parts.push(cur);
+      cur = p;
+      if (parts.length >= CONVERT_MAX_PARTS) {
+        // Remainder must still fit in the last allowed part.
+        const rest = paras.slice(paras.indexOf(p)).join("\n\n");
+        if (rest.length > CONVERT_PART_CHARS) return null;
+        cur = rest;
+        break;
+      }
+    } else {
+      cur = cur + add;
+    }
+  }
+  if (cur) parts.push(cur);
+  if (parts.length > CONVERT_MAX_PARTS) return null;
+  return parts.filter((s) => s.trim().length > 0);
+}
+
+// Convert one part (topics + optionally the week EOQ). Used directly for
+// small inputs and per-part for large ones.
+export async function convertPart(args: {
+  system: string;
+  user: string;
+  apiKeyOverride?: string;
+  partSuffix?: string;
+}): Promise<{ text: string; provider: string; model: string; attempts: number }> {
+  const { value, attempts } = await withRetry("convert", () =>
+    generateStructuredNote({
+      system: args.system,
+      user: args.partSuffix ? `${args.user}\n\n${args.partSuffix}` : args.user,
+      apiKeyOverride: args.apiKeyOverride,
+    })
+  );
+  return { ...value, attempts };
+}
+
+// Map a generation failure to a clear, actionable API error.
+export function toConvertError(e: unknown): { status: number; code: string; message: string; hint: string } {
+  const status = (e as { status?: number })?.status;
+  const raw = e instanceof Error ? e.message : String(e);
+  const clean = raw.replace(/^(Gemini|Anthropic|Anthropic API|Gemini API) (API )?Error: \d+\s*/, "").slice(0, 300);
+  if (status === 429 || /RESOURCE_EXHAUSTED|quota|rate.?limit/i.test(raw)) {
+    return { status: 429, code: "RATE_LIMITED", message: "The AI quota is busy right now.", hint: "Already retried automatically. Wait about 60 seconds, then press Generate again." };
+  }
+  if (status === 503 || /overloaded|try again later/i.test(raw)) {
+    return { status: 503, code: "MODEL_OVERLOADED", message: "The AI model is overloaded.", hint: "Already retried automatically. Try again in a minute, or a smaller input." };
+  }
+  if (!status || status === 500 || status === 502 || status === 504 || /timeout|timed out|socket|no text|empty/i.test(raw)) {
+    return { status: 502, code: "MODEL_FAILED", message: "The AI failed to answer.", hint: "Already retried automatically. Press Generate again, or split the input smaller." };
+  }
+  if (status === 400 && /key|auth|permission|API key/i.test(raw)) {
+    return { status: 400, code: "BAD_KEY", message: "The AI key is missing or invalid.", hint: "An admin must set a working GEMINI_API_KEY on Render." };
+  }
+  return { status: status && status >= 400 && status < 500 ? status : 500, code: "CONVERT_FAILED", message: clean || "Conversion failed.", hint: "Press Generate again. If it persists, split the input smaller." };
 }
 
 export async function generateStructuredNote(args: {

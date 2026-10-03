@@ -371,7 +371,7 @@ app.post("/api/convert", async (req, res) => {
     modeInstruction = "Segmentation Mode: Whole Week, AI Decides. You have authority to identify logical topic and subtopic break points from unstructured text.";
   }
 
-  const userPrompt = `Course Code: ${course || "Unspecified"}
+  const userPromptForPart = (chunkText: string) => `Course Code: ${course || "Unspecified"}
 Week Number: ${week || 1}
 ${title ? `Title: ${title}` : ""}
 ${subtitle ? `Subtitle: ${subtitle}` : ""}
@@ -380,39 +380,144 @@ ${tags ? `Tags: ${tags.join(", ")}` : ""}
 ${modeInstruction}
 
 RAW LECTURE NOTES TO STRUCTURE:
-${rawNotesText}
+${chunkText}
 `;
 
-  const { generateStructuredNote } = require("./src/lib/ai");
+  const { generateStructuredNote, convertPart, splitInput, toConvertError, CONVERT_PART_CHARS, CONVERT_HARD_CHARS } = require("./src/lib/ai");
   try {
-    const { text: rawJson, provider, model } = await generateStructuredNote({
-      system: SYSTEM_PROMPT,
-      user: userPrompt,
-      apiKeyOverride: typeof headerKey === "string" ? headerKey : undefined,
-    });
+    // BUG-004: large inputs split automatically (sequential parts, merged
+    // below). Small inputs take the exact same single-shot path as before.
+    const parts = splitInput(rawNotesText);
+    if (!parts) {
+      return res.status(413).json({
+        error: "Notes too large to convert reliably",
+        message: `This input is ~${rawNotesText.length.toLocaleString()} characters; the limit is ~${CONVERT_HARD_CHARS.toLocaleString()}.`,
+        hint: "Split into 2–3 classes and generate each separately, or use per-topic mode for one class at a time.",
+        code: "INPUT_TOO_LARGE",
+      });
+    }
+    const multi = parts.length > 1;
+    const merged = {
+      course: course || "Unspecified",
+      week: Number(week) || 1,
+      title: title || "",
+      subtitle: subtitle || "",
+      learningOutcome: learningOutcome || "",
+      metaChips: [],
+      tags: Array.isArray(tags) ? tags : [],
+      topics: [] as unknown[],
+      eoq: { questions: [] as unknown[] },
+    };
+    const partReports: { index: number; topics: number; model: string; attempts: number }[] = [];
+    const warnings: string[] = [];
+    let provider = "";
+    // Earlier parts' outlines ride into the final part so its 10-question
+    // EOQ can reference the whole week, not just the last chunk.
+    const outlines: string[] = [];
+    for (let pi = 0; pi < parts.length; pi++) {
+      const isLast = pi === parts.length - 1;
+      const offset = merged.topics.length;
+      const partSuffix = multi
+        ? isLast
+          ? `PART ${pi + 1} OF ${parts.length} (FINAL). Earlier parts covered: ${outlines.join(" | ") || "nothing yet"}. Output topics for THIS part only, continuing numbering after topic ${offset}. Then output the full end-of-week quiz: EXACTLY 10 questions (8 mcq + 2 fitb) covering the WHOLE week, with topicRef pointing at the final merged numbering (1..${offset}+yours).`
+          : `PART ${pi + 1} OF ${parts.length}. Output topics for THIS part only, numbered from 1. Set eoq.questions to an EMPTY array (the final part writes the one week quiz).`
+        : "";
+      let text: string;
+      let model = "";
+      try {
+        const r = await convertPart({
+          system: SYSTEM_PROMPT,
+          user: userPromptForPart(parts[pi]),
+          apiKeyOverride: typeof headerKey === "string" ? headerKey : undefined,
+          partSuffix,
+        });
+        text = r.text;
+        model = r.model;
+        provider = r.provider;
+        partReports.push({ index: pi + 1, topics: 0, model, attempts: r.attempts });
+      } catch (e) {
+        const mapped = toConvertError(e);
+        return res.status(mapped.status).json({
+          error: mapped.message,
+          message: `${mapped.message} (part ${pi + 1} of ${parts.length})`,
+          hint: mapped.hint,
+          code: mapped.code,
+        });
+      }
 
-    // Clean any accidental markdown fences ```json ... ```
-    const jsonText = rawJson.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/\s*```$/i, "").trim();
+      // Clean any accidental markdown fences ```json ... ```
+      const jsonText = text.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/\s*```$/i, "").trim();
 
-    const noteJson = JSON.parse(jsonText);
+      let noteJson: Record<string, unknown>;
+      try {
+        noteJson = JSON.parse(jsonText);
+      } catch {
+        return res.status(502).json({
+          error: "The AI returned invalid JSON.",
+          message: `Part ${pi + 1} of ${parts.length} came back unparseable after automatic retries.`,
+          hint: "Press Generate again. If it persists, split the input smaller or simplify formatting.",
+          code: "BAD_OUTPUT",
+        });
+      }
+      const partTopics = Array.isArray(noteJson.topics) ? (noteJson.topics as unknown[]) : [];
+      // Renumber sequentially across parts; remap topicRefs positionally
+      // when the part obeyed continued numbering, else clamp + warn.
+      const remap = new Map<number, number>();
+      partTopics.forEach((t, i) => {
+        const rawNum = Number((t as { number?: unknown })?.number);
+        const newNum = offset + i + 1;
+        if (Number.isInteger(rawNum) && rawNum >= 1) remap.set(rawNum, newNum);
+        (t as { number?: unknown }).number = newNum;
+      });
+      merged.topics.push(...partTopics);
+      partReports[partReports.length - 1].topics = partTopics.length;
+      outlines.push(
+        partTopics
+          .map((t) => {
+            const tt = t as { number?: unknown; title?: unknown };
+            return `T${tt.number}: ${String(tt.title || "").slice(0, 80)}`;
+          })
+          .join("; ")
+      );
+      const partEoq = (noteJson.eoq as { questions?: unknown[] } | undefined)?.questions;
+      if (isLast && Array.isArray(partEoq)) {
+        merged.eoq.questions = (partEoq as { topicRef?: unknown }[]).map((q, qi) => {
+          const ref = Number((q as { topicRef?: unknown }).topicRef);
+          if (!Number.isInteger(ref) || ref < 1 || ref > merged.topics.length) {
+            const clamped = Math.min(Math.max(Number.isInteger(ref) ? (ref as number) : 1, 1), Math.max(merged.topics.length, 1));
+            warnings.push(`Quiz Q${qi + 1} pointed at missing topic ${String((q as { topicRef?: unknown }).topicRef)} — moved to topic ${clamped}. Verify in review.`);
+            return { ...(q as object), topicRef: String(clamped) };
+          }
+          return q;
+        });
+      }
+      if (isLast) {
+        if (typeof noteJson.title === "string" && noteJson.title && !merged.title) merged.title = noteJson.title;
+        if (typeof noteJson.subtitle === "string" && noteJson.subtitle && !merged.subtitle) merged.subtitle = noteJson.subtitle;
+        if (typeof noteJson.learningOutcome === "string" && noteJson.learningOutcome && !merged.learningOutcome) merged.learningOutcome = noteJson.learningOutcome;
+      }
+    }
 
     // Validate quality rules
-    const validation = validateUnifyNote(noteJson);
+    const validation = validateUnifyNote(merged);
     if (!validation.valid) {
       console.warn("AI output failed validation warnings:", validation.errors);
     }
 
     res.json({
       success: true,
-      note: noteJson,
+      note: merged,
       validation,
       provider,
-      model
+      model: partReports.length ? partReports[partReports.length - 1].model : "",
+      split: multi,
+      parts: partReports,
+      warnings,
     });
   } catch (err) {
     console.error("Conversion error:", err);
-    const status = (err && err.status) || 500;
-    res.status(status).json({ error: "Failed to convert raw notes", message: err.message });
+    const mapped = toConvertError(err);
+    res.status(mapped.status).json({ error: mapped.message, message: mapped.message, hint: mapped.hint, code: mapped.code });
   }
 });
 
