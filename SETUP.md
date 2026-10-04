@@ -20,10 +20,17 @@ the Auth server.)
 2. **Settings → Database → Connection string** (replace `[YOUR-PASSWORD]`):
    - **Pooler** (port `6543`) → `DATABASE_URL` (app traffic)
    - **Direct** (port `5432`) → `DIRECT_URL` (`prisma migrate deploy` only)
-3. **Authentication → Providers → Google → Enable** (OAuth client from Google
-   Cloud, redirect `https://xyzcompany.supabase.co/auth/v1/callback`).
-4. **Authentication → URL Configuration**: Site URL + Redirect URLs +=
-   `https://unify-virid.vercel.app/**`.
+3. **Authentication → Providers → Google → Enable** (required for the
+    app's Continue with Google button): OAuth client ID + secret from Google
+    Cloud Console (APIs & Services → Credentials → OAuth client ID, Web app)
+    with authorized redirect URI
+    `https://xouxvmprrosstzlitcsp.supabase.co/auth/v1/callback`
+    (replace with your own project ref for a fresh project).
+4. **Authentication → URL Configuration**: Site URL
+    `https://unify-virid.vercel.app`, Redirect URLs +=
+    `https://unify-virid.vercel.app/auth` (app's OAuth return leg) and
+    `http://localhost:5173/auth` for local dev. Without the `/auth` entry,
+    Google sign-in fails after the redirect.
 5. **Authentication → Emails → SMTP Settings (custom sender via Brevo):**
    - Brevo → Settings → SMTP & API → **SMTP** tab → create an **SMTP key**
      (`xsmtpsib-...`). The Brevo **API key** (`xkeysib-...`) does NOT work
@@ -83,7 +90,9 @@ Settings → Environment Variables (Production + Preview):
 
 ## 4. First end-to-end test
 
-1. Test users register fresh via Google (Firebase accounts don't carry over).
+1. Register fresh via email or Continue with Google (Google needs setup
+   step 3–4 above; until the provider is enabled the button reports it
+   honestly). New users land in onboarding, then the dashboard.
 2. Sign in → onboarding (LASU guaranteed even unseeded) → dashboard →
    week content from `weeks.note_json` → complete a topic (XP/streak served).
 

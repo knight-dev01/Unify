@@ -885,6 +885,25 @@ router.post("/share", requireAuth, async (req: Request, res: Response) => {
 
 // Public: resolve a share link (no session needed). 404 unknown, 410
 // expired. Views count up; content is always the live latest version.
+// Authed: my links (manage + revoke expired ones). Registered BEFORE
+// /share/:token: Express matches in order, and "mine" would otherwise be
+// swallowed as a token and 404 (that silently broke the live-links list).
+router.get("/share/mine", requireAuth, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  try {
+    const { data, error } = await supabaseAdmin()
+      .from("share_links")
+      .select("token,course,week,expires_at,views,created_at")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(50);
+    if (error) throw error;
+    res.json({ links: data ?? [] });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
 router.get("/share/:token", async (req: Request, res: Response) => {
   const token = String(req.params.token || "").slice(0, 64);
   if (!token) {
@@ -917,23 +936,6 @@ router.get("/share/:token", async (req: Request, res: Response) => {
       .update({ views: (row.views || 0) + 1 })
       .eq("token", token);
     res.json({ ...assembled, share: { token, expires_at: row.expires_at, views: (row.views || 0) + 1 } });
-  } catch (e) {
-    res.status(500).json(dbError(e));
-  }
-});
-
-// Authed: my links (manage + revoke expired ones).
-router.get("/share/mine", requireAuth, async (req: Request, res: Response) => {
-  const userId = (req as AuthedRequest).userId as string;
-  try {
-    const { data, error } = await supabaseAdmin()
-      .from("share_links")
-      .select("token,course,week,expires_at,views,created_at")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false })
-      .limit(50);
-    if (error) throw error;
-    res.json({ links: data ?? [] });
   } catch (e) {
     res.status(500).json(dbError(e));
   }
