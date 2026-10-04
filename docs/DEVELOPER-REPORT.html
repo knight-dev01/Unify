@@ -1,0 +1,82 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><title>Unify Learn - Developer Report (4 October 2026)</title><style>body{font-family:Arial,Helvetica,sans-serif;max-width:760px;margin:32px auto;padding:0 24px;color:#111;line-height:1.6;font-size:14px}h1{font-size:24px;border-bottom:3px solid #059669;padding-bottom:8px}h2{font-size:18px;color:#065f46;margin-top:28px;border-bottom:1px solid #ddd;padding-bottom:4px}code{background:#f1f5f9;padding:1px 6px;border-radius:4px;font-size:12.5px}pre{background:#0f172a;color:#e2e8f0;padding:14px;border-radius:8px;overflow-x:auto;font-size:12px}li{margin-bottom:6px}</style></head><body><h1>Unify Learn — Developer Report (4 October 2026)</h1>
+<p>Covers the 1 October 2026 test bug list (14 confirmed: 7 critical P0, 7 important P1),
+everything fixed since, what is left, and what still needs live verification — and why.</p>
+<p>Current version: <strong>v1.11.1</strong>. Every change below was verified with <code>tsc --noEmit</code>
+both sides plus a production <code>vite build</code> before commit.</p>
+<h2>P0 fixes (critical — blocked student testing)</h2>
+<ul>
+<li><strong>BUG-001 Contributor sees all courses (v1.8.1).</strong> Server gates (<code>requireCourseAccess</code>,
+  403 for collaborators outside their teaching enrollments) on weeks, topics, notes and
+  publish; Browse/Studio only list assigned courses; admin can assign courses per user.</li>
+<li><strong>BUG-002 Raw math text (v1.8.2).</strong> One MathJax renderer app-wide (<code>lib/mathjax.ts</code> +
+  <code>MathText</code>); KaTeX uninstalled; service worker caches MathJax + fonts offline.</li>
+<li><strong>BUG-003 Diagram placeholders (v1.8.3).</strong> <code>diagrams</code> Storage bucket + policies,
+  <code>lib/storage.ts</code> upload, numbered figure cards, Studio diagram tagging.</li>
+<li><strong>BUG-004 Generation fails on large input (v1.8.4/v1.8.5).</strong> Auto-split into 20k-char
+  parts, per-part retry, typed errors (<code>INPUT_TOO_LARGE</code>, <code>BAD_OUTPUT</code>…), async convert
+  jobs (<code>202 + poll</code>) so long generations survive timeouts.</li>
+<li><strong>BUG-005 Quiz leaks answers (v1.8.5).</strong> Submit-at-end EOQ: neutral picks, <code>Check score</code>
+  only when all answered, verdicts/feedback/record on submit.</li>
+<li><strong>BUG-006 ME 352 not found (v1.8.6).</strong> <code>course_aliases</code> table + boot seed,
+  <code>GET /v1/courses/search</code> across code/title/alias, Explore debounced search spanning
+  both semesters with badges.</li>
+<li><strong>BUG-007 Silent stacking publishes (v1.8.7).</strong> Occupied week/topic returns 409
+  (<code>WEEK_OCCUPIED</code>/<code>TOPIC_OCCUPIED</code>); Studio offers Replace / Add as new version / Cancel.
+  Nothing overwrites or duplicates silently.</li>
+</ul>
+<h2>P1 fixes (important — before the research test)</h2>
+<ul>
+<li><strong>BUG-008 Old + new versions both listed (v1.8.7 batch).</strong> Student lists and the author
+  dashboard group by topic and show the latest version only (<code>older</code> count, history in reader).</li>
+<li><strong>BUG-009 No Lecture 1/2/3 structure (v1.9.0).</strong> Weeks hold lectures with per-lecture
+  topic numbering; reader switches via <code>?c=</code> with cross-lecture Back/Next; progress,
+  versions, resume and publish are lecture-keyed (migration <code>0018</code>). Studio/NoteBuilder
+  lecture pickers; AI prompt emits lecture groups. <strong>Known deviation:</strong> EOQ stays one week
+  bank after the final lecture — per-lecture banks have no storage yet (decision pending).</li>
+<li><strong>BUG-010 Partial EOQ banks (v1.9.1).</strong> A short bank triggers one automatic repair pass
+  requesting a fresh 10-question bank (8 MCQ + 2 FITB); repair never fails the job.</li>
+<li><strong>BUG-011 Definitions/formulas blend in (v1.9.2).</strong> Symbol cards render through MathJax
+  (no raw <code>\alpha</code> overlapping titles), flex-clamped, wider card spacing.</li>
+<li><strong>BUG-012 Dashboard strip (v1.9.3).</strong> 2-column course-card grid (title, lecturer,
+  weeks, topics done), one-tap elective removal, lecturer names batched into the catalog.
+  <strong>Decision pending:</strong> BUG-012 asks for no separate Explore page — Explore stays as the
+  add-courses path until you confirm removal (it is the only discovery route).</li>
+<li><strong>BUG-013 Slow page changes (v1.9.3).</strong> Idle-time warmup of enrolled week-lists kills the
+  slow-blank feel. <strong>Note:</strong> no discussion panel exists in the app, so that half of the
+  report had nothing to fix.</li>
+<li><strong>BUG-014 Quiz extra click + unstyled Check (v1.9.2).</strong> <code>Check score</code>/<code>Try again</code> styled
+  like primary buttons (the class had zero CSS); quiz tab opens directly.</li>
+</ul>
+<h2>Post-list fixes</h2>
+<ul>
+<li><strong>Explore crash (v1.9.4).</strong> Search <code>useEffect</code> sat below the loading return → hook-count
+  crash on load. All 14 routes audited; Explore was the sole offender.</li>
+<li><strong>Share live-links 404 (v1.11.1).</strong> <code>GET /share/mine</code> was registered after
+  <code>GET /share/:token</code>, so Express swallowed "mine" as a token. Route order fixed; create,
+  resolve, revoke, WhatsApp unfurl re-verified by code path.</li>
+<li><strong>My Classes + offline-first (v1.10.0).</strong> Recurring weekly timetable + live roster per
+  taught course (<code>/classes</code>, migration <code>0019</code>); offline write queue (progress/quiz/resume
+  flush on reconnect) + per-week Save offline into a version-proof cache (SW v6).</li>
+<li><strong>Google sign-in (v1.11.0).</strong> OAuth on both auth tabs, onboarding prefill, no backend
+  change (API is provider-agnostic).</li>
+</ul>
+<h2>Left + why unverified</h2>
+<ol>
+<li><strong>Render redeploy outstanding (blocks most verification).</strong> Migrations
+   <code>0016</code> (diagrams) → <code>0019</code> (class slots) plus new endpoints only land on <code>migrate deploy</code>.
+   Until then, fixes are code-verified (<code>tsc</code> + build) but not live-verified.</li>
+<li><strong>Google sign-in needs console work + a live test.</strong> Supabase provider enablement and
+   <code>/auth</code> redirect URLs cannot be done in code; after that, one real Google round-trip
+   (new user → onboarding → dashboard) is still untested.</li>
+<li><strong>Lecturer side never tested</strong> (per the original list) — including the new My Classes
+   page, which needs a teaching-account walkthrough: assign courses in admin, set slots,
+   check the roster and the student-side class-times card.</li>
+<li><strong>Phone pass outstanding</strong> for student + contributor sides (layouts are mobile-first
+   480px by construction, but not device-tested).</li>
+<li><strong>Progress/streak persistence retest</strong> after the lecture + offline changes (resume now
+   carries lecture; queue flush needs an offline→online cycle on a real device).</li>
+<li><strong>Proposed, not built:</strong> per-university allowed-email-domains policy (the actual gate
+   for multi-school expansion — works with both email and Google paths), and a
+   link-Google-to-existing-account action (same address via both methods can mint two
+   identities).</li>
+</ol></body></html>
