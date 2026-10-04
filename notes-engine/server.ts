@@ -10,6 +10,17 @@ const { validateUnifyNote } = require("./src/schema");
 const { renderUnifyNote } = require("./src/renderer");
 const { requestLogger, logger } = require("./src/middleware/logger");
 
+// Sentry (free tier): crash + 500 visibility. Env-gated — no SENTRY_DSN,
+// no-op, zero behavior change. DSN lives in Render env, never in code.
+try {
+  const Sentry = require("@sentry/node");
+  if (process.env.SENTRY_DSN) {
+    Sentry.init({ dsn: process.env.SENTRY_DSN, tracesSampleRate: 0.1 });
+  }
+} catch {
+  // sentry not installed/configured — API runs without it
+}
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 // Behind Render's proxy: trust one hop so rate limiters see real client IPs.
@@ -681,6 +692,16 @@ app.get("/api/convert/:jobId", async (req, res) => {
 
 // Unknown routes -> JSON (not HTML) so API clients get a clean 404.
 app.use((req, res) => res.status(404).json({ error: "Not found" }));
+
+// Sentry express error hook (only active when SENTRY_DSN is set).
+try {
+  const Sentry = require("@sentry/node");
+  if (process.env.SENTRY_DSN && Sentry.setupExpressErrorHandler) {
+    Sentry.setupExpressErrorHandler(app);
+  }
+} catch {
+  // ignore
+}
 
 app.listen(PORT, () => {
   logger.info("unify-api listening", {

@@ -169,6 +169,19 @@ create index if not exists class_slots_course_idx on class_slots (course, day, s
 create index if not exists class_slots_lecturer_idx on class_slots (lecturer_id);
 alter table class_slots enable row level security;
 
+create table if not exists client_errors (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid,
+  kind text not null default 'client',
+  message text not null default '',
+  stack text not null default '',
+  url text not null default '',
+  app_version text not null default '',
+  created_at timestamptz not null default now()
+);
+create index if not exists client_errors_created_idx on client_errors (created_at desc);
+alter table client_errors enable row level security;
+
 create table if not exists notifications (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null,

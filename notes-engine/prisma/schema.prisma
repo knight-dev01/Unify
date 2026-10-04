@@ -188,6 +188,20 @@ model ClassSlot {
   @@map("class_slots")
 }
 
+model ClientError {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String?  @map("user_id") @db.Uuid
+  kind       String   @default("client")
+  message    String   @default("")
+  stack      String   @default("")
+  url        String   @default("")
+  appVersion String   @default("") @map("app_version")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([createdAt(sort: Desc)], map: "client_errors_created_idx")
+  @@map("client_errors")
+}
+
 model Notification {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId    String   @map("user_id") @db.Uuid

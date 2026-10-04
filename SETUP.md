@@ -88,8 +88,30 @@ Settings → Environment Variables (Production + Preview):
 
 **Redeploy** so env vars bake in.
 
-## 4. First end-to-end test
+## Optional: crash reporting (Sentry, free tier)
 
+1. [sentry.io](https://sentry.io) → create organization + two projects (one
+   JavaScript/React, one Node/Express) → copy each DSN.
+2. Render → service → Environment: `SENTRY_DSN` = Node DSN. Vercel → project →
+   Environment: `VITE_SENTRY_DSN` = React DSN. Redeploy both.
+3. Without DSNs everything still works: the app POSTs render crashes to
+   `/v1/errors` and admins read the latest 50 in panel → App errors.
+   Sentry adds stack-symbolicated history when you want it.
+
+## Optional: WhatsApp support channel (Meta Cloud API)
+
+1. [Meta Developers](https://developers.facebook.com) → create app → add
+   **WhatsApp** product → API Setup: copy the temporary token (or create a
+   permanent system-user token for production), the Phone number ID, and note
+   the test number. Add your own number as a recipient to trial.
+2. Render → Environment: `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_ID`,
+   `WHATSAPP_SUPPORT_NUMBER` (digits only, e.g. `2348012345678`).
+3. The app then shows **Get help on WhatsApp** in Profile (prefilled with the
+   app version). The backend `sendWhatsApp()` helper is order-ready for
+   announcements. Meta rules apply on their side: free text inside the 24h
+   customer-service window, approved templates outside it.
+
+## 4. First end-to-end test
 1. Register fresh via email or Continue with Google (Google needs setup
    step 3–4 above; until the provider is enabled the button reports it
    honestly). New users land in onboarding, then the dashboard.

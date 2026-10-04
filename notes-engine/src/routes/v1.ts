@@ -973,6 +973,85 @@ router.delete("/share/:token", requireAuth, async (req: Request, res: Response) 
   }
 });
 
+// ---- Client error log (Sentry backup / Sentry alternative). ----
+// Public by design: crashes happen pre-auth too. Tiny payloads, global
+// rate limit applies, rows capped (oldest trimmed) so it can't be used
+// as free storage.
+const clientErrorSchema = z.object({
+  kind: z.string().max(30).default("client"),
+  message: z.string().max(500).default(""),
+  stack: z.string().max(4000).default(""),
+  url: z.string().max(300).default(""),
+  appVersion: z.string().max(20).default(""),
+});
+
+router.post("/errors", async (req: Request, res: Response) => {
+  const parsed = clientErrorSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid body" });
+    return;
+  }
+  try {
+    const sb = supabaseAdmin();
+    let userId: string | null = null;
+    try {
+      const auth = req.headers.authorization || "";
+      const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+      if (token) {
+        const { data } = await sb.auth.getUser(token);
+        userId = data.user?.id ?? null;
+      }
+    } catch {
+      userId = null;
+    }
+    const { error } = await sb.from("client_errors").insert({
+      user_id: userId,
+      kind: parsed.data.kind,
+      message: parsed.data.message,
+      stack: parsed.data.stack,
+      url: parsed.data.url,
+      app_version: parsed.data.appVersion,
+    });
+    if (error) throw error;
+    // Cap: keep the latest 500, trim the rest (one cheap delete).
+    await sb.from("client_errors").delete().lt(
+      "created_at",
+      new Date(Date.now() - 30 * 86400000).toISOString()
+    );
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// Public: support channel config (WhatsApp number only — token never
+// leaves the server). The app shows a help button when supported.
+router.get("/support", async (_req: Request, res: Response) => {
+  try {
+    const { whatsappPublic } = await import("../lib/whatsapp");
+    res.json(whatsappPublic());
+  } catch {
+    res.json({ supported: false, supportNumber: "" });
+  }
+});
+
+// Admin: latest client errors (newest first).
+router.get("/admin/errors", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  try {
+    const { data, error } = await supabaseAdmin()
+      .from("client_errors")
+      .select("kind,message,stack,url,app_version,created_at")
+      .order("created_at", { ascending: false })
+      .limit(50);
+    if (error) throw error;
+    res.json({ errors: data ?? [] });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
 // Public: per-topic version lists for a week (reader badges + author tools).
 router.get("/courses/:code/weeks/:week/topics", requireAuth, requireCourseAccess, async (req: Request, res: Response) => {
   const code = cleanCode(decodeURIComponent(req.params.code));
@@ -1185,13 +1264,14 @@ router.post("/publish", requireAuth, requireAuthor, requireCourseAccess, async (
       });
       return;
     }
-    if (parsed.data.mode === "replace" && occupied.length) {
-      // Replace: remove the old rows (and their student progress, which
-      // points at deleted topics) before inserting fresh v1s.
-      const { error: delErr } = await sb.from("topic_notes").delete().eq("course", code).eq("week", week);
-      if (delErr) throw delErr;
-      await sb.from("topic_progress").delete().eq("course", code).eq("week", week);
-    }
+    const versions: { topic: number; lecture: number; version: number; id: string }[] = [];
+    const cleanTopics = topics.flatMap((t) => {
+      const num = Number((t as { number?: unknown }).number);
+      if (!Number.isInteger(num) || num < 1 || num > 100) return [];
+      const clsRaw = Number((t as { lecture?: unknown }).lecture);
+      const cls = clsRaw === 2 || clsRaw === 3 ? clsRaw : 1;
+      return [{ num, cls, title: typeof t.title === "string" ? t.title : "", noteJson: t }];
+    });
     // Safety: a course deleted mid-authoring must not FK-fail the publish.
     // Insert-only so admin-customized titles are never overwritten.
     const { data: courseRow } = await sb.from("courses").select("code").eq("code", code).single();
@@ -1215,29 +1295,46 @@ router.post("/publish", requireAuth, requireAuthor, requireCourseAccess, async (
       { onConflict: "course,week" }
     );
     if (shellErr) throw shellErr;
-    const versions: { topic: number; lecture: number; version: number; id: string }[] = [];
-    for (const t of topics) {
-      const num = Number(t.number);
-      if (!Number.isInteger(num) || num < 1 || num > 100) continue;
-      const clsRaw = Number((t as { lecture?: unknown }).lecture);
-      const cls = clsRaw === 2 || clsRaw === 3 ? clsRaw : 1;
-      const version = await nextTopicVersion(code, week, num, cls);
+    if (parsed.data.mode === "replace" && occupied.length) {
+      // Replace runs as ONE database transaction (delete old rows +
+      // progress, insert fresh v1s): concurrent publishers can never leave
+      // a half-deleted week. Last writer still wins — but wins whole.
+      const { data: rpcData, error: rpcErr } = await sb.rpc("replace_week_topics", {
+        p_course: code,
+        p_week: week,
+        p_author: userId,
+        p_rows: cleanTopics.map((t) => ({ topic: t.num, lecture: t.cls, version: 1, title: t.title, noteJson: t.noteJson })),
+      });
+      if (rpcErr) throw rpcErr;
+      for (const v of ((rpcData ?? []) as { topic: number; lecture: number; version: number; id: string }[])) {
+        versions.push(v);
+      }
+      res.json({ ok: true, course: code, week, versions });
+      if (versions.length) {
+        void notifyCoursePublished(code, week, versions).catch(() => {});
+        void notifyInAppNewNote(code, week, versions).catch(() => {});
+        void pushNewNote(code, week, versions).catch(() => {});
+      }
+      return;
+    }
+    for (const t of cleanTopics) {
+      const version = await nextTopicVersion(code, week, t.num, t.cls);
       const { data: ins, error: insErr } = await sb
         .from("topic_notes")
         .insert({
           course: code,
           week,
-          topic: num,
-          lecture_no: cls,
+          topic: t.num,
+          lecture_no: t.cls,
           version,
-          title: typeof t.title === "string" ? t.title : "",
-          note_json: t,
+          title: t.title,
+          note_json: t.noteJson,
           author_id: userId,
         })
         .select("id")
         .single();
       if (insErr) throw insErr;
-      versions.push({ topic: num, lecture: cls, version, id: (ins as { id: string }).id });
+      versions.push({ topic: t.num, lecture: t.cls, version, id: (ins as { id: string }).id });
     }
     res.json({ ok: true, course: code, week, versions });
     // Notify enrolled students (fire-and-forget; never blocks publish).

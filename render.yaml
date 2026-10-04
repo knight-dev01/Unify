@@ -49,3 +49,11 @@ services:
         sync: false # web-push private key (never commit)
       - key: VAPID_SUBJECT
         value: 'mailto:notes@unify.learn'
+      - key: SENTRY_DSN
+        sync: false # optional: backend crash reporting (sentry.io, free tier); unset = log-only
+      - key: WHATSAPP_TOKEN
+        sync: false # optional: Meta Cloud API permanent token (support + announcements); unset = log-only
+      - key: WHATSAPP_PHONE_ID
+        sync: false # optional: Cloud API phone number ID
+      - key: WHATSAPP_SUPPORT_NUMBER
+        sync: false # optional: digits only (e.g. 2348012345678) — shown as the in-app help button
