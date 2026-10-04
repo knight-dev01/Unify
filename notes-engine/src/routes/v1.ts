@@ -1487,6 +1487,228 @@ router.get("/authored", requireAuth, async (req: Request, res: Response) => {
   }
 });
 
+// ---- Lecturer timetable (recurring weekly slots) + class management. ----
+// Slots are set once per course (day + time + venue) and repeat weekly.
+// Managing needs the course: a teaching enrollment in it, or admin.
+async function canManageCourse(userId: string, course: string): Promise<boolean> {
+  try {
+    const sb = supabaseAdmin();
+    const { data: prof } = await sb.from("profiles").select("role,is_admin").eq("id", userId).single();
+    const p = prof as { role?: string; is_admin?: boolean } | null;
+    if (p?.is_admin || p?.role === "admin") return true;
+    const { data: en } = await sb
+      .from("enrollments")
+      .select("course")
+      .eq("user_id", userId)
+      .eq("course", course)
+      .eq("kind", "teaching")
+      .limit(1);
+    return ((en ?? []) as unknown[]).length > 0;
+  } catch {
+    return false;
+  }
+}
+
+// Courses the caller teaches (lecturer Classes section).
+router.get("/teaching", requireAuth, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  try {
+    const { data, error } = await supabaseAdmin()
+      .from("enrollments")
+      .select("course")
+      .eq("user_id", userId)
+      .eq("kind", "teaching")
+      .order("course");
+    if (error) throw error;
+    res.json({ courses: ((data ?? []) as { course: string }[]).map((r) => r.course) });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// Read a course timetable (every signed-in user: students see class times).
+router.get("/timetable", requireAuth, async (req: Request, res: Response) => {
+  const course = cleanCode(String(req.query.course || ""));
+  if (!course) {
+    res.status(400).json({ error: "Pass ?course=CODE." });
+    return;
+  }
+  try {
+    const sb = supabaseAdmin();
+    const { data, error } = await sb
+      .from("class_slots")
+      .select("id,course,lecturer_id,day,start_time,end_time,venue")
+      .eq("course", course)
+      .order("day")
+      .order("start_time");
+    if (error) throw error;
+    const rows = ((data ?? []) as { id: string; course: string; lecturer_id: string; day: number; start_time: string; end_time: string; venue: string }[]);
+    let names: Record<string, string> = {};
+    const ids = [...new Set(rows.map((r) => r.lecturer_id))];
+    if (ids.length) {
+      const { data: profs } = await sb.from("profiles").select("id,first_name").in("id", ids);
+      for (const p of ((profs ?? []) as { id: string; first_name: string }[])) {
+        if (p.first_name) names[p.id] = p.first_name;
+      }
+    }
+    res.json({
+      slots: rows.map((r) => ({
+        id: r.id,
+        course: r.course,
+        day: r.day,
+        start: r.start_time,
+        end: r.end_time,
+        venue: r.venue,
+        lecturer: names[r.lecturer_id] || "",
+      })),
+    });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+const slotSchema = z.object({
+  course: z.string().min(1).max(20),
+  day: z.number().int().min(0).max(6),
+  start: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),
+  end: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),
+  venue: z.string().max(120).default(""),
+});
+
+// Add a weekly slot (teaching lecturer or admin).
+router.post("/timetable", requireAuth, requireAuthor, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  const parsed = slotSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid body", details: parsed.error.flatten() });
+    return;
+  }
+  const course = cleanCode(parsed.data.course);
+  if (!course) {
+    res.status(400).json({ error: "Invalid course" });
+    return;
+  }
+  if (parsed.data.end <= parsed.data.start) {
+    res.status(400).json({ error: "End time must be after start time." });
+    return;
+  }
+  if (!(await canManageCourse(userId, course))) {
+    res.status(403).json({ error: "Only the course lecturer or an admin manages its timetable." });
+    return;
+  }
+  try {
+    const { data, error } = await supabaseAdmin()
+      .from("class_slots")
+      .insert({
+        course,
+        lecturer_id: userId,
+        day: parsed.data.day,
+        start_time: parsed.data.start,
+        end_time: parsed.data.end,
+        venue: parsed.data.venue,
+      })
+      .select("id")
+      .single();
+    if (error) {
+      if (String((error as { code?: string }).code) === "23505") {
+        res.status(409).json({ error: "That day and start time already has a slot.", code: "SLOT_OCCUPIED" });
+        return;
+      }
+      throw error;
+    }
+    res.json({ ok: true, id: (data as { id: string }).id });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// Remove a slot (own slots, or any slot for admins).
+router.delete("/timetable/:id", requireAuth, requireAuthor, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  try {
+    const sb = supabaseAdmin();
+    const { data: slot } = await sb
+      .from("class_slots")
+      .select("id,course,lecturer_id")
+      .eq("id", req.params.id)
+      .single();
+    const s = slot as { id: string; course: string; lecturer_id: string } | null;
+    if (!s) {
+      res.status(404).json({ error: "Slot not found." });
+      return;
+    }
+    if (s.lecturer_id !== userId && !(await canManageCourse(userId, s.course))) {
+      res.status(403).json({ error: "Only the course lecturer or an admin removes slots." });
+      return;
+    }
+    const { error } = await sb.from("class_slots").delete().eq("id", req.params.id);
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// Class roster: students taking the course + per-student progress
+// (topics done, quizzes taken, last activity). Teaching lecturer or admin.
+router.get("/courses/:code/students", requireAuth, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  const course = cleanCode(decodeURIComponent(req.params.code));
+  if (!course) {
+    res.status(400).json({ error: "Invalid course" });
+    return;
+  }
+  if (!(await canManageCourse(userId, course))) {
+    res.status(403).json({ error: "Only the course lecturer or an admin sees the roster." });
+    return;
+  }
+  try {
+    const sb = supabaseAdmin();
+    const { data: taking, error: takeErr } = await sb
+      .from("enrollments")
+      .select("user_id")
+      .eq("course", course)
+      .eq("kind", "taking")
+      .limit(500);
+    if (takeErr) throw takeErr;
+    const ids = ((taking ?? []) as { user_id: string }[]).map((r) => r.user_id);
+    if (!ids.length) {
+      res.json({ students: [] });
+      return;
+    }
+    const [profs, prog, quiz] = await Promise.all([
+      sb.from("profiles").select("id,first_name,email,level").in("id", ids),
+      sb.from("topic_progress").select("user_id,completed_at").eq("course", course).in("user_id", ids).limit(5000),
+      sb.from("quiz_attempts").select("user_id,created_at").eq("course", course).in("user_id", ids).limit(2000),
+    ]);
+    if (profs.error) throw profs.error;
+    const doneBy: Record<string, number> = {};
+    const activeBy: Record<string, string> = {};
+    for (const p of ((prog.data ?? []) as { user_id: string; completed_at: string }[])) {
+      doneBy[p.user_id] = (doneBy[p.user_id] || 0) + 1;
+      if (!activeBy[p.user_id] || p.completed_at > activeBy[p.user_id]) activeBy[p.user_id] = p.completed_at;
+    }
+    const quizBy: Record<string, number> = {};
+    for (const q of ((quiz.data ?? []) as { user_id: string; created_at: string }[])) {
+      quizBy[q.user_id] = (quizBy[q.user_id] || 0) + 1;
+      if (!activeBy[q.user_id] || q.created_at > activeBy[q.user_id]) activeBy[q.user_id] = q.created_at;
+    }
+    res.json({
+      students: ((profs.data ?? []) as { id: string; first_name: string; email: string; level: string }[]).map((p) => ({
+        id: p.id,
+        name: p.first_name || "Unnamed",
+        email: p.email || "",
+        level: p.level || "",
+        topicsDone: doneBy[p.id] || 0,
+        quizzesTaken: quizBy[p.id] || 0,
+        lastActive: activeBy[p.id] || null,
+      })),
+    });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
 // Public: week list for a course (titles for pickers + student week lists).
 router.get("/courses/:code/weeks", requireAuth, requireCourseAccess, async (req: Request, res: Response) => {
   const code = cleanCode(decodeURIComponent(req.params.code));

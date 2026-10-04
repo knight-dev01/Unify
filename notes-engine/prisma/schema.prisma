@@ -172,6 +172,22 @@ model ResumeState {
   @@map("resume_state")
 }
 
+model ClassSlot {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  course     String
+  lecturerId String   @map("lecturer_id") @db.Uuid
+  day        Int
+  startTime  String   @map("start_time")
+  endTime    String   @map("end_time")
+  venue      String    @default("")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@unique([course, day, startTime])
+  @@index([course, day, startTime], map: "class_slots_course_idx")
+  @@index([lecturerId], map: "class_slots_lecturer_idx")
+  @@map("class_slots")
+}
+
 model Notification {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId    String   @map("user_id") @db.Uuid

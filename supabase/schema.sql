@@ -154,6 +154,21 @@ create table if not exists resume_state (
 create index if not exists resume_state_user_idx on resume_state (user_id);
 alter table resume_state enable row level security;
 
+create table if not exists class_slots (
+  id uuid primary key default gen_random_uuid(),
+  course text not null,
+  lecturer_id uuid not null references profiles(id) on delete cascade,
+  day int not null check (day between 0 and 6),
+  start_time text not null,
+  end_time text not null,
+  venue text not null default '',
+  created_at timestamptz not null default now(),
+  unique (course, day, start_time)
+);
+create index if not exists class_slots_course_idx on class_slots (course, day, start_time);
+create index if not exists class_slots_lecturer_idx on class_slots (lecturer_id);
+alter table class_slots enable row level security;
+
 create table if not exists notifications (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null,
