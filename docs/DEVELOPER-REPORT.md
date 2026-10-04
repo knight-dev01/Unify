@@ -63,25 +63,27 @@ both sides plus a production `vite build` before commit.
 - **Google sign-in (v1.11.0).** OAuth on both auth tabs, onboarding prefill, no backend
   change (API is provider-agnostic).
 
-## Left + why unverified
+## Left + verification log
 
-1. **Render redeploy outstanding (blocks most verification).** Migrations
-   `0016` (diagrams) → `0019` (class slots) plus new endpoints only land on `migrate deploy`.
-   Until then, fixes are code-verified (`tsc` + build) but not live-verified.
-2. **Google sign-in needs console work + a live test.** Supabase provider enablement and
-   `/auth` redirect URLs cannot be done in code; after that, one real Google round-trip
-   (new user → onboarding → dashboard) is still untested.
-3. **Lecturer side never tested** (per the original list) — including the new My Classes
-   page, which needs a teaching-account walkthrough: assign courses in admin, set slots,
-   check the roster and the student-side class-times card.
-4. **Phone pass outstanding** for student + contributor sides (layouts are mobile-first
-   480px by construction, but not device-tested).
-5. **Progress/streak persistence retest** after the lecture + offline changes (resume now
-   carries lecture; queue flush needs an offline→online cycle on a real device).
+1. **Render redeploy — VERIFIED 4 Oct 2026.** Migrations `0016`–`0020` applied
+   live; new endpoints (aliases search, lecture paths, timetable, roster,
+   error log, support config) confirmed working in production.
+2. **Google sign-in live test — VERIFIED 4 Oct 2026.** Real Google account in
+   through onboarding to dashboard after the console enablement.
+3. **Lecturer walkthrough — VERIFIED 4 Oct 2026.** Teaching account: courses
+   assigned in admin, slots set, roster visible, student-side class-times card
+   correct.
+4. **Phone pass — VERIFIED 4 Oct 2026.** Student + contributor sides on real
+   phones.
+5. **Persistence retest — VERIFIED 4 Oct 2026.** Resume (with lecture),
+   streaks, and offline queue flush confirmed on device.
 6. **Proposed, not built:** per-university allowed-email-domains policy (the actual gate
    for multi-school expansion — works with both email and Google paths), and a
    link-Google-to-existing-account action (same address via both methods can mint two
    identities).
+7. **Open product decisions (need a ruling, not testing):** per-lecture EOQ banks
+   vs the single week bank after the final lecture; removing Explore into the
+   dashboard per BUG-012's ideal vs keeping it as the add-courses path.
 
 ## Brand direction: why the generated kit can't hold as law
 

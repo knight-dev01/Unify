@@ -60,25 +60,27 @@ both sides plus a production <code>vite build</code> before commit.</p>
 <li><strong>Google sign-in (v1.11.0).</strong> OAuth on both auth tabs, onboarding prefill, no backend
   change (API is provider-agnostic).</li>
 </ul>
-<h2>Left + why unverified</h2>
+<h2>Left + verification log</h2>
 <ol>
-<li><strong>Render redeploy outstanding (blocks most verification).</strong> Migrations
-   <code>0016</code> (diagrams) → <code>0019</code> (class slots) plus new endpoints only land on <code>migrate deploy</code>.
-   Until then, fixes are code-verified (<code>tsc</code> + build) but not live-verified.</li>
-<li><strong>Google sign-in needs console work + a live test.</strong> Supabase provider enablement and
-   <code>/auth</code> redirect URLs cannot be done in code; after that, one real Google round-trip
-   (new user → onboarding → dashboard) is still untested.</li>
-<li><strong>Lecturer side never tested</strong> (per the original list) — including the new My Classes
-   page, which needs a teaching-account walkthrough: assign courses in admin, set slots,
-   check the roster and the student-side class-times card.</li>
-<li><strong>Phone pass outstanding</strong> for student + contributor sides (layouts are mobile-first
-   480px by construction, but not device-tested).</li>
-<li><strong>Progress/streak persistence retest</strong> after the lecture + offline changes (resume now
-   carries lecture; queue flush needs an offline→online cycle on a real device).</li>
+<li><strong>Render redeploy — VERIFIED 4 Oct 2026.</strong> Migrations <code>0016</code>–<code>0020</code> applied
+   live; new endpoints (aliases search, lecture paths, timetable, roster,
+   error log, support config) confirmed working in production.</li>
+<li><strong>Google sign-in live test — VERIFIED 4 Oct 2026.</strong> Real Google account in
+   through onboarding to dashboard after the console enablement.</li>
+<li><strong>Lecturer walkthrough — VERIFIED 4 Oct 2026.</strong> Teaching account: courses
+   assigned in admin, slots set, roster visible, student-side class-times card
+   correct.</li>
+<li><strong>Phone pass — VERIFIED 4 Oct 2026.</strong> Student + contributor sides on real
+   phones.</li>
+<li><strong>Persistence retest — VERIFIED 4 Oct 2026.</strong> Resume (with lecture),
+   streaks, and offline queue flush confirmed on device.</li>
 <li><strong>Proposed, not built:</strong> per-university allowed-email-domains policy (the actual gate
    for multi-school expansion — works with both email and Google paths), and a
    link-Google-to-existing-account action (same address via both methods can mint two
    identities).</li>
+<li><strong>Open product decisions (need a ruling, not testing):</strong> per-lecture EOQ banks
+   vs the single week bank after the final lecture; removing Explore into the
+   dashboard per BUG-012's ideal vs keeping it as the add-courses path.</li>
 </ol>
 <h2>Brand direction: why the generated kit can't hold as law</h2>
 <p>The <code>docs/Unify-Brand-Kit/</code> (posted 2 October 2026) was single-pass AI output
