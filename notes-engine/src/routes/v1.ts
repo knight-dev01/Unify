@@ -1360,6 +1360,14 @@ router.get("/contributions", requireAuth, async (req: Request, res: Response) =>
       sb.from("course_levels").select("course,level,semester").limit(2000),
     ]);
     if (mine.error) throw mine.error;
+    // Course totals across ALL authors: shared courses show the whole
+    // library next to the contributor's own count.
+    const { data: allNotes } = await sb.from("topic_notes").select("course,week,topic,lecture_no").limit(5000);
+    const totalByCourse: Record<string, Set<string>> = {};
+    for (const n of (((allNotes ?? []) as unknown[]) as { course: string; week: number; topic: number; lecture_no?: number }[])) {
+      const e = (totalByCourse[n.course] = totalByCourse[n.course] || new Set());
+      e.add(`${n.week}::${n.lecture_no || 1}::${n.topic}`);
+    }
     const lvl: Record<string, { level: string; semester: string }> = {};
     for (const l of ((links.data ?? []) as { course: string; level: string; semester: string }[])) {
       if (!lvl[l.course]) lvl[l.course] = { level: l.level, semester: l.semester };
@@ -1378,6 +1386,7 @@ router.get("/contributions", requireAuth, async (req: Request, res: Response) =>
       assigned: assigned.has(course),
       topics: byCourse[course]?.topics.size || 0,
       versions: byCourse[course]?.versions || 0,
+      totalTopics: totalByCourse[course]?.size || 0,
     }));
     res.json({ courses });
   } catch (e) {
@@ -2112,8 +2121,12 @@ router.delete("/timetable/:id", requireAuth, requireAuthor, async (req: Request,
       res.status(404).json({ error: "Slot not found." });
       return;
     }
-    if (s.lecturer_id !== userId && !(await canManageCourse(userId, s.course))) {
-      res.status(403).json({ error: "Only the course lecturer or an admin removes slots." });
+    // Lecturers only (owners may remove their own): admins work from the
+    // panel and content browser, not timetables.
+    const { data: dprof } = await sb.from("profiles").select("role").eq("id", userId).single();
+    const isLecturer = (dprof as { role?: string } | null)?.role === "lecturer";
+    if (!isLecturer || (s.lecturer_id !== userId && !(await canManageCourse(userId, s.course)))) {
+      res.status(403).json({ error: "Only the course lecturer removes slots." });
       return;
     }
     const { error } = await sb.from("class_slots").delete().eq("id", req.params.id);
@@ -2124,9 +2137,9 @@ router.delete("/timetable/:id", requireAuth, requireAuthor, async (req: Request,
   }
 });
 
-// Class roster: lecturers (+admins) see who's taking their course.
-// Contributors do NOT: they see their assigned courses + contribution
-// counts (via /contributions), never the student list.
+// Class roster: the course lecturer sees who's taking their course.
+// Contributors do NOT (assigned courses + counts via /contributions),
+// and neither do admins (platform stats + content browser instead).
 router.get("/courses/:code/students", requireAuth, async (req: Request, res: Response) => {
   const userId = (req as AuthedRequest).userId as string;
   const course = cleanCode(decodeURIComponent(req.params.code));
@@ -2136,9 +2149,11 @@ router.get("/courses/:code/students", requireAuth, async (req: Request, res: Res
   }
   const { data: prof } = await supabaseAdmin().from("profiles").select("role,is_admin").eq("id", userId).single();
   const pr = prof as { role?: string; is_admin?: boolean } | null;
-  const staff = Boolean(pr?.is_admin || pr?.role === "admin" || pr?.role === "lecturer");
+  // Lecturers only — admins oversee through contributions + the content
+  // browser, never the student roster.
+  const staff = pr?.role === "lecturer";
   if (!staff || !(await canManageCourse(userId, course))) {
-    res.status(403).json({ error: "Only the course lecturer or an admin sees the roster." });
+    res.status(403).json({ error: "Only the course lecturer sees the roster." });
     return;
   }
   try {
