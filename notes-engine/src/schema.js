@@ -68,6 +68,36 @@ const NOTE_SCHEMA = {
 };
 
 /**
+ * Math-delimiter check: every \(...\) and \[...\] in a quiz string must be
+ * balanced, or MathJax leaves raw LaTeX on screen. Returns error strings.
+ * This is HOW quiz math is confirmed before publish — the Studio review
+ * lists each hit so the author fixes the exact question.
+ */
+function mathIssues(label, texts) {
+  const out = [];
+  for (const t of texts) {
+    if (typeof t !== "string" || !t) continue;
+    // Ignore escaped backslashes (\\) so literal text isn't flagged.
+    const s = t.replace(/\\\\/g, "");
+    const openI = (s.match(/\\\(/g) || []).length;
+    const closeI = (s.match(/\\\)/g) || []).length;
+    const openD = (s.match(/\\\[/g) || []).length;
+    const closeD = (s.match(/\\\]/g) || []).length;
+    if (openI !== closeI || openD !== closeD) {
+      out.push(`${label}: unbalanced math delimiters — the equation will show as raw text. Fix the \\( \\) or \\[ \\] pairing.`);
+    } else {
+      // Bare single underscore outside math (T_2) renders literally — it
+      // must sit inside \( \). Runs of __+ are FITB blanks, not errors.
+      const stripped = s.replace(/\\\(.*?\\\)/g, "").replace(/\\\[.*?\\\]/g, "");
+      if (/(?<!\\)(?<!_)_(?!_)/.test(stripped)) {
+        out.push(`${label}: bare subscript outside math delimiters — wrap it in \\( \\) so it renders.`);
+      }
+    }
+  }
+  return out;
+}
+
+/**
  * Validate a note JSON against the schema and UNIFY_RULES quality checklist.
  * @param {object} data Note JSON
  * @returns {{ valid: boolean, errors: string[] }}
@@ -94,8 +124,7 @@ function validateUnifyNote(data) {
   // Validate Topics & Subtopics
   if (!Array.isArray(data.topics) || data.topics.length === 0) {
     errors.push("Topic array must contain at least 1 topic.");
-  } else {
-    data.topics.forEach((topic, tIdx) => {
+  } else {    data.topics.forEach((topic, tIdx) => {
       const topicNum = topic.number || (tIdx + 1);
 
       if (!topic.title) errors.push(`Topic ${topicNum}: missing title.`);
@@ -125,6 +154,16 @@ function validateUnifyNote(data) {
                   errors.push(`Subtopic ${subNum} Mini Check Q${qIdx + 1} (FITB): missing acceptedAnswers array.`);
                 }
               }
+              // Quiz math confirmation: question + options + answers must
+              // carry balanced delimiters or they render as raw LaTeX.
+              errors.push(
+                ...mathIssues(`Subtopic ${subNum} Mini Check Q${qIdx + 1}`, [
+                  q.question,
+                  ...((q.options || [])),
+                  ...((q.acceptedAnswers || [])),
+                  q.answer,
+                ])
+              );
             });
           }
         });
@@ -168,6 +207,15 @@ function validateUnifyNote(data) {
         errors.push(`EOQ Q${qNum}: missing feedback object with 'correct' and 'wrong' strings.`);
       }
       if (!q.topicRef) errors.push(`EOQ Q${qNum}: missing topicRef string for student review list.`);
+      errors.push(
+        ...mathIssues(`EOQ Q${qNum}`, [
+          q.question,
+          ...((q.options || [])),
+          ...((q.acceptedAnswers || [])),
+          q.feedback && (q.feedback.correct || q.feedback.c),
+          q.feedback && (q.feedback.wrong || q.feedback.w),
+        ])
+      );
     });
 
     if (mcqCount !== 8 || fitbCount !== 2) {

@@ -1193,6 +1193,23 @@ router.get("/role-requests/mine", requireAuth, async (req: Request, res: Respons
   }
 });
 
+// Authed: cancel my pending request (the waiting room's way out —
+// standing down changes nothing about student access).
+router.delete("/role-requests/mine", requireAuth, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  try {
+    const { error } = await supabaseAdmin()
+      .from("role_requests")
+      .delete()
+      .eq("user_id", userId)
+      .eq("status", "pending");
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
 // Admin: pending staff requests with applicant names.
 router.get("/admin/role-requests", requireAuth, async (req: Request, res: Response) => {
   const adminId = await requireAdminUser(req, res);
