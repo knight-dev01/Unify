@@ -221,7 +221,29 @@ router.post("/enrollments", requireAuth, async (req: Request, res: Response) => 
     }
     if (parsed.data.enroll) {
       const { data: prof } = await sb.from("profiles").select("role").eq("id", userId).single();
-      const kind = (prof as { role?: string } | null)?.role === "student" ? "taking" : "teaching";
+      const role = (prof as { role?: string } | null)?.role || "student";
+      const kind = role === "student" ? "taking" : "teaching";
+      // Contributor cap at the self-enroll path too: a contributor tapping
+      // Enroll on a 3rd course of a level gets a 403, not a 3rd course.
+      if (kind === "teaching" && role === "contributor") {
+        const { data: lv } = await sb.from("course_levels").select("level").eq("course", code).limit(10);
+        const levels = ((lv ?? []) as { level: string }[]).map((r) => r.level);
+        if (levels.length) {
+          const { data: mine } = await sb.from("enrollments").select("course").eq("user_id", userId).eq("kind", "teaching").limit(100);
+          const mineCodes = ((mine ?? []) as { course: string }[]).map((r) => r.course).filter((c) => c !== code);
+          let inLevel = 0;
+          if (mineCodes.length) {
+            const { data: theirs } = await sb.from("course_levels").select("course,level").in("course", mineCodes);
+            for (const t of ((theirs ?? []) as { course: string; level: string }[])) {
+              if (levels.includes(t.level)) inLevel += 1;
+            }
+          }
+          if (inLevel >= 2) {
+            res.status(403).json({ error: "Contributor cap: at most 2 courses per level. Ask an admin to adjust your assignment." });
+            return;
+          }
+        }
+      }
       const { error } = await sb
         .from("enrollments")
         .upsert({ user_id: userId, course: code, kind }, { onConflict: "user_id,course" });
@@ -2395,7 +2417,9 @@ router.get("/admin/activity", requireAuth, async (req: Request, res: Response) =
     const sb = supabaseAdmin();
     const [users, notes] = await Promise.all([
       sb.from("profiles").select("first_name,email,role,created_at").order("created_at", { ascending: false }).limit(5),
-      sb.from("topic_notes").select("course,week,topic,version,title,created_at").order("created_at", { ascending: false }).limit(5),
+      // Boot-seeded demo rows are the library, not news — the feed shows
+      // human publishes only.
+      sb.from("topic_notes").select("course,week,topic,version,title,created_at").eq("is_seed", false).order("created_at", { ascending: false }).limit(5),
     ]);
     if (users.error) throw users.error;
     if (notes.error) throw notes.error;
@@ -2509,6 +2533,86 @@ router.put("/admin/users/:id/courses", requireAuth, async (req: Request, res: Re
       if (error) throw error;
     }
     res.json({ ok: true, courses: codes });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// ---- Admin: contributor-cap audit. Lists every contributor holding more
+// than 2 teaching courses in any level (legacy rows predate the gate).
+// POST { trim: true } unassigns the excess, keeping the two earliest per
+// level. Lecturers are exempt and never listed.
+async function capViolations(): Promise<{ user_id: string; name: string; email: string; level: string; courses: string[] }[]> {
+  const sb = supabaseAdmin();
+  const { data: contribs } = await sb.from("profiles").select("id,first_name,email").eq("role", "contributor").limit(500);
+  const users = ((contribs ?? []) as { id: string; first_name: string; email: string }[]);
+  if (!users.length) return [];
+  const ids = users.map((u) => u.id);
+  const { data: teaching } = await sb.from("enrollments").select("user_id,course").in("user_id", ids).eq("kind", "teaching").limit(5000);
+  const byUser: Record<string, string[]> = {};
+  for (const t of ((teaching ?? []) as { user_id: string; course: string }[])) {
+    (byUser[t.user_id] = byUser[t.user_id] || []).push(t.course);
+  }
+  const allCourses = [...new Set(Object.values(byUser).flat())];
+  let levelOf: Record<string, string[]> = {};
+  if (allCourses.length) {
+    const { data: links } = await sb.from("course_levels").select("course,level").in("course", allCourses);
+    for (const l of ((links ?? []) as { course: string; level: string }[])) {
+      (levelOf[l.course] = levelOf[l.course] || []).push(l.level);
+    }
+  }
+  const out: { user_id: string; name: string; email: string; level: string; courses: string[] }[] = [];
+  for (const u of users) {
+    const perLevel: Record<string, string[]> = {};
+    for (const c of byUser[u.id] || []) {
+      for (const lv of levelOf[c] || ["Unscoped"]) {
+        (perLevel[lv] = perLevel[lv] || []).push(c);
+      }
+    }
+    for (const [lv, cs] of Object.entries(perLevel)) {
+      if (cs.length > 2) out.push({ user_id: u.id, name: u.first_name || "Unnamed", email: u.email || "", level: lv, courses: cs });
+    }
+  }
+  return out;
+}
+
+router.get("/admin/cap-audit", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  try {
+    res.json({ violations: await capViolations() });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+router.post("/admin/cap-audit", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  if ((req.body as { trim?: unknown } | null)?.trim !== true) {
+    res.status(400).json({ error: "Pass { trim: true } to unassign the excess (keeps earliest two per level)." });
+    return;
+  }
+  try {
+    const sb = supabaseAdmin();
+    const violations = await capViolations();
+    let trimmed = 0;
+    for (const v of violations) {
+      // Earliest two stay: enrollments carry no timestamp, so course code
+      // order is the deterministic stand-in.
+      const drop = [...v.courses].sort().slice(2);
+      if (!drop.length) continue;
+      // Only drop rows in THIS level scope: match by the violation's level
+      // through course_levels to avoid touching other levels' courses.
+      const { data: links } = await sb.from("course_levels").select("course").in("course", drop).eq("level", v.level === "Unscoped" ? "__none__" : v.level);
+      const inScope = new Set(((links ?? []) as { course: string }[]).map((r) => r.course));
+      const targets = v.level === "Unscoped" ? drop.filter((c) => !inScope.size || !inScope.has(c)) : drop.filter((c) => inScope.has(c));
+      if (!targets.length) continue;
+      const { error } = await sb.from("enrollments").delete().eq("user_id", v.user_id).eq("kind", "teaching").in("course", targets);
+      if (error) throw error;
+      trimmed += targets.length;
+    }
+    res.json({ ok: true, trimmed, remaining: await capViolations() });
   } catch (e) {
     res.status(500).json(dbError(e));
   }
@@ -2868,6 +2972,36 @@ const quizSchema = z.object({
   total: z.number().int().min(1).max(100),
 });
 
+// Authed: daily-activity heartbeat. Streak = days with qualifying activity:
+// topic completions, passed quizzes, or simply showing up and engaging
+// (one ping per day, client-throttled). Amount 0: streak fuel, not XP —
+// lifetime XP totals never move on heartbeats.
+router.post("/ping", requireAuth, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  try {
+    const sb = supabaseAdmin();
+    const day = new Date().toISOString().slice(0, 10);
+    const { data: existing } = await sb
+      .from("xp_events")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("reason", "daily_active")
+      .gte("created_at", `${day}T00:00:00.000Z`)
+      .limit(1);
+    if (!((existing ?? []) as unknown[]).length) {
+      const { error } = await sb.from("xp_events").insert({
+        user_id: userId,
+        amount: 0,
+        reason: "daily_active",
+      });
+      if (error) throw error;
+    }
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
 router.post("/quiz/attempt", requireAuth, async (req: Request, res: Response) => {
   const parsed = quizSchema.safeParse(req.body);
   if (!parsed.success) {
@@ -2900,6 +3034,14 @@ router.post("/quiz/attempt", requireAuth, async (req: Request, res: Response) =>
       total: parsed.data.total,
     });
     if (error) throw error;
+    // Passed quizzes extend the streak (amount 0: streak fuel, not XP).
+    if (parsed.data.total > 0 && parsed.data.score / parsed.data.total >= 0.6) {
+      await supabaseAdmin().from("xp_events").insert({
+        user_id: userId,
+        amount: 0,
+        reason: `quiz_pass:${course}:w${parsed.data.week}`,
+      }).then(() => {}, () => {});
+    }
     res.json({ ok: true });
   } catch (e) {
     res.status(500).json(dbError(e));

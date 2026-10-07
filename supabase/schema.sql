@@ -80,6 +80,7 @@ create table if not exists topic_notes (
   title text not null default '',
   note_json jsonb not null default '{}'::jsonb,
   author_id uuid,
+  is_seed boolean not null default false,
   created_at timestamptz not null default now(),
   unique (course, week, lecture_no, topic, version)
 );

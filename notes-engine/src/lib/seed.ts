@@ -449,6 +449,7 @@ async function seedLegacyContent(
         title: typeof (t as { title?: unknown }).title === "string" ? ((t as { title?: string }).title as string) : "",
         note_json: t,
         author_id: null,
+        is_seed: true,
       });
       if (iErr) throw iErr;
         stats.topics += 1;
@@ -494,6 +495,7 @@ async function seedLegacyContent(
         title: typeof t.title === "string" ? t.title : "",
         note_json: t,
         author_id: w.author_id,
+        is_seed: true,
       });
       if (bErr) throw bErr;
     }
@@ -582,7 +584,7 @@ export async function ensureDefaultAdmin(): Promise<void> {
   const sb = supabaseAdmin();
   const finish = async (id: string) => {
     const { error } = await sb.from("profiles").upsert(
-      { id, first_name: "Unify Admin", email: DEFAULT_ADMIN_EMAIL, role: "contributor", is_admin: true },
+      { id, first_name: "Unify Admin", email: DEFAULT_ADMIN_EMAIL, role: "admin", is_admin: true },
       { onConflict: "id" }
     );
     if (error) throw error;

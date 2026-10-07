@@ -353,7 +353,7 @@ begin
     insert into auth.identities (id, provider_id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
     values (gen_random_uuid(), admin_id, admin_id, jsonb_build_object('sub', admin_id, 'email', 'unify.admin@unify.learn'), 'email', now(), now(), now());
     insert into public.profiles (id, first_name, email, role, is_admin)
-    values (admin_id, 'Unify Admin', 'unify.admin@unify.learn', 'contributor', true);
+    values (admin_id, 'Unify Admin', 'unify.admin@unify.learn', 'admin', true);
   end if;
 end $$;
 
