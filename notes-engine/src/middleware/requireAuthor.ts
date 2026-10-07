@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction } from "express";
 import { supabaseAdmin } from "../lib/supabase";
 import type { AuthedRequest } from "./requireAuth";
 
-const AUTHOR_ROLES = ["lecturer", "collaborator"];
+const AUTHOR_ROLES = ["lecturer", "contributor"];
 
 async function isPlatformAdmin(userId: string): Promise<boolean> {
   try {
@@ -22,7 +22,7 @@ async function isPlatformAdmin(userId: string): Promise<boolean> {
   }
 }
 
-// Authoring gate: lecturers + collaborators + platform admins. Admins pass
+// Authoring gate: lecturers + contributors + platform admins. Admins pass
 // by flag OR by role, so a granted admin is never locked out of the studio.
 export async function requireAuthor(req: Request, res: Response, next: NextFunction): Promise<void> {
   const userId = (req as AuthedRequest).userId;
@@ -45,8 +45,8 @@ export async function requireAuthor(req: Request, res: Response, next: NextFunct
       next();
       return;
     }
-    res.status(403).json({ error: "Lecturer or collaborator role required" });
+    res.status(403).json({ error: "Lecturer or contributor role required" });
   } catch {
-    res.status(403).json({ error: "Lecturer or collaborator role required" });
+    res.status(403).json({ error: "Lecturer or contributor role required" });
   }
 }

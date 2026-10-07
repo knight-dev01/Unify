@@ -582,7 +582,7 @@ export async function ensureDefaultAdmin(): Promise<void> {
   const sb = supabaseAdmin();
   const finish = async (id: string) => {
     const { error } = await sb.from("profiles").upsert(
-      { id, first_name: "Unify Admin", email: DEFAULT_ADMIN_EMAIL, role: "collaborator", is_admin: true },
+      { id, first_name: "Unify Admin", email: DEFAULT_ADMIN_EMAIL, role: "contributor", is_admin: true },
       { onConflict: "id" }
     );
     if (error) throw error;

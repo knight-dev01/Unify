@@ -38,6 +38,7 @@ model Profile {
   isAdmin       Boolean     @default(false) @map("is_admin")
   notifyNewNotes Boolean    @default(true) @map("notify_new_notes")
   emailConfirmed Boolean    @default(false) @map("email_confirmed")
+  avatarUrl     String      @default("") @map("avatar_url")
   createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt     DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
@@ -200,6 +201,21 @@ model ClientError {
 
   @@index([createdAt(sort: Desc)], map: "client_errors_created_idx")
   @@map("client_errors")
+}
+
+model RoleRequest {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  role      String
+  level     String   @default("")
+  courses   String[] @default([])
+  status    String   @default("pending")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  decidedAt DateTime? @map("decided_at") @db.Timestamptz(6)
+
+  @@index([status, createdAt(sort: Desc)], map: "role_requests_status_idx")
+  @@index([userId], map: "role_requests_user_idx")
+  @@map("role_requests")
 }
 
 model Notification {

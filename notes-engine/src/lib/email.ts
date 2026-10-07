@@ -91,6 +91,50 @@ export async function sendNewNoteEmails(opts: {
   return { sent, skipped: list.length - sent };
 }
 
+// Generic one-off email (admin alerts, request decisions). Same Brevo
+// transport, same log-and-skip without a key.
+export async function sendSimpleEmail(opts: {
+  to: { email: string; name?: string }[];
+  subject: string;
+  html: string;
+}): Promise<number> {
+  const list = (opts.to || []).filter((r) => r.email).slice(0, 50);
+  if (!list.length) return 0;
+  const key = process.env.BREVO_API_KEY || "";
+  const fromRaw = process.env.EMAIL_FROM || "Unify Learn <notes@unify.learn>";
+  const sender = (() => {
+    const m = fromRaw.match(/^(.*)<([^<>]+)>$/);
+    if (m) return { name: (m[1].trim() || "Unify Learn"), email: m[2].trim() };
+    return { name: "Unify Learn", email: fromRaw.trim() };
+  })();
+  if (!key) {
+    console.info(`[email] BREVO_API_KEY unset — would send "${opts.subject}" to ${list.length}`);
+    return 0;
+  }
+  let sent = 0;
+  const results = await Promise.allSettled(
+    list.map((r) =>
+      fetch("https://api.brevo.com/v3/smtp/email", {
+        method: "POST",
+        headers: { "api-key": key, "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          sender,
+          to: [{ email: r.email, name: r.name || undefined }],
+          subject: opts.subject,
+          htmlContent: opts.html,
+        }),
+      }).then((res) => {
+        if (!res.ok) throw new Error(`brevo ${res.status}`);
+      })
+    )
+  );
+  for (const r of results) {
+    if (r.status === "fulfilled") sent += 1;
+    else console.warn("[email] send failed", r.reason instanceof Error ? r.reason.message : r.reason);
+  }
+  return sent;
+}
+
 // In-app twin of the email above: bell-badge rows for every enrolled
 // student (no confirmed-email requirement — it lives in the app).
 export async function notifyInAppNewNote(

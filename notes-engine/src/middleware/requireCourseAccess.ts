@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction } from "express";
 import { supabaseAdmin } from "../lib/supabase";
 import type { AuthedRequest } from "./requireAuth";
 
-// Course-access gate (BUG-001): collaborators reach ONLY the courses they
+// Course-access gate (BUG-001): contributors reach ONLY the courses they
 // are assigned to (teaching enrollments). Everyone else passes:
 // - lecturers teach broadly, students are gated client-side by enrollment,
 // - platform admins (flag, role, or ADMIN_EMAILS) go everywhere.
@@ -21,9 +21,9 @@ export async function requireCourseAccess(req: Request, res: Response, next: Nex
       .eq("id", userId)
       .single();
     const p = prof as { role?: string; is_admin?: boolean } | null;
-    // Non-collaborators pass here (lecturers teach broadly, students are
+    // Non-contributors pass here (lecturers teach broadly, students are
     // gated client-side by enrollment, admins of any kind go everywhere).
-    if (!p || p.role !== "collaborator" || p.is_admin) {
+    if (!p || p.role !== "contributor" || p.is_admin) {
       next();
       return;
     }

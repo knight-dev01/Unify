@@ -162,7 +162,7 @@ app.get("/healthz", (req, res) => res.json({ ok: true, service: "unify-api" }));
 const v1 = require("./src/routes/v1");
 app.use("/v1", v1.default || v1);
 
-// Authoring guard: lecturers/collaborators only (students get 403).
+// Authoring guard: lecturers/contributors only (students get 403).
 // convert costs Claude money; save/upload cost disk. validate/render/sample
 // stay public (pure functions, no secrets, no side effects).
 const { requireAuth } = require("./src/middleware/requireAuth");

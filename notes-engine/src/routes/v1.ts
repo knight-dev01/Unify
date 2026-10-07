@@ -42,7 +42,7 @@ async function getCurrentSemester(): Promise<string> {
 
 const onboardingSchema = z.object({
   firstName: z.string().min(1).max(60),
-  // Only students complete the full flow; lecturers/collaborators stop
+  // Only students complete the full flow; lecturers/contributors stop
   // after name, so these accept missing AND explicit null (client state
   // initializes unpicked fields to null, not undefined).
   university: z.string().min(1).max(120).nullish(),
@@ -51,7 +51,7 @@ const onboardingSchema = z.object({
   level: z.string().min(1).max(40).nullish(),
   universityId: z.string().uuid().max(80).optional(),
   gradTarget: z.number().min(0).max(5).optional(),
-  role: z.enum(["student", "lecturer", "collaborator"]).default("student"),
+  role: z.enum(["student", "lecturer", "contributor"]).default("student"),
   semester: z.string().min(1).max(40).optional(),
   courses: z.array(z.string().min(1).max(20)).max(30).optional(),
 });
@@ -112,10 +112,10 @@ router.get("/me", requireAuth, async (req: Request, res: Response) => {
       email?: string;
       email_confirmed?: boolean;
     };
-    // Students need a university; lecturers/collaborators/admins stop after name.
+    // Students need a university; lecturers/contributors/admins stop after name.
     const onboarded =
       Boolean(p.university) ||
-      ((p.role === "lecturer" || p.role === "collaborator" || p.role === "admin") && Boolean(p.first_name));
+      ((p.role === "lecturer" || p.role === "contributor" || p.role === "admin") && Boolean(p.first_name));
     // One-time backfill (then only while unconfirmed): email + confirmation
     // from Auth, so publish notifications can reach confirmed inboxes.
     if (!p.email || !p.email_confirmed) {
@@ -185,7 +185,7 @@ router.get("/me", requireAuth, async (req: Request, res: Response) => {
       const row = ((last ?? []) as { course: string; week: number; topic: number; lecture_no?: number }[])[0];
       if (row && row.course) resume = { course: row.course, week: row.week, topic: row.topic, lecture: row.lecture_no || 1 };
     }
-    res.json({ onboarded, profile: data, isAdmin, courses, resume });
+    res.json({ onboarded, profile: data, isAdmin, courses, resume, avatar: await avatarFor(data as { avatar_url?: string; email?: string } | null) });
   } catch (e) {
     res.status(500).json(dbError(e));
   }
@@ -565,27 +565,34 @@ router.get("/courses", async (req: Request, res: Response) => {
     for (const w of ((weekRows ?? []) as { course: string }[])) {
       weeksByCourse[w.course] = (weeksByCourse[w.course] || 0) + 1;
     }
-    // BUG-012: lecturer names ride the catalog too (dashboard cards show
-    // who teaches each course). Two batched queries, no per-course fan-out.
-    const lecturersByCourse: Record<string, string[]> = {};
+    // BUG-012: staff ride the catalog too (dashboard cards show avatars
+    // of everyone assigned — lecturers AND contributors). Uploaded picture
+    // wins, Gravatar-by-email is the automatic fallback. Batched, no N+1.
+    const staffByCourse: Record<string, { name: string; avatar: string }[]> = {};
     try {
       const { data: teaching } = await sb.from("enrollments").select("course,user_id").eq("kind", "teaching").limit(2000);
       const ids = [...new Set(((teaching ?? []) as { course: string; user_id: string }[]).map((t) => t.user_id))].slice(0, 500);
       if (ids.length) {
-        const { data: profs } = await sb.from("profiles").select("id,first_name").in("id", ids);
-        const nameById: Record<string, string> = {};
-        for (const p of ((profs ?? []) as { id: string; first_name: string }[])) {
-          if (p.first_name) nameById[p.id] = p.first_name;
+        const { data: profs } = await sb.from("profiles").select("id,first_name,email,avatar_url").in("id", ids);
+        const byId: Record<string, { name: string; email: string; avatar: string }> = {};
+        for (const p of ((profs ?? []) as { id: string; first_name: string; email: string; avatar_url: string }[])) {
+          if (p.first_name) byId[p.id] = { name: p.first_name, email: p.email || "", avatar: p.avatar_url || "" };
         }
+        const { createHash } = await import("node:crypto");
         for (const t of ((teaching ?? []) as { course: string; user_id: string }[])) {
-          const nm = nameById[t.user_id];
-          if (!nm) continue;
-          const list = (lecturersByCourse[t.course] = lecturersByCourse[t.course] || []);
-          if (!list.includes(nm) && list.length < 2) list.push(nm);
+          const who = byId[t.user_id];
+          if (!who) continue;
+          const list = (staffByCourse[t.course] = staffByCourse[t.course] || []);
+          if (list.some((s) => s.name === who.name) || list.length >= 4) continue;
+          let avatar = who.avatar;
+          if (!avatar && who.email) {
+            avatar = `https://www.gravatar.com/avatar/${createHash("md5").update(who.email.trim().toLowerCase()).digest("hex")}?d=identicon&s=128`;
+          }
+          list.push({ name: who.name, avatar });
         }
       }
     } catch {
-      // names stay empty; cards fall back to code-only
+      // cards fall back to code-only
     }
     const byCourse: Record<string, { levels: string[]; semesters: string[] }> = {};
     for (const l of ((links ?? []) as { course: string; level: string; semester: string }[])) {
@@ -600,7 +607,8 @@ router.get("/courses", async (req: Request, res: Response) => {
       levels: (byCourse[c.code]?.levels || []).sort(),
       semesters: (byCourse[c.code]?.semesters || []).sort(),
       weeks: weeksByCourse[c.code] || 0,
-      lecturers: lecturersByCourse[c.code] || [],
+      lecturers: (staffByCourse[c.code] || []).map((s) => s.name),
+      staff: staffByCourse[c.code] || [],
     }));
     if (level) out = out.filter((c) => c.levels.includes(level));
     if (semester) out = out.filter((c) => c.semesters.includes(semester));
@@ -851,11 +859,11 @@ router.post("/share", requireAuth, async (req: Request, res: Response) => {
     return;
   }
   try {
-    // Sharing is an author/admin act (lecturers, collaborators, admins).
+    // Sharing is an author/admin act (lecturers, contributors, admins).
     // Students read shared links; they don't mint them.
     const { data: prof } = await supabaseAdmin().from("profiles").select("role,is_admin").eq("id", userId).single();
     const p = prof as { role?: string; is_admin?: boolean } | null;
-    const canShare = Boolean(p?.is_admin || (p?.role && ["lecturer", "collaborator", "admin"].includes(p.role)));
+    const canShare = Boolean(p?.is_admin || (p?.role && ["lecturer", "contributor", "admin"].includes(p.role)));
     if (!canShare) {
       res.status(403).json({ error: "Only authors and admins can share notes" });
       return;
@@ -1047,6 +1055,349 @@ router.get("/admin/errors", requireAuth, async (req: Request, res: Response) => 
       .limit(50);
     if (error) throw error;
     res.json({ errors: data ?? [] });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// Admin: latest client errors (newest first).
+router.get("/admin/errors", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  try {
+    const { data, error } = await supabaseAdmin()
+      .from("client_errors")
+      .select("kind,message,stack,url,app_version,created_at")
+      .order("created_at", { ascending: false })
+      .limit(50);
+    if (error) throw error;
+    res.json({ errors: data ?? [] });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// ---- Staff role requests: apply as lecturer/contributor, admin approves.
+// Until approval the account stays a student — picking a staff role in
+// onboarding never grants powers by itself. ----
+
+// Avatar shown across the app: uploaded picture wins, otherwise Gravatar
+// from the email (works for every user with zero setup).
+async function avatarFor(profile: { avatar_url?: string; email?: string } | null): Promise<string> {
+  const up = (profile?.avatar_url || "").trim();
+  if (up) return up;
+  const email = (profile?.email || "").trim().toLowerCase();
+  if (!email) return "";
+  try {
+    const { createHash } = await import("node:crypto");
+    return `https://www.gravatar.com/avatar/${createHash("md5").update(email).digest("hex")}?d=identicon&s=128`;
+  } catch {
+    return "";
+  }
+}
+
+async function adminRecipients(): Promise<{ ids: string[]; emails: { email: string; name: string }[] }> {
+  const ids: string[] = [];
+  const emails: { email: string; name: string }[] = [];
+  try {
+    const { data } = await supabaseAdmin()
+      .from("profiles")
+      .select("id,first_name,email")
+      .or("is_admin.eq.true,role.eq.admin")
+      .limit(50);
+    for (const p of ((data ?? []) as { id: string; first_name: string; email: string }[])) {
+      ids.push(p.id);
+      if (p.email) emails.push({ email: p.email, name: p.first_name || "Admin" });
+    }
+  } catch {
+    // notify best-effort
+  }
+  return { ids, emails };
+}
+
+const roleRequestSchema = z.object({
+  role: z.enum(["lecturer", "contributor"]),
+  level: z.string().max(40).default(""),
+  courses: z.array(z.string().min(1).max(20)).max(10).default([]),
+});
+
+// Authed: file (or re-file) a staff role request.
+router.post("/role-requests", requireAuth, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  const parsed = roleRequestSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid body", details: parsed.error.flatten() });
+    return;
+  }
+  try {
+    const sb = supabaseAdmin();
+    const { data: prof } = await sb.from("profiles").select("first_name,email,role").eq("id", userId).single();
+    const p = prof as { first_name?: string; email?: string; role?: string } | null;
+    if (p?.role === "lecturer" || p?.role === "contributor" || p?.role === "admin") {
+      res.status(400).json({ error: "You already hold a staff role." });
+      return;
+    }
+    const courses = [...new Set(parsed.data.courses.map((c) => cleanCode(c)).filter(Boolean))];
+    // One live request per user: re-filing replaces the pending one.
+    await sb.from("role_requests").delete().eq("user_id", userId).eq("status", "pending");
+    const { data: ins, error } = await sb
+      .from("role_requests")
+      .insert({ user_id: userId, role: parsed.data.role, level: parsed.data.level, courses })
+      .select("id")
+      .single();
+    if (error) throw error;
+    // Admins hear about it twice: bell notification + email.
+    const label = parsed.data.role === "lecturer" ? "Lecturer" : "Contributor";
+    const { ids, emails } = await adminRecipients();
+    if (ids.length) {
+      await sb.from("notifications").insert(
+        ids.map((id) => ({
+          user_id: id,
+          type: "role_request",
+          title: `New ${label} request: ${p?.first_name || "Unnamed"}`,
+          body: `${p?.first_name || "Someone"} (${p?.email || "no email"}) wants the ${label} role${parsed.data.level ? ` · ${parsed.data.level}` : ""}${courses.length ? ` · ${courses.join(", ")}` : ""}.`,
+          link: "/admin",
+        }))
+      );
+    }
+    if (emails.length) {
+      const { sendSimpleEmail } = await import("../lib/email");
+      const base = (process.env.CORS_ORIGIN || "").split(",")[0].trim() || "https://unify-virid.vercel.app";
+      await sendSimpleEmail({
+        to: emails,
+        subject: `Unify: new ${label} request needs review`,
+        html: `<div style="font-family:sans-serif;max-width:480px;"><p><strong>${p?.first_name || "Someone"}</strong> (${p?.email || "no email"}) requested the <strong>${label}</strong> role${parsed.data.level ? ` for <strong>${parsed.data.level}</strong>` : ""}${courses.length ? ` (${courses.join(", ")})` : ""}.</p><p><a href="${base}/admin" style="display:inline-block;padding:12px 24px;background:#10b981;color:#fff;border-radius:9999px;text-decoration:none;font-weight:800;">Review in admin panel</a></p></div>`,
+      }).catch(() => {});
+    }
+    res.json({ ok: true, id: (ins as { id: string }).id });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// Authed: my pending request (onboarding shows "under review" instead of
+// letting staff through).
+router.get("/role-requests/mine", requireAuth, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  try {
+    const { data, error } = await supabaseAdmin()
+      .from("role_requests")
+      .select("id,role,level,courses,status,created_at")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(1);
+    if (error) throw error;
+    res.json({ request: ((data ?? []) as unknown[])[0] || null });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// Admin: pending staff requests with applicant names.
+router.get("/admin/role-requests", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  try {
+    const sb = supabaseAdmin();
+    const { data, error } = await sb
+      .from("role_requests")
+      .select("id,user_id,role,level,courses,status,created_at")
+      .eq("status", "pending")
+      .order("created_at", { ascending: true })
+      .limit(100);
+    if (error) throw error;
+    const rows = ((data ?? []) as { id: string; user_id: string; role: string; level: string; courses: string[]; status: string; created_at: string }[]);
+    const ids = [...new Set(rows.map((r) => r.user_id))];
+    let names: Record<string, { name: string; email: string }> = {};
+    if (ids.length) {
+      const { data: profs } = await sb.from("profiles").select("id,first_name,email").in("id", ids);
+      for (const p of ((profs ?? []) as { id: string; first_name: string; email: string }[])) {
+        names[p.id] = { name: p.first_name || "Unnamed", email: p.email || "" };
+      }
+    }
+    res.json({
+      requests: rows.map((r) => ({
+        ...r,
+        name: names[r.user_id]?.name || "Unnamed",
+        email: names[r.user_id]?.email || "",
+      })),
+    });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// Contributor cap: at most 2 teaching courses per level. Lecturers are
+// exempt (they teach whole departments); contributors are capped so one
+// account can't sprawl across a faculty.
+async function teachingCountsByLevel(userId: string): Promise<Record<string, number>> {
+  const sb = supabaseAdmin();
+  const { data: taking } = await sb.from("enrollments").select("course").eq("user_id", userId).eq("kind", "teaching");
+  const courses = ((taking ?? []) as { course: string }[]).map((r) => r.course);
+  if (!courses.length) return {};
+  const { data: links } = await sb.from("course_levels").select("course,level").in("course", courses);
+  const counts: Record<string, number> = {};
+  const seen = new Set<string>();
+  for (const l of ((links ?? []) as { course: string; level: string }[])) {
+    const k = `${l.course}::${l.level}`;
+    if (seen.has(k)) continue;
+    seen.add(k);
+    counts[l.level] = (counts[l.level] || 0) + 1;
+  }
+  return counts;
+}
+
+// Admin: approve (grants role + enrolls teaching courses within cap) or
+// reject a staff request. The applicant is notified both ways, by bell.
+router.post("/admin/role-requests/:id", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  const parsed = z.object({ approve: z.boolean() }).safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Pass { approve: true|false }." });
+    return;
+  }
+  try {
+    const sb = supabaseAdmin();
+    const { data: rq } = await sb.from("role_requests").select("*").eq("id", req.params.id).single();
+    const r = rq as { id: string; user_id: string; role: string; level: string; courses: string[]; status: string } | null;
+    if (!r || r.status !== "pending") {
+      res.status(404).json({ error: "Request not found or already decided." });
+      return;
+    }
+    if (!parsed.data.approve) {
+      await sb.from("role_requests").update({ status: "rejected", decided_at: new Date().toISOString() }).eq("id", r.id);
+      await sb.from("notifications").insert({
+        user_id: r.user_id,
+        type: "role",
+        title: "Staff request not approved",
+        body: "An admin reviewed your lecturer/contributor request and declined it this time. You keep full student access.",
+        link: "/dashboard",
+      });
+      res.json({ ok: true, approved: false });
+      return;
+    }
+    // Approve: grant the role first (enrollments are kinded by role).
+    await sb.from("profiles").update({ role: r.role, level: r.level || undefined, updated_at: new Date().toISOString() }).eq("id", r.user_id);
+    // Enroll requested teaching courses, honoring the contributor cap.
+    const { data: prof } = await sb.from("profiles").select("role").eq("id", r.user_id).single();
+    const isContributor = (prof as { role?: string } | null)?.role === "contributor";
+    const counts = isContributor ? await teachingCountsByLevel(r.user_id) : {};
+    const { data: links } = await sb.from("course_levels").select("course,level").in("course", r.courses.length ? r.courses : ["__none__"]);
+    const levelOf: Record<string, string> = {};
+    for (const l of ((links ?? []) as { course: string; level: string }[])) {
+      if (!levelOf[l.course]) levelOf[l.course] = l.level;
+    }
+    const granted: string[] = [];
+    const capped: string[] = [];
+    for (const c of r.courses) {
+      const lv = levelOf[c] || r.level || "";
+      if (isContributor && lv && (counts[lv] || 0) >= 2) {
+        capped.push(c);
+        continue;
+      }
+      granted.push(c);
+      if (isContributor && lv) counts[lv] = (counts[lv] || 0) + 1;
+    }
+    if (granted.length) {
+      await sb.from("enrollments").upsert(
+        granted.map((course) => ({ user_id: r.user_id, course, kind: "teaching" })),
+        { onConflict: "user_id,course" }
+      );
+    }
+    await sb.from("role_requests").update({ status: "approved", decided_at: new Date().toISOString() }).eq("id", r.id);
+    const label = r.role === "lecturer" ? "Lecturer" : "Contributor";
+    await sb.from("notifications").insert({
+      user_id: r.user_id,
+      type: "role",
+      title: `You're now a ${label}`,
+      body: granted.length
+        ? `Approved! You teach ${granted.join(", ")}.${capped.length ? ` Held back by the 2-per-level cap: ${capped.join(", ")}.` : ""} Open the Studio to begin.`
+        : "Approved! Open the Studio to begin.",
+      link: r.role === "lecturer" ? "/classes" : "/studio",
+    });
+    res.json({ ok: true, approved: true, granted, capped });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// Authed author: my contributions grouped by course (topics + versions),
+// with level/semester context for the contributor dashboard.
+router.get("/contributions", requireAuth, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  try {
+    const sb = supabaseAdmin();
+    const { data: prof } = await sb.from("profiles").select("role").eq("id", userId).single();
+    const role = (prof as { role?: string } | null)?.role || "";
+    if (!["lecturer", "contributor", "admin"].includes(role)) {
+      const { data: isAdm } = await sb.from("profiles").select("is_admin").eq("id", userId).single();
+      if (!(isAdm as { is_admin?: boolean } | null)?.is_admin) {
+        res.status(403).json({ error: "Authors only." });
+        return;
+      }
+    }
+    const [mine, teaching, links] = await Promise.all([
+      sb.from("topic_notes").select("course,week,topic,lecture_no,version").eq("author_id", userId).limit(5000),
+      sb.from("enrollments").select("course").eq("user_id", userId).eq("kind", "teaching").limit(100),
+      sb.from("course_levels").select("course,level,semester").limit(2000),
+    ]);
+    if (mine.error) throw mine.error;
+    const lvl: Record<string, { level: string; semester: string }> = {};
+    for (const l of ((links.data ?? []) as { course: string; level: string; semester: string }[])) {
+      if (!lvl[l.course]) lvl[l.course] = { level: l.level, semester: l.semester };
+    }
+    const byCourse: Record<string, { topics: Set<string>; versions: number }> = {};
+    for (const n of ((mine.data ?? []) as { course: string; week: number; topic: number; lecture_no?: number; version: number }[])) {
+      const e = (byCourse[n.course] = byCourse[n.course] || { topics: new Set(), versions: 0 });
+      e.topics.add(`${n.week}::${n.lecture_no || 1}::${n.topic}`);
+      e.versions += 1;
+    }
+    const assigned = new Set(((teaching.data ?? []) as { course: string }[]).map((r) => r.course));
+    const courses = [...new Set([...Object.keys(byCourse), ...assigned])].sort().map((course) => ({
+      course,
+      level: lvl[course]?.level || "",
+      semester: lvl[course]?.semester || "",
+      assigned: assigned.has(course),
+      topics: byCourse[course]?.topics.size || 0,
+      versions: byCourse[course]?.versions || 0,
+    }));
+    res.json({ courses });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// Authed: upload a profile picture (staff and students alike). ≤2MB image
+// into the avatars bucket; the public URL lands on the profile.
+router.post("/avatar", requireAuth, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  const parsed = z.object({ image: z.string().min(100).max(3000000) }).safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Pass { image: dataURL } (≤2MB)." });
+    return;
+  }
+  const m = parsed.data.image.match(/^data:(image\/(png|jpeg|webp)):base64,(.+)$/);
+  if (!m) {
+    res.status(400).json({ error: "Image must be a PNG/JPEG/WEBP data URL." });
+    return;
+  }
+  try {
+    const buf = Buffer.from(m[3], "base64");
+    if (buf.length > 2 * 1024 * 1024) {
+      res.status(400).json({ error: "Image must be ≤2MB." });
+      return;
+    }
+    const ext = m[2] === "png" ? "png" : m[2] === "webp" ? "webp" : "jpg";
+    const path = `${userId}.${ext}`;
+    const { error: upErr } = await supabaseAdmin().storage.from("avatars").upload(path, buf, {
+      contentType: `image/${m[2]}`,
+      upsert: true,
+    });
+    if (upErr) throw upErr;
+    const { data } = supabaseAdmin().storage.from("avatars").getPublicUrl(path);
+    await supabaseAdmin().from("profiles").update({ avatar_url: data.publicUrl, updated_at: new Date().toISOString() }).eq("id", userId);
+    res.json({ ok: true, avatarUrl: data.publicUrl });
   } catch (e) {
     res.status(500).json(dbError(e));
   }
@@ -1695,6 +2046,14 @@ router.post("/timetable", requireAuth, requireAuthor, async (req: Request, res: 
     res.status(403).json({ error: "Only the course lecturer or an admin manages its timetable." });
     return;
   }
+  // Timetable is lecturer management: contributors author content, they
+  // don't set class times (even when assigned to the course).
+  const { data: tprof } = await supabaseAdmin().from("profiles").select("role,is_admin").eq("id", userId).single();
+  const tp = tprof as { role?: string; is_admin?: boolean } | null;
+  if (!(tp?.is_admin || tp?.role === "admin" || tp?.role === "lecturer")) {
+    res.status(403).json({ error: "Only the course lecturer or an admin manages its timetable." });
+    return;
+  }
   try {
     const { data, error } = await supabaseAdmin()
       .from("class_slots")
@@ -1748,8 +2107,9 @@ router.delete("/timetable/:id", requireAuth, requireAuthor, async (req: Request,
   }
 });
 
-// Class roster: students taking the course + per-student progress
-// (topics done, quizzes taken, last activity). Teaching lecturer or admin.
+// Class roster: lecturers (+admins) see who's taking their course.
+// Contributors do NOT: they see their assigned courses + contribution
+// counts (via /contributions), never the student list.
 router.get("/courses/:code/students", requireAuth, async (req: Request, res: Response) => {
   const userId = (req as AuthedRequest).userId as string;
   const course = cleanCode(decodeURIComponent(req.params.code));
@@ -1757,7 +2117,10 @@ router.get("/courses/:code/students", requireAuth, async (req: Request, res: Res
     res.status(400).json({ error: "Invalid course" });
     return;
   }
-  if (!(await canManageCourse(userId, course))) {
+  const { data: prof } = await supabaseAdmin().from("profiles").select("role,is_admin").eq("id", userId).single();
+  const pr = prof as { role?: string; is_admin?: boolean } | null;
+  const staff = Boolean(pr?.is_admin || pr?.role === "admin" || pr?.role === "lecturer");
+  if (!staff || !(await canManageCourse(userId, course))) {
     res.status(403).json({ error: "Only the course lecturer or an admin sees the roster." });
     return;
   }
@@ -1852,7 +2215,7 @@ async function requireContentViewer(req: Request, res: Response): Promise<string
       prof?.is_admin ||
       prof?.role === "admin" ||
       prof?.role === "lecturer" ||
-      prof?.role === "collaborator"
+      prof?.role === "contributor"
     ) {
       return userId;
     }
@@ -1924,7 +2287,7 @@ router.get("/admin/stats", requireAuth, async (req: Request, res: Response) => {
 });
 
 // ---- Admin: full content tree (every course → weeks → topics/versions).
-// Collaborators see ONLY their assigned (teaching) courses, enforced here
+// Contributors see ONLY their assigned (teaching) courses, enforced here
 // — clients must not be trusted with the filter (BUG-001).
 router.get("/admin/content", requireAuth, async (req: Request, res: Response) => {
   const adminId = await requireContentViewer(req, res);
@@ -1934,7 +2297,7 @@ router.get("/admin/content", requireAuth, async (req: Request, res: Response) =>
     const { data: meProf } = await sb.from("profiles").select("role,is_admin").eq("id", adminId).single();
     const me = meProf as { role?: string; is_admin?: boolean } | null;
     let allowed: Set<string> | null = null;
-    if (me?.role === "collaborator" && !me?.is_admin) {
+    if (me?.role === "contributor" && !me?.is_admin) {
       const { data: mine } = await sb
         .from("enrollments")
         .select("course")
@@ -2054,7 +2417,7 @@ router.get("/admin/trends", requireAuth, async (req: Request, res: Response) => 
 });
 
 // ---- Admin: assign teaching courses to an author (BUG-001). The
-// collaborator's reachable set IS this list — gates enforce it server-side.
+// contributor's reachable set IS this list — gates enforce it server-side.
 router.get("/admin/users/:id/courses", requireAuth, async (req: Request, res: Response) => {
   const adminId = await requireAdminUser(req, res);
   if (!adminId) return;
@@ -2090,7 +2453,22 @@ router.put("/admin/users/:id/courses", requireAuth, async (req: Request, res: Re
       return;
     }
     const { data: prof } = await sb.from("profiles").select("role").eq("id", req.params.id).single();
-    const kind = (prof as { role?: string } | null)?.role === "student" ? "taking" : "teaching";
+    const role = (prof as { role?: string } | null)?.role || "";
+    const kind = role === "student" ? "taking" : "teaching";
+    // Contributor cap (2 teaching courses per level): enforced on direct
+    // assignment too, not just request approval. Lecturers are exempt.
+    if (kind === "teaching" && role === "contributor" && codes.length) {
+      const { data: links } = await sb.from("course_levels").select("course,level").in("course", codes);
+      const perLevel: Record<string, number> = {};
+      for (const l of ((links ?? []) as { course: string; level: string }[])) {
+        perLevel[l.level] = (perLevel[l.level] || 0) + 1;
+      }
+      const over = Object.entries(perLevel).filter(([, n]) => n > 2);
+      if (over.length) {
+        res.status(400).json({ error: `Contributor cap: at most 2 courses per level (${over.map(([lv]) => lv).join(", ")} exceed it).` });
+        return;
+      }
+    }
     await sb.from("enrollments").delete().eq("user_id", req.params.id).eq("kind", kind);
     if (codes.length) {
       const { error } = await sb
@@ -2116,7 +2494,7 @@ router.get("/admin/users", requireAuth, async (req: Request, res: Response) => {
       .select("id,first_name,email,university,faculty,department,level,role,is_admin,created_at")
       .order("created_at", { ascending: false })
       .limit(limit);
-    if (role === "student" || role === "lecturer" || role === "collaborator" || role === "admin") {
+    if (role === "student" || role === "lecturer" || role === "contributor" || role === "admin") {
       query = query.eq("role", role);
     }
     const { data, error } = await query;
@@ -2136,7 +2514,7 @@ router.get("/admin/users", requireAuth, async (req: Request, res: Response) => {
 });
 
 const adminUserSchema = z.object({
-  role: z.enum(["student", "lecturer", "collaborator", "admin"]).optional(),
+  role: z.enum(["student", "lecturer", "contributor", "admin"]).optional(),
   is_admin: z.boolean().optional(),
   level: z
     .string()
@@ -2334,7 +2712,7 @@ router.post("/admin/users/invite", requireAuth, async (req: Request, res: Respon
   const parsed = z
     .object({
       email: z.string().email().max(120),
-  role: z.enum(["student", "lecturer", "collaborator", "admin"]).default("student"),
+  role: z.enum(["student", "lecturer", "contributor", "admin"]).default("student"),
     })
     .safeParse(req.body);
   if (!parsed.success) {
