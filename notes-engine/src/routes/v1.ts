@@ -824,7 +824,7 @@ router.get("/courses/:code/weeks/:week", requireAuth, requireCourseAccess, async
 async function assembleWeek(
   code: string,
   week: number
-): Promise<{ course: string; week: number; title: string; subtitle: string; note_json: unknown; topicMeta: TopicMeta[]; lectures: number[] } | null> {
+): Promise<{ course: string; week: number; title: string; subtitle: string; note_json: unknown; topicMeta: TopicMeta[]; lectures: number[]; authors: string[] } | null> {
   const sb = supabaseAdmin();
   let shell: { course: string; week: number; title: string; subtitle: string; note_json: unknown } | null = null;
   for (const v of courseVariants(code)) {
@@ -842,13 +842,31 @@ async function assembleWeek(
   const rows = await topicRowsFor(code, week);
   if (!shell && rows.length === 0) return null;
   if (rows.length === 0 && shell) {
-    return { ...shell, topicMeta: [], lectures: [1] };
+    return { ...shell, topicMeta: [], lectures: [1], authors: [] };
   }
   const { topics, meta, lectures } = groupTopics(rows);
   const shellNote = ((shell?.note_json ?? {}) as Record<string, unknown>) || {};
   const course = shell?.course ?? rows[0].course;
   const title = shell?.title || (typeof shellNote.title === "string" ? shellNote.title : `Week ${week}`);
   const subtitle = shell?.subtitle || (typeof shellNote.subtitle === "string" ? shellNote.subtitle : "");
+  // Contributor badges: distinct author names behind this week's topics.
+  let authors: string[] = [];
+  try {
+    const ids = [...new Set(rows.map((r) => r.author_id).filter(Boolean))] as string[];
+    if (ids.length) {
+      const { data: profs } = await sb.from("profiles").select("id,first_name").in("id", ids.slice(0, 20));
+      const seen = new Set<string>();
+      for (const p of ((profs ?? []) as { id: string; first_name: string }[])) {
+        const nm = (p.first_name || "").trim();
+        if (nm && !seen.has(nm)) {
+          seen.add(nm);
+          authors.push(nm);
+        }
+      }
+    }
+  } catch {
+    // badges stay empty; content never blocks on them
+  }
   return {
     course,
     week,
@@ -857,6 +875,7 @@ async function assembleWeek(
     note_json: { ...shellNote, course, week, title, subtitle, topics },
     topicMeta: meta,
     lectures,
+    authors,
   };
 }
 
@@ -2247,7 +2266,36 @@ router.get("/courses/:code/weeks", requireAuth, requireCourseAccess, async (req:
         if (!seen.has(r.week)) seen.set(r.week, r);
       }
     }
-    res.json({ weeks: [...seen.values()].sort((a, b) => a.week - b.week) });
+    // Contributor badges per week (actual note authors, any role).
+    const weekNums = [...seen.keys()];
+    const authorsByWeek: Record<number, string[]> = {};
+    if (weekNums.length) {
+      const { data: tn } = await sb
+        .from("topic_notes")
+        .select("week,author_id")
+        .in("course", variants)
+        .in("week", weekNums)
+        .limit(2000);
+      const ids = [...new Set(((tn ?? []) as { week: number; author_id: string }[]).map((r) => r.author_id).filter(Boolean))];
+      let names: Record<string, string> = {};
+      if (ids.length) {
+        const { data: profs } = await sb.from("profiles").select("id,first_name").in("id", ids.slice(0, 100));
+        for (const p of ((profs ?? []) as { id: string; first_name: string }[])) {
+          if (p.first_name) names[p.id] = p.first_name;
+        }
+      }
+      for (const r of ((tn ?? []) as { week: number; author_id: string }[])) {
+        const nm = names[r.author_id];
+        if (!nm) continue;
+        const list = (authorsByWeek[r.week] = authorsByWeek[r.week] || []);
+        if (!list.includes(nm) && list.length < 3) list.push(nm);
+      }
+    }
+    res.json({
+      weeks: [...seen.values()]
+        .sort((a, b) => a.week - b.week)
+        .map((w) => ({ ...w, authors: authorsByWeek[w.week] || [] })),
+    });
   } catch (e) {
     res.status(500).json(dbError(e));
   }
