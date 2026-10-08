@@ -42,7 +42,7 @@ export async function sendNewNoteEmails(opts: {
   topics: { topic: number; version: number }[];
   recipients: Recipient[];
 }): Promise<{ sent: number; skipped: number }> {
-  const list = (opts.recipients || []).filter((r) => r.email).slice(0, 200);
+  const list = (opts.recipients || []).filter((r) => r.email);
   if (!list.length) return { sent: 0, skipped: 0 };
   const key = process.env.BREVO_API_KEY || "";
   const fromRaw = process.env.EMAIL_FROM || "Unify Learn <notes@unify.learn>";
@@ -144,14 +144,29 @@ export async function notifyInAppNewNote(
 ): Promise<void> {
   try {
     const sb = supabaseAdmin();
-    const { data } = await sb
-      .from("enrollments")
-      .select("user_id")
-      .eq("course", course)
-      .eq("kind", "taking")
-      .limit(2000);
-    const ids = [...new Set(((data ?? []) as { user_id: string }[]).map((r) => r.user_id))];
-    if (!ids.length) return;
+    // Paginated: 10k-student courses must not silently lose the tail
+    // past row 2000. Keyset over user_id, 1000 per page.
+    const ids: string[] = [];
+    let last = "";
+    for (;;) {
+      let q = sb
+        .from("enrollments")
+        .select("user_id")
+        .eq("course", course)
+        .eq("kind", "taking")
+        .order("user_id")
+        .limit(1000);
+      if (last) q = q.gt("user_id", last);
+      const { data, error } = await q;
+      if (error) throw error;
+      const rows = ((data ?? []) as { user_id: string }[]);
+      if (!rows.length) break;
+      for (const r of rows) ids.push(r.user_id);
+      last = rows[rows.length - 1].user_id;
+      if (rows.length < 1000) break;
+    }
+    const uniq = [...new Set(ids)];
+    if (!uniq.length) return;
     const topicLine = topics.map((t) => `Topic ${t.topic} (v${t.version})`).join(" · ") || "fresh content";
     const rows = ids.map((user_id) => ({
       user_id,
@@ -167,6 +182,9 @@ export async function notifyInAppNewNote(
       const { error } = await sb.from("notifications").insert(rows.slice(i, i + 200));
       if (error) throw error;
     }
+    // Hygiene: read notifications older than 90 days are dead weight at
+    // 10k-user scale. Unread rows are never touched (badge integrity).
+    await sb.from("notifications").delete().eq("read", true).lt("created_at", new Date(Date.now() - 90 * 86400000).toISOString()).then(() => {}, () => {});
   } catch (e) {
     console.warn("[notify] in-app failed", e instanceof Error ? e.message : e);
   }
@@ -180,26 +198,44 @@ export async function notifyCoursePublished(
 ): Promise<{ sent: number; skipped: number }> {
   try {
     const sb = supabaseAdmin();
-    const { data: enrolled } = await sb
-      .from("enrollments")
-      .select("user_id")
-      .eq("course", course)
-      .eq("kind", "taking")
-      .limit(1000);
-    const ids = [...new Set(((enrolled ?? []) as { user_id: string }[]).map((r) => r.user_id))];
-    if (!ids.length) return { sent: 0, skipped: 0 };
-    const { data: profs } = await sb
-      .from("profiles")
-      .select("first_name,email,notify_new_notes,email_confirmed")
-      .in("id", ids.slice(0, 1000));
-    const recipients = ((profs ?? []) as {
-      first_name?: string;
-      email?: string;
-      notify_new_notes?: boolean;
-      email_confirmed?: boolean;
-    }[])
-      .filter((p) => p.email && p.email_confirmed && p.notify_new_notes !== false)
-      .map((p) => ({ email: p.email as string, firstName: p.first_name }));
+    const ids: string[] = [];
+    let last = "";
+    for (;;) {
+      let q = sb
+        .from("enrollments")
+        .select("user_id")
+        .eq("course", course)
+        .eq("kind", "taking")
+        .order("user_id")
+        .limit(1000);
+      if (last) q = q.gt("user_id", last);
+      const { data: enrolled, error: eErr } = await q;
+      if (eErr) throw eErr;
+      const rows = ((enrolled ?? []) as { user_id: string }[]);
+      if (!rows.length) break;
+      for (const r of rows) ids.push(r.user_id);
+      last = rows[rows.length - 1].user_id;
+      if (rows.length < 1000) break;
+    }
+    const uniq = [...new Set(ids)];
+    if (!uniq.length) return { sent: 0, skipped: 0 };
+    const recipients: { email: string; firstName?: string }[] = [];
+    for (let i = 0; i < uniq.length; i += 500) {
+      const { data: profs } = await sb
+        .from("profiles")
+        .select("first_name,email,notify_new_notes,email_confirmed")
+        .in("id", uniq.slice(i, i + 500));
+      for (const p of ((profs ?? []) as {
+        first_name?: string;
+        email?: string;
+        notify_new_notes?: boolean;
+        email_confirmed?: boolean;
+      }[])) {
+        if (p.email && p.email_confirmed && p.notify_new_notes !== false) {
+          recipients.push({ email: p.email, firstName: p.first_name });
+        }
+      }
+    }
     const res = await sendNewNoteEmails({ course, week, topics, recipients });
     console.info(`[email] ${course} w${week}: sent ${res.sent}, skipped ${res.skipped}`);
     return res;
