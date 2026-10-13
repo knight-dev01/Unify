@@ -824,7 +824,7 @@ router.get("/courses/:code/weeks/:week", requireAuth, requireCourseAccess, async
 async function assembleWeek(
   code: string,
   week: number
-): Promise<{ course: string; week: number; title: string; subtitle: string; note_json: unknown; topicMeta: TopicMeta[]; lectures: number[]; authors: string[] } | null> {
+): Promise<{ course: string; week: number; title: string; subtitle: string; note_json: unknown; topicMeta: TopicMeta[]; lectures: number[]; authors: { name: string; avatar: string }[] } | null> {
   const sb = supabaseAdmin();
   let shell: { course: string; week: number; title: string; subtitle: string; note_json: unknown } | null = null;
   for (const v of courseVariants(code)) {
@@ -849,19 +849,25 @@ async function assembleWeek(
   const course = shell?.course ?? rows[0].course;
   const title = shell?.title || (typeof shellNote.title === "string" ? shellNote.title : `Week ${week}`);
   const subtitle = shell?.subtitle || (typeof shellNote.subtitle === "string" ? shellNote.subtitle : "");
-  // Contributor badges: distinct author names behind this week's topics.
-  let authors: string[] = [];
+  // Contributor badges: distinct authors behind this week's topics, with
+  // pictures (upload wins, Gravatar-by-email fallback).
+  let authors: { name: string; avatar: string }[] = [];
   try {
     const ids = [...new Set(rows.map((r) => r.author_id).filter(Boolean))] as string[];
     if (ids.length) {
-      const { data: profs } = await sb.from("profiles").select("id,first_name").in("id", ids.slice(0, 20));
+      const { data: profs } = await sb.from("profiles").select("id,first_name,email,avatar_url").in("id", ids.slice(0, 20));
+      const { createHash } = await import("node:crypto");
       const seen = new Set<string>();
-      for (const p of ((profs ?? []) as { id: string; first_name: string }[])) {
+      for (const p of ((profs ?? []) as { id: string; first_name: string; email: string; avatar_url: string }[])) {
         const nm = (p.first_name || "").trim();
-        if (nm && !seen.has(nm)) {
-          seen.add(nm);
-          authors.push(nm);
+        if (!nm || seen.has(nm)) continue;
+        seen.add(nm);
+        let avatar = (p.avatar_url || "").trim();
+        if (!avatar && p.email) {
+          avatar = `https://www.gravatar.com/avatar/${createHash("md5").update(p.email.trim().toLowerCase()).digest("hex")}?d=identicon&s=128`;
         }
+        authors.push({ name: nm, avatar });
+        if (authors.length >= 4) break;
       }
     }
   } catch {
@@ -1251,18 +1257,20 @@ router.delete("/role-requests/mine", requireAuth, async (req: Request, res: Resp
   }
 });
 
-// Admin: pending staff requests with applicant names.
+// Admin: staff requests — pending queue by default, recent decisions with
+// ?status=all (every module keeps its history, not just its inbox).
 router.get("/admin/role-requests", requireAuth, async (req: Request, res: Response) => {
   const adminId = await requireAdminUser(req, res);
   if (!adminId) return;
+  const all = String(req.query.status || "") === "all";
   try {
     const sb = supabaseAdmin();
-    const { data, error } = await sb
+    let q = sb
       .from("role_requests")
-      .select("id,user_id,role,level,courses,status,created_at")
-      .eq("status", "pending")
-      .order("created_at", { ascending: true })
-      .limit(100);
+      .select("id,user_id,role,level,courses,status,created_at,decided_at")
+      .order("created_at", { ascending: !all });
+    q = all ? q.neq("status", "pending").limit(20) : q.eq("status", "pending").limit(100);
+    const { data, error } = await q;
     if (error) throw error;
     const rows = ((data ?? []) as { id: string; user_id: string; role: string; level: string; courses: string[]; status: string; created_at: string }[]);
     const ids = [...new Set(rows.map((r) => r.user_id))];
@@ -1305,6 +1313,27 @@ async function teachingCountsByLevel(userId: string): Promise<Record<string, num
   return counts;
 }
 
+// Applicant decision fan-out: push + email alongside the bell row the
+// caller already inserted. Best-effort; the bell is the source of truth.
+async function notifyApplicant(userId: string, title: string, body: string, url: string): Promise<void> {
+  try {
+    const { data } = await supabaseAdmin().from("profiles").select("first_name,email,email_confirmed").eq("id", userId).single();
+    const u = data as { first_name?: string; email?: string; email_confirmed?: boolean } | null;
+    pushToUser(userId, { title, body, url }).catch(() => {});
+    if (u?.email && u.email_confirmed) {
+      const { sendSimpleEmail } = await import("../lib/email");
+      const base = (process.env.CORS_ORIGIN || "").split(",")[0].trim() || "https://unify-virid.vercel.app";
+      await sendSimpleEmail({
+        to: [{ email: u.email, name: u.first_name || "" }],
+        subject: `Unify: ${title}`,
+        html: `<div style="font-family:sans-serif;max-width:480px;"><p>Hi${u.first_name ? ` ${u.first_name}` : ""},</p><p>${body}</p><p><a href="${base}${url}" style="display:inline-block;padding:12px 24px;background:#10b981;color:#fff;border-radius:9999px;text-decoration:none;font-weight:800;">Open Unify Learn</a></p></div>`,
+      }).catch(() => {});
+    }
+  } catch {
+    // bell row already inserted by the caller
+  }
+}
+
 // Admin: approve (grants role + enrolls teaching courses within cap) or
 // reject a staff request. The applicant is notified both ways, by bell.
 router.post("/admin/role-requests/:id", requireAuth, async (req: Request, res: Response) => {
@@ -1332,6 +1361,7 @@ router.post("/admin/role-requests/:id", requireAuth, async (req: Request, res: R
         body: "An admin reviewed your lecturer/contributor request and declined it this time. You keep full student access.",
         link: "/dashboard",
       });
+      void notifyApplicant(r.user_id, "Staff request not approved", "An admin reviewed your lecturer/contributor request and declined it this time. You keep full student access.", "/dashboard");
       res.json({ ok: true, approved: false });
       return;
     }
@@ -1365,15 +1395,17 @@ router.post("/admin/role-requests/:id", requireAuth, async (req: Request, res: R
     }
     await sb.from("role_requests").update({ status: "approved", decided_at: new Date().toISOString() }).eq("id", r.id);
     const label = r.role === "lecturer" ? "Lecturer" : "Contributor";
+    const approveBody = granted.length
+      ? `Approved! You teach ${granted.join(", ")}.${capped.length ? ` Held back by the 2-per-level cap: ${capped.join(", ")}.` : ""} Open the Studio to begin.`
+      : "Approved! Open the Studio to begin.";
     await sb.from("notifications").insert({
       user_id: r.user_id,
       type: "role",
       title: `You're now a ${label}`,
-      body: granted.length
-        ? `Approved! You teach ${granted.join(", ")}.${capped.length ? ` Held back by the 2-per-level cap: ${capped.join(", ")}.` : ""} Open the Studio to begin.`
-        : "Approved! Open the Studio to begin.",
+      body: approveBody,
       link: r.role === "lecturer" ? "/classes" : "/studio",
     });
+    void notifyApplicant(r.user_id, `You're now a ${label}`, approveBody, r.role === "lecturer" ? "/classes" : "/studio");
     res.json({ ok: true, approved: true, granted, capped });
   } catch (e) {
     res.status(500).json(dbError(e));
@@ -2266,9 +2298,9 @@ router.get("/courses/:code/weeks", requireAuth, requireCourseAccess, async (req:
         if (!seen.has(r.week)) seen.set(r.week, r);
       }
     }
-    // Contributor badges per week (actual note authors, any role).
+    // Contributor badges per week (actual note authors, any role, with pictures).
     const weekNums = [...seen.keys()];
-    const authorsByWeek: Record<number, string[]> = {};
+    const authorsByWeek: Record<number, { name: string; avatar: string }[]> = {};
     if (weekNums.length) {
       const { data: tn } = await sb
         .from("topic_notes")
@@ -2277,18 +2309,24 @@ router.get("/courses/:code/weeks", requireAuth, requireCourseAccess, async (req:
         .in("week", weekNums)
         .limit(2000);
       const ids = [...new Set(((tn ?? []) as { week: number; author_id: string }[]).map((r) => r.author_id).filter(Boolean))];
-      let names: Record<string, string> = {};
+      let names: Record<string, { name: string; avatar: string }> = {};
       if (ids.length) {
-        const { data: profs } = await sb.from("profiles").select("id,first_name").in("id", ids.slice(0, 100));
-        for (const p of ((profs ?? []) as { id: string; first_name: string }[])) {
-          if (p.first_name) names[p.id] = p.first_name;
+        const { data: profs } = await sb.from("profiles").select("id,first_name,email,avatar_url").in("id", ids.slice(0, 100));
+        const { createHash } = await import("node:crypto");
+        for (const p of ((profs ?? []) as { id: string; first_name: string; email: string; avatar_url: string }[])) {
+          if (!p.first_name) continue;
+          let avatar = (p.avatar_url || "").trim();
+          if (!avatar && p.email) {
+            avatar = `https://www.gravatar.com/avatar/${createHash("md5").update(p.email.trim().toLowerCase()).digest("hex")}?d=identicon&s=128`;
+          }
+          names[p.id] = { name: p.first_name, avatar };
         }
       }
       for (const r of ((tn ?? []) as { week: number; author_id: string }[])) {
-        const nm = names[r.author_id];
-        if (!nm) continue;
+        const who = names[r.author_id];
+        if (!who) continue;
         const list = (authorsByWeek[r.week] = authorsByWeek[r.week] || []);
-        if (!list.includes(nm) && list.length < 3) list.push(nm);
+        if (!list.some((s) => s.name === who.name) && list.length < 3) list.push(who);
       }
     }
     res.json({
@@ -2760,6 +2798,24 @@ router.patch("/admin/users/:id", requireAuth, async (req: Request, res: Response
         link,
       });
       void pushToUser(req.params.id, { title: `Your role is now ${label}`, body, url: link }).catch(() => {});
+      // Email leg for role news (confirmed inbox only).
+      void (async () => {
+        try {
+          const { data: up } = await supabaseAdmin().from("profiles").select("first_name,email,email_confirmed").eq("id", req.params.id).single();
+          const u = up as { first_name?: string; email?: string; email_confirmed?: boolean } | null;
+          if (u?.email && u.email_confirmed) {
+            const { sendSimpleEmail } = await import("../lib/email");
+            const base = (process.env.CORS_ORIGIN || "").split(",")[0].trim() || "https://unify-virid.vercel.app";
+            await sendSimpleEmail({
+              to: [{ email: u.email, name: u.first_name || "" }],
+              subject: `Unify: your role is now ${label}`,
+              html: `<div style="font-family:sans-serif;max-width:480px;"><p>Hi${u.first_name ? ` ${u.first_name}` : ""},</p><p>${body}</p><p><a href="${base}${link}" style="display:inline-block;padding:12px 24px;background:#10b981;color:#fff;border-radius:9999px;text-decoration:none;font-weight:800;">Open Unify Learn</a></p></div>`,
+            }).catch(() => {});
+          }
+        } catch {
+          // bell + push already delivered
+        }
+      })();
     }
     res.json({ ok: true, profile: data });
   } catch (e) {
@@ -3006,6 +3062,39 @@ router.post("/admin/announce", requireAuth, async (req: Request, res: Response) 
       if (iErr) throw iErr;
     }
     void pushAnnounce(parsed.data.title, parsed.data.body, parsed.data.link).catch(() => {});
+    // Email leg: confirmed inboxes, paginated — announcements reach mail
+    // too, not just the bell.
+    void (async () => {
+      try {
+        const { sendSimpleEmail } = await import("../lib/email");
+        const base = (process.env.CORS_ORIGIN || "").split(",")[0].trim() || "https://unify-virid.vercel.app";
+        let last = "";
+        for (;;) {
+          let q = sb
+            .from("profiles")
+            .select("id,first_name,email")
+            .eq("email_confirmed", true)
+            .order("id")
+            .limit(500);
+          if (last) q = q.gt("id", last);
+          const { data: page } = await q;
+          const list = ((page ?? []) as { id: string; first_name: string; email: string }[]).filter((p) => p.email);
+          if (!list.length) break;
+          last = list[list.length - 1].id;
+          for (let i = 0; i < list.length; i += 50) {
+            const chunk = list.slice(i, i + 50);
+            await sendSimpleEmail({
+              to: chunk.map((p) => ({ email: p.email, name: p.first_name || "" })),
+              subject: `Unify: ${parsed.data.title}`,
+              html: `<div style="font-family:sans-serif;max-width:480px;"><p>Hi there,</p><p>${parsed.data.body}</p><p><a href="${base}${parsed.data.link || "/dashboard"}" style="display:inline-block;padding:12px 24px;background:#10b981;color:#fff;border-radius:9999px;text-decoration:none;font-weight:800;">Open Unify Learn</a></p></div>`,
+            }).catch(() => {});
+          }
+          if (list.length < 500) break;
+        }
+      } catch {
+        // email is best-effort; bell + push already delivered
+      }
+    })();
     res.json({ ok: true, reached: ids.length });
   } catch (e) {
     res.status(500).json(dbError(e));

@@ -581,11 +581,13 @@ async function runConvertJob(
     );
     const partEoq = (noteJson.eoq as { questions?: unknown[] } | undefined)?.questions;
     if (isLast && Array.isArray(partEoq)) {
-      merged.eoq.questions = (partEoq as { topicRef?: unknown }[]).map((q, qi) => {
+      // Dangling topicRefs are clamped silently now: the beware checklist
+      // in review already forces eyes on quiz completeness, and a wall of
+      // "Q3 pointed at..." notices was pure noise authors asked to remove.
+      merged.eoq.questions = (partEoq as { topicRef?: unknown }[]).map((q) => {
         const ref = Number((q as { topicRef?: unknown }).topicRef);
         if (!Number.isInteger(ref) || ref < 1 || ref > merged.topics.length) {
           const clamped = Math.min(Math.max(Number.isInteger(ref) ? (ref as number) : 1, 1), Math.max(merged.topics.length, 1));
-          warnings.push(`Quiz Q${qi + 1} pointed at missing topic ${String((q as { topicRef?: unknown }).topicRef)} — moved to topic ${clamped}. Verify in review.`);
           return { ...(q as object), topicRef: String(clamped) };
         }
         return q;
