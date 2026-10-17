@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    background: #F5F4F0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    position: relative;
+  }
+  .rail {
+    position: absolute;
+    top: 0; right: 0;
+    width: 160px; height: 380px;
+    background: #4ADE80;
+  }
+  .wordmark {
+    position: absolute;
+    top: 78px; left: 72px;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 58px;
+    font-weight: 700;
+    color: #0A0A0A;
+    letter-spacing: -1px;
+  }
+  .wordmark .dot { color: #22C55E; }
+  .tagline {
+    position: absolute;
+    top: 158px; left: 74px;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 5.5px;
+    color: #3F3F46;
+  }
+  h1 {
+    position: absolute;
+    top: 208px; left: 72px;
+    font-family: 'Arial Black', Arial, sans-serif;
+    font-size: 50px;
+    line-height: 1.14;
+    color: #0A0A0A;
+    letter-spacing: -1.2px;
+  }
+  h1 .g { color: #16A34A; }
+  .subline {
+    position: absolute;
+    top: 455px; left: 72px;
+    font-size: 23px;
+    color: #52525B;
+    font-weight: 500;
+  }
+  .chips {
+    position: absolute;
+    top: 512px; left: 72px;
+    display: flex; gap: 12px;
+  }
+  .chip {
+    border: 1.5px solid #0A0A0A;
+    border-radius: 999px;
+    padding: 9px 22px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #0A0A0A;
+    background: transparent;
+  }
+  .mascot {
+    position: absolute;
+    right: 152px; bottom: 47px;
+    width: 240px; height: 319px;
+  }
+  .footer {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 45px;
+    background: #0A0A0A;
+    display: flex;
+    align-items: center;
+    padding-left: 72px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: #F5F4F0;
+  }
+</style>
+</head>
+<body>
+  <div class="rail"></div>
+  <div class="wordmark">Unify<span class="dot">.</span> Learn</div>
+  <div class="tagline">BUILT FOR THE ONES WHO BUILD</div>
+  <h1>The questions<br/>they'll ask.<br/><span class="g">Already mapped.</span></h1>
+  <div class="subline">Lecture notes · past questions · XP &amp; streaks · offline reading</div>
+  <div class="chips">
+    <span class="chip">Google + email sign-in</span>
+    <span class="chip">Free for students</span>
+    <span class="chip">Works offline</span>
+  </div>
+  <img class="mascot" src="mascot.png" alt=""/>
+  <div class="footer">LECTURE NOTES · PAST QUESTIONS · STREAKS · OFFLINE</div>
+</body>
+</html>
