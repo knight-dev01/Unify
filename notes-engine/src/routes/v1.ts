@@ -9,6 +9,10 @@ import { requireAuthor } from "../middleware/requireAuthor";
 import { requireCourseAccess } from "../middleware/requireCourseAccess";
 
 const router = Router();
+
+// /me SSO-picture backfill throttle: one Auth lookup per user per hour
+// while the profile has no picture (password users have none to find).
+const picBackfillAt = new Map<string, number>();
 router.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 200, standardHeaders: true, legacyHeaders: false }));
 
 const TOPIC_XP = 10;
@@ -136,6 +140,30 @@ router.get("/me", requireAuth, async (req: Request, res: Response) => {
         }
       } catch {
         // notify targeting degrades gracefully without it
+      }
+    }
+    // SSO picture backfill: Google/Apple sign-in already stores the email
+    // account's photo in user_metadata — copy it onto the profile while no
+    // picture exists, so using the picture from the email needs no
+    // revalidation round-trip from users.
+    if (!(data as { avatar_url?: string }).avatar_url) {
+      const now = Date.now();
+      if (now - (picBackfillAt.get(userId) || 0) > 60 * 60 * 1000) {
+        picBackfillAt.set(userId, now);
+        try {
+          const uRes = await supabaseAdmin().auth.admin.getUserById(userId);
+          const u = (uRes.data as { user?: { user_metadata?: { avatar_url?: string; picture?: string } } } | null)?.user;
+          const pic = (u?.user_metadata?.avatar_url || u?.user_metadata?.picture || "").trim();
+          if (/^https:\/\//.test(pic)) {
+            await supabaseAdmin()
+              .from("profiles")
+              .update({ avatar_url: pic, updated_at: new Date().toISOString() })
+              .eq("id", userId);
+            (data as { avatar_url?: string }).avatar_url = pic;
+          }
+        } catch {
+          // retried on a later /me (hourly throttle)
+        }
       }
     }
     // Effective admin: the is_admin flag, ADMIN_EMAILS, or the admin role.
@@ -1495,8 +1523,12 @@ router.post("/avatar", requireAuth, async (req: Request, res: Response) => {
     });
     if (upErr) throw upErr;
     const { data } = supabaseAdmin().storage.from("avatars").getPublicUrl(path);
-    await supabaseAdmin().from("profiles").update({ avatar_url: data.publicUrl, updated_at: new Date().toISOString() }).eq("id", userId);
-    res.json({ ok: true, avatarUrl: data.publicUrl });
+    // The storage path per user never changes — ?v= busts every browser/SW
+    // cache the moment a new picture lands, so header, profile and cards
+    // all pick up the update instead of the old cached image.
+    const avatarUrl = `${data.publicUrl}?v=${Date.now()}`;
+    await supabaseAdmin().from("profiles").update({ avatar_url: avatarUrl, updated_at: new Date().toISOString() }).eq("id", userId);
+    res.json({ ok: true, avatarUrl });
   } catch (e) {
     res.status(500).json(dbError(e));
   }
