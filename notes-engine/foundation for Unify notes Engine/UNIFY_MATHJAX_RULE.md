@@ -30,7 +30,10 @@ Use standard LaTeX syntax wrapped in delimiters:
 \( your equation here \)
 ```
 
----
+**Canonical spacing:** bind every command to its group with no space —
+`\frac{a}{b}`, `\sqrt{x}`, never `\frac {a}` / `\sqrt {x}`. Prefer `\frac`
+over `\dfrac`/`\tfrac`. Generated notes are consumed by the React reader and
+its plain-text fallback; canonical spacing keeps both correct.---
 
 ## Examples
 

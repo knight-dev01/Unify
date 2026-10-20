@@ -1,10 +1,12 @@
-# Unify Learn — Developer Report (4 October 2026)
+# Unify Learn — Developer Report (updated 20 October 2026)
 
 Covers the 1 October 2026 test bug list (14 confirmed: 7 critical P0, 7 important P1),
 everything fixed since, what is left, and what still needs live verification — and why.
 
-Current version: **v1.11.1**. Every change below was verified with `tsc --noEmit`
-both sides plus a production `vite build` before commit.
+Current version: **v1.26.1**. Every change below was verified with `tsc --noEmit`
+both sides plus a production `vite build` before commit. Per-version history for
+v1.12–v1.24 is in the git log (`feat:`/`fix:` commits carry the version); this
+report picks up in detail at the 20 October batch.
 
 ## P0 fixes (critical — blocked student testing)
 
@@ -62,6 +64,42 @@ both sides plus a production `vite build` before commit.
   flush on reconnect) + per-week Save offline into a version-proof cache (SW v6).
 - **Google sign-in (v1.11.0).** OAuth on both auth tabs, onboarding prefill, no backend
   change (API is provider-agnostic).
+
+## Batch of 20 October 2026 (v1.25.0 → v1.26.1)
+
+- **Reader controls (v1.25.0/v1.25.1/v1.26.0).** Focus mode hides the top bar + bottom
+  tabs while reading (store `lib/focus.ts`; always resets on reader unmount). The
+  floating bottom-right pill is the only place controls live and renders **only on note
+  readers**: Focus on every device; zoom-in only 100–150% on desktop, targeting
+  `#unify-content` so header/nav keep normal size; first zoom-in switches Focus on,
+  the % button resets zoom and exits Focus; leaving a reader clears the applied zoom.
+- **Dropdowns (v1.25.0/v1.26.0).** `Drop` overlay component (floating panel, outside-
+  click/Escape, flip-up near viewport) replaced native selects app-wide with shared
+  option spacing; the read-aloud voice picker was un-squeezed from its flex row.
+- **Math rendering (v1.25.0/v1.26.0/v1.26.1).** MathJax typeset race fixed (awaits
+  `startup.promise` + polls `typesetPromise`). Studio review and NoteBuilder previews
+  render **real formulas** through `<Formula>` again (plain-text preview output was the
+  "code-like" complaint). Offline/CDN-blocked fallback hardened: spaced AI LaTeX
+  (`\frac {a}{b}`, `\sqrt {x}`) is normalized before glyphing so roots and fractions
+  always show their signs (`√(x)`, `a⁄b`) — previously they degraded to literal
+  `frac ab` / `\sqrt x`.
+- **Email (v1.25.0).** Profile shows the email-verify chip with a Resend action
+  (`email_confirmed_at`); new-note + announcement emails send from Render's
+  `EMAIL_FROM` via the Brevo API (see SETUP.md — the from-address must be a verified
+  Brevo sender or every send fails `brevo 400`).
+- **Avatars (v1.25.0/v1.26.0).** Any-size upload: input is downscaled on-device to a
+  256px JPEG; backend accepts png/jpe?g/webp/gif/avif/bmp data URLs and picks the real
+  format from magic bytes (declared MIME never trusted); `?v=` cache-bust +
+  `unify:avatar` event keep the header chip live. `/me` backfills Google/Apple SSO
+  profile pictures (hourly throttle). Server rejections now surface verbatim in the
+  profile UI.
+- **Delivery speed (v1.26.0).** Route-level code-splitting (studio/admin/browse/share/
+  classes/onboarding/notifications/explore are `React.lazy`): main bundle 350→190 KB
+  raw (89→52 KB gzip). jsDelivr preconnect for MathJax. Assets already immutable-cached
+  on Vercel; SW documents stay network-first.
+- **Docs (v1.26.1).** README, apps/web/README, SETUP (BREVO/EMAIL_FROM env + no-mail
+  troubleshooting), UNIFY_MATHJAX_RULE (React implementation + canonical LaTeX
+  spacing) refreshed; versioning rule (bump `APP_VERSION` every push) recorded.
 
 ## Left + verification log
 

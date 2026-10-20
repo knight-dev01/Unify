@@ -64,6 +64,11 @@ the Auth server.)
    - `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`
    - `DATABASE_URL`, `DIRECT_URL`
    - `CORS_ORIGIN` → `https://unify-virid.vercel.app` (exact, no trailing slash)
+   - `BREVO_API_KEY` (Brevo **API** key, `xkeysib-...` — app notification
+     emails; without it sends log-and-skip) + `EMAIL_FROM`
+     (e.g. `Unify Learn <you@yourdomain>` — **must equal a sender verified
+     in Brevo → Senders**, or every send fails `brevo 400` in the logs)
+   - `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` (web push)
    - Skip `ANTHROPIC_API_KEY` unless using note authoring
 4. **Deploy** (~3-5 min). Logs must show, in order: `npm install` →
    `prisma generate` → `prisma migrate deploy` (`0001_init` applied) →
@@ -127,6 +132,7 @@ Settings → Environment Variables (Production + Preview):
 | `401 Invalid session` | Google provider off, or user signed in pre-cutover — re-register. |
 | Prisma `P1001 can't reach DB` | `DIRECT_URL` must be `:5432` direct with correct password. |
 | Signup `POST /auth/v1/signup → 500` | Custom SMTP: use the SMTP key (`xsmtpsib-`), verify the sender in Brevo, then **Send test email** in Supabase. |
+| New-note / announcement email never arrives | App emails use `BREVO_API_KEY` + `EMAIL_FROM` (Render), not Supabase SMTP. Check Render logs for `[email] send failed brevo …` — usually the `EMAIL_FROM` address is not verified in Brevo → Senders. New-note mail also requires the recipient to be enrolled in the course, `email_confirmed`, and not opted out; announcements require `email_confirmed`. |
 | Push notifications silent | Render needs `VAPID_PUBLIC_KEY` + `VAPID_PRIVATE_KEY` + `VAPID_SUBJECT` (generate: `npx web-push generate-vapid-keys` in `notes-engine`). Without them the backend logs and skips. Users opt in from Profile → Appearance. |
 | Prisma re-creates existing tables | You used path B already — run the baseline command from 1.5. |
 | `/v1/universities` returns `[]` | Seed not run yet — run `supabase/seed.sql`. |
