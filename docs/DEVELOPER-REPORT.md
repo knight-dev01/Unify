@@ -65,7 +65,7 @@ report picks up in detail at the 20 October batch.
 - **Google sign-in (v1.11.0).** OAuth on both auth tabs, onboarding prefill, no backend
   change (API is provider-agnostic).
 
-## Batch of 20 October 2026 (v1.25.0 → v1.26.1)
+## Batch of 20 October 2026 (v1.25.0 → v1.26.4)
 
 - **Reader controls (v1.25.0 → v1.26.3).** Focus mode hides the top bar + bottom
   tabs while reading (store `lib/focus.ts`, persisted per device). Both Focus and zoom
@@ -85,6 +85,16 @@ report picks up in detail at the 20 October batch.
   (`\frac {a}{b}`, `\sqrt {x}`) is normalized before glyphing so roots and fractions
   always show their signs (`√(x)`, `a⁄b`) — previously they degraded to literal
   `frac ab` / `\sqrt x`.
+- **Never-raw math + offline previews (v1.26.4).** Root cause of "formula section still
+  shows `\frac`": `typesetMath` swallowed every failure (a rejected typeset on malformed
+  TeX, a hung MathJax font fetch, a CDN timeout) and `MathText` had no fallback at all,
+  so raw source sat on screen forever. Now `typesetMath` returns a boolean with a hard
+  6s deadline + one clear-and-retry; `Formula` renders glyph math from first paint and
+  only reveals an off-screen MathJax twin after a real typeset (or a **saved render**
+  from `localStorage unify.fx.v1`, capped at 80 entries) — raw TeX is never displayed
+  online or offline; `MathText` swaps failed `\(...\)` segments for glyphs; the
+  NoteBuilder equation field gained a persistent live `RENDERED` preview box (it
+  previously showed only the builder button until you opened the visual builder).
 - **Email (v1.25.0).** Profile shows the email-verify chip with a Resend action
   (`email_confirmed_at`); new-note + announcement emails send from Render's
   `EMAIL_FROM` via the Brevo API (see SETUP.md — the from-address must be a verified
