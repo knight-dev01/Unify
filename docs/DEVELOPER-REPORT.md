@@ -67,11 +67,10 @@ report picks up in detail at the 20 October batch.
 
 ## Batch of 20 October 2026 (v1.25.0 → v1.26.1)
 
-- **Reader controls (v1.25.0/v1.25.1/v1.26.0/v1.26.2).** Focus mode hides the top bar + bottom
-  tabs while reading (store `lib/focus.ts`; resets on reader unmount **and** when hopping to
-  a different course/week — param changes reuse the reader component, so the unmount cleanup
-  alone missed it; lecture/topic switches inside one note keep focus). Zoom persists per
-  device across notes via localStorage. The
+- **Reader controls (v1.25.0 → v1.26.3).** Focus mode hides the top bar + bottom
+  tabs while reading (store `lib/focus.ts`, persisted per device). Both Focus and zoom
+  are **retained when switching notes**; the layout only hides chrome on reader routes,
+  so neither ever leaks onto dashboard/studio/etc. The
   floating bottom-right pill is the only place controls live and renders **only on note
   readers**: Focus on every device; zoom-in only 100–150% on desktop, targeting
   `#unify-content` so header/nav keep normal size; first zoom-in switches Focus on,
