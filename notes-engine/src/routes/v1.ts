@@ -1504,21 +1504,34 @@ router.post("/avatar", requireAuth, async (req: Request, res: Response) => {
     res.status(400).json({ error: "Pass { image: dataURL } (≤2MB)." });
     return;
   }
-  const m = parsed.data.image.match(/^data:(image\/(png|jpeg|webp)):base64,(.+)$/);
+  const m = parsed.data.image.match(/^data:image\/(png|jpe?g|webp|gif|avif|bmp):base64,(.+)$/i);
   if (!m) {
     res.status(400).json({ error: "Image must be a PNG/JPEG/WEBP data URL." });
     return;
   }
   try {
-    const buf = Buffer.from(m[3], "base64");
+    const buf = Buffer.from(m[2], "base64");
     if (buf.length > 2 * 1024 * 1024) {
       res.status(400).json({ error: "Image must be ≤2MB." });
       return;
     }
-    const ext = m[2] === "png" ? "png" : m[2] === "webp" ? "webp" : "jpg";
+    // Trust the bytes, not the declared MIME: pick the real format from
+    // magic numbers so any picker's odd label (or a mislabeled file) still
+    // uploads. Fallback to the declared type when no signature matches.
+    const sniff = (
+      buf.length > 12 && buf[0] === 0x89 && buf[1] === 0x50 ? "png" :
+      buf.length > 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff ? "jpg" :
+      buf.length > 12 && buf.toString("ascii", 0, 4) === "RIFF" && buf.toString("ascii", 8, 12) === "WEBP" ? "webp" :
+      buf.length > 4 && buf.toString("ascii", 0, 4) === "GIF8" ? "gif" :
+      buf.length > 12 && buf.toString("ascii", 4, 8) === "ftyp" ? "avif" :
+      buf.length > 2 && buf[0] === 0x42 && buf[1] === 0x4d ? "bmp" :
+      (/jpe?g/i.test(m[1]) ? "jpg" : m[1].toLowerCase())
+    );
+    const ext = sniff === "jpeg" ? "jpg" : sniff;
+    const contentType = sniff === "jpg" ? "image/jpeg" : `image/${sniff}`;
     const path = `${userId}.${ext}`;
     const { error: upErr } = await supabaseAdmin().storage.from("avatars").upload(path, buf, {
-      contentType: `image/${m[2]}`,
+      contentType,
       upsert: true,
     });
     if (upErr) throw upErr;
