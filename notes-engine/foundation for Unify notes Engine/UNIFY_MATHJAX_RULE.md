@@ -98,5 +98,10 @@ Inside `.we-math` blocks (worked examples):
 
 ## Platform Note
 
-MathJax loads from a CDN. The file requires an internet connection to render equations. All Unify Learn HTML files are designed for browser use — this is not a limitation.
+MathJax loads from a CDN, but rendering never depends on being online: every
+successful typeset is saved per-equation (localStorage `unify.fx.v1`) and
+re-injected instantly on later visits, and when neither the CDN nor a saved
+render is available the equation shows readable glyphs (`a⁄b`, `√(x)`). Raw
+TeX is never shown. An internet connection only upgrades glyph text to live
+MathJax output. All Unify Learn HTML files are designed for browser use.
 

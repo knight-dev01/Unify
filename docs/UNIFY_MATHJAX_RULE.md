@@ -98,7 +98,12 @@ Inside `.we-math` blocks (worked examples):
 
 ## Platform Note
 
-MathJax loads from a CDN. The file requires an internet connection to render equations. All Unify Learn HTML files are designed for browser use — this is not a limitation.
+MathJax loads from a CDN, but rendering never depends on being online: every
+successful typeset is saved per-equation (localStorage `unify.fx.v1`) and
+re-injected instantly on later visits, and when neither the CDN nor a saved
+render is available the equation shows readable glyphs (`a⁄b`, `√(x)`). Raw
+TeX is never shown. An internet connection only upgrades glyph text to live
+MathJax output. All Unify Learn HTML files are designed for browser use.
 
 ---
 
@@ -109,17 +114,21 @@ instance serves the whole SPA:
 
 - `src/lib/mathjax.ts` — `ensureMathJax()` loads `tex-mml-chtml` from jsDelivr
   once (preconnected in `index.html`); `typesetMath(el)` awaits
-  `startup.promise` and polls for `typesetPromise` before typesetting a
-  subtree. Never typeset before that await — it silently no-ops and leaves raw
-  TeX on screen (the old "preview doesn't render" bug).
+  `startup.promise`, polls for `typesetPromise`, then typesets under a hard
+  6s deadline with one clear-and-retry — and **returns a boolean**. False
+  (missing CDN, rejected typeset on malformed TeX, hung font fetch) means the
+  caller must show fallback text; it can never hang or silently leave raw TeX
+  on screen (the old "preview doesn't render" bug).
 - `components/Formula.tsx` — display math (formula boxes, worked-example math,
-  **Studio review + editor previews**). Normalizes any equation string to
-  `\(…\)` (bare `V=IR` included) and typesets. Offline/CDN-blocked it falls
-  back to plain-text glyphs: `\frac{a}{b}` → `a⁄b` (U+2044 fraction slash),
-  `\sqrt{x}` → `√(x)` — roots and fractions always keep a sign. The fallback
-  also normalizes spaced commands (`\frac {`, `\sqrt {`) before glyphing.
+  **Studio review + editor previews**). Never-raw design: the card shows
+  readable glyph math from first paint (`\frac{a}{b}` → `a⁄b` U+2044,
+  `\sqrt{x}` → `√(x)`, spaced commands like `\frac {` normalized first) and
+  only reveals an off-screen MathJax twin once a real typeset **or a saved
+  render** (`localStorage unify.fx.v1`, capped at 80 entries) exists — so the
+  preview works instantly offline and raw TeX is never displayed.
 - `components/MathText.tsx` — HTML/plain text containing inline `\(…\)`
-  (paragraphs, quiz questions, titles) via `MathText`/`MathPlain`.
+  (paragraphs, quiz questions, titles) via `MathText`/`MathPlain`. On a
+  failed typeset the `\(...\)` segments are swapped for glyph math in place.
 
 **Rule:** any new surface that shows note math (review panes, previews, share
 cards) must use `Formula`/`MathText` — never raw text and never the
