@@ -1,8 +1,35 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><title>Unify Learn - Developer Report (4 October 2026)</title><style>body{font-family:Arial,Helvetica,sans-serif;max-width:760px;margin:32px auto;padding:0 24px;color:#111;line-height:1.6;font-size:14px}h1{font-size:24px;border-bottom:3px solid #059669;padding-bottom:8px}h2{font-size:18px;color:#065f46;margin-top:28px;border-bottom:1px solid #ddd;padding-bottom:4px}code{background:#f1f5f9;padding:1px 6px;border-radius:4px;font-size:12.5px}pre{background:#0f172a;color:#e2e8f0;padding:14px;border-radius:8px;overflow-x:auto;font-size:12px}li{margin-bottom:6px}</style></head><body><h1>Unify Learn — Developer Report (4 October 2026)</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Unify Learn — Developer Report (21 October 2026)</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm 18mm 15mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, Helvetica, sans-serif; max-width: 760px; margin: 32px auto; padding: 0 24px; color: #1f2937; line-height: 1.6; font-size: 11.5pt; }
+  h1 { font-size: 23pt; border-bottom: 3px solid #059669; padding-bottom: 8px; margin-bottom: 14px; color: #111827; }
+  h2 { font-size: 15pt; color: #065f46; margin-top: 28px; border-bottom: 1px solid #d1d5db; padding-bottom: 4px; page-break-after: avoid; }
+  h3 { font-size: 12pt; color: #065f46; margin-top: 16px; page-break-after: avoid; }
+  p { margin-bottom: 8px; }
+  code { background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 4px; padding: 0 4px; font-size: 9.5pt; }
+  pre { background: #0f172a; color: #e2e8f0; padding: 14px; border-radius: 8px; overflow-x: auto; font-size: 10pt; }
+  ul, ol { padding-left: 20px; margin: 8px 0 12px; }
+  li { margin-bottom: 7px; page-break-inside: avoid; }
+  strong { color: #111827; }
+  .foot { margin-top: 30px; text-align: center; font-size: 9pt; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 10px; }
+</style>
+</head>
+<body>
+
+<h1>Unify Learn — Developer Report (updated 21 October 2026)</h1>
+
 <p>Covers the 1 October 2026 test bug list (14 confirmed: 7 critical P0, 7 important P1),
 everything fixed since, what is left, and what still needs live verification — and why.</p>
-<p>Current version: <strong>v1.11.1</strong>. Every change below was verified with <code>tsc --noEmit</code>
-both sides plus a production <code>vite build</code> before commit.</p>
+<p>Current version: <strong>v1.26.7</strong>. Every change below was verified with <code>tsc --noEmit</code>
+both sides plus a production <code>vite build</code> before commit. Per-version history for
+v1.12–v1.24 is in the git log (<code>feat:</code>/<code>fix:</code> commits carry the version); this
+report picks up in detail at the 20 October batch.</p>
+
 <h2>P0 fixes (critical — blocked student testing)</h2>
 <ul>
 <li><strong>BUG-001 Contributor sees all courses (v1.8.1).</strong> Server gates (<code>requireCourseAccess</code>,
@@ -24,6 +51,7 @@ both sides plus a production <code>vite build</code> before commit.</p>
   (<code>WEEK_OCCUPIED</code>/<code>TOPIC_OCCUPIED</code>); Studio offers Replace / Add as new version / Cancel.
   Nothing overwrites or duplicates silently.</li>
 </ul>
+
 <h2>P1 fixes (important — before the research test)</h2>
 <ul>
 <li><strong>BUG-008 Old + new versions both listed (v1.8.7 batch).</strong> Student lists and the author
@@ -47,6 +75,7 @@ both sides plus a production <code>vite build</code> before commit.</p>
 <li><strong>BUG-014 Quiz extra click + unstyled Check (v1.9.2).</strong> <code>Check score</code>/<code>Try again</code> styled
   like primary buttons (the class had zero CSS); quiz tab opens directly.</li>
 </ul>
+
 <h2>Post-list fixes</h2>
 <ul>
 <li><strong>Explore crash (v1.9.4).</strong> Search <code>useEffect</code> sat below the loading return → hook-count
@@ -60,34 +89,100 @@ both sides plus a production <code>vite build</code> before commit.</p>
 <li><strong>Google sign-in (v1.11.0).</strong> OAuth on both auth tabs, onboarding prefill, no backend
   change (API is provider-agnostic).</li>
 </ul>
+
+<h2>Batch of 20 October 2026 (v1.25.0 → v1.26.7)</h2>
+<ul>
+<li><strong>Reader controls (v1.25.0 → v1.26.3).</strong> Focus mode hides the top bar + bottom
+  tabs while reading (store <code>lib/focus.ts</code>, persisted per device). Both Focus and zoom
+  are <strong>retained when switching notes</strong>; the layout only hides chrome on reader routes,
+  so neither ever leaks onto dashboard/studio/etc. The
+  floating bottom-right pill is the only place controls live and renders <strong>only on note
+  readers</strong>: Focus on every device; zoom-in only 100–150% on desktop, targeting
+  <code>#unify-content</code> so header/nav keep normal size; first zoom-in switches Focus on,
+  the % button resets zoom and exits Focus; leaving a reader clears the applied zoom.</li>
+<li><strong>Dropdowns (v1.25.0/v1.26.0).</strong> <code>Drop</code> overlay component (floating panel, outside-
+  click/Escape, flip-up near viewport) replaced native selects app-wide with shared
+  option spacing; the read-aloud voice picker was un-squeezed from its flex row.</li>
+<li><strong>Math rendering (v1.25.0/v1.26.0/v1.26.1).</strong> MathJax typeset race fixed (awaits
+  <code>startup.promise</code> + polls <code>typesetPromise</code>). Studio review and NoteBuilder previews
+  render <strong>real formulas</strong> through <code>&lt;Formula&gt;</code> again (plain-text preview output was the
+  "code-like" complaint). Offline/CDN-blocked fallback hardened: spaced AI LaTeX
+  (<code>\frac {a}{b}</code>, <code>\sqrt {x}</code>) is normalized before glyphing so roots and fractions
+  always show their signs (<code>√(x)</code>, <code>a⁄b</code>) — previously they degraded to literal
+  <code>frac ab</code> / <code>\sqrt x</code>.</li>
+<li><strong>Never-raw math + offline previews (v1.26.4) — RESOLVED, closed.</strong> The
+  "formula section still shows <code>\frac</code>" report is fixed and verified shipped:
+  <code>typesetMath</code> swallowed every failure (a rejected typeset on malformed
+  TeX, a hung MathJax font fetch, a CDN timeout) and <code>MathText</code> had no
+  fallback at all, so raw source sat on screen forever. Now <code>typesetMath</code>
+  returns a boolean with a hard 6s deadline + one clear-and-retry; <code>Formula</code>
+  renders glyph math from first paint and only reveals an off-screen MathJax
+  twin after a real typeset (or a <strong>saved render</strong> from
+  <code>localStorage unify.fx.v1</code>, capped at 80 entries) — raw TeX is never
+  displayed online or offline; <code>MathText</code> swaps failed <code>\(...\)</code> segments
+  for glyphs; the NoteBuilder equation field gained a persistent live
+  <code>RENDERED</code> preview box (it previously showed only the builder button until
+  you opened the visual builder). Offline preview is no longer hidden or
+  empty — it shows the saved typeset render, or readable glyphs when nothing
+  is saved yet.</li>
+<li><strong>Email (v1.25.0).</strong> Profile shows the email-verify chip with a Resend action
+  (<code>email_confirmed_at</code>); new-note + announcement emails send from Render's
+  <code>EMAIL_FROM</code> via the Brevo API (see SETUP.md — the from-address must be a verified
+  Brevo sender or every send fails <code>brevo 400</code>).</li>
+<li><strong>Avatars (v1.25.0/v1.26.0).</strong> Any-size upload: input is downscaled on-device to a
+  256px JPEG; backend accepts png/jpe?g/webp/gif/avif/bmp data URLs and picks the real
+  format from magic bytes (declared MIME never trusted); <code>?v=</code> cache-bust +
+  <code>unify:avatar</code> event keep the header chip live. <code>/me</code> backfills Google/Apple SSO
+  profile pictures (hourly throttle). Server rejections now surface verbatim in the
+  profile UI.</li>
+<li><strong>Save PDF (v1.26.6).</strong> The XP-gated Save PDF button is <code>window.print()</code> of the
+  rendered reader — documented in apps/web/README (it had no docs entry). Print
+  cleanup: the duplicated <code>@media print</code> block was merged into one, the ZoomBar
+  pill and InstallBar are now <code>screen-only</code> (they used to print as empty floating
+  boxes), and <code>#unify-content</code> zoom is forced back to 100% in print so a zoomed
+  session never clips the exported page. Because the reader is never-raw since
+  v1.26.4, PDFs can only contain typeset math or glyphs — never TeX source.</li>
+<li><strong>Delivery speed (v1.26.0).</strong> Route-level code-splitting (studio/admin/browse/share/
+  classes/onboarding/notifications/explore are <code>React.lazy</code>): main bundle 350→190 KB
+  raw (89→52 KB gzip). jsDelivr preconnect for MathJax. Assets already immutable-cached
+  on Vercel; SW documents stay network-first.</li>
+<li><strong>Docs (v1.26.1+).</strong> README, apps/web/README, SETUP (BREVO/EMAIL_FROM env + no-mail
+  troubleshooting), UNIFY_MATHJAX_RULE (React implementation + canonical LaTeX
+  spacing), product doc v1.26.7 and this report refreshed; versioning rule (bump
+  <code>APP_VERSION</code> every push) recorded.</li>
+</ul>
+
 <h2>Left + verification log</h2>
 <ol>
 <li><strong>Render redeploy — VERIFIED 4 Oct 2026.</strong> Migrations <code>0016</code>–<code>0020</code> applied
-   live; new endpoints (aliases search, lecture paths, timetable, roster,
-   error log, support config) confirmed working in production.</li>
+  live; new endpoints (aliases search, lecture paths, timetable, roster,
+  error log, support config) confirmed working in production.</li>
 <li><strong>Google sign-in live test — VERIFIED 4 Oct 2026.</strong> Real Google account in
-   through onboarding to dashboard after the console enablement.</li>
+  through onboarding to dashboard after the console enablement.</li>
 <li><strong>Lecturer walkthrough — VERIFIED 4 Oct 2026.</strong> Teaching account: courses
-   assigned in admin, slots set, roster visible, student-side class-times card
-   correct.</li>
+  assigned in admin, slots set, roster visible, student-side class-times card
+  correct.</li>
 <li><strong>Phone pass — VERIFIED 4 Oct 2026.</strong> Student + contributor sides on real
-   phones.</li>
+  phones.</li>
 <li><strong>Persistence retest — VERIFIED 4 Oct 2026.</strong> Resume (with lecture),
-   streaks, and offline queue flush confirmed on device.</li>
+  streaks, and offline queue flush confirmed on device.</li>
 <li><strong>Proposed, not built:</strong> per-university allowed-email-domains policy (the actual gate
-   for multi-school expansion — works with both email and Google paths), and a
-   link-Google-to-existing-account action (same address via both methods can mint two
-   identities).</li>
+  for multi-school expansion — works with both email and Google paths), and a
+  link-Google-to-existing-account action (same address via both methods can mint two
+  identities).</li>
 <li><strong>Open product decisions (need a ruling, not testing):</strong> per-lecture EOQ banks
-   vs the single week bank after the final lecture; removing Explore into the
-   dashboard per BUG-012's ideal vs keeping it as the add-courses path.</li>
+  vs the single week bank after the final lecture; removing Explore into the
+  dashboard per BUG-012's ideal vs keeping it as the add-courses path.</li>
 </ol>
+
 <h2>Brand direction: why the generated kit can't hold as law</h2>
+
 <p>The <code>docs/Unify-Brand-Kit/</code> (posted 2 October 2026) was single-pass AI output
 (Claude): no user testing behind it, no ratification, and it contradicts decisions
 that were already tested and shipped. A generated draft is an input to a brand
 decision — it is not the decision. What follows is the recorded reasoning so the
 next reader doesn't re-litigate it from a chatbot's authority.</p>
+
 <p><strong>1. The kit contradicts the product's own retention thesis.</strong>
 The master PRD's core loop is Duolingo mechanics (streaks, XP, badges, tactile
 progression) applied to university study. The kit's headline rule — "it should never
@@ -95,6 +190,7 @@ look like a game" — outlaws the very psychology the product is built on. Teste
 reality agrees with the PRD: residents and students shown the Duolingo-style revamp
 (Classic) preferred it. Playfair editorial (Story) was added as a second theme to
 keep the serif direction alive, not to replace a validated winner.</p>
+
 <p><strong>2. The kit contradicts tested user requests.</strong>
 It mandates one-column course cards; real testing (BUG-012) asked for a card grid.
 It bans Save PDF; the XP-gated PDF is a shipped retention incentive users
@@ -102,6 +198,7 @@ understand. It bans the mascot from the dashboard; the greeting mascot is part o
 the daily habit loop. In each case the tested artifact wins over the generated rule —
 the kit's own social guideline concedes this precedent (the shipped lighter post
 template "is now the standard" over the earlier generated one).</p>
+
 <p><strong>3. The case for the Duolingo style (Classic, the default).</strong>
 Duolingo (~100M+ MAU), Quizlet and Khan Academy converge on the same findings for
 young mass-market learners: chunky 44px-grade touch targets (cheap Androids, touch
@@ -110,12 +207,14 @@ imprecision), high-contrast CTA colour (sunlight legibility), rounded friendly t
 screens), and celebration moments (XP bursts, streaks) that create the return habit
 the PRD demands. Serif-editorial is the right voice for lecturers, certificates and
 campaigns — not for a first-year student revising on a bus.</p>
+
 <p><strong>4. Why the theme switch stays.</strong>
 Two validated tastes exist and they split by role and age: students motivate on
 Classic; lecturers, collaborators and formal surfaces read premium on Story. Forcing
 one face loses one audience. Both themes persist, per-device, with usage measured —
 a future default follows data, not taste. Proposed instrumentation: log the active
 design with existing analytics events so the split is evidence, not anecdote.</p>
+
 <p><strong>5. The Unify ecosystem brand (adopted).</strong>
 Classic ("Play") and Story ("Editorial") are co-equal official themes, not a main
 and a fallback. From the kit we adopt what is genuinely good regardless of theme:
@@ -124,4 +223,9 @@ fix queued), the social-post template structure, and Story's token set for the
 editorial theme. From the kit we reject: the Playfair-only rule, the gradient ban
 where gradients carry meaning (progress, earned states), the PDF ban, the mascot
 confinement, and the one-column-cards rule. Future brand proposals arrive as diffs
-against this section with test evidence attached — never as generated doctrine.</p></body></html>
+against this section with test evidence attached — never as generated doctrine.</p>
+
+<div class="foot">Unify Learn · Developer Report v1.26.7 · Generated 21 October 2026 · Source: docs/DEVELOPER-REPORT.md</div>
+
+</body>
+</html>
