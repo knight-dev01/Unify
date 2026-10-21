@@ -65,7 +65,7 @@ report picks up in detail at the 20 October batch.
 - **Google sign-in (v1.11.0).** OAuth on both auth tabs, onboarding prefill, no backend
   change (API is provider-agnostic).
 
-## Batch of 20 October 2026 (v1.25.0 → v1.26.4)
+## Batch of 20 October 2026 (v1.25.0 → v1.26.6)
 
 - **Reader controls (v1.25.0 → v1.26.3).** Focus mode hides the top bar + bottom
   tabs while reading (store `lib/focus.ts`, persisted per device). Both Focus and zoom
@@ -110,6 +110,13 @@ report picks up in detail at the 20 October batch.
   `unify:avatar` event keep the header chip live. `/me` backfills Google/Apple SSO
   profile pictures (hourly throttle). Server rejections now surface verbatim in the
   profile UI.
+- **Save PDF (v1.26.6).** The XP-gated Save PDF button is `window.print()` of the
+  rendered reader — documented in apps/web/README (it had no docs entry). Print
+  cleanup: the duplicated `@media print` block was merged into one, the ZoomBar
+  pill and InstallBar are now `screen-only` (they used to print as empty floating
+  boxes), and `#unify-content` zoom is forced back to 100% in print so a zoomed
+  session never clips the exported page. Because the reader is never-raw since
+  v1.26.4, PDFs can only contain typeset math or glyphs — never TeX source.
 - **Delivery speed (v1.26.0).** Route-level code-splitting (studio/admin/browse/share/
   classes/onboarding/notifications/explore are `React.lazy`): main bundle 350→190 KB
   raw (89→52 KB gzip). jsDelivr preconnect for MathJax. Assets already immutable-cached
