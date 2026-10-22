@@ -1,14 +1,24 @@
 # UNIFY LEARN — MATHEMATICS RENDERING RULE
 
-## Rule: Always Use MathJax for Mathematical Equations
+## Rule: Always render math through the unified pipeline
 
-All Unify Learn HTML files that contain mathematical equations, formulas, derivations, or expressions **must use MathJax** for rendering.
+All Unify Learn surfaces that contain mathematical equations, formulas,
+derivations, or expressions **must render through the one pipeline**
+(`Formula` / `MathText` / `MathPlain`) — never monospace, never raw text.
+
+**Renderer as of v1.26.10: KaTeX, bundled in the app.** The React app
+statically imports KaTeX — it ships inside the main bundle (no CDN, no
+code-split fetch, no typeset race, works offline by construction).
+Unsupported TeX falls back to readable glyphs, never raw source. MathJax
+was removed from the app in v1.26.10 (the renderer from before MathJax,
+restored at the user's request).
 
 ---
 
-## How to Include MathJax
+## How to Include MathJax (standalone HTML files only)
 
-Add this single script tag inside the `<head>` of every HTML file that contains maths:
+The React app needs no script tag — KaTeX is bundled. Standalone HTML
+artifacts keep this single tag inside `<head>`:
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -31,7 +41,7 @@ Use standard LaTeX syntax wrapped in delimiters:
 ```
 
 **Canonical spacing:** always bind a command to its group with no space —
-`\frac{a}{b}`, `\sqrt{x}`, never `\frac {a}` or `\sqrt {x}`. MathJax accepts
+`\frac{a}{b}`, `\sqrt{x}`, never `\frac {a}` or `\sqrt {x}`. KaTeX accepts
 both, but every other consumer (exporters, plain-text fallback, search) is
 simpler and safer with the canonical form. Prefer `\frac` over `\dfrac`/`\tfrac`.---
 
@@ -98,42 +108,37 @@ Inside `.we-math` blocks (worked examples):
 
 ## Platform Note
 
-MathJax loads from a CDN. Equations type set directly to real math; if the
-CDN is unreachable or rejects an equation, the app falls back to readable
-glyphs (`a⁄b`, `√(x)`) instead of raw source, and every successful typeset is
-saved per-equation (localStorage `unify.fx.v1`) so previously-seen math
-renders instantly offline. An internet connection is only needed the first
-time an equation is seen. All Unify Learn HTML files are designed for
-browser use.
+Math is fully local in the React app: KaTeX ships inside the main bundle,
+so equations render instantly online AND offline with no CDN at all — the
+same service-worker cache that serves the app shell carries it. If KaTeX
+can't parse an equation, the app shows readable glyphs (`a⁄b`, `√(x)`)
+instead of raw source. Standalone HTML files still load MathJax from a CDN
+and need an internet connection the first time. All Unify Learn HTML files
+are designed for browser use.
 
 ---
 
-## React App Implementation (v1.25+)
+## React App Implementation (v1.26.10+)
 
-The app does **not** include the script tag per file — one lazy-loaded MathJax
-instance serves the whole SPA:
+KaTeX is statically imported — no loader, no async typeset, no race:
 
-- `src/lib/mathjax.ts` — `ensureMathJax()` loads `tex-mml-chtml` from jsDelivr
-  once (preconnected in `index.html`); `typesetMath(el)` awaits
-  `startup.promise`, polls for `typesetPromise`, then typesets under a hard
-  6s deadline with one clear-and-retry — and **returns a boolean**. False
-  (missing CDN, rejected typeset on malformed TeX, hung font fetch) means the
-  caller must show fallback text; it can never hang or silently leave raw TeX
-  on screen (the old "preview doesn't render" bug).
-- `components/Formula.tsx` — display math (formula boxes, worked-example math,
-  **Studio review + editor previews**). Typesets **directly** through MathJax
-  (raw `\(…\)` innerHTML, MathJax rewrites in place). On a failed typeset
-  (`typesetMath` false) it swaps in glyph math (`\frac{a}{b}` → `a⁄b` U+2044,
-  `\sqrt{x}` → `√(x)`, spaced `\frac {`/`\sqrt {` normalized first) so raw TeX
-  never stays on screen. Every successful typeset is saved per-equation
-  (`localStorage unify.fx.v1`, capped at 80 entries) and re-injected instantly
-  on later visits — offline notes and previews render real math without the
-  CDN. The Studio equation field keeps a live RENDERED preview box.
+- `components/Formula.tsx` — formula boxes (notes, worked examples, Studio
+  review + editor previews). `katex.renderToString(tex, …)` runs
+  synchronously; `stripTex` accepts bare TeX, `\(…\)`, `\[…\]`, `$$…$$`
+  (always inline layout to keep the compact card rhythm). On a parse error
+  it swaps in glyph math (`\frac{a}{b}` → `a⁄b` U+2044, `\sqrt{x}` →
+  `√(x)`, spaced `\frac {`/`\sqrt {` normalized first) so raw TeX never
+  stays on screen. Exports `escHtml`; `beautify`/`beautifyMath` live here.
 - `components/MathText.tsx` — HTML/plain text containing inline `\(…\)`
-  (paragraphs, quiz questions, titles) via `MathText`/`MathPlain`. On a
-  failed typeset the `\(...\)` segments are swapped for glyph math in place.
+  (paragraphs, quiz questions, titles) via `MathText`/`MathPlain`. Each
+  math segment renders through KaTeX synchronously (display `\[…\]`
+  honoured, entities decoded, markup-looking segments left alone); failed
+  segments are glyph-ified and escaped.
+- `src/lib/mathjax.ts` was **deleted** in v1.26.10; `index.html` no longer
+  preconnects to jsdelivr. The service worker's now-inert MathJax cache
+  rule is harmless (nothing requests that origin anymore).
 
-**Rule:** any new surface that shows note math (review panes, previews, share
-cards) must use `Formula`/`MathText` — never raw text and never the
+**Rule:** any new surface that shows note math (review panes, previews,
+share cards) must use `Formula`/`MathText` — never raw text and never the
 `beautifyMath` fallback as a primary renderer.
 

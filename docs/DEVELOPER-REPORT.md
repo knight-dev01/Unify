@@ -3,7 +3,7 @@
 Covers the 1 October 2026 test bug list (14 confirmed: 7 critical P0, 7 important P1),
 everything fixed since, what is left, and what still needs live verification — and why.
 
-Current version: **v1.26.9**. Every change below was verified with `tsc --noEmit`
+Current version: **v1.26.10**. Every change below was verified with `tsc --noEmit`
 both sides plus a production `vite build` before commit. Per-version history for
 v1.12–v1.24 is in the git log (`feat:`/`fix:` commits carry the version); this
 report picks up in detail at the 20 October batch.
@@ -65,7 +65,7 @@ report picks up in detail at the 20 October batch.
 - **Google sign-in (v1.11.0).** OAuth on both auth tabs, onboarding prefill, no backend
   change (API is provider-agnostic).
 
-## Batch of 20 October 2026 (v1.25.0 → v1.26.9)
+## Batch of 20 October 2026 (v1.25.0 → v1.26.10)
 
 - **Reader controls (v1.25.0 → v1.26.3).** Focus mode hides the top bar + bottom
   tabs while reading (store `lib/focus.ts`, persisted per device). Both Focus and zoom
@@ -135,6 +135,15 @@ report picks up in detail at the 20 October batch.
   our own origin — no CDN, no typeset race, works offline by construction, lazy-loaded
   code-split chunk). TeX KaTeX can't parse falls back to the glyph text, never raw
   commands. Paragraph inline math (`MathText`) stays on the MathJax pipeline unchanged.
+- **Full KaTeX switch, MathJax removed (v1.26.10).** User reported glyphs where
+  formulas should render after v1.26.9. Two causes: (1) KaTeX was lazy-loaded as a
+  separate chunk — on flaky/offline data `import('katex')` rejected and everything
+  fell to glyphs; (2) paragraph inline math (`MathText`) was still on the MathJax CDN
+  and failed exactly like the original BUG-002. Fix: KaTeX is now statically imported
+  (rides inside the main bundle the app already fetches — one request, offline by
+  construction) and `MathText` renders each `\(...\)`/`\[...\]` segment through KaTeX
+  synchronously. `src/lib/mathjax.ts` deleted, jsdelivr preconnect removed, `escHtml`
+  moved into `Formula.tsx`. MathJax is no longer used anywhere in the app.
 
 ## Left + verification log
 

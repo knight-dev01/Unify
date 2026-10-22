@@ -25,7 +25,7 @@
 
 <p>Covers the 1 October 2026 test bug list (14 confirmed: 7 critical P0, 7 important P1),
 everything fixed since, what is left, and what still needs live verification — and why.</p>
-<p>Current version: <strong>v1.26.9</strong>. Every change below was verified with <code>tsc --noEmit</code>
+<p>Current version: <strong>v1.26.10</strong>. Every change below was verified with <code>tsc --noEmit</code>
 both sides plus a production <code>vite build</code> before commit. Per-version history for
 v1.12–v1.24 is in the git log (<code>feat:</code>/<code>fix:</code> commits carry the version); this
 report picks up in detail at the 20 October batch.</p>
@@ -90,7 +90,7 @@ report picks up in detail at the 20 October batch.</p>
   change (API is provider-agnostic).</li>
 </ul>
 
-<h2>Batch of 20 October 2026 (v1.25.0 → v1.26.9)</h2>
+<h2>Batch of 20 October 2026 (v1.25.0 → v1.26.10)</h2>
 <ul>
 <li><strong>Reader controls (v1.25.0 → v1.26.3).</strong> Focus mode hides the top bar + bottom
   tabs while reading (store <code>lib/focus.ts</code>, persisted per device). Both Focus and zoom
@@ -161,6 +161,15 @@ report picks up in detail at the 20 October batch.</p>
   our own origin — no CDN, no typeset race, works offline by construction, lazy-loaded
   code-split chunk). TeX KaTeX can't parse falls back to the glyph text, never raw
   commands. Paragraph inline math (<code>MathText</code>) stays on the MathJax pipeline unchanged.</li>
+<li><strong>Full KaTeX switch, MathJax removed (v1.26.10).</strong> User reported glyphs where
+  formulas should render after v1.26.9. Two causes: (1) KaTeX was lazy-loaded as a
+  separate chunk — on flaky/offline data <code>import('katex')</code> rejected and everything
+  fell to glyphs; (2) paragraph inline math (<code>MathText</code>) was still on the MathJax CDN
+  and failed exactly like the original BUG-002. Fix: KaTeX is now statically imported
+  (rides inside the main bundle the app already fetches — one request, offline by
+  construction) and <code>MathText</code> renders each <code>\(...\)</code>/<code>\[...\]</code> segment through KaTeX
+  synchronously. <code>src/lib/mathjax.ts</code> deleted, jsdelivr preconnect removed, <code>escHtml</code>
+  moved into <code>Formula.tsx</code>. MathJax is no longer used anywhere in the app.</li>
 </ul>
 
 <h2>Left + verification log</h2>
@@ -236,7 +245,7 @@ where gradients carry meaning (progress, earned states), the PDF ban, the mascot
 confinement, and the one-column-cards rule. Future brand proposals arrive as diffs
 against this section with test evidence attached — never as generated doctrine.</p>
 
-<div class="foot">Unify Learn · Developer Report v1.26.9 · Generated 21 October 2026 · Source: docs/DEVELOPER-REPORT.md</div>
+<div class="foot">Unify Learn · Developer Report v1.26.10 · Generated 21 October 2026 · Source: docs/DEVELOPER-REPORT.md</div>
 
 </body>
 </html>
