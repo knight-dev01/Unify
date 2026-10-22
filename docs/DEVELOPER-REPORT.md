@@ -3,7 +3,7 @@
 Covers the 1 October 2026 test bug list (14 confirmed: 7 critical P0, 7 important P1),
 everything fixed since, what is left, and what still needs live verification — and why.
 
-Current version: **v1.26.10**. Every change below was verified with `tsc --noEmit`
+Current version: **v1.26.11**. Every change below was verified with `tsc --noEmit`
 both sides plus a production `vite build` before commit. Per-version history for
 v1.12–v1.24 is in the git log (`feat:`/`fix:` commits carry the version); this
 report picks up in detail at the 20 October batch.
@@ -65,7 +65,7 @@ report picks up in detail at the 20 October batch.
 - **Google sign-in (v1.11.0).** OAuth on both auth tabs, onboarding prefill, no backend
   change (API is provider-agnostic).
 
-## Batch of 20 October 2026 (v1.25.0 → v1.26.10)
+## Batch of 20 October 2026 (v1.25.0 → v1.26.11)
 
 - **Reader controls (v1.25.0 → v1.26.3).** Focus mode hides the top bar + bottom
   tabs while reading (store `lib/focus.ts`, persisted per device). Both Focus and zoom
@@ -144,6 +144,16 @@ report picks up in detail at the 20 October batch.
   construction) and `MathText` renders each `\(...\)`/`\[...\]` segment through KaTeX
   synchronously. `src/lib/mathjax.ts` deleted, jsdelivr preconnect removed, `escHtml`
   moved into `Formula.tsx`. MathJax is no longer used anywhere in the app.
+- **KaTeX + MathJax hand in hand, no fallbacks (v1.26.11).** Per user: MathJax must
+  still render complex formulas and previews must be exact. One two-stage pipeline
+  everywhere: KaTeX (static bundle) first, MathJax (on-demand, SW-cached) for
+  whatever KaTeX rejects; `Formula` and `MathText` share it, and the equation
+  editor's RENDERED preview runs the same component as the reader. The glyph
+  engine was deleted outright — only a double failure leaves source (logged).
+  Also in this push: `Drop` dropdown spacing polished (row rhythm, optical
+  alignment with the trigger, panel offset) and email failures now log Brevo's
+  actual response body + sender/recipient context + an `EMAIL_FROM`-not-set
+  warning (before: bare `brevo 400` with no explanation).
 
 ## Left + verification log
 

@@ -56,6 +56,10 @@ export async function sendNewNoteEmails(opts: {
     return { sent: 0, skipped: list.length };
   }
   const url = `${appBaseUrl().replace(/\/$/, "")}/learn/${encodeURIComponent(opts.course)}/week/${opts.week}`;
+  console.info(
+    `[email] ${list.length} recipient(s) for ${opts.course} w${opts.week} via sender ${sender.email}` +
+      (process.env.EMAIL_FROM ? "" : " (DEFAULT — set EMAIL_FROM on Render to your verified Brevo sender)")
+  );
   let sent = 0;
   // chunks of 10 concurrent posts (Brevo free tier is rate-limited)
   for (let i = 0; i < list.length; i += 10) {
@@ -78,14 +82,31 @@ export async function sendNewNoteEmails(opts: {
             subject: built.subject,
             htmlContent: built.html,
           }),
-        }).then((res) => {
-          if (!res.ok) throw new Error(`brevo ${res.status}`);
+        }).then(async (res) => {
+          // Brevo's body carries the EXACT reason (unverified sender, bad
+          // recipient…) — capture it, never just "brevo 400".
+          if (!res.ok) {
+            const text = await res.text().catch(() => "");
+            throw new Error(`brevo ${res.status} from=${sender.email} to=${r.email}: ${text || "no response body"}`);
+          }
         });
       })
     );
+    let failed = false;
     for (const r of results) {
       if (r.status === "fulfilled") sent += 1;
-      else console.warn("[email] send failed", r.reason instanceof Error ? r.reason.message : r.reason);
+      else {
+        failed = true;
+        const msg = r.reason instanceof Error ? r.reason.message : String(r.reason);
+        console.warn(`[email] send failed (${opts.course} w${opts.week}) — ${msg}`);
+      }
+    }
+    if (failed) {
+      console.warn(
+        process.env.EMAIL_FROM
+          ? `[email] sender configured via EMAIL_FROM (${sender.email}) — if Brevo's message above mentions the from address, verify it in Brevo → Senders.`
+          : `[email] EMAIL_FROM is NOT set on Render — using default ${sender.email}, which is likely unverified in Brevo. Set EMAIL_FROM to your verified Brevo sender.`
+      );
     }
   }
   return { sent, skipped: list.length - sent };
@@ -123,14 +144,30 @@ export async function sendSimpleEmail(opts: {
           subject: opts.subject,
           htmlContent: opts.html,
         }),
-      }).then((res) => {
-        if (!res.ok) throw new Error(`brevo ${res.status}`);
+      }).then(async (res) => {
+        // Same as sendNewNoteEmails: keep Brevo's explanatory body.
+        if (!res.ok) {
+          const text = await res.text().catch(() => "");
+          throw new Error(`brevo ${res.status} from=${sender.email} to=${r.email}: ${text || "no response body"}`);
+        }
       })
     )
   );
+  let failed = false;
   for (const r of results) {
     if (r.status === "fulfilled") sent += 1;
-    else console.warn("[email] send failed", r.reason instanceof Error ? r.reason.message : r.reason);
+    else {
+      failed = true;
+      const msg = r.reason instanceof Error ? r.reason.message : String(r.reason);
+      console.warn(`[email] send failed ("${opts.subject}") — ${msg}`);
+    }
+  }
+  if (failed) {
+    console.warn(
+      process.env.EMAIL_FROM
+        ? `[email] sender configured via EMAIL_FROM (${sender.email}) — if Brevo's message above mentions the from address, verify it in Brevo → Senders.`
+        : `[email] EMAIL_FROM is NOT set on Render — using default ${sender.email}, which is likely unverified in Brevo. Set EMAIL_FROM to your verified Brevo sender.`
+    );
   }
   return sent;
 }

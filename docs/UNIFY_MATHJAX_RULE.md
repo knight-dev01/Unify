@@ -6,12 +6,13 @@ All Unify Learn surfaces that contain mathematical equations, formulas,
 derivations, or expressions **must render through the one pipeline**
 (`Formula` / `MathText` / `MathPlain`) — never monospace, never raw text.
 
-**Renderer as of v1.26.10: KaTeX, bundled in the app.** The React app
-statically imports KaTeX — it ships inside the main bundle (no CDN, no
-code-split fetch, no typeset race, works offline by construction).
-Unsupported TeX falls back to readable glyphs, never raw source. MathJax
-was removed from the app in v1.26.10 (the renderer from before MathJax,
-restored at the user's request).
+**Renderer (v1.26.11): KaTeX first, MathJax for complex — no fallbacks.**
+Every formula goes through the same two stages: KaTeX (statically bundled,
+instant, offline) renders what it can; TeX KaTeX rejects is handed to
+MathJax (loaded on demand, service-worker cached), which accepts nearly
+all valid TeX. There is NO glyph-fallback stage — the two renderers are
+the pipeline. Preview and reader share the same component, so the
+equation preview is exactly what readers see.
 
 ---
 
@@ -108,37 +109,37 @@ Inside `.we-math` blocks (worked examples):
 
 ## Platform Note
 
-Math is fully local in the React app: KaTeX ships inside the main bundle,
-so equations render instantly online AND offline with no CDN at all — the
-same service-worker cache that serves the app shell carries it. If KaTeX
-can't parse an equation, the app shows readable glyphs (`a⁄b`, `√(x)`)
-instead of raw source. Standalone HTML files still load MathJax from a CDN
-and need an internet connection the first time. All Unify Learn HTML files
-are designed for browser use.
+Math needs no network for the common case: KaTeX ships inside the app
+bundle, so equations render instantly online AND offline. Complex TeX
+loads MathJax from a CDN on demand; the service worker caches it on first
+use, after which stage 2 also works offline. Only if MathJax is
+unreachable AND never cached does the equation's source stay visible
+(logged for diagnosis, never styled as fake math). Standalone HTML files
+still load MathJax from a CDN. All Unify Learn HTML files are designed
+for browser use.
 
 ---
 
-## React App Implementation (v1.26.10+)
+## React App Implementation (v1.26.11+)
 
-KaTeX is statically imported — no loader, no async typeset, no race:
+Two stages, one policy everywhere — no glyph fallback anywhere:
 
-- `components/Formula.tsx` — formula boxes (notes, worked examples, Studio
-  review + editor previews). `katex.renderToString(tex, …)` runs
-  synchronously; `stripTex` accepts bare TeX, `\(…\)`, `\[…\]`, `$$…$$`
-  (always inline layout to keep the compact card rhythm). On a parse error
-  it swaps in glyph math (`\frac{a}{b}` → `a⁄b` U+2044, `\sqrt{x}` →
-  `√(x)`, spaced `\frac {`/`\sqrt {` normalized first) so raw TeX never
-  stays on screen. Exports `escHtml`; `beautify`/`beautifyMath` live here.
-- `components/MathText.tsx` — HTML/plain text containing inline `\(…\)`
-  (paragraphs, quiz questions, titles) via `MathText`/`MathPlain`. Each
-  math segment renders through KaTeX synchronously (display `\[…\]`
-  honoured, entities decoded, markup-looking segments left alone); failed
-  segments are glyph-ified and escaped.
-- `src/lib/mathjax.ts` was **deleted** in v1.26.10; `index.html` no longer
-  preconnects to jsdelivr. The service worker's now-inert MathJax cache
-  rule is harmless (nothing requests that origin anymore).
+- `src/lib/mathjax.ts` — restored: `ensureMathJax()` loads
+  `tex-mml-chtml` from jsDelivr once (preconnected in `index.html`);
+  `typesetMath(el)` awaits startup, polls `typesetPromise`, runs under a
+  hard 6s deadline with one clear-and-retry, and returns a boolean
+  (false = CDN unreachable → the caller logs; it never hangs).
+- `components/MathText.tsx` / `Formula.tsx` — **Stage 1:** KaTeX
+  (statically imported) renders every segment/formula it can,
+  synchronously (offline-proof). **Stage 2:** rejected TeX is left as
+  `\(..\)` source and handed to MathJax — in `Formula` per box, in
+  `MathText` as ONE pass over the subtree. `stripTex` canonicalizes
+  delimiters and command spacing before stage 1. `Formula` exports
+  `escHtml` (used by `MathPlain`).
+- The glyph/beautify engine was **deleted** in v1.26.11 — it must never
+  come back as a renderer.
 
 **Rule:** any new surface that shows note math (review panes, previews,
-share cards) must use `Formula`/`MathText` — never raw text and never the
-`beautifyMath` fallback as a primary renderer.
+share cards) must use `Formula`/`MathText` — never raw text, never a
+glyph-style substitute.
 
