@@ -25,7 +25,7 @@
 
 <p>Covers the 1 October 2026 test bug list (14 confirmed: 7 critical P0, 7 important P1),
 everything fixed since, what is left, and what still needs live verification — and why.</p>
-<p>Current version: <strong>v1.26.8</strong>. Every change below was verified with <code>tsc --noEmit</code>
+<p>Current version: <strong>v1.26.9</strong>. Every change below was verified with <code>tsc --noEmit</code>
 both sides plus a production <code>vite build</code> before commit. Per-version history for
 v1.12–v1.24 is in the git log (<code>feat:</code>/<code>fix:</code> commits carry the version); this
 report picks up in detail at the 20 October batch.</p>
@@ -90,7 +90,7 @@ report picks up in detail at the 20 October batch.</p>
   change (API is provider-agnostic).</li>
 </ul>
 
-<h2>Batch of 20 October 2026 (v1.25.0 → v1.26.8)</h2>
+<h2>Batch of 20 October 2026 (v1.25.0 → v1.26.9)</h2>
 <ul>
 <li><strong>Reader controls (v1.25.0 → v1.26.3).</strong> Focus mode hides the top bar + bottom
   tabs while reading (store <code>lib/focus.ts</code>, persisted per device). Both Focus and zoom
@@ -156,6 +156,11 @@ report picks up in detail at the 20 October batch.</p>
   with a 6s deadline + one retry (failures fall back to glyphs instead of leaving raw
   code on screen forever), saved offline renders (<code>unify.fx.v1</code>), the <code>MathText</code> failure
   swap and the live RENDERED preview in the equation field.</li>
+<li><strong>KaTeX restored for formula boxes (v1.26.9).</strong> Per user request the renderer from
+  before MathJax is back: <code>Formula</code> now renders with KaTeX (npm-bundled, served from
+  our own origin — no CDN, no typeset race, works offline by construction, lazy-loaded
+  code-split chunk). TeX KaTeX can't parse falls back to the glyph text, never raw
+  commands. Paragraph inline math (<code>MathText</code>) stays on the MathJax pipeline unchanged.</li>
 </ul>
 
 <h2>Left + verification log</h2>
@@ -231,7 +236,7 @@ where gradients carry meaning (progress, earned states), the PDF ban, the mascot
 confinement, and the one-column-cards rule. Future brand proposals arrive as diffs
 against this section with test evidence attached — never as generated doctrine.</p>
 
-<div class="foot">Unify Learn · Developer Report v1.26.8 · Generated 21 October 2026 · Source: docs/DEVELOPER-REPORT.md</div>
+<div class="foot">Unify Learn · Developer Report v1.26.9 · Generated 21 October 2026 · Source: docs/DEVELOPER-REPORT.md</div>
 
 </body>
 </html>
