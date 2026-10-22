@@ -98,12 +98,13 @@ Inside `.we-math` blocks (worked examples):
 
 ## Platform Note
 
-MathJax loads from a CDN, but rendering never depends on being online: every
-successful typeset is saved per-equation (localStorage `unify.fx.v1`) and
-re-injected instantly on later visits, and when neither the CDN nor a saved
-render is available the equation shows readable glyphs (`a⁄b`, `√(x)`). Raw
-TeX is never shown. An internet connection only upgrades glyph text to live
-MathJax output. All Unify Learn HTML files are designed for browser use.
+MathJax loads from a CDN. Equations type set directly to real math; if the
+CDN is unreachable or rejects an equation, the app falls back to readable
+glyphs (`a⁄b`, `√(x)`) instead of raw source, and every successful typeset is
+saved per-equation (localStorage `unify.fx.v1`) so previously-seen math
+renders instantly offline. An internet connection is only needed the first
+time an equation is seen. All Unify Learn HTML files are designed for
+browser use.
 
 ---
 
@@ -120,12 +121,14 @@ instance serves the whole SPA:
   caller must show fallback text; it can never hang or silently leave raw TeX
   on screen (the old "preview doesn't render" bug).
 - `components/Formula.tsx` — display math (formula boxes, worked-example math,
-  **Studio review + editor previews**). Never-raw design: the card shows
-  readable glyph math from first paint (`\frac{a}{b}` → `a⁄b` U+2044,
-  `\sqrt{x}` → `√(x)`, spaced commands like `\frac {` normalized first) and
-  only reveals an off-screen MathJax twin once a real typeset **or a saved
-  render** (`localStorage unify.fx.v1`, capped at 80 entries) exists — so the
-  preview works instantly offline and raw TeX is never displayed.
+  **Studio review + editor previews**). Typesets **directly** through MathJax
+  (raw `\(…\)` innerHTML, MathJax rewrites in place). On a failed typeset
+  (`typesetMath` false) it swaps in glyph math (`\frac{a}{b}` → `a⁄b` U+2044,
+  `\sqrt{x}` → `√(x)`, spaced `\frac {`/`\sqrt {` normalized first) so raw TeX
+  never stays on screen. Every successful typeset is saved per-equation
+  (`localStorage unify.fx.v1`, capped at 80 entries) and re-injected instantly
+  on later visits — offline notes and previews render real math without the
+  CDN. The Studio equation field keeps a live RENDERED preview box.
 - `components/MathText.tsx` — HTML/plain text containing inline `\(…\)`
   (paragraphs, quiz questions, titles) via `MathText`/`MathPlain`. On a
   failed typeset the `\(...\)` segments are swapped for glyph math in place.

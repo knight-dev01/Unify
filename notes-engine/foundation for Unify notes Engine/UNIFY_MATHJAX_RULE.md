@@ -98,10 +98,11 @@ Inside `.we-math` blocks (worked examples):
 
 ## Platform Note
 
-MathJax loads from a CDN, but rendering never depends on being online: every
-successful typeset is saved per-equation (localStorage `unify.fx.v1`) and
-re-injected instantly on later visits, and when neither the CDN nor a saved
-render is available the equation shows readable glyphs (`a⁄b`, `√(x)`). Raw
-TeX is never shown. An internet connection only upgrades glyph text to live
-MathJax output. All Unify Learn HTML files are designed for browser use.
+MathJax loads from a CDN. Equations type set directly to real math; if the
+CDN is unreachable or rejects an equation, the app falls back to readable
+glyphs (`a⁄b`, `√(x)`) instead of raw source, and every successful typeset is
+saved per-equation (localStorage `unify.fx.v1`) so previously-seen math
+renders instantly offline. An internet connection is only needed the first
+time an equation is seen. All Unify Learn HTML files are designed for
+browser use.
 

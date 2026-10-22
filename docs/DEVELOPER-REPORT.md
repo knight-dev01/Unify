@@ -3,7 +3,7 @@
 Covers the 1 October 2026 test bug list (14 confirmed: 7 critical P0, 7 important P1),
 everything fixed since, what is left, and what still needs live verification — and why.
 
-Current version: **v1.26.7**. Every change below was verified with `tsc --noEmit`
+Current version: **v1.26.8**. Every change below was verified with `tsc --noEmit`
 both sides plus a production `vite build` before commit. Per-version history for
 v1.12–v1.24 is in the git log (`feat:`/`fix:` commits carry the version); this
 report picks up in detail at the 20 October batch.
@@ -65,7 +65,7 @@ report picks up in detail at the 20 October batch.
 - **Google sign-in (v1.11.0).** OAuth on both auth tabs, onboarding prefill, no backend
   change (API is provider-agnostic).
 
-## Batch of 20 October 2026 (v1.25.0 → v1.26.7)
+## Batch of 20 October 2026 (v1.25.0 → v1.26.8)
 
 - **Reader controls (v1.25.0 → v1.26.3).** Focus mode hides the top bar + bottom
   tabs while reading (store `lib/focus.ts`, persisted per device). Both Focus and zoom
@@ -124,6 +124,12 @@ report picks up in detail at the 20 October batch.
 - **Docs (v1.26.1).** README, apps/web/README, SETUP (BREVO/EMAIL_FROM env + no-mail
   troubleshooting), UNIFY_MATHJAX_RULE (React implementation + canonical LaTeX
   spacing) refreshed; versioning rule (bump `APP_VERSION` every push) recorded.
+- **Direct typesetting restored (v1.26.8).** Per user request the v1.26.4 glyph-first
+  twin was removed: `Formula` typesets directly again (raw TeX in, MathJax rewrites in
+  place — the renderer that always worked). Kept from v1.26.4: the boolean `typesetMath`
+  with a 6s deadline + one retry (failures fall back to glyphs instead of leaving raw
+  code on screen forever), saved offline renders (`unify.fx.v1`), the `MathText` failure
+  swap and the live RENDERED preview in the equation field.
 
 ## Left + verification log
 

@@ -25,7 +25,7 @@
 
 <p>Covers the 1 October 2026 test bug list (14 confirmed: 7 critical P0, 7 important P1),
 everything fixed since, what is left, and what still needs live verification — and why.</p>
-<p>Current version: <strong>v1.26.7</strong>. Every change below was verified with <code>tsc --noEmit</code>
+<p>Current version: <strong>v1.26.8</strong>. Every change below was verified with <code>tsc --noEmit</code>
 both sides plus a production <code>vite build</code> before commit. Per-version history for
 v1.12–v1.24 is in the git log (<code>feat:</code>/<code>fix:</code> commits carry the version); this
 report picks up in detail at the 20 October batch.</p>
@@ -90,7 +90,7 @@ report picks up in detail at the 20 October batch.</p>
   change (API is provider-agnostic).</li>
 </ul>
 
-<h2>Batch of 20 October 2026 (v1.25.0 → v1.26.7)</h2>
+<h2>Batch of 20 October 2026 (v1.25.0 → v1.26.8)</h2>
 <ul>
 <li><strong>Reader controls (v1.25.0 → v1.26.3).</strong> Focus mode hides the top bar + bottom
   tabs while reading (store <code>lib/focus.ts</code>, persisted per device). Both Focus and zoom
@@ -150,6 +150,12 @@ report picks up in detail at the 20 October batch.</p>
   troubleshooting), UNIFY_MATHJAX_RULE (React implementation + canonical LaTeX
   spacing), product doc v1.26.7 and this report refreshed; versioning rule (bump
   <code>APP_VERSION</code> every push) recorded.</li>
+<li><strong>Direct typesetting restored (v1.26.8).</strong> Per user request the v1.26.4 glyph-first
+  twin was removed: <code>Formula</code> typesets directly again (raw TeX in, MathJax rewrites in
+  place — the renderer that always worked). Kept from v1.26.4: the boolean <code>typesetMath</code>
+  with a 6s deadline + one retry (failures fall back to glyphs instead of leaving raw
+  code on screen forever), saved offline renders (<code>unify.fx.v1</code>), the <code>MathText</code> failure
+  swap and the live RENDERED preview in the equation field.</li>
 </ul>
 
 <h2>Left + verification log</h2>
@@ -225,7 +231,7 @@ where gradients carry meaning (progress, earned states), the PDF ban, the mascot
 confinement, and the one-column-cards rule. Future brand proposals arrive as diffs
 against this section with test evidence attached — never as generated doctrine.</p>
 
-<div class="foot">Unify Learn · Developer Report v1.26.7 · Generated 21 October 2026 · Source: docs/DEVELOPER-REPORT.md</div>
+<div class="foot">Unify Learn · Developer Report v1.26.8 · Generated 21 October 2026 · Source: docs/DEVELOPER-REPORT.md</div>
 
 </body>
 </html>
