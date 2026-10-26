@@ -25,7 +25,7 @@
 
 <p>Covers the 1 October 2026 test bug list (14 confirmed: 7 critical P0, 7 important P1),
 everything fixed since, what is left, and what still needs live verification — and why.</p>
-<p>Current version: <strong>v1.26.13</strong>. Every change below was verified with <code>tsc --noEmit</code>
+<p>Current version: <strong>v1.26.14</strong>. Every change below was verified with <code>tsc --noEmit</code>
 both sides plus a production <code>vite build</code> before commit. Per-version history for
 v1.12–v1.24 is in the git log (<code>feat:</code>/<code>fix:</code> commits carry the version); this
 report picks up in detail at the 20 October batch.</p>
@@ -90,7 +90,7 @@ report picks up in detail at the 20 October batch.</p>
   change (API is provider-agnostic).</li>
 </ul>
 
-<h2>Batch of 20 October 2026 (v1.25.0 → v1.26.13)</h2>
+<h2>Batch of 20 October 2026 (v1.25.0 → v1.26.14)</h2>
 <ul>
 <li><strong>Reader controls (v1.25.0 → v1.26.3).</strong> Focus mode hides the top bar + bottom
   tabs while reading (store <code>lib/focus.ts</code>, persisted per device). Both Focus and zoom
@@ -139,7 +139,7 @@ report picks up in detail at the 20 October batch.</p>
   <code>BREVO_API_KEY</code> / <code>EMAIL_FROM</code> hints). <code>Drop</code> now applies form-field
   styles to the trigger instead of the wrapper, so the course picker matches the Week input
   in height, and the panel widens to show full course titles instead of ragged truncation.</li>
-<li><strong>Bare LaTeX renders everywhere (v1.26.13).</strong> The reported &quot;raw <code>\frac</code>&quot; came from paragraph math: <code>MathText</code> only rendered spans wrapped in <code>\(...\)</code>, while AI output (and stored notes) often leaves TeX undelimited - so <code>\frac{v^2}{2g}</code> sat as source in paragraphs, titles, bullets and quiz text. The segmenter now finds bare commands (<code>\frac</code>, <code>\sqrt</code>, <code>\sum</code> with limits, Greek symbols...) outside code spans, KaTeX renders them instantly, and anything KaTeX refuses is wrapped and handed to MathJax. <code>$$...$$</code> is supported too; sentence punctuation and surrounding prose are left alone. 12-case node sweep covered fractions, roots, sums, AI-spaced <code>\frac {a}</code>, display math, <code>&lt;code&gt;</code> exclusion, prose boundaries and the MathJax hand-off.</li>
+<li><strong>Bare LaTeX renders everywhere (v1.26.13).</strong> The reported &quot;raw <code>\frac</code>&quot; came from paragraph math: <code>MathText</code> only rendered spans wrapped in <code>\(...\)</code>, while AI output (and stored notes) often leaves TeX undelimited - so <code>\frac{v^2}{2g}</code> sat as source in paragraphs, titles, bullets and quiz text. The segmenter now finds bare commands (<code>\frac</code>, <code>\sqrt</code>, <code>\sum</code> with limits, Greek symbols...) outside code spans, KaTeX renders them instantly, and anything KaTeX refuses is wrapped and handed to MathJax. <code>$$...$$</code> is supported too; sentence punctuation and surrounding prose are left alone. 12-case node sweep covered fractions, roots, sums, AI-spaced <code>\frac {a}</code>, display math, <code>&lt;code&gt;</code> exclusion, prose boundaries and the MathJax hand-off.</li><li><strong>Studio review headers render math (v1.26.14).</strong> Review printed the week title, subtitle, learning outcome and topic-row titles as plain strings, so TeX there still looked raw even after paragraph math was fixed. Those headers now run through an inline <code>MathPlain</code> (span-based <code>MathText</code>, so heading/paragraph nesting stays valid and no line breaks are introduced). Reader hero, outcome line and the print view use the same inline renderer; nothing else changed.</li>
 <li><strong>Avatars (v1.25.0/v1.26.0).</strong> Any-size upload: input is downscaled on-device to a
   256px JPEG; backend accepts png/jpe?g/webp/gif/avif/bmp data URLs and picks the real
   format from magic bytes (declared MIME never trusted); <code>?v=</code> cache-bust +
@@ -266,7 +266,7 @@ where gradients carry meaning (progress, earned states), the PDF ban, the mascot
 confinement, and the one-column-cards rule. Future brand proposals arrive as diffs
 against this section with test evidence attached — never as generated doctrine.</p>
 
-<div class="foot">Unify Learn · Developer Report v1.26.13 · Generated 21 October 2026 · Source: docs/DEVELOPER-REPORT.md</div>
+<div class="foot">Unify Learn · Developer Report v1.26.14 · Generated 21 October 2026 · Source: docs/DEVELOPER-REPORT.md</div>
 
 </body>
 </html>

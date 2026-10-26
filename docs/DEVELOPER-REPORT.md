@@ -3,7 +3,7 @@
 Covers the 1 October 2026 test bug list (14 confirmed: 7 critical P0, 7 important P1),
 everything fixed since, what is left, and what still needs live verification — and why.
 
-Current version: **v1.26.13**. Every change below was verified with `tsc --noEmit`
+Current version: **v1.26.14**. Every change below was verified with `tsc --noEmit`
 both sides plus a production `vite build` before commit. Per-version history for
 v1.12–v1.24 is in the git log (`feat:`/`fix:` commits carry the version); this
 report picks up in detail at the 20 October batch.
@@ -65,7 +65,7 @@ report picks up in detail at the 20 October batch.
 - **Google sign-in (v1.11.0).** OAuth on both auth tabs, onboarding prefill, no backend
   change (API is provider-agnostic).
 
-## Batch of 20 October 2026 (v1.25.0 → v1.26.13)
+## Batch of 20 October 2026 (v1.25.0 → v1.26.14)
 
 - **Reader controls (v1.25.0 → v1.26.3).** Focus mode hides the top bar + bottom
   tabs while reading (store `lib/focus.ts`, persisted per device). Both Focus and zoom
@@ -123,6 +123,12 @@ report picks up in detail at the 20 October batch.
   `$$...$$` is supported too; sentence punctuation and surrounding prose are left alone.
   12-case node sweep covered fractions, roots, sums, AI-spaced `\frac {a}`, `$$` display,
   `<code>` exclusion, prose boundaries and the MathJax hand-off.
+- **Studio review headers render math (v1.26.14).** Review printed the week title, subtitle,
+  learning outcome and topic-row titles as plain strings, so TeX there still looked raw
+  even after paragraph math was fixed. Those headers now run through an inline
+  `MathPlain` (span-based `MathText`, so `<h2>`/`<p>` nesting stays valid and no line
+  breaks are introduced). Reader hero, outcome line and the print view use the same
+  inline renderer; nothing else changed.
 - **Avatars (v1.25.0/v1.26.0).** Any-size upload: input is downscaled on-device to a
   256px JPEG; backend accepts png/jpe?g/webp/gif/avif/bmp data URLs and picks the real
   format from magic bytes (declared MIME never trusted); `?v=` cache-bust +
