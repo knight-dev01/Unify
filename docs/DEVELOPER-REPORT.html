@@ -25,7 +25,7 @@
 
 <p>Covers the 1 October 2026 test bug list (14 confirmed: 7 critical P0, 7 important P1),
 everything fixed since, what is left, and what still needs live verification — and why.</p>
-<p>Current version: <strong>v1.26.11</strong>. Every change below was verified with <code>tsc --noEmit</code>
+<p>Current version: <strong>v1.26.12</strong>. Every change below was verified with <code>tsc --noEmit</code>
 both sides plus a production <code>vite build</code> before commit. Per-version history for
 v1.12–v1.24 is in the git log (<code>feat:</code>/<code>fix:</code> commits carry the version); this
 report picks up in detail at the 20 October batch.</p>
@@ -90,7 +90,7 @@ report picks up in detail at the 20 October batch.</p>
   change (API is provider-agnostic).</li>
 </ul>
 
-<h2>Batch of 20 October 2026 (v1.25.0 → v1.26.11)</h2>
+<h2>Batch of 20 October 2026 (v1.25.0 → v1.26.12)</h2>
 <ul>
 <li><strong>Reader controls (v1.25.0 → v1.26.3).</strong> Focus mode hides the top bar + bottom
   tabs while reading (store <code>lib/focus.ts</code>, persisted per device). Both Focus and zoom
@@ -129,6 +129,16 @@ report picks up in detail at the 20 October batch.</p>
   (<code>email_confirmed_at</code>); new-note + announcement emails send from Render's
   <code>EMAIL_FROM</code> via the Brevo API (see SETUP.md — the from-address must be a verified
   Brevo sender or every send fails <code>brevo 400</code>).</li>
+<li><strong>Email delivery + Drop spacing (v1.26.12).</strong> Announcements fired up to 50 concurrent
+  Brevo calls, so the free-tier rate limit rejected bursts (429) and every rejection body
+  was thrown away - the admin saw "sent to N users" because only the in-app bell was
+  counted. Sends now batch 5 at a time with 429/5xx retry (honouring <code>Retry-After</code>),
+  the recipient walk no longer stops early on emailless rows, the announce response reports
+  how many confirmed inboxes were queued, and Admin &gt; Announce gained an <strong>Email check</strong>
+  that sends one real email and prints Brevo's exact status + body (with
+  <code>BREVO_API_KEY</code> / <code>EMAIL_FROM</code> hints). <code>Drop</code> now applies form-field
+  styles to the trigger instead of the wrapper, so the course picker matches the Week input
+  in height, and the panel widens to show full course titles instead of ragged truncation.</li>
 <li><strong>Avatars (v1.25.0/v1.26.0).</strong> Any-size upload: input is downscaled on-device to a
   256px JPEG; backend accepts png/jpe?g/webp/gif/avif/bmp data URLs and picks the real
   format from magic bytes (declared MIME never trusted); <code>?v=</code> cache-bust +
@@ -255,7 +265,7 @@ where gradients carry meaning (progress, earned states), the PDF ban, the mascot
 confinement, and the one-column-cards rule. Future brand proposals arrive as diffs
 against this section with test evidence attached — never as generated doctrine.</p>
 
-<div class="foot">Unify Learn · Developer Report v1.26.11 · Generated 21 October 2026 · Source: docs/DEVELOPER-REPORT.md</div>
+<div class="foot">Unify Learn · Developer Report v1.26.12 · Generated 21 October 2026 · Source: docs/DEVELOPER-REPORT.md</div>
 
 </body>
 </html>

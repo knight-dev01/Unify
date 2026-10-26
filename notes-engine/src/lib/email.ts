@@ -13,6 +13,68 @@ function appBaseUrl(): string {
   return fromEnv || "https://unify-virid.vercel.app";
 }
 
+function parseSender(): { name: string; email: string } {
+  const fromRaw = process.env.EMAIL_FROM || "Unify Learn <notes@unify.learn>";
+  const m = fromRaw.match(/^(.*)<([^<>]+)>$/);
+  if (m) return { name: m[1].trim() || "Unify Learn", email: m[2].trim() };
+  return { name: "Unify Learn", email: fromRaw.trim() };
+}
+
+// One Brevo call with a 429/5xx retry (honours Retry-After). Returns Brevo's
+// status + body verbatim — its body names the exact reason (unverified
+// sender, daily limit reached, bad recipient), which is what used to vanish.
+type BrevoResult = { ok: boolean; status: number; body: string };
+
+async function brevoSend(key: string, payload: Record<string, unknown>): Promise<BrevoResult> {
+  let last: BrevoResult = { ok: false, status: 0, body: "no attempt made" };
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: { "api-key": key, "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const body = await res.text().catch(() => "");
+    last = { ok: res.ok, status: res.status, body };
+    if (res.ok) return last;
+    // Only rate limits and server hiccups are retried; a rejection of the
+    // sender/recipient never becomes success by repeating it.
+    if (res.status !== 429 && res.status < 500) return last;
+    const retryAfter = Number(res.headers.get("retry-after") || "0");
+    const waitMs = retryAfter > 0 ? retryAfter * 1000 : 1200 * (attempt + 1);
+    await new Promise((r) => setTimeout(r, waitMs));
+  }
+  return last;
+}
+
+// Admin self-test: send one email and hand Brevo's answer straight back to
+// the UI, so "emails aren't arriving" is diagnosable without Render logs.
+export async function probeEmail(to: string): Promise<
+  BrevoResult & { sender: string; keySet: boolean; fromSet: boolean }
+> {
+  const key = process.env.BREVO_API_KEY || "";
+  const sender = parseSender();
+  const fromSet = Boolean(process.env.EMAIL_FROM);
+  if (!key) {
+    return {
+      ok: false,
+      status: 0,
+      body: "BREVO_API_KEY is not set on the server — no email can be sent.",
+      sender: sender.email,
+      keySet: false,
+      fromSet,
+    };
+  }
+  const res = await brevoSend(key, {
+    sender,
+    to: [{ email: to }],
+    subject: "Unify email test",
+    htmlContent:
+      `<div style="font-family:sans-serif;max-width:420px;"><p>This is a test from Unify.</p>` +
+      `<p style="font-size:12px;color:#777;">If you can read this, the Brevo sender, API key and domain are all working.</p></div>`,
+  });
+  return { ...res, sender: sender.email, keySet: true, fromSet };
+}
+
 function noteHtml(opts: {
   firstName: string;
   course: string;
@@ -45,12 +107,7 @@ export async function sendNewNoteEmails(opts: {
   const list = (opts.recipients || []).filter((r) => r.email);
   if (!list.length) return { sent: 0, skipped: 0 };
   const key = process.env.BREVO_API_KEY || "";
-  const fromRaw = process.env.EMAIL_FROM || "Unify Learn <notes@unify.learn>";
-  const sender = (() => {
-    const m = fromRaw.match(/^(.*)<([^<>]+)>$/);
-    if (m) return { name: (m[1].trim() || "Unify Learn"), email: m[2].trim() };
-    return { name: "Unify Learn", email: fromRaw.trim() };
-  })();
+  const sender = parseSender();
   if (!key) {
     console.info(`[email] BREVO_API_KEY unset — would notify ${list.length} about ${opts.course} week ${opts.week}`);
     return { sent: 0, skipped: list.length };
@@ -61,10 +118,11 @@ export async function sendNewNoteEmails(opts: {
       (process.env.EMAIL_FROM ? "" : " (DEFAULT — set EMAIL_FROM on Render to your verified Brevo sender)")
   );
   let sent = 0;
+  let limited = false;
   // chunks of 10 concurrent posts (Brevo free tier is rate-limited)
   for (let i = 0; i < list.length; i += 10) {
     const chunk = list.slice(i, i + 10);
-    const results = await Promise.allSettled(
+    const results = await Promise.all(
       chunk.map((r) => {
         const built = newNoteEmail({
           firstName: r.firstName || "",
@@ -73,34 +131,25 @@ export async function sendNewNoteEmails(opts: {
           topics: opts.topics,
           url,
         });
-        return fetch("https://api.brevo.com/v3/smtp/email", {
-          method: "POST",
-          headers: { "api-key": key, "Content-Type": "application/json", Accept: "application/json" },
-          body: JSON.stringify({
-            sender,
-            to: [{ email: r.email, name: r.firstName || undefined }],
-            subject: built.subject,
-            htmlContent: built.html,
-          }),
-        }).then(async (res) => {
-          // Brevo's body carries the EXACT reason (unverified sender, bad
-          // recipient…) — capture it, never just "brevo 400".
-          if (!res.ok) {
-            const text = await res.text().catch(() => "");
-            throw new Error(`brevo ${res.status} from=${sender.email} to=${r.email}: ${text || "no response body"}`);
-          }
+        return brevoSend(key, {
+          sender,
+          to: [{ email: r.email, name: r.firstName || undefined }],
+          subject: built.subject,
+          htmlContent: built.html,
         });
       })
     );
     let failed = false;
-    for (const r of results) {
-      if (r.status === "fulfilled") sent += 1;
+    results.forEach((res, idx) => {
+      if (res.ok) sent += 1;
       else {
         failed = true;
-        const msg = r.reason instanceof Error ? r.reason.message : String(r.reason);
-        console.warn(`[email] send failed (${opts.course} w${opts.week}) — ${msg}`);
+        if (res.status === 429) limited = true;
+        console.warn(
+          `[email] send failed (${opts.course} w${opts.week}) — brevo ${res.status} from=${sender.email} to=${chunk[idx].email}: ${res.body.slice(0, 400) || "no response body"}`
+        );
       }
-    }
+    });
     if (failed) {
       console.warn(
         process.env.EMAIL_FROM
@@ -108,12 +157,17 @@ export async function sendNewNoteEmails(opts: {
           : `[email] EMAIL_FROM is NOT set on Render — using default ${sender.email}, which is likely unverified in Brevo. Set EMAIL_FROM to your verified Brevo sender.`
       );
     }
+    // A 429 means we are over Brevo's quota: pacing the rest slowly beats
+    // hammering the API and burning the daily allowance on rejections.
+    if (limited) await new Promise((r) => setTimeout(r, 1000));
   }
   return { sent, skipped: list.length - sent };
 }
 
-// Generic one-off email (admin alerts, request decisions). Same Brevo
-// transport, same log-and-skip without a key.
+// Generic one-off email (admin alerts, request decisions, announcements).
+// Same Brevo transport, same log-and-skip without a key. Sends in small
+// batches: bursts of 50 concurrent calls trip Brevo's rate limit (429) and
+// the printed reason used to be thrown away.
 export async function sendSimpleEmail(opts: {
   to: { email: string; name?: string }[];
   subject: string;
@@ -122,45 +176,37 @@ export async function sendSimpleEmail(opts: {
   const list = (opts.to || []).filter((r) => r.email).slice(0, 50);
   if (!list.length) return 0;
   const key = process.env.BREVO_API_KEY || "";
-  const fromRaw = process.env.EMAIL_FROM || "Unify Learn <notes@unify.learn>";
-  const sender = (() => {
-    const m = fromRaw.match(/^(.*)<([^<>]+)>$/);
-    if (m) return { name: (m[1].trim() || "Unify Learn"), email: m[2].trim() };
-    return { name: "Unify Learn", email: fromRaw.trim() };
-  })();
+  const sender = parseSender();
   if (!key) {
     console.info(`[email] BREVO_API_KEY unset — would send "${opts.subject}" to ${list.length}`);
     return 0;
   }
   let sent = 0;
-  const results = await Promise.allSettled(
-    list.map((r) =>
-      fetch("https://api.brevo.com/v3/smtp/email", {
-        method: "POST",
-        headers: { "api-key": key, "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({
+  let failed = false;
+  let limited = false;
+  for (let i = 0; i < list.length; i += 5) {
+    const chunk = list.slice(i, i + 5);
+    const results = await Promise.all(
+      chunk.map((r) =>
+        brevoSend(key, {
           sender,
           to: [{ email: r.email, name: r.name || undefined }],
           subject: opts.subject,
           htmlContent: opts.html,
-        }),
-      }).then(async (res) => {
-        // Same as sendNewNoteEmails: keep Brevo's explanatory body.
-        if (!res.ok) {
-          const text = await res.text().catch(() => "");
-          throw new Error(`brevo ${res.status} from=${sender.email} to=${r.email}: ${text || "no response body"}`);
-        }
-      })
-    )
-  );
-  let failed = false;
-  for (const r of results) {
-    if (r.status === "fulfilled") sent += 1;
-    else {
-      failed = true;
-      const msg = r.reason instanceof Error ? r.reason.message : String(r.reason);
-      console.warn(`[email] send failed ("${opts.subject}") — ${msg}`);
-    }
+        })
+      )
+    );
+    results.forEach((res, idx) => {
+      if (res.ok) sent += 1;
+      else {
+        failed = true;
+        if (res.status === 429) limited = true;
+        console.warn(
+          `[email] send failed ("${opts.subject}") — brevo ${res.status} from=${sender.email} to=${chunk[idx].email}: ${res.body.slice(0, 400) || "no response body"}`
+        );
+      }
+    });
+    if (limited) await new Promise((r) => setTimeout(r, 1000));
   }
   if (failed) {
     console.warn(

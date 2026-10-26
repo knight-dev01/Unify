@@ -3095,6 +3095,32 @@ router.post("/admin/announce", requireAuth, async (req: Request, res: Response) 
     const { data, error } = await sb.from("profiles").select("id").limit(5000);
     if (error) throw error;
     const ids = ((data ?? []) as { id: string }[]).map((r) => r.id);
+    // Mailboxes are collected BEFORE the bell inserts so the response can
+    // tell the admin how many inboxes this announcement actually reaches.
+    // Keyset pagination over profiles.id, breaking on the RAW page size (not
+    // on the filtered list — a few emailless rows used to strand the tail).
+    const inboxes: { email: string; name?: string }[] = [];
+    let lastInbox = "";
+    for (;;) {
+      let q = sb
+        .from("profiles")
+        .select("id,first_name,email")
+        .eq("email_confirmed", true)
+        .not("email", "is", null)
+        .order("id")
+        .limit(500);
+      if (lastInbox) q = q.gt("id", lastInbox);
+      const { data: page, error: pgErr } = await q;
+      if (pgErr) {
+        console.warn("[email] announce recipient walk failed", pgErr.message);
+        break;
+      }
+      const rows = ((page ?? []) as { id: string; first_name?: string; email?: string }[]);
+      if (!rows.length) break;
+      for (const p of rows) if (p.email) inboxes.push({ email: p.email, name: p.first_name || undefined });
+      lastInbox = rows[rows.length - 1].id;
+      if (rows.length < 500) break;
+    }
     const rows = ids.map((user_id) => ({
       user_id,
       type: "announce",
@@ -3107,42 +3133,54 @@ router.post("/admin/announce", requireAuth, async (req: Request, res: Response) 
       if (iErr) throw iErr;
     }
     void pushAnnounce(parsed.data.title, parsed.data.body, parsed.data.link).catch(() => {});
-    // Email leg: confirmed inboxes, paginated — announcements reach mail
-    // too, not just the bell.
+    // Email leg runs after the response (an announcement to a few thousand
+    // inboxes outlives a request), but every outcome is logged with Brevo's
+    // own reason and the final tally: "sent X/Y".
     void (async () => {
       try {
         const { sendSimpleEmail } = await import("../lib/email");
         const base = (process.env.CORS_ORIGIN || "").split(",")[0].trim() || "https://unify-virid.vercel.app";
-        let last = "";
-        for (;;) {
-          let q = sb
-            .from("profiles")
-            .select("id,first_name,email")
-            .eq("email_confirmed", true)
-            .order("id")
-            .limit(500);
-          if (last) q = q.gt("id", last);
-          const { data: page } = await q;
-          const list = ((page ?? []) as { id: string; first_name: string; email: string }[]).filter((p) => p.email);
-          if (!list.length) break;
-          last = list[list.length - 1].id;
-          for (let i = 0; i < list.length; i += 50) {
-            const chunk = list.slice(i, i + 50);
-            await sendSimpleEmail({
-              to: chunk.map((p) => ({ email: p.email, name: p.first_name || "" })),
-              subject: `Unify: ${parsed.data.title}`,
-              html: `<div style="font-family:sans-serif;max-width:480px;"><p>Hi there,</p><p>${parsed.data.body}</p><p><a href="${base}${parsed.data.link || "/dashboard"}" style="display:inline-block;padding:12px 24px;background:#10b981;color:#fff;border-radius:9999px;text-decoration:none;font-weight:800;">Open Unify Learn</a></p></div>`,
-            }).catch(() => {});
-          }
-          if (list.length < 500) break;
+        const html =
+          `<div style="font-family:sans-serif;max-width:480px;"><p>Hi there,</p><p>${parsed.data.body}</p>` +
+          `<p><a href="${base}${parsed.data.link || "/dashboard"}" style="display:inline-block;padding:12px 24px;background:#10b981;color:#fff;border-radius:9999px;text-decoration:none;font-weight:800;">Open Unify Learn</a></p></div>`;
+        let sent = 0;
+        for (let i = 0; i < inboxes.length; i += 50) {
+          const chunk = inboxes.slice(i, i + 50);
+          sent += await sendSimpleEmail({
+            to: chunk,
+            subject: `Unify: ${parsed.data.title}`,
+            html,
+          }).catch((e: unknown) => {
+            console.warn("[email] announce chunk failed", e instanceof Error ? e.message : e);
+            return 0;
+          });
         }
-      } catch {
-        // email is best-effort; bell + push already delivered
+        console.info(`[email] announce "${parsed.data.title}": ${sent}/${inboxes.length} delivered`);
+      } catch (e) {
+        console.warn("[email] announce leg failed", e instanceof Error ? e.message : e);
       }
     })();
-    res.json({ ok: true, reached: ids.length });
+    res.json({ ok: true, reached: ids.length, emailTo: inboxes.length });
   } catch (e) {
     res.status(500).json(dbError(e));
+  }
+});
+
+// ---- Admin: prove the Brevo wiring end-to-end (returns Brevo's own answer) ----
+router.post("/admin/email/test", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  const parsed = z.object({ to: z.string().email() }).safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Enter a valid recipient email." });
+    return;
+  }
+  try {
+    const { probeEmail } = await import("../lib/email");
+    const result = await probeEmail(parsed.data.to);
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ error: e instanceof Error ? e.message : "Test email failed." });
   }
 });
 

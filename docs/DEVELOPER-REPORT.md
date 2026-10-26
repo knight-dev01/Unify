@@ -3,7 +3,7 @@
 Covers the 1 October 2026 test bug list (14 confirmed: 7 critical P0, 7 important P1),
 everything fixed since, what is left, and what still needs live verification — and why.
 
-Current version: **v1.26.11**. Every change below was verified with `tsc --noEmit`
+Current version: **v1.26.12**. Every change below was verified with `tsc --noEmit`
 both sides plus a production `vite build` before commit. Per-version history for
 v1.12–v1.24 is in the git log (`feat:`/`fix:` commits carry the version); this
 report picks up in detail at the 20 October batch.
@@ -65,7 +65,7 @@ report picks up in detail at the 20 October batch.
 - **Google sign-in (v1.11.0).** OAuth on both auth tabs, onboarding prefill, no backend
   change (API is provider-agnostic).
 
-## Batch of 20 October 2026 (v1.25.0 → v1.26.11)
+## Batch of 20 October 2026 (v1.25.0 → v1.26.12)
 
 - **Reader controls (v1.25.0 → v1.26.3).** Focus mode hides the top bar + bottom
   tabs while reading (store `lib/focus.ts`, persisted per device). Both Focus and zoom
@@ -104,6 +104,16 @@ report picks up in detail at the 20 October batch.
   (`email_confirmed_at`); new-note + announcement emails send from Render's
   `EMAIL_FROM` via the Brevo API (see SETUP.md — the from-address must be a verified
   Brevo sender or every send fails `brevo 400`).
+- **Email delivery + Drop spacing (v1.26.12).** Announcements fired up to 50 concurrent
+  Brevo calls, so the free-tier rate limit rejected bursts (429) and every rejection body
+  was thrown away - the admin saw "sent to N users" because only the in-app bell was
+  counted. Sends now batch 5 at a time with 429/5xx retry (honouring `Retry-After`), the
+  recipient walk no longer stops early on emailless rows, the announce response reports
+  how many confirmed inboxes were queued, and Admin > Announce gained an **Email check**
+  that sends one real email and prints Brevo's exact status + body (with
+  `BREVO_API_KEY` / `EMAIL_FROM` hints). `Drop` now applies form-field styles to the
+  trigger instead of the wrapper, so the course picker matches the Week input in height,
+  and the panel widens to show full course titles instead of ragged truncation.
 - **Avatars (v1.25.0/v1.26.0).** Any-size upload: input is downscaled on-device to a
   256px JPEG; backend accepts png/jpe?g/webp/gif/avif/bmp data URLs and picks the real
   format from magic bytes (declared MIME never trusted); `?v=` cache-bust +
