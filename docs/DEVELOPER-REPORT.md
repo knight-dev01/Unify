@@ -3,7 +3,7 @@
 Covers the 1 October 2026 test bug list (14 confirmed: 7 critical P0, 7 important P1),
 everything fixed since, what is left, and what still needs live verification — and why.
 
-Current version: **v1.26.12**. Every change below was verified with `tsc --noEmit`
+Current version: **v1.26.13**. Every change below was verified with `tsc --noEmit`
 both sides plus a production `vite build` before commit. Per-version history for
 v1.12–v1.24 is in the git log (`feat:`/`fix:` commits carry the version); this
 report picks up in detail at the 20 October batch.
@@ -65,7 +65,7 @@ report picks up in detail at the 20 October batch.
 - **Google sign-in (v1.11.0).** OAuth on both auth tabs, onboarding prefill, no backend
   change (API is provider-agnostic).
 
-## Batch of 20 October 2026 (v1.25.0 → v1.26.12)
+## Batch of 20 October 2026 (v1.25.0 → v1.26.13)
 
 - **Reader controls (v1.25.0 → v1.26.3).** Focus mode hides the top bar + bottom
   tabs while reading (store `lib/focus.ts`, persisted per device). Both Focus and zoom
@@ -114,6 +114,15 @@ report picks up in detail at the 20 October batch.
   `BREVO_API_KEY` / `EMAIL_FROM` hints). `Drop` now applies form-field styles to the
   trigger instead of the wrapper, so the course picker matches the Week input in height,
   and the panel widens to show full course titles instead of ragged truncation.
+- **Bare LaTeX renders everywhere (v1.26.13).** The reported "raw `\frac`" came from
+  paragraph math: `MathText` only rendered spans wrapped in `\(...\)`, while AI output
+  (and stored notes) often leaves TeX undelimited — so `\frac{v^2}{2g}` sat as source in
+  paragraphs, titles, bullets and quiz text. The segmenter now finds bare commands
+  (`\frac`, `\sqrt`, `\sum` with limits, Greek symbols…) outside code spans, KaTeX
+  renders them instantly, and anything KaTeX refuses is wrapped and handed to MathJax.
+  `$$...$$` is supported too; sentence punctuation and surrounding prose are left alone.
+  12-case node sweep covered fractions, roots, sums, AI-spaced `\frac {a}`, `$$` display,
+  `<code>` exclusion, prose boundaries and the MathJax hand-off.
 - **Avatars (v1.25.0/v1.26.0).** Any-size upload: input is downscaled on-device to a
   256px JPEG; backend accepts png/jpe?g/webp/gif/avif/bmp data URLs and picks the real
   format from magic bytes (declared MIME never trusted); `?v=` cache-bust +
