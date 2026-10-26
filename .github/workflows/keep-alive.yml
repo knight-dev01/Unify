@@ -1,19 +1,28 @@
 # Keeps the Render free-tier backend warm + reports outages.
-# Pings /healthz every 12 minutes (cold starts get a 100s budget + 2 retries).
+# Pings /healthz every 5 minutes (GitHub's minimum; cold starts get a 100s
+# budget + 2 retries). Free-tier Render spins down after 15 min idle, and
+# GitHub throttles schedules on quiet repos — real runs can lag 15-30+ min,
+# so this is best-effort. For guaranteed warmth, also point a free external
+# monitor (UptimeRobot 5-min HTTP check, or cron-job.org 1-min) at
+# <API_URL>/healthz — that is the only GitHub-independent keep-alive.
 # Needs repo secret RENDER_API_URL (e.g. https://unify-api.onrender.com, no
-# trailing slash). Run manually anytime via workflow_dispatch.
-# For real alerting (email/SMS on downtime), add UptimeRobot's free plan on
-# top pointing at the same /healthz URL.
+# trailing slash) or falls back to the live Render URL below. Run manually
+# anytime via workflow_dispatch.
 name: Backend keep-alive
 
 on:
   schedule:
-    - cron: '*/12 * * * *'
+    - cron: '*/5 * * * *'
   workflow_dispatch:
+
+concurrency:
+  group: keep-alive
+  cancel-in-progress: true
 
 jobs:
   ping:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Ping healthz (cold-start tolerant)
         env:
