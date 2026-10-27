@@ -3,7 +3,7 @@
 Covers the 1 October 2026 test bug list (14 confirmed: 7 critical P0, 7 important P1),
 everything fixed since, what is left, and what still needs live verification — and why.
 
-Current version: **v1.26.14**. Every change below was verified with `tsc --noEmit`
+Current version: **v1.26.15**. Every change below was verified with `tsc --noEmit`
 both sides plus a production `vite build` before commit. Per-version history for
 v1.12–v1.24 is in the git log (`feat:`/`fix:` commits carry the version); this
 report picks up in detail at the 20 October batch.
@@ -65,7 +65,7 @@ report picks up in detail at the 20 October batch.
 - **Google sign-in (v1.11.0).** OAuth on both auth tabs, onboarding prefill, no backend
   change (API is provider-agnostic).
 
-## Batch of 20 October 2026 (v1.25.0 → v1.26.14)
+## Batch of 20 October 2026 (v1.25.0 → v1.26.15)
 
 - **Reader controls (v1.25.0 → v1.26.3).** Focus mode hides the top bar + bottom
   tabs while reading (store `lib/focus.ts`, persisted per device). Both Focus and zoom
@@ -129,6 +129,24 @@ report picks up in detail at the 20 October batch.
   `MathPlain` (span-based `MathText`, so `<h2>`/`<p>` nesting stays valid and no line
   breaks are introduced). Reader hero, outcome line and the print view use the same
   inline renderer; nothing else changed.
+- **Formula boxes use true display math (v1.26.15).** The standalone `.formula-box`
+  equation, the NoteBuilder "RENDERED"/"READER PREVIEW" panels and the visual-builder
+  preview all rendered in inline layout, which squeezes stacked fractions and limits into
+  cramped one-line shapes. `Formula` gained a `display` prop (KaTeX `displayMode`, MathJax
+  `\[...\]`, centred, larger type); step maths inside prose stays inline.
+- **One dropdown metric everywhere (v1.26.15).** `Drop` now ignores call-site visual
+  overrides (`padding`, `border`, `radius`, type size) and keeps a single 44px control,
+  identical trigger padding, panel radius, item padding and gap on every screen — the
+  Studio course picker no longer looks chunkier than sibling selects. Call sites may only
+  pass layout keys (width/flex/margins). Panel width is clamped to the space between the
+  trigger and the viewport edge, so long course/question labels extend cleanly and then
+  truncate with an ellipsis plus `title` tooltip instead of running off-screen.
+- **Chunk-load failures self-heal (v1.26.15).** A tab held open across a deploy asked for
+  an old hashed route chunk and threw "Failed to fetch dynamically imported module" — most
+  visible on `/notifications`, which is the first lazy route after sign-in. All lazy routes
+  now go through `lazyRoute`, which retries the import once, then performs a single silent
+  reload to pick up the new `index.html` chunk map (guarded for 10s so a genuinely broken
+  build cannot loop).
 - **Avatars (v1.25.0/v1.26.0).** Any-size upload: input is downscaled on-device to a
   256px JPEG; backend accepts png/jpe?g/webp/gif/avif/bmp data URLs and picks the real
   format from magic bytes (declared MIME never trusted); `?v=` cache-bust +
