@@ -14,6 +14,7 @@ import { useParams } from 'react-router-dom';
 // visual equation builder — each chunk fetches only when its route opens.
 const ExploreRoute = lazyRoute(() => import('./routes/explore'));
 const OnboardingRoute = lazyRoute(() => import('./routes/onboarding'));
+const OnboardingPersonaRoute = lazyRoute(() => import('./routes/onboarding-persona'));
 const NotificationsRoute = lazyRoute(() => import('./routes/notifications'));
 const AdminRoute = lazyRoute(() => import('./routes/admin'));
 const AdminContentRoute = lazyRoute(() => import('./routes/admin/content'));
@@ -179,6 +180,14 @@ export default function App() {
           element={
             <RequireAuth>
               <OnboardingRoute />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/onboarding/persona"
+          element={
+            <RequireAuth>
+              <OnboardingPersonaRoute />
             </RequireAuth>
           }
         />
