@@ -45,6 +45,11 @@ model Profile {
   cgpaCurrent   Decimal?    @map("cgpa_current") @db.Decimal(3,2)
   cgpaTarget    Decimal?    @map("cgpa_target") @db.Decimal(3,2)
   hideCgpa      Boolean     @default(false) @map("hide_cgpa")
+  attendanceFullName String? @map("attendance_full_name")
+  attendanceMatric String? @map("attendance_matric")
+  isHoc         Boolean     @default(false) @map("is_hoc")
+  hocApprovedAt DateTime?   @map("hoc_approved_at") @db.Timestamptz(6)
+  hocApprovedBy String?     @map("hoc_approved_by") @db.Uuid
   createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt     DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
@@ -281,4 +286,77 @@ model ShareLink {
   @@index([userId], map: "share_links_user_idx")
   @@index([token], map: "share_links_token_idx")
   @@map("share_links")
+}
+
+model DeviceKey {
+  userId      String   @id @map("user_id") @db.Uuid
+  devicePubkey String  @map("device_pubkey")
+  registeredAt DateTime @default(now()) @map("registered_at") @db.Timestamptz(6)
+
+  @@map("device_keys")
+}
+
+model AttendanceRecord {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  studentId  String   @map("student_id") @db.Uuid
+  courseCode String   @map("course_code")
+  scannedBy  String   @map("scanned_by") @db.Uuid
+  scannedAt  DateTime @default(now()) @map("scanned_at") @db.Timestamptz(6)
+  verified   Boolean  @default(false)
+  week       Int?
+
+  @@index([studentId, courseCode])
+  @@index([courseCode, scannedAt])
+  @@map("attendance_records")
+}
+
+model HocPost {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  authorId     String   @map("author_id") @db.Uuid
+  department   String
+  level        String
+  type         String
+  title        String?
+  content      String
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([department, level])
+  @@map("hoc_posts")
+}
+
+model LecturerMaterial {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  uploadedBy String   @map("uploaded_by") @db.Uuid
+  courseCode String   @map("course_code")
+  weekNumber Int      @map("week_number")
+  type       String
+  fileUrl    String   @map("file_url")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([courseCode, weekNumber])
+  @@map("lecturer_materials")
+}
+
+model OnlineClassSession {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  courseCode String  @map("course_code")
+  meetLink  String?  @map("meet_link")
+  startedAt DateTime? @map("started_at") @db.Timestamptz(6)
+  endedAt   DateTime? @map("ended_at") @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("online_class_sessions")
+}
+
+model OnlineCheckin {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sessionId  String   @map("session_id") @db.Uuid
+  studentId  String   @map("student_id") @db.Uuid
+  checkin1   DateTime? @map("checkin_1") @db.Timestamptz(6)
+  checkin2   DateTime? @map("checkin_2") @db.Timestamptz(6)
+  checkin3   DateTime? @map("checkin_3") @db.Timestamptz(6)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@unique([sessionId, studentId])
+  @@map("online_checkins")
 }

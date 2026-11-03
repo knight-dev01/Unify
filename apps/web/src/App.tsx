@@ -16,6 +16,13 @@ const ExploreRoute = lazyRoute(() => import('./routes/explore'));
 const OnboardingRoute = lazyRoute(() => import('./routes/onboarding'));
 const OnboardingPersonaRoute = lazyRoute(() => import('./routes/onboarding-persona'));
 const CGPAPlannerRoute = lazyRoute(() => import('./routes/cgpa-planner'));
+const AttendanceSetupRoute = lazyRoute(() => import('./routes/attendance-setup'));
+const AttendancePassRoute = lazyRoute(() => import('./routes/attendance-pass'));
+const MyAttendanceRoute = lazyRoute(() => import('./routes/my-attendance'));
+const ScannerRoute = lazyRoute(() => import('./routes/scanner'));
+const HocDashboardRoute = lazyRoute(() => import('./routes/hoc-dashboard'));
+const OnlineClassRoute = lazyRoute(() => import('./routes/online-class'));
+const LecturerHomeRoute = lazyRoute(() => import('./routes/lecturer-home'));
 const NotificationsRoute = lazyRoute(() => import('./routes/notifications'));
 const AdminRoute = lazyRoute(() => import('./routes/admin'));
 const AdminContentRoute = lazyRoute(() => import('./routes/admin/content'));
@@ -314,6 +321,13 @@ export default function App() {
               </RequireAuth>
             }
           />
+          <Route path="/attendance/setup" element={<RequireAuth><AttendanceSetupRoute /></RequireAuth>} />
+          <Route path="/attendance/pass" element={<RequireAuth><AttendancePassRoute /></RequireAuth>} />
+          <Route path="/attendance/my" element={<RequireAuth><MyAttendanceRoute /></RequireAuth>} />
+          <Route path="/attendance/scanner" element={<RequireAuth><ScannerRoute /></RequireAuth>} />
+          <Route path="/hoc" element={<RequireAuth><HocDashboardRoute /></RequireAuth>} />
+          <Route path="/online-class" element={<RequireAuth><OnlineClassRoute /></RequireAuth>} />
+          <Route path="/lecturer" element={<RequireAuth><LecturerHomeRoute /></RequireAuth>} />
 
           <Route path="*" element={<NotFound />} />
         </Route>
