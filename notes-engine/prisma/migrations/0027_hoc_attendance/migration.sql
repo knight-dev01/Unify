@@ -20,7 +20,6 @@ CREATE TABLE IF NOT EXISTS attendance_records (
   verified BOOLEAN DEFAULT FALSE,
   week INT
 );
-CREATE UNIQUE INDEX IF NOT EXISTS attendance_records_unique_day ON attendance_records (student_id, course_code, date(scanned_at));
 
 CREATE TABLE IF NOT EXISTS hoc_posts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
