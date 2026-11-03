@@ -39,6 +39,12 @@ model Profile {
   notifyNewNotes Boolean    @default(true) @map("notify_new_notes")
   emailConfirmed Boolean    @default(false) @map("email_confirmed")
   avatarUrl     String      @default("") @map("avatar_url")
+  boxBoyPersona String?     @map("box_boy_persona") // Phase 2: go-getter | comeback | curious | team-player | on-the-move
+  semesterStart DateTime?   @map("semester_start") @db.Date
+  semesterWeeks Int?        @default(12) @map("semester_weeks")
+  cgpaCurrent   Decimal?    @map("cgpa_current") @db.Decimal(3,2)
+  cgpaTarget    Decimal?    @map("cgpa_target") @db.Decimal(3,2)
+  hideCgpa      Boolean     @default(false) @map("hide_cgpa")
   createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt     DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
@@ -121,6 +127,21 @@ model Enrollment {
 
   @@id([userId, course])
   @@map("enrollments")
+}
+
+model CourseStatus {
+  userId     String   @map("user_id") @db.Uuid
+  courseCode String   @map("course_code")
+  status     String   // done | priority | not_yet
+  units      Int      @default(3)
+  grade      Decimal? @db.Decimal(3,2)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@id([userId, courseCode])
+  @@index([userId])
+  @@index([userId, status])
+  @@map("course_status")
 }
 
 model TopicNote {

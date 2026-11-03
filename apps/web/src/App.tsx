@@ -14,6 +14,8 @@ import { useParams } from 'react-router-dom';
 // visual equation builder — each chunk fetches only when its route opens.
 const ExploreRoute = lazyRoute(() => import('./routes/explore'));
 const OnboardingRoute = lazyRoute(() => import('./routes/onboarding'));
+const OnboardingPersonaRoute = lazyRoute(() => import('./routes/onboarding-persona'));
+const CGPAPlannerRoute = lazyRoute(() => import('./routes/cgpa-planner'));
 const NotificationsRoute = lazyRoute(() => import('./routes/notifications'));
 const AdminRoute = lazyRoute(() => import('./routes/admin'));
 const AdminContentRoute = lazyRoute(() => import('./routes/admin/content'));
@@ -182,6 +184,14 @@ export default function App() {
             </RequireAuth>
           }
         />
+        <Route
+          path="/onboarding/persona"
+          element={
+            <RequireAuth>
+              <OnboardingPersonaRoute />
+            </RequireAuth>
+          }
+        />
         <Route element={<Layout />}>
           <Route path="/" element={<Navigate to="/auth" replace />} />
           <Route
@@ -237,6 +247,16 @@ export default function App() {
             element={
               <RequireAuth>
                 <ProfileRoute />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/cgpa-planner"
+            element={
+              <RequireAuth>
+                <RequireRole allow={STUDENT_ONLY}>
+                  <CGPAPlannerRoute />
+                </RequireRole>
               </RequireAuth>
             }
           />
