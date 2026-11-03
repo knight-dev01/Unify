@@ -18,6 +18,7 @@
 
 @import url('./tokens.css');
 @import url('./ui.css');
+@import url('https://fonts.googleapis.com/css2?family=Bowlby+One+SC&display=swap');
 
 /* Dark mode support (keeping it live per user decision) */
 [data-theme="dark"] {
@@ -52,10 +53,6 @@
   --u-page: #0f0f0f;
   --u-card: #1a1a1a;
 }
-
-/* Font loading for new Bowlby One SC */
-/* Note: Google Fonts already loads Playfair + DM Sans in current app */
-@import url('https://fonts.googleapis.com/css2?family=Bowlby+One+SC&display=swap');
 
 /* Utility: Force amber CTA on specific elements (migration helper) */
 .btn-primary-amber {

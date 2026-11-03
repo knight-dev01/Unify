@@ -4,7 +4,7 @@ import { PersonaCarousel } from '../components/redesign/PersonaCarousel'
 import { type PersonaKey } from '../components/redesign/brand'
 import { supabaseBrowser } from '../lib/supabase'
 import { toastError, toastSuccess } from '../lib/toast'
-import '@/styles/redesign'
+import '@/styles/redesign/index.css'
 
 /**
  * S11: Persona selection screen

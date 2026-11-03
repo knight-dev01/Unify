@@ -81,24 +81,22 @@ export async function flushQueue(): Promise<{ flushed: number; failed: number }>
     }
     
     try {
-      let query = sb.from(write.table)
-      
       if (write.operation === 'update') {
-        query = query.update(write.data)
+        let q = sb.from(write.table).update(write.data)
         if (write.filter) {
           for (const [key, value] of Object.entries(write.filter)) {
-            query = query.eq(key, value)
+            q = q.eq(key, value)
           }
         }
+        const { error } = await q
+        if (error) throw error
       } else if (write.operation === 'insert') {
-        query = query.insert(write.data)
+        const { error } = await sb.from(write.table).insert(write.data)
+        if (error) throw error
       } else if (write.operation === 'upsert') {
-        query = query.upsert(write.data)
+        const { error } = await sb.from(write.table).upsert(write.data)
+        if (error) throw error
       }
-      
-      const { error } = await query
-      
-      if (error) throw error
       
       flushed++
     } catch (err) {
