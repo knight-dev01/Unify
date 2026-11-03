@@ -24,6 +24,7 @@ const HocDashboardRoute = lazyRoute(() => import('./routes/hoc-dashboard'));
 const OnlineClassRoute = lazyRoute(() => import('./routes/online-class'));
 const LecturerHomeRoute = lazyRoute(() => import('./routes/lecturer-home'));
 const BecomeHocRoute = lazyRoute(() => import('./routes/become-hoc'));
+const LecturerRedesignRoute = lazyRoute(() => import('./routes/lecturer-redesign'));
 const NotificationsRoute = lazyRoute(() => import('./routes/notifications'));
 const AdminRoute = lazyRoute(() => import('./routes/admin'));
 const AdminContentRoute = lazyRoute(() => import('./routes/admin/content'));
@@ -329,6 +330,7 @@ export default function App() {
           <Route path="/hoc" element={<RequireAuth><HocDashboardRoute /></RequireAuth>} />
           <Route path="/online-class" element={<RequireAuth><OnlineClassRoute /></RequireAuth>} />
           <Route path="/lecturer" element={<RequireAuth><LecturerHomeRoute /></RequireAuth>} />
+          <Route path="/lecturer/redesign" element={<RequireAuth><LecturerRedesignRoute /></RequireAuth>} />
           <Route path="/hoc/request" element={<RequireAuth><BecomeHocRoute /></RequireAuth>} />
 
           <Route path="*" element={<NotFound />} />
