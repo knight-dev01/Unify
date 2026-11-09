@@ -5,6 +5,11 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.13.1] - 2026-11-09
+
+### Changed
+- **The app updates itself on every release**: each build gets its own id, stamped into the offline worker and published as `/version.json`. Open copies check on launch, when you return to the app, when the connection comes back and every 2 minutes, then reload onto the new build. The previous build's offline cache is deleted. If you are typing in a field, the reload waits until you leave it or hide the app. Saved weeks (offline content) are kept
+
 ## [2.13.0] - 2026-11-09
 
 ### Added
