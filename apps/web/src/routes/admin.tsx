@@ -12,6 +12,7 @@ import BackButton from '../components/BackButton';
 import Drop from '../components/Drop';
 import { describeError } from '../lib/errors';
 import AdminContentPanel from './admin/content';
+import { localGreeting, dailyProverb } from '../lib/naija';
 
 type Stats = { users: number; byRole: Record<string, number>; weeks: number; topics: number; courses: number; xpTotal: number };
 type Uni = { id: string; name: string; short_name?: string };
@@ -19,32 +20,7 @@ type Course = { code: string; title: string; levels: string[]; semesters: string
 
 const LEVELS = ['100 Level', '200 Level', '300 Level', '400 Level', '500 Level'];
 
-// One admin hub. Each section has its own URL (/admin/users …) so links,
-// refresh and the back button behave; /admin is the Overview. Grouped by job.
-const GROUPS = [
-  { label: null, items: [{ id: 'overview', title: 'Overview', icon: LayoutGrid }] },
-  { label: 'People', items: [
-    { id: 'users', title: 'Users & roles', icon: Users },
-    { id: 'requests', title: 'Staff requests', icon: UserCheck },
-    { id: 'hoc', title: 'Class reps (HOC)', icon: GraduationCap },
-  ] },
-  { label: 'Academics', items: [
-    { id: 'courses', title: 'Courses per level', icon: LibraryBig },
-    { id: 'content', title: 'All content', icon: BookOpen },
-    { id: 'unis', title: 'Universities', icon: Building2 },
-    { id: 'session', title: 'Academic session', icon: CalendarDays },
-  ] },
-  { label: 'Platform', items: [
-    { id: 'announce', title: 'Announce', icon: Megaphone },
-    { id: 'models', title: 'AI models', icon: Cpu },
-  ] },
-  { label: 'Health', items: [
-    { id: 'analytics', title: 'Analytics', icon: BarChart3 },
-    { id: 'errors', title: 'App errors', icon: AlertTriangle },
-    { id: 'capaudit', title: 'Cap audit', icon: Scale },
-  ] },
-];
-const SECTION_IDS = GROUPS.flatMap((g) => g.items.map((i) => i.id));
+import { GROUPS, SECTION_IDS } from '../lib/adminNav';
 
 function Module({ id, openId, children }: { id: string; openId: string; children: React.ReactNode }) {
   if (openId !== id) return null;
@@ -85,6 +61,8 @@ export default function AdminRoute() {
   const openModule = section && SECTION_IDS.includes(section) ? section : 'overview';
   const setOpenModule = (id: string) => navigate(id === 'overview' ? '/admin' : `/admin/${id}`);
   const [hocEmail, setHocEmail] = useState('');
+  const [adminName, setAdminName] = useState('');
+  const [activity, setActivity] = useState<{ recentUsers: { first_name: string; role: string }[]; recentNotes: { course: string; week: number; topic: number }[] } | null>(null);
   const [courseQ, setCourseQ] = useState('');
   // App errors (client log + Sentry backup). Sentry presence is a build-time
   // env flag, read here so the module says which window is live.
@@ -243,6 +221,8 @@ export default function AdminRoute() {
       setOwnId(sessionData.session.user.id);
       try {
         const me = await api.me();
+        setAdminName(me.profile?.first_name || '');
+        api.adminActivity().then((r) => setActivity(r)).catch(() => {});
         if (!me.isAdmin) {
           navigate('/home');
           return;
@@ -472,6 +452,24 @@ export default function AdminRoute() {
       {success && <Flash tone="success" message={success} onDismiss={() => setSuccess('')} />}
 
       <div className="admin-shell" style={{ marginTop: 12 }}>
+        <label className="admin-select-wrap">
+          <span className="admin-grouplabel" style={{ padding: '0 2px 4px', display: 'block' }}>Section</span>
+          <select
+            className="admin-select"
+            value={openModule}
+            onChange={(e) => (e.target.value === '__studio' ? navigate('/studio') : setOpenModule(e.target.value))}
+          >
+            {GROUPS.map((g) => (
+              <optgroup key={g.label || 'top'} label={g.label || 'Admin'}>
+                {g.items.map((m) => {
+                  const n = m.id === 'requests' ? requests.length : m.id === 'errors' ? errors.length : m.id === 'capaudit' ? violations.length : 0;
+                  return <option key={m.id} value={m.id}>{m.title}{n > 0 ? ` (${n})` : ''}</option>;
+                })}
+              </optgroup>
+            ))}
+            <option value="__studio">Studio</option>
+          </select>
+        </label>
         <nav className="admin-side" aria-label="Admin sections">
           {GROUPS.map((g) => (
             <div key={g.label || 'top'} className="admin-group">
@@ -506,7 +504,12 @@ export default function AdminRoute() {
         <div className="admin-view">
 
       <Module id="overview" openId={openModule}>
-        <h2 style={{ fontWeight: 800, fontSize: 20, margin: '4px 0 0' }}>Overview</h2>
+        <div className="african-dark" style={{ background: '#0a0a0a', color: '#fff', borderRadius: 18, padding: '18px 18px 24px', position: 'relative', overflow: 'hidden' }}>
+          <div className="kente-edge" aria-hidden="true" />
+          <div style={{ fontSize: 12, opacity: 0.75, fontWeight: 700 }}>{localGreeting().text}</div>
+          <div style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 24, marginTop: 2 }}>{adminName ? adminName + ', welcome back' : 'Welcome back'}</div>
+          <div style={{ fontSize: 13, opacity: 0.8, marginTop: 8, lineHeight: 1.45 }}>{dailyProverb()}</div>
+        </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 8, marginTop: 12 }}>
           {[
             { id: 'requests', label: 'Staff requests waiting', n: requests.length },
@@ -549,6 +552,18 @@ export default function AdminRoute() {
       )}
 
       </Module>
+
+      {openModule === 'overview' && activity && ((activity.recentUsers || []).length > 0 || (activity.recentNotes || []).length > 0) && (
+        <div style={{ ...card, marginTop: 12 }}>
+          <div style={{ fontSize: 12, fontWeight: 800, marginBottom: 8 }}>Recent activity</div>
+          {(activity.recentUsers || []).slice(0, 4).map((u, i) => (
+            <div key={'u' + i} style={{ fontSize: 13, color: 'var(--text2)', padding: '3px 0' }}>New {u.role || 'user'}: <b style={{ color: 'var(--text)' }}>{u.first_name || 'Unnamed'}</b></div>
+          ))}
+          {(activity.recentNotes || []).slice(0, 4).map((n, i) => (
+            <div key={'n' + i} style={{ fontSize: 13, color: 'var(--text2)', padding: '3px 0' }}>Published: <b style={{ color: 'var(--text)' }}>{n.course} W{n.week}T{n.topic}</b></div>
+          ))}
+        </div>
+      )}
 
       <Module id="content" openId={openModule}>
         <AdminContentPanel />

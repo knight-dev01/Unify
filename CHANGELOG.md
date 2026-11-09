@@ -5,6 +5,22 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.8.0] - 2026-11-09
+
+### Fixed
+- **Popups hiding under the bottom bar.** The screen entrance animation kept every page and card in its own layer, which trapped dropdowns and popups beneath the nav. Entrance animations now release their layer when they finish, the nav has an explicit layer, and floating toasts and the install bar sit above it
+- **Modals are true overlays.** Confirmations, share, quiz results and the notification prompt now centre on screen over a dimmed backdrop, never run past the screen edge, and scroll inside themselves when they are taller than the viewport
+- **Dropdowns near the bottom** open the way with more room, stay clear of the nav and scroll inside when the space is short
+- **Sideways scrolling on phones.** The admin section rail scrolled sideways; phones now get a native section picker. A sweep of every screen at 320 and 390px found no other horizontal overflow
+- **CGPA planner**: "I don't have a CGPA yet" is now reachable and plans from zero (the target step was blank for first-semester students), the target step has a Back button, and the target and plan screens fall back to step one when there is no CGPA to plan from
+
+### Changed
+- **CGPA target** is set once through the planner; after that Home shows it read-only and the only place to change it is Me, CGPA target
+- **Courses and Class are separate tabs.** Courses holds My Courses with an Add courses screen (search and enroll); Class is now the class itself: board posts, attendance and Meet links
+- **Admin has one front page.** Admin Home is the Overview (greeting, proverb, queues, recent activity), and on desktop the sidebar lists every admin section in groups, with the section list inside the page hidden because the sidebar replaces it
+- **Box Boy** shows three quarters of the body instead of half, breathes slowly and has small sparkles drifting around him instead of moving about; loading uses a gentle rise and grow. Mascots now match their screens (waving on errors, phone-out on notifications, peeking on searches and empty lists, teaching on author screens, relaxed when all caught up)
+- **African pattern in dark mode** is now clearly visible (green Adire tiles) and sits behind auth and screen backgrounds in both themes
+
 ## [2.7.0] - 2026-11-09
 
 ### Changed

@@ -71,7 +71,7 @@ export default function HocDashboardRoute() {
 
   return (
     <div style={shell}>
-      <BackButton to={ROUTES.timetable} />
+      <BackButton to={ROUTES.home} />
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <BoxBoy pose="teaching" width={64} />
         <div>

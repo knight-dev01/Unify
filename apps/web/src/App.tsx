@@ -225,8 +225,9 @@ export default function App() {
               </RequireAuth>
             }
           />
+          <Route path="/class" element={<RequireAuth><HocDashboardRoute /></RequireAuth>} />
           <Route
-            path="/class"
+            path="/courses/find"
             element={
               <RequireAuth>
                 <RequireRole allow={STUDENT_ONLY}>

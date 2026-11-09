@@ -422,7 +422,7 @@ router.post("/attendance/checkin", requireAuth, checkinLimiter, async (req: Requ
       const { data: e } = await sb.from("enrollments").select("course").eq("user_id", me.id).eq("kind", "taking").in("course", variants(m.course_code)).limit(1);
       if (e && e.length) { s = m; break; }
     }
-    if (!s) return fail(res, 403, `You're not enrolled in ${matches[0].course_code}. Add it from Class first.`);
+    if (!s) return fail(res, 403, `You're not enrolled in ${matches[0].course_code}. Add it from Courses first.`);
     const { error } = await sb
       .from("attendance_records")
       .insert({ student_id: me.id, course_code: s.course_code, scanned_by: s.created_by, verified: true, week: s.week, session_id: s.id });
