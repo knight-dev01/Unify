@@ -33,6 +33,9 @@ app.use(express.json({ limit: "50mb" }));
 // web Studio now. /uploads stays (authored figure images).
 app.use("/uploads", express.static("uploads"));
 app.use(requestLogger);
+const { metricsMiddleware, startSampling } = require("./src/lib/metrics");
+const alerts = require("./src/lib/alert");
+app.use(metricsMiddleware);
 
 // Storage directories
 const STORAGE_DIR = path.join(__dirname, "storage/notes");
@@ -164,6 +167,9 @@ app.use("/v1", v1.default || v1);
 // Head-of-Class posts + in-person attendance (separate file: v1.ts is already huge).
 const classroom = require("./src/routes/classroom");
 app.use("/v1", classroom.default || classroom);
+// Live performance + browser vitals for the admin panel.
+const ops = require("./src/routes/ops");
+app.use("/v1", ops.default || ops);
 
 // Authoring guard: lecturers/contributors only (students get 403).
 // convert costs Claude money; save/upload cost disk. validate/render/sample
@@ -698,6 +704,13 @@ app.get("/api/convert/:jobId", async (req, res) => {
 // Unknown routes -> JSON (not HTML) so API clients get a clean 404.
 app.use((req, res) => res.status(404).json({ error: "Not found" }));
 
+// Anything that throws past a route's own try/catch: tell the admins, answer cleanly.
+app.use((err, req, res, next) => {
+  alerts.raise("route:" + req.method + " " + String(req.path).slice(0, 60), "Unhandled route error", ((err && err.message) || "unknown") + " on " + req.method + " " + req.path, err && err.stack);
+  if (res.headersSent) return next(err);
+  res.status(500).json({ error: "Something went wrong on our side. Please try again." });
+});
+
 // Sentry express error hook (only active when SENTRY_DSN is set).
 try {
   const Sentry = require("@sentry/node");
@@ -709,6 +722,9 @@ try {
 }
 
 app.listen(PORT, () => {
+  // Self-sampling (memory, event loop, database round trip) and the admin alert watchdog.
+  startSampling();
+  alerts.startWatchdog();
   logger.info("unify-api listening", {
     port: PORT,
     env: {
@@ -735,7 +751,10 @@ function bootJob(label, fn, delays) {
       .then(() => fn())
       .then(() => logger.info(label + " done"))
       .catch((e) => {
-        if (!left.length) return logger.warn(label + " skipped", { message: e && e.message });
+        if (!left.length) {
+          alerts.raise("boot:" + label, "Startup job failed: " + label, (e && e.message) || "gave up after several tries", e && e.stack);
+          return logger.warn(label + " skipped", { message: e && e.message });
+        }
         setTimeout(() => attempt(left.slice(1)), left[0]);
       });
   };

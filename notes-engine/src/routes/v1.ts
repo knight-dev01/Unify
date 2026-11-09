@@ -1,3 +1,4 @@
+import { noteClientError } from "../lib/alert";
 import { Router, type Request, type Response } from "express";
 import rateLimit from "express-rate-limit";
 import { z } from "zod";
@@ -1096,6 +1097,7 @@ router.post("/errors", async (req: Request, res: Response) => {
       app_version: parsed.data.appVersion,
     });
     if (error) throw error;
+    noteClientError(String(parsed.data.message || ""));
     // Cap: keep the latest 500, trim the rest (one cheap delete).
     await sb.from("client_errors").delete().lt(
       "created_at",

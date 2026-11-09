@@ -4,6 +4,7 @@ import { createHmac } from "node:crypto";
 import { z } from "zod";
 import { supabaseAdmin } from "../lib/supabase";
 import { requireAuth, type AuthedRequest } from "../middleware/requireAuth";
+import { sendPushToUsers } from "../lib/push";
 
 // Classroom features on top of v1: Head-of-Class posts and in-person
 // attendance by session code. Mounted at /v1 (see server.ts).
@@ -339,6 +340,42 @@ const sessionOut = (s: SessionRow) => {
   };
 };
 
+// A new session tells the other half of the pair, so the lecturer and the class
+// rep are always together: a lecturer starting it notifies the course's class
+// reps; a class rep starting it notifies the lecturers who teach the course.
+// In-app bell + push. Never allowed to fail the request.
+async function notifyPair(me: Prof, session: SessionRow): Promise<void> {
+  try {
+    const sb = supabaseAdmin();
+    const course = session.course_code;
+    const { data: teach } = await sb.from("enrollments").select("user_id").eq("kind", "teaching").in("course", variants(course));
+    const teacherIds = [...new Set(((teach ?? []) as { user_id: string }[]).map((r) => r.user_id))];
+    const starterIsTeacher = me.is_admin || me.role === "lecturer" || teacherIds.includes(me.id);
+    let recipients: string[] = [];
+    if (starterIsTeacher) {
+      const { data: taking } = await sb.from("enrollments").select("user_id").eq("kind", "taking").in("course", variants(course)).limit(2000);
+      const takerIds = [...new Set(((taking ?? []) as { user_id: string }[]).map((r) => r.user_id))];
+      if (takerIds.length) {
+        const { data: reps } = await sb.from("profiles").select("id").eq("is_hoc", true).in("id", takerIds);
+        recipients = ((reps ?? []) as { id: string }[]).map((r) => r.id);
+      }
+    } else {
+      recipients = teacherIds;
+    }
+    recipients = recipients.filter((id) => id !== me.id);
+    if (!recipients.length) return;
+    const who = me.first_name || (starterIsTeacher ? "Your lecturer" : "Your class rep");
+    const title = `Attendance is open for ${course}`;
+    const body = `${who} started it. Open it to show the QR and watch the register.`;
+    await sb.from("notifications").insert(
+      recipients.map((user_id) => ({ user_id, type: "attendance_started", title, body, course, link: "/attendance/scanner" }))
+    );
+    await sendPushToUsers(recipients, { title, body, url: "/attendance/scanner" });
+  } catch {
+    // starting attendance must not fail because a notification did
+  }
+}
+
 // Who started it, so the other person sees "Started by Dr Ade" and both are in sync.
 async function sessionView(s: SessionRow, meId: string) {
   const { data } = await supabaseAdmin().from("profiles").select("first_name,role,is_hoc").eq("id", s.created_by).maybeSingle();
@@ -387,6 +424,7 @@ router.post("/attendance/sessions", requireAuth, async (req: Request, res: Respo
       .select("id,course_code,created_by,code,week,opens_at,closes_at,closed_at")
       .single();
     if (error) throw error;
+    void notifyPair(me, data as SessionRow);
     res.json({ session: await sessionView(data as SessionRow, me.id), present: [], enrolled: await enrolledCount(course) });
   } catch (e) {
     dbFail(res, e);

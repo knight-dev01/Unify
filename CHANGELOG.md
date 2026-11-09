@@ -5,6 +5,19 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.12.0] - 2026-11-09
+
+### Added
+- **Live performance in Admin** (Health, Live performance; also in the desktop sidebar): requests per minute, server error rate, typical and slow (p95) response times, database round trip, memory and server stalls, each charted minute by minute for the last 15 minutes, 1 hour or 3 hours, and broken down by module (Attendance, Class board, Courses, Learning, Studio, Profile, Notifications, Timetable, CGPA, Materials, Sharing, Admin). Tap a module for its own per-minute charts. It refreshes every 10 seconds. Numbers are kept in memory, so a server restart clears them
+- **How pages feel to real users**: browsers report Core Web Vitals (main content, first paint, first byte, tap response, layout jump) per page, one visit in two, with no personal data, and the panel shows what 3 in 4 visits get
+- **Alert emails to the admins** when something is suddenly wrong: server crashes and unhandled errors, a spike in server errors (overall or in one module), slow responses, an unreachable or slow database, high memory, a stalled server, startup jobs that gave up, and a burst of browser crashes. The same problem emails at most once every 15 minutes (at most 12 emails an hour overall). Recipients are `ADMIN_EMAILS` plus every real admin account. A "Send test alert" button proves it works. Needs `BREVO_API_KEY` on the server
+- **Notification when attendance starts**: the lecturer's session notifies the course's class reps, and a class rep's session notifies the lecturers, in the bell and as a push
+
+### Changed
+- **Every loading state shows a rotating proverb or fact** (Nigeria, engineering, study tips), changing every five seconds and shuffled so no two loads start the same way
+- **Each screen loads with its own skeleton** that mirrors its layout (Home, lists, course detail, note reader, profile, forms, Admin) instead of one generic loader
+- **The greeting types itself out** on Home and the Admin overview (and shows at once for reduced-motion users)
+
 ## [2.11.0] - 2026-11-09
 
 ### Fixed
