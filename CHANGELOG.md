@@ -5,6 +5,11 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.12.1] - 2026-11-09
+
+### Changed
+- **Faster first load**: the maths engine (KaTeX) now loads only on screens that show formulas instead of with the first page. The main app bundle drops from about 139 KB to 61 KB gzipped and the first-page stylesheet from 18 KB to 10 KB. Formulas show as plain text for a moment, then turn into maths
+
 ## [2.12.0] - 2026-11-09
 
 ### Added
