@@ -5,6 +5,15 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.0] - 2026-11-09
+
+### Fixed
+- **Equation builder produced broken fractions.** A spacing rule meant to stop `\pi` gluing to the next letter backtracked into `\frac{` and cut it to `\fra c{`, so every fraction built with the keypad rendered as garbled text in the preview and in the published note. Each symbol now carries its own trailing space instead, and the preview renders through KaTeX again
+
+### Changed
+- **Studio note editing follows the redesign** (realigned, not rebuilt): Compose / Review / Live as a segmented control you can move between; the AI / Manual / External AI switcher as dark pills with icons; one topic edited at a time from a chip row with a "+ Topic" chip; block cards with the green left edge; quiz options as tappable rows where you tap the letter to mark the right answer (add and remove options); a warning card plus a tickable "Before you publish, check" list that must be fully ticked before Publish; and a fixed action bar that stays above the bottom nav
+- **Quiz timer and pass mark.** Authors can set a timer (minutes, starts at the student's first answer, submits at zero) and a pass mark (correct answers needed, default 60%). The reader shows them under the quiz title, counts down, and reports "need X of N". Both are stored with the quiz and survive editing
+
 ## [2.10.0] - 2026-11-09
 
 ### Changed
