@@ -76,7 +76,7 @@
 @keyframes eq-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 
 /* ---------- Note builder: one section at a time ---------- */
-.nb-steps { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 0 0 12px; }
+.nb-steps { scroll-margin-top: 72px; outline: none; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 0 0 12px; }
 .nb-count { margin-left: auto; font-size: 12px; color: var(--text3); font-weight: 700; }
 .nb-secs { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 12px; padding-bottom: 10px; border-bottom: 1px dashed var(--border); }
 .nb-pane { animation: rise-in var(--dur-3, .24s) var(--ease-out, ease-out) backwards; }

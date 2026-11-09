@@ -128,7 +128,7 @@ export default function AttendancePassRoute() {
         <Card style={{ alignItems: 'center', textAlign: 'center', marginTop: 8, gap: 10 }}>
           <div className="eyebrow" style={{ color: 'var(--green-deep)' }}>Step 1 of 2</div>
           <Display size={26}>Take a quick selfie</Display>
-          <div className="t-13 muted">Your lecturer sees it next to your name so they know you are in class. It is not shared with anyone else.</div>
+          <div className="t-13 muted">Your lecturer sees it next to your name so they know you are in class. It is not shared with anyone else, and it is deleted as soon as attendance for this class closes.</div>
           <SelfieCapture onUse={setSelfie} />
         </Card>
       </div>

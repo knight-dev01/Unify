@@ -5,10 +5,17 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.14.1] - 2026-11-09
+
+### Changed
+- **Selfies are deleted when attendance closes.** The photo is only a live check; once the session ends and the attendance is recorded, it is removed (closing the session deletes it at once, and a sweep every 5 minutes covers sessions that simply time out). Only names and times stay in the register. This replaces the 30-day retention
+- **New app icon files** (`/icons/v2/`): black Playfair "U" and black dot on the brand green (the in-app name stays Unify, green dot, Learn). The new file names make installed copies fetch the new icon instead of reusing the cached one
+- **Note builder Next and Back** now return you (and keyboard focus) to the Week / Topics / Quiz header, so each new section starts in view instead of at the top of the whole page
+
 ## [2.14.0] - 2026-11-09
 
 ### Added
-- **Selfie attendance**: students take a quick selfie, then scan the QR. The photo is stored privately, shown only to the lecturer or class rep running that session (as a thumbnail in the roster), and deleted after 30 days. `ATTENDANCE_SELFIE=off` makes it optional
+- **Selfie attendance**: students take a quick selfie, then scan the QR. The photo is stored privately, shown only to the lecturer or class rep running that session (as a thumbnail in the roster), and deleted as soon as the session ends. `ATTENDANCE_SELFIE=off` makes it optional
 - **Scanner animation**: a slow sweep line and breathing corner brackets on the QR viewfinder, and a pulsing guide ring on the selfie screen. Quiet, and off under reduced motion
 - **Live updates in the Home slider**: admins publish notices with a Box Boy, link, button and optional end date (Admin, Announcements). Everyone sees them first in the slider within about 30 seconds
 - **Documentation**: new `docs/OPERATIONS.md` and `docs/PRODUCTION-READINESS.md`, a new `notes-engine/README.md`, load-test tools in `notes-engine/scripts/loadtest/`, and refreshed root, web and setup docs

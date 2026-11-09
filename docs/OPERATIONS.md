@@ -20,7 +20,6 @@ Bump the version in four places and add a changelog entry (see the root `README.
 | `BREVO_API_KEY`, `EMAIL_FROM` | Email (new-note mail, announcements, **alert emails**). `EMAIL_FROM` must be a sender verified in Brevo. Without the key, alerts still appear in Admin, marked "not emailed". |
 | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | Web Push. The public key must match the one in the web app. |
 | `ATTENDANCE_SELFIE` | `on` (default) requires a selfie to mark attendance; `off` makes it optional. |
-| `SELFIE_RETENTION_DAYS` | Days to keep attendance selfies before they are deleted (default 30). |
 | `SEED_TEST_USERS` | `1` creates `*.test.unify` accounts for testing. **Remove after testing and delete those accounts.** |
 | `CORS_ORIGIN` | Comma-separated web origins allowed to call the API. |
 | `SENTRY_DSN` | Optional crash reporting. |
@@ -34,7 +33,7 @@ Bump the version in four places and add a changelog entry (see the root `README.
 ## Pictures and privacy
 
 - **Profile pictures** go to the public `avatars` bucket, 320 px JPEG, normally under 60 KB, cached for a year (the URL carries a version stamp).
-- **Attendance selfies** go to the **private** `attendance-selfies` bucket. Only the lecturer or class rep running that session sees them, through links that expire in 10 minutes. They are deleted automatically after `SELFIE_RETENTION_DAYS`. Tell students what the photo is for (the app says so on the selfie screen). If you operate under the Nigeria Data Protection Act, record the lawful basis and keep this retention period consistent with your privacy notice.
+- **Attendance selfies** are a live check that the student is in the room. They go to the **private** `attendance-selfies` bucket and only the lecturer or class rep running that session sees them, through links that expire in 10 minutes. **They are deleted the moment the session is closed** (and a sweep every 5 minutes removes photos from sessions that simply timed out). Only the student's name and the time stay in the register. The selfie screen tells students this. Record the purpose (attendance verification) in your privacy notice.
 
 ## Home slider updates
 
@@ -50,7 +49,7 @@ Admin, Announcements has a Home slider card: title, message, optional link (`/pa
 | Alerts say "not emailed" | `BREVO_API_KEY` or `ADMIN_EMAILS` missing, or the sender is not verified. |
 | A user cannot sign in right after being removed | A signed-out or revoked session can stay valid for up to 60 seconds (auth cache). |
 | Installed app shows an old icon or screen | It updates itself on next open while online. If stuck, remove and reinstall the PWA. |
-| Out of Supabase storage | Lower `SELFIE_RETENTION_DAYS`; check the `avatars` and `diagrams` buckets. |
+| Out of Supabase storage | Selfies clean themselves up when a session ends; check the `avatars` and `diagrams` buckets, and that sessions are being closed or timing out. |
 
 ## Backups
 

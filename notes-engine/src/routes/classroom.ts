@@ -308,7 +308,7 @@ type SessionRow = { id: string; course_code: string; created_by: string; code: s
 // ---------- Attendance selfies ----------
 // A student confirms they are in the room with a quick photo. It is stored in a
 // PRIVATE bucket (never a public URL); only the lecturer or class rep running
-// that session sees it, through a link that expires in 10 minutes. Set
+// that session sees it, through a link that expires in 10 minutes, and it is deleted when the session ends. Set
 // ATTENDANCE_SELFIE=off to make the photo optional.
 const SELFIE_BUCKET = "attendance-selfies";
 const selfieRequired = () => (process.env.ATTENDANCE_SELFIE || "on").toLowerCase() !== "off";
@@ -350,25 +350,42 @@ async function selfieUrls(sessionId: string, studentIds: string[]): Promise<Reco
   return out;
 }
 
-// Selfies are deleted after SELFIE_RETENTION_DAYS (default 30): long enough to settle an
-// attendance dispute, short enough to respect privacy and to keep the storage bucket small.
-async function purgeOldSelfies(): Promise<void> {
+// A selfie is only a live check that the student is in the room. Once the session ends and
+// the attendance is recorded (the name stays in the register), the photo is deleted:
+//  - closing the session deletes its photos straight away;
+//  - sessions that simply time out are swept every 5 minutes.
+async function deleteSessionSelfies(sessionId: string): Promise<void> {
   try {
-    const days = Math.max(1, Number(process.env.SELFIE_RETENTION_DAYS) || 30);
-    const cutoff = new Date(Date.now() - days * 86400000).toISOString();
     const sb = supabaseAdmin();
-    const { data } = await sb.from("attendance_sessions").select("id").lt("opens_at", cutoff).order("opens_at", { ascending: false }).limit(200);
-    for (const row of (data ?? []) as { id: string }[]) {
-      const { data: files } = await sb.storage.from(SELFIE_BUCKET).list(row.id, { limit: 500 });
-      const paths = (files ?? []).map((f) => `${row.id}/${f.name}`);
-      if (paths.length) await sb.storage.from(SELFIE_BUCKET).remove(paths);
+    const { data: files } = await sb.storage.from(SELFIE_BUCKET).list(sessionId, { limit: 1000 });
+    const paths = (files ?? []).map((f) => `${sessionId}/${f.name}`);
+    if (paths.length) {
+      await sb.storage.from(SELFIE_BUCKET).remove(paths);
+      for (const p of paths) urlCache.delete(p);
     }
   } catch {
-    // retention is best effort; it runs again in a few hours
+    // the next sweep tries again
   }
 }
-setTimeout(() => void purgeOldSelfies(), 3 * 60 * 1000).unref();
-setInterval(() => void purgeOldSelfies(), 6 * 60 * 60 * 1000).unref();
+
+async function sweepEndedSelfies(days: number): Promise<void> {
+  try {
+    const now = new Date().toISOString();
+    const since = new Date(Date.now() - days * 86400000).toISOString();
+    const { data } = await supabaseAdmin()
+      .from("attendance_sessions")
+      .select("id")
+      .gt("opens_at", since)
+      .or(`closed_at.not.is.null,closes_at.lt.${now}`)
+      .order("opens_at", { ascending: false })
+      .limit(300);
+    for (const row of (data ?? []) as { id: string }[]) await deleteSessionSelfies(row.id);
+  } catch {
+    // best effort; runs again shortly
+  }
+}
+setTimeout(() => void sweepEndedSelfies(14), 60 * 1000).unref();
+setInterval(() => void sweepEndedSelfies(3), 5 * 60 * 1000).unref();
 
 async function rosterFor(session: SessionRow) {
   const sb = supabaseAdmin();
@@ -386,7 +403,8 @@ async function rosterFor(session: SessionRow) {
       info[p.id] = { name: p.attendance_full_name || p.first_name || "Student", matric: p.attendance_matric || "" };
     }
   }
-  const photos = await selfieUrls(session.id, ids);
+  const live = !session.closed_at && new Date(session.closes_at).getTime() > Date.now();
+  const photos = live ? await selfieUrls(session.id, ids) : {};
   return rows.map((r) => ({ studentId: r.student_id, at: r.scanned_at, name: info[r.student_id]?.name || "Student", matric: info[r.student_id]?.matric || "", photo: photos[r.student_id] || null }));
 }
 
@@ -532,6 +550,7 @@ router.post("/attendance/sessions/:id/close", requireAuth, async (req: Request, 
     // The session is shared: the lecturer or the class rep for this course can end it.
     if (!me || !(await canScan(me, s.course_code))) return fail(res, 403, "You can't end this session.");
     await sb.from("attendance_sessions").update({ closed_at: new Date().toISOString() }).eq("id", s.id);
+    await deleteSessionSelfies(s.id); // attendance is recorded; the photos have done their job
     res.json({ ok: true });
   } catch (e) {
     dbFail(res, e);
