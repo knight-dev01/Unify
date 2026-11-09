@@ -1,9 +1,8 @@
 // Unify Learn offline worker: shell + readable content stay available offline.
 // Versioned cache; documents network-first (never a stale app), static assets
 // cache-first, API GETs network-first with cache fallback. Writes (POST/PUT/
-// DELETE) and everything else always bypass. v9 (redesign tokens global import +
-// cache bust for v2 brand).
-const CACHE = 'unify-app-v9';
+// DELETE) and everything else always bypass. v10 (redesign tokens + BoxBoy offline cache).
+const CACHE = 'unify-app-v11';
 const CONTENT = 'unify-content-v1';
 const SHELL = ['/', '/index.html', '/manifest.json'];
 
@@ -54,6 +53,8 @@ self.addEventListener('fetch', (e) => {
   const isAsset =
     sameOrigin &&
     (url.pathname.startsWith('/assets/') ||
+      url.pathname.startsWith('/boxboy/') ||
+      url.pathname.startsWith('/icons/') ||
       url.pathname === '/og-image.png' ||
       url.pathname === '/favicon.svg');
   // Offline math + typography: MathJax (script + its font files, same

@@ -51,7 +51,7 @@ export default function ErrorState({
   return (
     <div style={{ padding: 40, maxWidth: 'var(--shell, 480px)', margin: '0 auto', textAlign: 'center' }}>
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
-        <BoxBoy pose="thinking" width={88} />
+        <BoxBoy pose="readingStanding" width={88} />
       </div>
       <h1 style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 20 }}>
         {showOffline ? "You're offline" : title}
@@ -62,7 +62,7 @@ export default function ErrorState({
           : message}
       </p>
       <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
-        <button onClick={retry} style={{ padding: '12px 28px', borderRadius: 9999, background: '#10b981', color: '#fff', border: 'none', borderBottom: '4px solid #059669', fontWeight: 800, fontSize: 14 }}>
+        <button onClick={retry} style={{ padding: '12px 28px', borderRadius: 9999, background: 'var(--u-amber)', color: 'var(--u-black)', border: 'none', borderBottom: '4px solid #c69a1a', fontWeight: 800, fontSize: 14 }}>
           {retryLabel}
         </button>
         {action}
@@ -70,3 +70,4 @@ export default function ErrorState({
     </div>
   );
 }
+

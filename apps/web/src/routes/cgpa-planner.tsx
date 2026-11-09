@@ -137,7 +137,7 @@ export default function CGPAPlannerRoute() {
     } catch (err) {
       console.error('Load profile failed:', err)
       toastError('Could not load profile')
-      navigate('/dashboard')
+      navigate('/home')
     } finally {
       setLoading(false)
     }
@@ -222,7 +222,7 @@ export default function CGPAPlannerRoute() {
       if (error) throw error
       
       toastSuccess('CGPA target set!')
-      navigate('/dashboard')
+      navigate('/home')
       
     } catch (err) {
       console.error('Save target failed:', err)
@@ -235,7 +235,7 @@ export default function CGPAPlannerRoute() {
   if (loading) return <Loading text="Loading..." />
   
   return (
-    <div className="screen">
+    <div className="screen screen--tabs">
       {/* Top bar */}
       <div 
         className="row between" 
@@ -244,27 +244,28 @@ export default function CGPAPlannerRoute() {
           borderBottom: '1px solid var(--u-hairline)' 
         }}
       >
-        <button
-          type="button"
-          onClick={() => {
-            if (step === 'enter') navigate(-1)
-            else if (step === 'courses') setStep('enter')
-            else if (step === 'target') setStep('courses')
-            else if (step === 'plan') setStep('target')
-          }}
-          className="row"
-          style={{ 
-            gap: 8, 
-            border: 0, 
-            background: 'transparent', 
-            cursor: 'pointer',
-            fontSize: 15,
-            fontWeight: 600
-          }}
-        >
-          <ChevronLeft size={20} />
-          Back
-        </button>
+        {step !== 'target' && (
+          <button
+            type="button"
+            onClick={() => {
+              if (step === 'enter') navigate(-1)
+              else if (step === 'courses') setStep('enter')
+              else if (step === 'plan') setStep('target')
+            }}
+            className="row"
+            style={{ 
+              gap: 8, 
+              border: 0, 
+              background: 'transparent', 
+              cursor: 'pointer',
+              fontSize: 15,
+              fontWeight: 600
+            }}
+          >
+            <ChevronLeft size={20} />
+            Back
+          </button>
+        )}
         <div className="t-13 faint">
           Step {step === 'enter' ? 1 : step === 'courses' ? 2 : step === 'target' ? 3 : 4} of 4
         </div>
@@ -679,3 +680,4 @@ function ThePlan({
     </div>
   )
 }
+

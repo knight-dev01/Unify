@@ -36,67 +36,66 @@ export function HomeHero({ profile, firstName }: HomeHeroProps) {
       )}
       
       {/* Greeting */}
-      <div style={{ marginBottom: 16 }}>
-        <div className="eyebrow" style={{ color: 'var(--u-green)', marginBottom: 6 }}>
-          {getGreeting()}
-        </div>
-        <h1 className="display" style={{ fontSize: 28, color: 'var(--u-on-dark)' }}>
-          {firstName || 'Welcome'}
-        </h1>
-        {profile.department && (
-          <div 
-            className="pill pill--dark" 
-            style={{ marginTop: 8, display: 'inline-flex' }}
-          >
-            {profile.department}
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
+        <div style={{ flex: 1 }}>
+          <div className="eyebrow" style={{ color: 'var(--u-amber)', marginBottom: 6 }}>
+            {getGreeting()}
           </div>
+          <h1 className="display" style={{ fontSize: 28, color: 'var(--u-on-dark)' }}>
+            {firstName || 'Welcome'}
+          </h1>
+          {profile.department && (
+            <div 
+              className="pill pill--dark" 
+              style={{ marginTop: 8, display: 'inline-flex' }}
+            >
+              {profile.department}
+            </div>
+          )}
+        </div>
+        <BoxBoy pose={hasTarget ? "targetSign" : "readingStanding"} width={72} style={{ flexShrink: 0 }} />
+      </div>
+
+      {/* CGPA target / Set target - inside hero */}
+      <div style={{ marginTop: 20 }}>
+        {hasTarget && !profile.hide_cgpa ? (
+          <Link
+            to="/cgpa-planner"
+            style={{ 
+              display: 'flex',
+              alignItems: 'center',
+              gap: 16,
+              padding: 16,
+              textDecoration: 'none',
+              background: 'var(--u-card)',
+              borderRadius: 16,
+              border: '1px solid var(--u-border)'
+            }}
+          >
+            <BoxBoy pose="targetSign" width={60} />
+            <div style={{ flex: 1 }}>
+              <div className="t-13 muted">CGPA Target</div>
+              <div className="t-20 w-7">{profile.cgpa_target?.toFixed(2)}</div>
+              {profile.cgpa_current != null && (
+                <div className="t-12 faint">
+                  Current: {profile.cgpa_current.toFixed(2)}
+                </div>
+              )}
+            </div>
+            <div className="t-13 w-6" style={{ color: 'var(--u-text-3)' }}>
+              Edit →
+            </div>
+          </Link>
+        ) : (
+          <Link
+            to="/cgpa-planner"
+            className="btn btn--amber btn--block"
+            style={{ marginTop: 12 }}
+          >
+            Set my target
+          </Link>
         )}
       </div>
-      
-      {/* CGPA target card */}
-      {hasTarget && !profile.hide_cgpa ? (
-        <Link
-          to="/cgpa-planner"
-          className="card"
-          style={{ 
-            display: 'flex',
-            alignItems: 'center',
-            gap: 16,
-            padding: 16,
-            textDecoration: 'none',
-            marginTop: 16
-          }}
-        >
-          <BoxBoy pose="targetSign" width={60} />
-          <div style={{ flex: 1 }}>
-            <div className="t-13 muted">CGPA Target</div>
-            <div className="t-20 w-7">{profile.cgpa_target?.toFixed(2)}</div>
-            {profile.cgpa_current != null && (
-              <div className="t-12 faint">
-                Current: {profile.cgpa_current.toFixed(2)}
-              </div>
-            )}
-          </div>
-          <div className="t-13 w-6" style={{ color: 'var(--u-text-3)' }}>
-            Edit →
-          </div>
-        </Link>
-      ) : (
-        <Link
-          to="/cgpa-planner"
-          className="btn btn--amber btn--block"
-          style={{ marginTop: 16 }}
-        >
-          Set my target
-        </Link>
-      )}
-      
-      {/* Box Boy peeking from bottom right */}
-      {!hasTarget && (
-        <div style={{ position: 'absolute', right: -20, bottom: -20, opacity: 0.15 }}>
-          <BoxBoy pose="targetSign" width={140} />
-        </div>
-      )}
     </div>
   )
 }
@@ -131,3 +130,4 @@ function getGreeting(): string {
   if (hour < 17) return 'Good afternoon'
   return 'Good evening'
 }
+

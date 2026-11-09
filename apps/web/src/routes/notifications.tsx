@@ -4,8 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { BellRing, BookOpen, Megaphone, PartyPopper, ShieldCheck, CheckCheck } from 'lucide-react';
 import BackButton from '../components/BackButton';
 import Loading from '../components/Loading';
-import Mascot from '../components/Mascot';
 import Flash from '../components/Flash';
+import { BoxBoy } from '../components/redesign/brand';
 import { supabaseBrowser } from '../lib/supabase';
 import { api, type NotificationItem } from '../lib/api';
 
@@ -71,7 +71,7 @@ export default function NotificationsRoute() {
       }
       setNotes((prev) => prev.map((x) => (x.id === n.id ? { ...x, read: true } : x)));
     }
-    navigate(n.link || '/dashboard');
+    navigate(n.link || '/home');
   };
 
   const markAll = async () => {
@@ -90,7 +90,7 @@ export default function NotificationsRoute() {
 
   return (
     <div style={{ maxWidth: 'var(--shell, 480px)', margin: '0 auto', padding: '20px 16px 80px' }}>
-      <BackButton to="/dashboard" />
+      <BackButton to="/home" />
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <h1 style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 28, flex: 1 }}>Notifications</h1>
         {notes.some((n) => !n.read) && (
@@ -102,7 +102,7 @@ export default function NotificationsRoute() {
       <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
         {notes.length === 0 && !error && (
           <div style={{ padding: 24, textAlign: 'center', color: 'var(--text2)', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12 }}>
-            <Mascot size={96} />
+            <BoxBoy pose="readingStanding" width={96} />
             <div style={{ marginTop: 8 }}>All caught up. New notes and updates land here.</div>
           </div>
         )}
@@ -112,9 +112,9 @@ export default function NotificationsRoute() {
             <button
               key={n.id}
               onClick={() => openNote(n)}
-              style={{ padding: '14px 16px', background: n.read ? 'var(--surface)' : 'var(--green-bg)', border: `1px solid ${n.read ? 'var(--border)' : '#a7f3d0'}`, borderRadius: 12, display: 'flex', gap: 12, alignItems: 'flex-start', textAlign: 'left', width: '100%', color: 'var(--text)' }}
+              style={{ padding: '14px 16px', background: n.read ? 'var(--surface)' : 'var(--green-bg)', border: `1px solid ${n.read ? 'var(--border)' : 'var(--u-good)'}`, borderRadius: 12, display: 'flex', gap: 12, alignItems: 'flex-start', textAlign: 'left', width: '100%', color: 'var(--text)' }}
             >
-              <span style={{ width: 36, height: 36, borderRadius: 10, background: n.read ? 'var(--surface2)' : '#10b981', color: n.read ? 'var(--text2)' : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <span style={{ width: 36, height: 36, borderRadius: 10, background: n.read ? 'var(--surface2)' : 'var(--u-amber)', color: n.read ? 'var(--text2)' : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 {n.type === 'new_note' ? <BookOpen size={18} /> : <Icon size={18} />}
               </span>
               <span style={{ flex: 1, minWidth: 0 }}>
@@ -122,16 +122,17 @@ export default function NotificationsRoute() {
                 <span style={{ fontSize: 13, color: '#555', display: 'block', marginTop: 2 }}>{n.body}</span>
                 <span style={{ fontSize: 11, color: 'var(--text3)', marginTop: 4, display: 'block' }}>{timeAgo(n.created_at)}</span>
               </span>
-              {!n.read && <span style={{ width: 10, height: 10, borderRadius: 9999, background: '#10b981', flexShrink: 0, marginTop: 6 }} />}
+              {!n.read && <span style={{ width: 10, height: 10, borderRadius: 9999, background: 'var(--u-amber)', flexShrink: 0, marginTop: 6 }} />}
             </button>
           );
         })}
       </div>
       <div style={{ marginTop: 12, textAlign: 'center' }}>
-        <Link to="/dashboard" style={{ fontSize: 13, color: '#059669', fontWeight: 700, textDecoration: 'none' }}>
+        <Link to="/home" style={{ fontSize: 13, color: '#059669', fontWeight: 700, textDecoration: 'none' }}>
           Back to dashboard
         </Link>
       </div>
     </div>
   );
 }
+

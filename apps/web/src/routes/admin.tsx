@@ -243,7 +243,7 @@ export default function AdminRoute() {
       try {
         const me = await api.me();
         if (!me.isAdmin) {
-          navigate('/dashboard');
+          navigate('/home');
           return;
         }
         await loadAll();
@@ -444,7 +444,7 @@ export default function AdminRoute() {
 
   const card = { background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 12 } as const;
   const input = { padding: 10, border: '1px solid var(--border)', borderRadius: 10, fontSize: 14 } as const;
-  const primaryBtn = { padding: '10px 18px', borderRadius: 12, background: '#10b981', color: '#fff', border: 'none', fontWeight: 800 } as const;
+  const primaryBtn = { padding: '10px 18px', borderRadius: 12, background: 'var(--u-green)', color: 'var(--u-on-dark)', border: 'none', fontWeight: 800 } as const;
   const shownCourses = courses.filter((c) => {
     const needle = courseQ.trim().toLowerCase();
     if (!needle) return true;
@@ -453,7 +453,7 @@ export default function AdminRoute() {
 
   return (
     <div style={{ maxWidth: 960, margin: '0 auto', padding: '20px 16px 100px' }}>
-      <BackButton to="/dashboard" />
+      <BackButton to="/home" />
       <h1 style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 24, display: 'flex', gap: 8, alignItems: 'center' }}>
         <Shield size={22} color="#059669" /> Admin
       </h1>
@@ -580,7 +580,7 @@ export default function AdminRoute() {
             const healthy = m.failures < 3;
             return (
               <div key={m.model} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <span style={{ width: 10, height: 10, borderRadius: 9999, background: healthy ? '#10b981' : '#ff4b4b', flexShrink: 0 }} />
+                <span style={{ width: 10, height: 10, borderRadius: 9999, background: healthy ? 'var(--u-amber)' : '#ff4b4b', flexShrink: 0 }} />
                 <span style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {m.model}
                 </span>
@@ -629,7 +629,7 @@ export default function AdminRoute() {
               <div style={{ fontWeight: 700, fontSize: 14 }}>{u.name}</div>
               <div style={{ fontSize: 12, color: 'var(--text2)' }}>{u.short_name || ''}</div>
             </div>
-            <button onClick={() => setConfirm({ title: `Delete ${u.name}?`, body: 'Profiles keep the name as text.', label: 'Delete', run: () => void delUni(u.id, u.name) })} aria-label={`Delete ${u.name}`} style={{ background: 'none', border: '1px solid #fecaca', borderRadius: 8, color: '#991b1b', padding: 8, display: 'flex' }}>
+            <button onClick={() => setConfirm({ title: `Delete ${u.name}?`, body: 'Profiles keep the name as text.', label: 'Delete', run: () => void delUni(u.id, u.name) })} aria-label={`Delete ${u.name}`} style={{ background: 'none', border: '1px solid #fecaca', borderRadius: 8, color: 'var(--u-red)', padding: 8, display: 'flex' }}>
               <Trash2 size={16} />
             </button>
           </div>
@@ -653,7 +653,7 @@ export default function AdminRoute() {
               <div style={{ fontWeight: 700, fontSize: 14 }}>{c.code} — {c.title}</div>
               <div style={{ fontSize: 12, color: 'var(--text2)' }}>{(c.levels || []).join(', ') || 'No levels'}{(c.semesters || []).length ? ` · ${(c.semesters || []).join(', ')}` : ''}</div>
             </div>
-            <button onClick={() => setConfirm({ title: `Delete ${c.code}?`, body: 'ALL its weeks go with it. Students lose that content.', label: 'Delete course', run: () => void delCourse(c.code) })} aria-label={`Delete ${c.code}`} style={{ background: 'none', border: '1px solid #fecaca', borderRadius: 8, color: '#991b1b', padding: 8, display: 'flex' }}>
+            <button onClick={() => setConfirm({ title: `Delete ${c.code}?`, body: 'ALL its weeks go with it. Students lose that content.', label: 'Delete course', run: () => void delCourse(c.code) })} aria-label={`Delete ${c.code}`} style={{ background: 'none', border: '1px solid #fecaca', borderRadius: 8, color: 'var(--u-red)', padding: 8, display: 'flex' }}>
               <Trash2 size={16} />
             </button>
           </div>
@@ -672,7 +672,7 @@ export default function AdminRoute() {
                   padding: '8px 14px',
                   borderRadius: 9999,
                   border: `1px solid ${courseLevels.includes(l) ? '#059669' : 'var(--border)'}`,
-                  background: courseLevels.includes(l) ? '#10b981' : 'var(--surface)',
+                  background: courseLevels.includes(l) ? 'var(--u-amber)' : 'var(--surface)',
                   color: courseLevels.includes(l) ? '#fff' : 'var(--text2)',
                   fontSize: 12,
                   fontWeight: 700,
@@ -692,7 +692,7 @@ export default function AdminRoute() {
                   padding: '8px 14px',
                   borderRadius: 9999,
                   border: `1px solid ${courseSemester === s ? '#059669' : 'var(--border)'}`,
-                  background: courseSemester === s ? '#10b981' : 'var(--surface)',
+                  background: courseSemester === s ? 'var(--u-amber)' : 'var(--surface)',
                   color: courseSemester === s ? '#fff' : 'var(--text2)',
                   fontSize: 12,
                   fontWeight: 700,
@@ -721,7 +721,7 @@ export default function AdminRoute() {
                 padding: '10px 14px',
                 borderRadius: 9999,
                 border: `1px solid ${currentSemester === s ? '#059669' : 'var(--border)'}`,
-                background: currentSemester === s ? '#10b981' : 'var(--surface)',
+                background: currentSemester === s ? 'var(--u-amber)' : 'var(--surface)',
                 color: currentSemester === s ? '#fff' : 'var(--text2)',
                 fontSize: 13,
                 fontWeight: 800,
@@ -759,7 +759,7 @@ export default function AdminRoute() {
             </button>
           </div>
           {testResult && (
-            <div style={{ marginTop: 8, padding: '10px 12px', borderRadius: 10, border: `1px solid ${testResult.ok ? '#a7f3d0' : '#fecaca'}`, background: testResult.ok ? '#ecfdf5' : '#fef2f2', fontSize: 12, color: testResult.ok ? '#065f46' : '#991b1b' }}>
+            <div style={{ marginTop: 8, padding: '10px 12px', borderRadius: 10, border: `1px solid ${testResult.ok ? 'var(--u-good)' : '#fecaca'}`, background: testResult.ok ? 'var(--u-good-tint)' : '#fef2f2', fontSize: 12, color: testResult.ok ? '#065f46' : 'var(--u-red)' }}>
               <div style={{ fontWeight: 800, marginBottom: 4 }}>
                 {testResult.ok ? `Delivered — Brevo ${testResult.status}` : testResult.status ? `Brevo ${testResult.status}` : 'Not sent'}
                 {!testResult.keySet && ' · BREVO_API_KEY missing on the server'}
@@ -784,7 +784,7 @@ export default function AdminRoute() {
           {errors.slice(0, 20).map((e, i) => (
             <div key={i} style={{ background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: 10, padding: '10px 12px' }}>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <span style={{ fontSize: 10, fontWeight: 800, background: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', borderRadius: 9999, padding: '2px 8px' }}>{e.kind || 'client'}</span>
+                <span style={{ fontSize: 10, fontWeight: 800, background: 'var(--u-bad-tint)', border: '1px solid #fecaca', color: 'var(--u-red)', borderRadius: 9999, padding: '2px 8px' }}>{e.kind || 'client'}</span>
                 <span style={{ fontSize: 11, color: 'var(--text3)', marginLeft: 'auto' }}>{e.created_at ? new Date(e.created_at).toLocaleString() : ''}</span>
               </div>
               <div style={{ fontSize: 13, fontWeight: 700, marginTop: 6, wordBreak: 'break-word' }}>{e.message || '(no message)'}</div>
@@ -805,7 +805,7 @@ export default function AdminRoute() {
             <button
               key={t}
               onClick={() => { setReqTab(t); void loadRequests(t === 'history'); }}
-              style={{ flex: 1, padding: '8px 10px', borderRadius: 9999, border: `1px solid ${reqTab === t ? '#059669' : 'var(--border)'}`, background: reqTab === t ? '#10b981' : 'var(--surface)', color: reqTab === t ? '#fff' : 'var(--text2)', fontSize: 12, fontWeight: 800 }}
+              style={{ flex: 1, padding: '8px 10px', borderRadius: 9999, border: `1px solid ${reqTab === t ? '#059669' : 'var(--border)'}`, background: reqTab === t ? 'var(--u-amber)' : 'var(--surface)', color: reqTab === t ? '#fff' : 'var(--text2)', fontSize: 12, fontWeight: 800 }}
             >
               {t === 'pending' ? 'Pending' : 'History'}
             </button>
@@ -826,14 +826,15 @@ export default function AdminRoute() {
                 <button
                   onClick={() => void decideRequest(r.id, true)}
                   disabled={deciding === r.id}
-                  style={{ flex: 1, padding: 10, borderRadius: 12, background: '#10b981', color: '#fff', border: 'none', borderBottom: '3px solid #059669', fontWeight: 800, fontSize: 13, opacity: deciding === r.id ? 0.6 : 1 }}
+                  className="btn btn--amber"
+                  style={{ flex: 1, fontSize: 13, opacity: deciding === r.id ? 0.6 : 1 }}
                 >
                   {deciding === r.id ? 'Working…' : 'Approve'}
                 </button>
                 <button
                   onClick={() => void decideRequest(r.id, false)}
                   disabled={deciding === r.id}
-                  style={{ flex: 1, padding: 10, borderRadius: 12, background: 'var(--surface)', color: '#991b1b', border: '1px solid #fecaca', borderBottom: '3px solid #fecaca', fontWeight: 800, fontSize: 13, opacity: deciding === r.id ? 0.6 : 1 }}
+                  style={{ flex: 1, padding: 10, borderRadius: 12, background: 'var(--surface)', color: 'var(--u-red)', border: '1px solid #fecaca', borderBottom: '3px solid #fecaca', fontWeight: 800, fontSize: 13, opacity: deciding === r.id ? 0.6 : 1 }}
                 >
                   Decline
                 </button>
@@ -926,13 +927,13 @@ export default function AdminRoute() {
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
               <div style={{ flex: 1, fontSize: 12, color: 'var(--text2)' }}>{[u.university, u.department].filter(Boolean).join(' · ') || 'No profile details'}</div>
               {u.id !== ownId && (
-                <button onClick={() => setConfirm({ title: `Remove ${u.first_name || 'this user'}?`, body: 'This cannot be undone.', label: 'Remove', run: () => void removeUser(u.id, u.first_name || '') })} aria-label="Remove user" style={{ background: 'none', border: '1px solid #fecaca', borderRadius: 8, color: '#991b1b', padding: 8, display: 'flex' }}>
+                <button onClick={() => setConfirm({ title: `Remove ${u.first_name || 'this user'}?`, body: 'This cannot be undone.', label: 'Remove', run: () => void removeUser(u.id, u.first_name || '') })} aria-label="Remove user" style={{ background: 'none', border: '1px solid #fecaca', borderRadius: 8, color: 'var(--u-red)', padding: 8, display: 'flex' }}>
                   <Trash2 size={16} />
                 </button>
               )}
             </div>
             {u.id === ownId ? (
-              <div style={{ marginTop: 8, fontSize: 12, color: '#059669', fontWeight: 700, background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: 8, padding: '8px 12px' }}>
+              <div style={{ marginTop: 8, fontSize: 12, color: '#059669', fontWeight: 700, background: 'var(--u-good-tint)', border: '1px solid var(--u-good)', borderRadius: 8, padding: '8px 12px' }}>
                 This is you — your role is locked so you can't lock yourself out.
               </div>
             ) : (
@@ -946,7 +947,7 @@ export default function AdminRoute() {
                     padding: 8,
                     borderRadius: 9999,
                     border: `1px solid ${u.role === r ? '#059669' : 'var(--border)'}`,
-                    background: u.role === r ? '#10b981' : 'var(--surface)',
+                    background: u.role === r ? 'var(--u-amber)' : 'var(--surface)',
                     color: u.role === r ? '#fff' : 'var(--text2)',
                     fontSize: 12,
                     fontWeight: 700,
@@ -997,13 +998,13 @@ export default function AdminRoute() {
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
                       {assigned.length === 0 && <span style={{ fontSize: 12, color: 'var(--text2)' }}>None assigned — reaches nothing.</span>}
                       {assigned.map((c) => (
-                        <span key={c} style={{ display: 'inline-flex', gap: 6, alignItems: 'center', fontSize: 12, fontWeight: 800, background: '#ecfdf5', border: '1px solid #a7f3d0', color: '#059669', borderRadius: 9999, padding: '4px 6px 4px 12px' }}>
+                        <span key={c} style={{ display: 'inline-flex', gap: 6, alignItems: 'center', fontSize: 12, fontWeight: 800, background: 'var(--u-good-tint)', border: '1px solid var(--u-good)', color: '#059669', borderRadius: 9999, padding: '4px 6px 4px 12px' }}>
                           {c}
                           <button
                             onClick={() => saveAssigned(u.id, assigned.filter((x) => x !== c))}
                             disabled={assignBusy}
                             aria-label={`Unassign ${c}`}
-                            style={{ background: 'none', border: 'none', color: '#991b1b', fontWeight: 800, display: 'flex', padding: 2 }}
+                            style={{ background: 'none', border: 'none', color: 'var(--u-red)', fontWeight: 800, display: 'flex', padding: 2 }}
                           >
                             ×
                           </button>
@@ -1047,9 +1048,9 @@ export default function AdminRoute() {
                                 void saveAssigned(u.id, [...assigned, c.code]);
                               }}
                               disabled={assignBusy || on}
-                              style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '10px 12px', borderRadius: 10, border: `1px solid ${on ? '#059669' : 'var(--border)'}`, background: on ? '#ecfdf5' : 'var(--surface)', textAlign: 'left', opacity: on ? 0.75 : 1 }}
+                              style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '10px 12px', borderRadius: 10, border: `1px solid ${on ? '#059669' : 'var(--border)'}`, background: on ? 'var(--u-good-tint)' : 'var(--surface)', textAlign: 'left', opacity: on ? 0.75 : 1 }}
                             >
-                              <span style={{ width: 20, height: 20, borderRadius: 6, border: `1px solid ${on ? '#059669' : 'var(--border)'}`, background: on ? '#10b981' : 'var(--surface)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, flexShrink: 0 }}>
+                              <span style={{ width: 20, height: 20, borderRadius: 6, border: `1px solid ${on ? '#059669' : 'var(--border)'}`, background: on ? 'var(--u-amber)' : 'var(--surface)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, flexShrink: 0 }}>
                                 {on ? '✓' : ''}
                               </span>
                               <span style={{ flex: 1, minWidth: 0 }}>
@@ -1119,3 +1120,4 @@ export default function AdminRoute() {
     </div>
   );
 }
+

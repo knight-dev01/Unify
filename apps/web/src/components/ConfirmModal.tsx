@@ -19,12 +19,11 @@ export function ConfirmModal({
   confirmLabel?: string;
   tone?: 'danger' | 'go';
   busy?: boolean;
-  icon?: 'auto' | 'bell' | 'mascot';
+  icon?: 'auto' | 'bell';
   cancelLabel?: string;
   onConfirm: () => void;
   onCancel: () => void;
 }) {
-  const showMascot = icon === 'mascot' || (icon === 'auto' && tone === 'go');
   const showBell = icon === 'bell';
   return (
     <div
@@ -37,13 +36,11 @@ export function ConfirmModal({
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           {showBell ? (
-            <span style={{ width: 52, height: 52, borderRadius: 9999, background: '#ecfdf5', border: '1px solid #a7f3d0', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ width: 52, height: 52, borderRadius: 9999, background: 'var(--u-good-tint)', border: '1px solid var(--u-good-tint)', color: 'var(--u-good)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <BellRing size={24} />
             </span>
-          ) : showMascot ? (
-            <BoxBoy pose="cheer" width={58} />
           ) : (
-            <span style={{ width: 52, height: 52, borderRadius: 9999, background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ width: 52, height: 52, borderRadius: 9999, background: 'var(--u-bad-tint)', border: '1px solid #fecaca', color: '#dc2626', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <AlertTriangle size={24} />
             </span>
           )}
@@ -70,3 +67,4 @@ export function ConfirmModal({
 }
 
 export default ConfirmModal;
+

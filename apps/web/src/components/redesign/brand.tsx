@@ -78,7 +78,7 @@ export function AppIcon({ size = 120 }: { size?: number }) {
 /* ---------- Speech bubble ---------- */
 export function Bubble({ children, style }: { children: ReactNode; style?: CSSProperties }) {
   return (
-    <div style={{ position: 'absolute', background: '#fff', borderRadius: 18, padding: '10px 14px', fontWeight: 600, fontSize: 16, boxShadow: '0 2px 0 #0a0a0a', border: '2px solid #0a0a0a', ...style }}>
+    <div style={{ position: 'absolute', background: 'var(--u-card)', color: 'var(--u-text)', borderRadius: 18, padding: '10px 14px', fontWeight: 600, fontSize: 16, boxShadow: '0 2px 0 #0a0a0a', border: '2px solid #0a0a0a', ...style }}>
       {children}
     </div>
   );
@@ -95,13 +95,13 @@ export function SemesterWeek({ week, total = 12 }: { week: number; total?: numbe
     stage === 'close' ? `Week ${week} · exams in ${left} weeks` :
     week === total ? `Week ${week} · exams next week` : `Week ${week} · exams in ${left} weeks`;
   return (
-    <div className="row" style={{ gap: 10, padding: '7px 12px', borderRadius: 14, background: 'rgba(255,255,255,.55)', alignSelf: 'flex-start' }} aria-label={label}>
+    <div className="row" style={{ gap: 10, padding: '7px 12px', borderRadius: 14, background: 'var(--u-surface)', alignSelf: 'flex-start' }} aria-label={label}>
       <span className="t-12 w-7">{label}</span>
       <span className="row" style={{ gap: 3 }}>
         {Array.from({ length: total }, (_, i) => {
           const n = i + 1;
           return (
-            <span key={n} style={{ width: 7, height: 12, borderRadius: 2, background: n < week ? '#0a0a0a' : n === week ? nowColor : 'rgba(255,255,255,.7)', outline: n === week ? '1.5px solid #0a0a0a' : undefined }} />
+            <span key={n} style={{ width: 7, height: 12, borderRadius: 2, background: n < week ? '#0a0a0a' : n === week ? nowColor : 'var(--u-border)', outline: n === week ? '1.5px solid #0a0a0a' : undefined }} />
           );
         })}
       </span>
@@ -137,3 +137,4 @@ export function StreakPill({ days, dark }: { days: number; dark?: boolean }) {
     </span>
   );
 }
+

@@ -230,7 +230,7 @@ export default function LearnPage() {
   if (!courseCode) {
     // Unreachable via router links — redirect to courses instead of stranding.
     log.warn('route', `week with empty course (url=${window.location.href})`);
-    return <Navigate to="/course" replace />;
+    return <Navigate to="/courses" replace />;
   }
   if (loadError)
     return (
@@ -242,7 +242,7 @@ export default function LearnPage() {
   if (blocked)
     return (
       <div style={{ padding: 40, textAlign: 'center', color: 'var(--text2)', maxWidth: 'var(--shell, 480px)', margin: '0 auto' }}>
-        <BoxBoy pose="thinking" width={72} />
+        <BoxBoy pose="readingStanding" width={72} />
         <h1 style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 20, color: 'var(--text)', marginTop: 12 }}>You're not enrolled in {courseCode}</h1>
         <p style={{ fontSize: 14, margin: '8px 0 20px' }}>Enroll to unlock its weeks, topics and quizzes.</p>
         <button
@@ -256,12 +256,12 @@ export default function LearnPage() {
             window.location.reload();
           }}
           disabled={enrolling}
-          style={{ padding: '12px 28px', borderRadius: 9999, background: '#10b981', color: '#fff', border: 'none', borderBottom: '4px solid #059669', fontWeight: 800, fontSize: 14, opacity: enrolling ? 0.6 : 1 }}
+          style={{ padding: '12px 28px', borderRadius: 9999, background: 'var(--u-amber)', color: 'var(--u-black)', border: 'none', borderBottom: '4px solid #c69a1a', fontWeight: 800, fontSize: 14, opacity: enrolling ? 0.6 : 1 }}
         >
           {enrolling ? 'Enrolling…' : 'Enroll & continue'}
         </button>
         <div style={{ marginTop: 12 }}>
-          <button onClick={() => navigate('/explore')} style={{ background: 'none', border: 'none', color: '#059669', fontWeight: 700, fontSize: 13 }}>
+          <button onClick={() => navigate('/class')} style={{ background: 'none', border: 'none', color: '#059669', fontWeight: 700, fontSize: 13 }}>
             or explore other courses
           </button>
         </div>
@@ -270,7 +270,7 @@ export default function LearnPage() {
   if (!note)
     return (
       <div style={{ padding: 40, textAlign: 'center', color: 'var(--text2)' }}>
-        <BoxBoy pose="thinking" width={72} />
+        <BoxBoy pose="readingStanding" width={72} />
         <div style={{ marginTop: 12 }}>No content for {courseCode} Week {weekNum} yet.</div>
       </div>
     );
@@ -448,9 +448,9 @@ export default function LearnPage() {
       </div>
 
       {preview && (
-        <div style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: 12, padding: 10, fontSize: 13, color: '#065f46', marginBottom: 12, display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ background: 'var(--u-good-tint)', border: '1px solid var(--u-good)', borderRadius: 12, padding: 10, fontSize: 13, color: '#065f46', marginBottom: 12, display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'space-between' }}>
           <span>Author preview — read-only, nothing is recorded.</span>
-          <button onClick={() => navigate(`/studio?edit=${encodeURIComponent(courseCode || '')}&week=${weekNum}`)} style={{ padding: '8px 14px', borderRadius: 9999, background: '#10b981', color: '#fff', border: 'none', fontWeight: 800, fontSize: 12, whiteSpace: 'nowrap' }}>
+          <button onClick={() => navigate(`/studio?edit=${encodeURIComponent(courseCode || '')}&week=${weekNum}`)} style={{ padding: '8px 14px', borderRadius: 9999, background: 'var(--u-amber)', color: 'var(--u-black)', border: 'none', borderBottom: '3px solid #c69a1a', fontWeight: 800, fontSize: 12, whiteSpace: 'nowrap' }}>
             Edit in Studio
           </button>
         </div>
@@ -521,13 +521,13 @@ export default function LearnPage() {
                     key={v.id}
                     disabled={loadingVersion}
                     onClick={() => viewVersion(activeMeta, v.version, v.id)}
-                    style={{ padding: '4px 12px', borderRadius: 9999, border: `1px solid ${current ? '#059669' : 'var(--border)'}`, background: current ? '#10b981' : 'var(--surface)', color: current ? '#fff' : 'var(--text2)', fontWeight: 800, fontSize: 11 }}
+                    style={{ padding: '4px 12px', borderRadius: 9999, border: `1px solid ${current ? '#059669' : 'var(--border)'}`, background: current ? 'var(--u-amber)' : 'var(--surface)', color: current ? '#fff' : 'var(--text2)', fontWeight: 800, fontSize: 11 }}
                   >
                     v{v.version}
                   </button>
                 );
               })}
-              {viewingOld && <span style={{ fontSize: 11, color: '#b45309', fontWeight: 700 }}>viewing older version</span>}
+              {viewingOld && <span style={{ fontSize: 11, color: 'var(--u-warn-ink)', fontWeight: 700 }}>viewing older version</span>}
             </div>
           )}
           {shownTopic && (
@@ -613,3 +613,4 @@ function TopicTab({ topic, done, onToggle, preview }: { topic: Topic; done: bool
     </div>
   );
 }
+

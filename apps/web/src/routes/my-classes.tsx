@@ -17,7 +17,7 @@ const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 // weekly timetable (set once, repeats every week) and a live roster
 // (enrolled students + topics done + quizzes taken + last activity).
 // Students read the same slots on their course pages.
-export default function ClassesRoute() {
+export default function MyClassesRoute() {
   const [courses, setCourses] = useState<string[]>([]);
   const [selected, setSelected] = useState('');
   const [slots, setSlots] = useState<ClassSlot[]>([]);
@@ -129,21 +129,21 @@ export default function ClassesRoute() {
   if (forbidden)
     return (
       <div style={{ maxWidth: 'var(--shell, 480px)', margin: '0 auto', padding: '20px 16px 80px' }}>
-        <BackButton to="/dashboard" />
+        <BackButton to="/home" />
         <ErrorState title="Lecturers only" message="Classes and timetables belong to lecturers. Admins oversee the platform from the admin panel and content browser." />
       </div>
     );
 
   return (
     <div style={{ maxWidth: 'var(--shell, 480px)', margin: '0 auto', padding: '20px 16px 80px' }}>
-      <BackButton to="/dashboard" />
+      <BackButton to="/home" />
       <h1 style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 28 }}>My Classes</h1>
       <p style={{ color: 'var(--text2)', marginTop: 6, fontSize: 13 }}>
         Weekly timetable + live roster for every course you teach
       </p>
       {courses.length === 0 ? (
         <div style={{ marginTop: 16, padding: 24, textAlign: 'center', color: 'var(--text2)', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12 }}>
-          <BoxBoy pose="thinking" width={62} />
+          <BoxBoy pose="readingStanding" width={62} />
           <div style={{ marginTop: 8 }}>No teaching courses assigned yet. Ask an admin to assign your courses.</div>
         </div>
       ) : (
@@ -182,7 +182,7 @@ export default function ClassesRoute() {
                     </div>
                   ) : null}
                 </div>
-                <button onClick={() => setConfirmSlot(s.id)} aria-label={`Remove ${DAYS[s.day]} ${s.start} slot`} style={{ padding: 8, borderRadius: 10, background: 'var(--surface)', border: '1px solid var(--border)', color: '#991b1b' }}>
+                <button onClick={() => setConfirmSlot(s.id)} aria-label={`Remove ${DAYS[s.day]} ${s.start} slot`} style={{ padding: 8, borderRadius: 10, background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--u-red)' }}>
                   <Trash2 size={14} />
                 </button>
               </div>
@@ -214,7 +214,7 @@ export default function ClassesRoute() {
               Venue
               <input value={venue} onChange={(e) => setVenue(e.target.value)} placeholder="e.g. LT1, Engineering block" style={{ display: 'block', width: '100%', marginTop: 4, padding: 10, borderRadius: 10, border: '1px solid var(--border)', background: 'var(--surface)', color: 'var(--text)' }} />
             </label>
-            <button onClick={addSlot} disabled={adding} style={{ marginTop: 10, width: '100%', padding: 12, borderRadius: 14, border: 'none', borderBottom: '4px solid #059669', background: '#10b981', color: '#fff', fontWeight: 800, opacity: adding ? 0.6 : 1 }}>
+            <button onClick={addSlot} disabled={adding} style={{ marginTop: 10, width: '100%', padding: 12, borderRadius: 14, border: 'none', borderBottom: '4px solid #c69a1a', background: 'var(--u-amber)', color: 'var(--u-black)', fontWeight: 800, opacity: adding ? 0.6 : 1 }}>
               {adding ? 'Adding…' : 'Add slot'}
             </button>
           </div>
@@ -229,7 +229,7 @@ export default function ClassesRoute() {
             )}
             {roster.map((s) => (
               <div key={s.id} className="cv-row" style={{ padding: '12px 14px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, display: 'flex', gap: 10, alignItems: 'center' }}>
-                <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg,#10b981,#059669)', color: '#fff', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg,var(--u-amber),#059669)', color: '#fff', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   {(s.name || '?').trim().charAt(0).toUpperCase()}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -259,3 +259,4 @@ export default function ClassesRoute() {
     </div>
   );
 }
+

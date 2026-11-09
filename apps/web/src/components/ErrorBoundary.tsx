@@ -47,7 +47,7 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, { error: E
     if (this.state.error) {
       return (
         <div style={{ maxWidth: 'var(--shell, 480px)', margin: '0 auto', padding: '60px 20px 80px', textAlign: 'center' }}>
-          <BoxBoy pose="thinking" width={96} />
+          <BoxBoy pose="readingStanding" width={96} />
           <h1 style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 24, marginTop: 12, color: 'var(--text)' }}>
             Something tripped.
           </h1>
@@ -56,7 +56,7 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, { error: E
           </p>
           <button
             onClick={() => window.location.reload()}
-            style={{ padding: '12px 28px', borderRadius: 9999, background: '#16a34a', color: '#fff', border: 'none', borderBottom: '4px solid #14532d', fontWeight: 800, fontSize: 14 }}
+            style={{ padding: '12px 28px', borderRadius: 9999, background: 'var(--u-amber)', color: 'var(--u-black)', border: 'none', borderBottom: '4px solid #c69a1a', fontWeight: 800, fontSize: 14 }}
           >
             Reload app
           </button>
@@ -66,3 +66,4 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, { error: E
     return this.props.children;
   }
 }
+

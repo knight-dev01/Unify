@@ -5,6 +5,58 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-11-09
+
+### Added
+- **Friendly error handling**: new `lib/errors.ts` (`isBenignError`, `describeError`, `errorToast`) maps Postgres/PostgREST codes, HTTP statuses, Supabase auth messages and network failures to plain sentences; aborts and offline blips no longer toast
+- Profile (email change, verification resend, save, avatar) and storage uploads no longer show raw library messages
+
+### Changed
+- **Legacy colour variables now alias the redesign tokens** (`--bg`, `--surface`, `--border`, `--text*`, `--green*`, `--brand*` -> `--u-*`), so unmigrated screens follow the redesign and dark mode automatically; page background is now warm paper
+- Shared components (Drop, ZoomBar, MiniCheck, TopicSlice, ShareModal, ConfirmModal, ErrorState, InstallBar, ReadAloud, VisualEquation) use tokens instead of hard-coded emerald/red hex; text on amber buttons is now black with the amber shadow edge
+- Dark-mode values added for `--u-good`, `--u-good-2`, `--u-good-ink`, `--u-warn-ink`
+
+### Added (routes)
+- **Routes renamed to the redesign tabs**: `/home`, `/timetable`, `/class`, `/me`, plus `/courses`, `/courses/:code`, `/my-classes`, `/lecturer`; route files renamed to match (`home.tsx`, `me.tsx`, `courses.tsx`, `course-detail.tsx`, `class.tsx`, `my-classes.tsx`)
+- Old paths (`/dashboard`, `/profile`, `/course`, `/course/:code`, `/explore`, `/classes`, `/lecturer/redesign`) redirect permanently, keeping params and query; the backend still writes them into notification and push links
+- **New Timetable page** (`/timetable`): this week's classes across enrolled courses, day chips with counts, Now/Next markers
+- **New `/screens` index**: every route grouped by area with role tags (shown on Me for admins and in dev)
+- `lib/routes.ts` is the single source of truth for paths
+- Lecturer stub replaced by the redesigned lecturer home
+
+### Changed (buttons)
+- **Duolingo depth on every button variant**: `.btn--*` share one edge-and-press system; legacy `.btn-primary`, modal and EOQ buttons are amber with the same edge; inline buttons that carry a bottom edge get the press-down
+- Amber buttons use black text and the `#c69a1a` edge everywhere (21 leftover white-on-amber / green-edge buttons fixed)
+- Screen copy follows the new names (Home, Class, Me)
+
+### Fixed
+- **Dark mode**: page background was a fixed light grey (redesign `ui.css`), Flash/offline banners and ~50 pale hex backgrounds were light blocks on dark; all now use tokens
+- Home no longer crashes if the stats response omits `courses`
+- Service worker cache bumped to `unify-app-v11`
+- `/class` route crashed at runtime: the lazy `ExploreRoute` import had been dropped
+- Profile footer and crash reports showed v1.26.15 (`APP_VERSION` had not followed the 2.x bumps)
+
+### Removed
+- Classic/Story design switch leftovers: `useDesign` hook, `bootDesign()`, unused `DesktopShell`, Story variable blocks
+
+## [2.0.1] - 2026-11-04
+
+### Changed
+- Box Boy replaces the SVG Mascot across onboarding, course, explore, course detail, learn/week, EoqQuiz and classes; mobile-first sizing
+- Mascot component and ConfirmModal mascot branch removed
+
+## [2.0.0] - 2026-11-03
+
+### Added
+- **Redesign foundation**: `--u-*` design tokens, amber primary CTA (`.btn--amber`), dark mode, Box Boy assets and personas, persona carousel, HomeHero, CGPA planner
+- **Attendance system**: setup, crypto-signed attendance pass (ECDSA P-256 scaffold), scanner, my attendance
+- **HOC role**: HOC request route and dashboard; online classes; lecturer redesign
+- Migration 0027 (attendance, HOC, online class tables)
+- Service worker cache bumped to `unify-app-v10`; desktop sidebar at >=1024px
+
+### Changed
+- Tabs renamed, Save PDF removed, weekly lectures flattened; `/explore` replaced by `/class`
+
 ## [1.26.15] - 2026-10-21
 
 ### Fixed

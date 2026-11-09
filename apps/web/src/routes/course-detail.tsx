@@ -30,7 +30,7 @@ export default function CourseDetailRoute() {
   const [enrolling, setEnrolling] = useState(false);
   // Preview landings (admin/author browsing) go back to their hub, never
   // to the student My Courses module.
-  const [backTo, setBackTo] = useState('/course');
+  const [backTo, setBackTo] = useState('/courses');
   const [slots, setSlots] = useState<{ day: number; start: string; end: string; venue: string; lecturer: string }[]>([]);
   const preview = searchParams.get('preview') === '1';
 
@@ -52,8 +52,8 @@ export default function CourseDetailRoute() {
                 ? '/admin/content'
                 : role === 'lecturer' || role === 'contributor'
                   ? '/browse'
-                  : '/course'
-              : '/course'
+                  : '/courses'
+              : '/courses'
           );
           if (preview) {
             setWeeks(res.weeks);
@@ -119,13 +119,13 @@ export default function CourseDetailRoute() {
     // it ever happens, send the student to their courses instead of a
     // dead-end message. Logged so a recurrence leaves a trace.
     log.warn('route', `course detail with empty code (url=${window.location.href})`);
-    return <Navigate to="/course" replace />;
+    return <Navigate to="/courses" replace />;
   }
   if (blocked)
     return (
       <div style={{ maxWidth: 'var(--shell, 480px)', margin: '0 auto', padding: '20px 16px 80px', textAlign: 'center' }}>
         <BackButton to={backTo} />
-        <BoxBoy pose="thinking" width={72} />
+        <BoxBoy pose="readingStanding" width={72} />
         <h1 style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 20, marginTop: 12 }}>You're not enrolled in {courseCode}</h1>
         <p style={{ color: 'var(--text2)', fontSize: 14, margin: '8px 0 20px' }}>Enroll to unlock its weeks, topics and quizzes.</p>
       {slots.length > 0 && (
@@ -145,11 +145,11 @@ export default function CourseDetailRoute() {
           </div>
         </div>
       )}
-        <button onClick={enrollHere} disabled={enrolling} style={{ padding: '12px 28px', borderRadius: 9999, background: '#10b981', color: '#fff', border: 'none', borderBottom: '4px solid #059669', fontWeight: 800, fontSize: 14, opacity: enrolling ? 0.6 : 1 }}>
+        <button onClick={enrollHere} disabled={enrolling} style={{ padding: '12px 28px', borderRadius: 9999, background: 'var(--u-amber)', color: 'var(--u-black)', border: 'none', borderBottom: '4px solid #c69a1a', fontWeight: 800, fontSize: 14, opacity: enrolling ? 0.6 : 1 }}>
           {enrolling ? 'Enrolling…' : `Enroll in ${courseCode}`}
         </button>
         <div style={{ marginTop: 12 }}>
-          <Link to="/explore" style={{ fontSize: 13, color: '#059669', fontWeight: 700, textDecoration: 'none' }}>
+          <Link to="/class" style={{ fontSize: 13, color: '#059669', fontWeight: 700, textDecoration: 'none' }}>
             or explore other courses
           </Link>
         </div>
@@ -166,7 +166,7 @@ export default function CourseDetailRoute() {
       <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
         {weeks.length === 0 && !error && (
           <div style={{ padding: 24, textAlign: 'center', color: 'var(--text2)', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12 }}>
-            <BoxBoy pose="thinking" width={62} />
+            <BoxBoy pose="readingStanding" width={62} />
             <div style={{ marginTop: 8 }}>No weeks published yet.</div>
           </div>
         )}
@@ -196,7 +196,7 @@ export default function CourseDetailRoute() {
                       a.avatar ? (
                         <img key={ai} src={a.avatar} alt={a.name} title={a.name} style={{ width: 20, height: 20, borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--surface)', marginLeft: ai === 0 ? 0 : -6 }} />
                       ) : (
-                        <span key={ai} title={a.name} style={{ width: 20, height: 20, borderRadius: '50%', background: '#ecfdf5', color: '#059669', fontWeight: 800, fontSize: 10, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--surface)', marginLeft: ai === 0 ? 0 : -6 }}>
+                        <span key={ai} title={a.name} style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--u-good-tint)', color: '#059669', fontWeight: 800, fontSize: 10, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--surface)', marginLeft: ai === 0 ? 0 : -6 }}>
                           {a.name.trim().charAt(0).toUpperCase()}
                         </span>
                       )
@@ -213,3 +213,4 @@ export default function CourseDetailRoute() {
     </div>
   );
 }
+

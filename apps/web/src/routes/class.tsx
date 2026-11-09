@@ -12,7 +12,7 @@ type CatalogCourse = { code: string; title: string; weeks: number; levels: strin
 
 // Explore + enroll: browse your level's courses for the active semester
 // and join them. Enrolled courses live under My Courses (/course).
-export default function ExplorePage() {
+export default function ClassRoute() {
   const [courses, setCourses] = useState<CatalogCourse[]>([]);
   const [myLevel, setMyLevel] = useState('');
   const [activeSemester, setActiveSemester] = useState('First Semester');
@@ -111,8 +111,8 @@ export default function ExplorePage() {
 
   return (
     <div style={{ maxWidth: 'var(--shell, 480px)', margin: '0 auto', padding: '20px 16px 80px' }}>
-      <BackButton to="/course" />
-      <h1 style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 28 }}>Explore courses</h1>
+      <BackButton to="/courses" />
+      <h1 style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 28 }}>Find your class</h1>
       <p style={{ color: 'var(--text2)', marginTop: 6, fontSize: 13 }}>
         Find courses and enroll{myLevel ? ` · ${myLevel}` : ''}
       </p>
@@ -132,7 +132,7 @@ export default function ExplorePage() {
       <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
         {shown.length === 0 && !error && (
           <div style={{ padding: 24, textAlign: 'center', color: 'var(--text2)', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12 }}>
-            <BoxBoy pose="thinking" width={62} />
+            <BoxBoy pose="readingStanding" width={62} />
             <div style={{ marginTop: 8 }}>{results !== null ? 'No courses match that search.' : 'No courses for this level yet. Check back soon.'}</div>
           </div>
         )}
@@ -159,7 +159,7 @@ export default function ExplorePage() {
               <div
                 style={{ flex: 1, display: 'flex', gap: 12, alignItems: 'center', color: 'var(--text)', minWidth: 0 }}
               >
-                <span style={{ width: 40, height: 40, borderRadius: 10, background: '#ecfdf5', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <span style={{ width: 40, height: 40, borderRadius: 10, background: 'var(--u-good-tint)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <BookOpen size={20} color="#059669" />
                 </span>
                 <span style={{ flex: 1, minWidth: 0 }}>
@@ -179,7 +179,7 @@ export default function ExplorePage() {
                   padding: '8px 14px',
                   borderRadius: 9999,
                   border: `1px solid ${isIn ? '#059669' : 'var(--border)'}`,
-                  background: isIn ? '#10b981' : 'var(--surface)',
+                  background: isIn ? 'var(--u-amber)' : 'var(--surface)',
                   color: isIn ? '#fff' : '#059669',
                   fontWeight: 800,
                   fontSize: 12,
@@ -196,3 +196,4 @@ export default function ExplorePage() {
     </div>
   );
 }
+

@@ -11,8 +11,8 @@ import { api } from '../lib/api';
 type MyCourse = { code: string; title: string; weeks: number };
 
 // My Courses: only courses this student enrolled in. Browsing + joining
-// new ones lives under Explore (/explore).
-export default function CoursePage() {
+// new ones lives under Class (/class).
+export default function CoursesRoute() {
   const [courses, setCourses] = useState<MyCourse[]>([]);
   const [activity, setActivity] = useState<string[]>([]);
   const [repairing, setRepairing] = useState(false);
@@ -79,7 +79,7 @@ export default function CoursePage() {
   if (loading)
     return (
       <div style={{ maxWidth: 'var(--shell, 480px)', margin: '0 auto', padding: '20px 16px 80px' }}>
-        <BackButton to="/dashboard" />
+        <BackButton to="/home" />
         <div className="skel" style={{ height: 32, width: '50%', marginTop: 4 }} />
         <div className="skel" style={{ height: 14, width: '70%', marginTop: 10 }} />
         <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -125,31 +125,34 @@ export default function CoursePage() {
 
   return (
     <div style={{ maxWidth: 'var(--shell, 480px)', margin: '0 auto', padding: '20px 16px 80px' }}>
-      <BackButton to="/dashboard" />
+      <BackButton to="/home" />
       <h1 style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 28 }}>My Courses</h1>
       <p style={{ color: 'var(--text2)', marginTop: 6, fontSize: 13 }}>
         Your enrolled courses — open one to keep learning
       </p>
       {success && <Flash tone="success" message={success} onDismiss={() => setSuccess('')} />}
-      <Link to="/explore" style={{ marginTop: 12, padding: 12, background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: 12, display: 'flex', gap: 10, alignItems: 'center', textDecoration: 'none', color: '#065f46', fontWeight: 700, fontSize: 14 }}>
-        <Search size={18} /> Explore courses to enroll
+      <Link to="/class" className="card" style={{ marginTop: 12, display: 'flex', gap: 10, alignItems: 'center', textDecoration: 'none', color: 'var(--text)' }}>
+        <span style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--u-green-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Search size={18} color="var(--u-green)" />
+        </span>
+        <span className="t-14 w-7">Find your class to enroll</span>
       </Link>
       {activity.length > 0 && (
-        <div style={{ marginTop: 12, padding: 14, background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 12 }}>
+        <div style={{ marginTop: 12, padding: 14, background: 'var(--u-warn-tint)', border: '1px solid #fde68a', borderRadius: 12 }}>
           <div style={{ fontWeight: 800, fontSize: 14 }}>You learned in {activity.length} course{activity.length === 1 ? '' : 's'} not on your list</div>
           <div style={{ fontSize: 12, color: 'var(--text2)', marginTop: 4 }}>{activity.join(' · ')}</div>
-          <button onClick={repair} disabled={repairing} style={{ marginTop: 10, padding: '10px 18px', borderRadius: 9999, background: '#10b981', color: '#fff', border: 'none', borderBottom: '4px solid #059669', fontWeight: 800, fontSize: 13, opacity: repairing ? 0.6 : 1 }}>
+          <button onClick={repair} disabled={repairing} style={{ marginTop: 10, padding: '10px 18px', borderRadius: 9999, background: 'var(--u-amber)', color: 'var(--u-black)', border: 'none', borderBottom: '4px solid #c69a1a', fontWeight: 800, fontSize: 13, opacity: repairing ? 0.6 : 1 }}>
             {repairing ? 'Restoring…' : 'Restore my courses'}
           </button>
         </div>
       )}
       <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
         {courses.length === 0 && !error && (
-          <div style={{ padding: 24, textAlign: 'center', color: 'var(--text2)', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12 }}>
-            <BoxBoy pose="thinking" width={62} />
-            <div style={{ marginTop: 8 }}>No enrolled courses yet.</div>
-            <Link to="/explore" style={{ display: 'inline-block', marginTop: 12, padding: '10px 22px', background: '#10b981', color: '#fff', borderRadius: 9999, textDecoration: 'none', fontWeight: 800, borderBottom: '4px solid #059669' }}>
-              Explore courses
+          <div className="card" style={{ padding: 24, textAlign: 'center' }}>
+            <BoxBoy pose="readingStanding" width={72} />
+            <div className="t-15" style={{ marginTop: 12 }}>No enrolled courses yet.</div>
+            <Link to="/class" className="btn btn--amber" style={{ marginTop: 12, display: 'inline-block' }}>
+              Find your class
             </Link>
           </div>
         )}
@@ -157,31 +160,28 @@ export default function CoursePage() {
           <Link
             key={c.code}
             to={`/course/${encodeURIComponent(c.code.trim())}`}
-            className="rise"
+            className="card rise"
             style={{
               animationDelay: `${Math.min(i, 6) * 40}ms`,
-              padding: '14px 16px',
-              background: 'var(--surface)',
-              border: '1px solid var(--border)',
-              borderRadius: 12,
-              textDecoration: 'none',
-              color: 'var(--text)',
               display: 'flex',
               gap: 12,
               alignItems: 'center',
+              textDecoration: 'none',
+              color: 'var(--text)',
             }}
           >
-            <span style={{ width: 40, height: 40, borderRadius: 10, background: '#ecfdf5', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <BookOpen size={20} color="#059669" />
+            <span style={{ width: 44, height: 44, borderRadius: 12, background: 'var(--u-green-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <BookOpen size={20} color="var(--u-green)" />
             </span>
             <span style={{ flex: 1 }}>
-              <span style={{ fontWeight: 700, display: 'block' }}>{c.code}</span>
-              <span style={{ fontSize: 12, color: 'var(--text2)' }}>{c.title} · {c.weeks} {c.weeks === 1 ? 'week' : 'weeks'}</span>
+              <span className="t-15 w-7" style={{ display: 'block' }}>{c.code}</span>
+              <span className="t-13 muted">{c.title} · {c.weeks} {c.weeks === 1 ? 'week' : 'weeks'}</span>
             </span>
-            <ChevronRight size={18} color="#059669" />
+            <ChevronRight size={18} color="var(--u-green)" />
           </Link>
         ))}
       </div>
     </div>
   );
 }
+

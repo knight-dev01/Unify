@@ -77,7 +77,7 @@ function OversightCard({ platform, activity, mainAdmin }: { platform: Platform; 
   );
 }
 
-export default function DashboardRoute() {
+export default function HomeRoute() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [xp, setXp] = useState(0);
@@ -206,7 +206,7 @@ export default function DashboardRoute() {
         if (stats) {
           setXp(stats.xp);
           setStreak(stats.streak);
-          setCourses(stats.courses);
+          setCourses(stats.courses || []);
           setQuizzes({ taken: stats.quizzesTaken || 0, avg: stats.quizAvg || 0 });
         }
         if (me.profile?.role === 'lecturer' || me.profile?.role === 'contributor') {
@@ -256,7 +256,7 @@ export default function DashboardRoute() {
 
   if (loading) return <DashboardSkeleton author={skelAuthor} />;
   if (loadError)
-    return <ErrorState title="Couldn't load your dashboard" message={loadError} />;
+    return <ErrorState title="Couldn't load Home" message={loadError} />;
 
   const firstName = profile?.first_name || 'Builder';
   const cleanEnrolled = enrolled.map((c) => (c || '').trim()).filter(Boolean);
@@ -299,7 +299,7 @@ export default function DashboardRoute() {
         {!profile?.avatar_url && (
           <div style={{ margin: '12px 16px 0', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 12, display: 'flex', gap: 10, alignItems: 'center' }}>
             <div style={{ flex: 1, fontSize: 13 }}><strong>Finish your profile</strong> <span style={{ color: 'var(--text2)' }}>— add a picture auditors see on your notes.</span></div>
-            <Link to="/profile" style={{ padding: '8px 16px', background: '#10b981', color: '#fff', borderRadius: 9999, textDecoration: 'none', fontWeight: 800, fontSize: 12, whiteSpace: 'nowrap' }}>
+            <Link to="/me" style={{ padding: '8px 16px', background: 'var(--u-amber)', color: 'var(--u-black)', borderBottom: '3px solid #c69a1a', borderRadius: 9999, textDecoration: 'none', fontWeight: 800, fontSize: 12, whiteSpace: 'nowrap' }}>
               Add photo
             </Link>
           </div>
@@ -334,7 +334,7 @@ export default function DashboardRoute() {
           </Link>
         </div>
         {profile?.role === 'lecturer' || teaching.length > 0 ? (
-          <Link to="/classes" style={{ margin: '12px 16px 0', padding: 14, background: 'linear-gradient(135deg,#10b981,#059669)', color: '#fff', borderRadius: 12, display: 'flex', gap: 10, alignItems: 'center', textDecoration: 'none' }}>
+          <Link to="/my-classes" style={{ margin: '12px 16px 0', padding: 14, background: 'linear-gradient(135deg,var(--u-amber),#059669)', color: '#fff', borderRadius: 12, display: 'flex', gap: 10, alignItems: 'center', textDecoration: 'none' }}>
             <BookOpen size={20} />
             <span style={{ flex: 1 }}>
               <span style={{ fontWeight: 800, display: 'block' }}>My Classes</span>
@@ -373,7 +373,7 @@ export default function DashboardRoute() {
         <div style={{ margin: '12px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
           {notes.length === 0 ? (
             <div style={{ padding: 24, textAlign: 'center', color: 'var(--text2)', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12 }}>
-              <BoxBoy pose="thinking" width={77} />
+              <BoxBoy pose="readingStanding" width={77} />
               <div style={{ marginTop: 8 }}>Nothing published yet. Open Studio to author your first week.</div>
             </div>
           ) : (
@@ -398,7 +398,7 @@ export default function DashboardRoute() {
                   onClick={() => setConfirmDelete(n.id)}
                   disabled={deleting === n.id}
                   aria-label={`Delete ${n.course} week ${n.week} topic ${n.topic} version ${n.version}`}
-                  style={{ padding: 10, borderRadius: 10, background: 'var(--surface)', border: '1px solid var(--border)', color: '#991b1b', opacity: deleting === n.id ? 0.5 : 1 }}
+                  style={{ padding: 10, borderRadius: 10, background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--u-red)', opacity: deleting === n.id ? 0.5 : 1 }}
                 >
                   <Trash2 size={16} />
                 </button>
@@ -461,14 +461,14 @@ export default function DashboardRoute() {
             <div style={{ fontWeight: 800, fontSize: 14 }}>Finish your profile</div>
             <div style={{ fontSize: 12, color: 'var(--text2)' }}>Add a picture so coursemates and lecturers recognize you.</div>
           </div>
-          <Link to="/profile" style={{ padding: '8px 16px', background: '#10b981', color: '#fff', borderRadius: 9999, textDecoration: 'none', fontWeight: 800, fontSize: 12, whiteSpace: 'nowrap' }}>
+          <Link to="/me" style={{ padding: '8px 16px', background: 'var(--u-amber)', color: 'var(--u-black)', borderBottom: '3px solid #c69a1a', borderRadius: 9999, textDecoration: 'none', fontWeight: 800, fontSize: 12, whiteSpace: 'nowrap' }}>
             Add photo
           </Link>
         </div>
       )}
 
       {pendingReq && (
-        <div style={{ margin: '0 16px 12px', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 12, padding: 16 }}>
+        <div style={{ margin: '0 16px 12px', background: 'var(--u-warn-tint)', border: '1px solid #fde68a', borderRadius: 12, padding: 16 }}>
           <div style={{ fontWeight: 800, fontSize: 15 }}>
             Welcome{profile?.first_name ? `, ${profile.first_name}` : ''} — your {pendingReq.role} application is with the admin
           </div>
@@ -488,15 +488,13 @@ export default function DashboardRoute() {
       )}
 
       {resume && resume.course ? (
-        <div style={{ margin: '0 16px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 16, display: 'flex', gap: 12, alignItems: 'center' }}>
-          <div style={{ width: 44, height: 44, background: '#ecfdf5', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <BookOpen size={20} color="#059669" />
-          </div>
+        <div className="card" style={{ margin: '0 16px 12px', display: 'flex', gap: 12, alignItems: 'center', padding: 16 }}>
+          <BoxBoy pose="readingStanding" width={56} style={{ flexShrink: 0 }} />
           <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 700 }}>Continue Learning</div>
-            <div style={{ fontSize: 12, color: 'var(--text2)' }}>{resume.course} · Week {resume.week} · pick up where you stopped</div>
+            <div className="t-15 w-7" style={{ marginBottom: 4 }}>Continue Learning</div>
+            <div className="t-13 muted">{resume.course} · Week {resume.week} · pick up where you stopped</div>
           </div>
-          <Link to={`/learn/${encodeURIComponent(resume.course.trim())}/week/${resume.week}${(() => { const q = new URLSearchParams(); if (resume.topic) q.set('t', String(resume.topic)); if (resume.lecture && resume.lecture > 1) q.set('c', String(resume.lecture)); const s = q.toString(); return s ? `?${s}` : ''; })()}`} style={{ padding: '10px 16px', background: '#10b981', color: '#fff', borderRadius: 9999, textDecoration: 'none', fontWeight: 800, borderBottom: '4px solid #059669' }}>
+          <Link to={`/learn/${encodeURIComponent(resume.course.trim())}/week/${resume.week}${(() => { const q = new URLSearchParams(); if (resume.topic) q.set('t', String(resume.topic)); if (resume.lecture && resume.lecture > 1) q.set('c', String(resume.lecture)); const s = q.toString(); return s ? `?${s}` : ''; })()}`} className="btn btn--amber" style={{ whiteSpace: 'nowrap' }}>
             Resume
           </Link>
         </div>
@@ -508,16 +506,16 @@ export default function DashboardRoute() {
 
       <div style={{ margin: '16px 16px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2 style={{ fontFamily: 'var(--fd)', fontWeight: 800 }}>Your Courses</h2>
-        <Link to="/explore" style={{ fontSize: 13, color: '#059669', fontWeight: 700, textDecoration: 'none', display: 'flex', gap: 4, alignItems: 'center' }}>
+        <Link to="/class" style={{ fontSize: 13, color: '#059669', fontWeight: 700, textDecoration: 'none', display: 'flex', gap: 4, alignItems: 'center' }}>
           Add courses <ChevronRight size={14} />
         </Link>
       </div>
       <div style={{ margin: '12px 16px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
         {shown.length === 0 ? (
           <div style={{ gridColumn: '1 / -1', padding: 24, textAlign: 'center', color: 'var(--text2)', background: 'var(--surface)', border: '2px solid var(--border)', borderRadius: 16 }}>
-            <BoxBoy pose="thinking" width={77} />
+            <BoxBoy pose="readingStanding" width={77} />
             <div style={{ marginTop: 8 }}>No courses yet.</div>
-            <Link to="/explore" style={{ display: 'inline-block', marginTop: 12, padding: '10px 22px', background: '#10b981', color: '#fff', borderRadius: 9999, textDecoration: 'none', fontWeight: 800, borderBottom: '4px solid #059669' }}>
+            <Link to="/class" style={{ display: 'inline-block', marginTop: 12, padding: '10px 22px', background: 'var(--u-amber)', color: 'var(--u-black)', borderRadius: 9999, textDecoration: 'none', fontWeight: 800, borderBottom: '4px solid #c69a1a' }}>
               Explore courses to enroll
             </Link>
           </div>
@@ -537,14 +535,14 @@ export default function DashboardRoute() {
                         s.avatar ? (
                           <img key={si} src={s.avatar} alt={s.name} title={s.name} style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--surface)', marginLeft: si === 0 ? 0 : -10 }} />
                         ) : (
-                          <div key={si} title={s.name} style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg,#10b981,#059669)', color: '#fff', fontWeight: 800, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--surface)', marginLeft: si === 0 ? 0 : -10 }}>
+                          <div key={si} title={s.name} style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg,var(--u-amber),#059669)', color: '#fff', fontWeight: 800, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--surface)', marginLeft: si === 0 ? 0 : -10 }}>
                             {s.name.trim().charAt(0).toUpperCase()}
                           </div>
                         )
                       ))}
                     </div>
                   ) : (
-                    <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg,#10b981,#059669)', color: '#fff', fontWeight: 800, fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg,var(--u-amber),#059669)', color: '#fff', fontWeight: 800, fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                       {c.course.trim().charAt(0).toUpperCase()}
                     </div>
                   )}
@@ -579,7 +577,7 @@ export default function DashboardRoute() {
       {confirmUnenroll && (
         <ConfirmModal
           title={`Remove ${confirmUnenroll}?`}
-          body="It leaves your dashboard. Re-enroll anytime from Explore — your XP and progress stay."
+          body="It leaves Home. Re-enroll anytime from Class — your XP and progress stay."
           confirmLabel="Remove"
           busy={unenrolling}
           onConfirm={() => {
@@ -594,3 +592,4 @@ export default function DashboardRoute() {
     </div>
   );
 }
+
