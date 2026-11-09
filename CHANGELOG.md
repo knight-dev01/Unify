@@ -5,6 +5,17 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.7.0] - 2026-11-09
+
+### Changed
+- **One admin hub**: every admin job now lives under `/admin`, grouped as People (users and roles, staff requests, class reps), Academics (courses per level, all content, universities, academic session), Platform (announce, AI models) and Health (analytics, app errors, cap audit). Each section has its own URL (`/admin/users`, `/admin/content`, ...), so links, refresh and the back button work, and unknown sections fall back to the Overview
+- **Admin Overview**: a landing page with tiles for staff requests waiting, recent app errors and cap violations, plus the platform counts. It replaces the old behaviour of jumping into the requests queue on load
+- **All content** moved into the hub (the old `/admin/content` link still works) and **grant or remove HOC** moved from the class board to Admin, Class reps
+- Admins get an **Admin** tab in the bottom bar and desktop rail
+
+### Removed
+- The leftover accordion wiring in the admin page, the separate All content page shell, and the admin-only card on the class board
+
 ## [2.6.0] - 2026-11-09
 
 ### Added

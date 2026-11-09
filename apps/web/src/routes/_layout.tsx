@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, CalendarDays, ClipboardCheck, Search, User, PenTool, Bell } from 'lucide-react';
+import { LayoutDashboard, CalendarDays, ClipboardCheck, Search, User, PenTool, Bell, Shield } from 'lucide-react';
 import { supabaseBrowser, touchActivity, isSessionExpired, expireSession } from '../lib/supabase';
 import { pushSupported, enablePush } from '../lib/push';
 import ConfirmModal from '../components/ConfirmModal';
@@ -44,6 +44,7 @@ const LECTURER_TABS: Tab[] = [
 // /browse + /classes light the Studio tab (the working area).
 const ADMIN_TABS: Tab[] = [
   { to: '/home', label: 'Home', icon: LayoutDashboard, match: ['/home'] },
+  { to: '/admin', label: 'Admin', icon: Shield, match: ['/admin'] },
   { to: '/studio', label: 'Studio', icon: PenTool, match: ['/studio', '/browse', '/my-classes'] },
   { to: '/me', label: 'Me', icon: User, match: ['/me'] },
 ];

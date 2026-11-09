@@ -34,7 +34,6 @@ export default function HocDashboardRoute() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [busy, setBusy] = useState(false);
-  const [grantEmail, setGrantEmail] = useState('');
 
   const load = async () => {
     setFailed(false);
@@ -65,13 +64,6 @@ export default function HocDashboardRoute() {
   const remove = async (id: string) => {
     try { await api.hocDelete(id); setPosts((p) => (p || []).filter((x) => x.id !== id)); }
     catch (e) { errorToast(e, 'delete that post'); }
-  };
-  const grant = async (revoke: boolean) => {
-    try {
-      const r = await api.hocGrant(grantEmail.trim(), revoke);
-      toastSuccess(r.isHoc ? `${r.name || 'Student'} is now HOC.` : `${r.name || 'Student'} is no longer HOC.`);
-      setGrantEmail('');
-    } catch (e) { errorToast(e, 'update that HOC'); }
   };
 
   const shell = { maxWidth: 'min(var(--shell, 480px), 760px)', margin: '0 auto', padding: '20px 16px 96px' } as const;
@@ -133,16 +125,6 @@ export default function HocDashboardRoute() {
         )}
       </section>
 
-      {isAdmin && (
-        <Card style={{ marginTop: 24, gap: 10 }}>
-          <Label>Admin · grant or remove HOC</Label>
-          <input value={grantEmail} onChange={(e) => setGrantEmail(e.target.value)} placeholder="student@email.com" type="email" style={field} />
-          <div style={{ display: 'flex', gap: 10 }}>
-            <button className="btn btn--amber btn--sm" disabled={!grantEmail.includes('@')} onClick={() => void grant(false)}>Make HOC</button>
-            <button className="btn btn--white btn--sm" disabled={!grantEmail.includes('@')} onClick={() => void grant(true)}>Remove HOC</button>
-          </div>
-        </Card>
-      )}
     </div>
   );
 }

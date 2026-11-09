@@ -1,7 +1,7 @@
 import { toastError } from '../lib/toast';
-import { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Shield, Trash2, PenTool, BookOpen, ChevronDown, ChevronRight, BarChart3, UserCheck, Users, LibraryBig, Cpu, Building2, CalendarDays, Megaphone, AlertTriangle, Scale } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Shield, Trash2, PenTool, BookOpen, ChevronDown, ChevronRight, BarChart3, UserCheck, Users, LibraryBig, Cpu, Building2, CalendarDays, Megaphone, AlertTriangle, Scale, LayoutGrid, GraduationCap } from 'lucide-react';
 import { supabaseBrowser } from '../lib/supabase';
 import { api, type AdminUser } from '../lib/api';
 import Loading from '../components/Loading';
@@ -11,6 +11,7 @@ import { Bars, Donut, Spark } from '../components/Charts';
 import BackButton from '../components/BackButton';
 import Drop from '../components/Drop';
 import { describeError } from '../lib/errors';
+import AdminContentPanel from './admin/content';
 
 type Stats = { users: number; byRole: Record<string, number>; weeks: number; topics: number; courses: number; xpTotal: number };
 type Uni = { id: string; name: string; short_name?: string };
@@ -18,33 +19,34 @@ type Course = { code: string; title: string; levels: string[]; semesters: string
 
 const LEVELS = ['100 Level', '200 Level', '300 Level', '400 Level', '500 Level'];
 
-// Full admin panel: sidebar navigation, one module view at a time (never
-// the old horizontal accordion). Modules below render into the view.
-const MODS = [
-  { id: 'requests', title: 'Staff requests', icon: UserCheck },
-  { id: 'users', title: 'Users & roles', icon: Users },
-  { id: 'capaudit', title: 'Cap audit', icon: Scale },
-  { id: 'courses', title: 'Courses per level', icon: LibraryBig },
-  { id: 'analytics', title: 'Analytics', icon: BarChart3 },
-  { id: 'models', title: 'AI models', icon: Cpu },
-  { id: 'unis', title: 'Universities', icon: Building2 },
-  { id: 'session', title: 'Academic session', icon: CalendarDays },
-  { id: 'announce', title: 'Announce', icon: Megaphone },
-  { id: 'errors', title: 'App errors', icon: AlertTriangle },
+// One admin hub. Each section has its own URL (/admin/users …) so links,
+// refresh and the back button behave; /admin is the Overview. Grouped by job.
+const GROUPS = [
+  { label: null, items: [{ id: 'overview', title: 'Overview', icon: LayoutGrid }] },
+  { label: 'People', items: [
+    { id: 'users', title: 'Users & roles', icon: Users },
+    { id: 'requests', title: 'Staff requests', icon: UserCheck },
+    { id: 'hoc', title: 'Class reps (HOC)', icon: GraduationCap },
+  ] },
+  { label: 'Academics', items: [
+    { id: 'courses', title: 'Courses per level', icon: LibraryBig },
+    { id: 'content', title: 'All content', icon: BookOpen },
+    { id: 'unis', title: 'Universities', icon: Building2 },
+    { id: 'session', title: 'Academic session', icon: CalendarDays },
+  ] },
+  { label: 'Platform', items: [
+    { id: 'announce', title: 'Announce', icon: Megaphone },
+    { id: 'models', title: 'AI models', icon: Cpu },
+  ] },
+  { label: 'Health', items: [
+    { id: 'analytics', title: 'Analytics', icon: BarChart3 },
+    { id: 'errors', title: 'App errors', icon: AlertTriangle },
+    { id: 'capaudit', title: 'Cap audit', icon: Scale },
+  ] },
 ];
+const SECTION_IDS = GROUPS.flatMap((g) => g.items.map((i) => i.id));
 
-function Module({
-  id,
-  openId,
-  children,
-}: {
-  id: string;
-  title: string;
-  badge?: number;
-  openId: string;
-  onToggle: (id: string) => void;
-  children: React.ReactNode;
-}) {
+function Module({ id, openId, children }: { id: string; openId: string; children: React.ReactNode }) {
   if (openId !== id) return null;
   return <div>{children}</div>;
 }
@@ -79,7 +81,10 @@ export default function AdminRoute() {
   // role buttons + remove button, so the primary admin can never lock
   // itself out by flipping its own role.
   const [ownId, setOwnId] = useState('');
-  const [openModule, setOpenModule] = useState('users');
+  const { section } = useParams();
+  const openModule = section && SECTION_IDS.includes(section) ? section : 'overview';
+  const setOpenModule = (id: string) => navigate(id === 'overview' ? '/admin' : `/admin/${id}`);
+  const [hocEmail, setHocEmail] = useState('');
   const [courseQ, setCourseQ] = useState('');
   // App errors (client log + Sentry backup). Sentry presence is a build-time
   // env flag, read here so the module says which window is live.
@@ -119,16 +124,11 @@ export default function AdminRoute() {
   const [reqTab, setReqTab] = useState<'pending' | 'history'>('pending');
   // First paint lands on the requests queue when anything waits — pending
   // applications outrank routine browsing. Later refreshes never yank.
-  const routedRef = useRef(false);
 
   const loadRequests = async (history = false) => {
     try {
       const r = await api.adminRoleRequests(history);
       setRequests(r.requests || []);
-      if (!history && !routedRef.current && (r.requests || []).length > 0) {
-        routedRef.current = true;
-        setOpenModule('requests');
-      }
     } catch {
       // queue stands empty
     }
@@ -441,6 +441,17 @@ export default function AdminRoute() {
     }
   };
 
+  const grantHoc = async (revoke: boolean) => {
+    setError('');
+    try {
+      const r = await api.hocGrant(hocEmail.trim(), revoke);
+      setSuccess(r.isHoc ? `${r.name || 'Student'} is now HOC.` : `${r.name || 'Student'} is no longer HOC.`);
+      setHocEmail('');
+    } catch (err) {
+      setError(describeError(err, 'update that HOC'));
+    }
+  };
+
   if (loading) return <Loading text="Loading admin…" />;
 
   const card = { background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 12 } as const;
@@ -461,35 +472,32 @@ export default function AdminRoute() {
       {success && <Flash tone="success" message={success} onDismiss={() => setSuccess('')} />}
 
       <div className="admin-shell" style={{ marginTop: 12 }}>
-        <nav className="admin-side" aria-label="Admin modules">
-          {MODS.map((m) => {
-            const Icon = m.icon;
-            const active = openModule === m.id;
-            const badge = m.id === 'requests' ? requests.length
-              : m.id === 'users' ? users.length
-              : m.id === 'courses' ? courses.length
-              : m.id === 'models' ? models.length
-              : m.id === 'errors' ? errors.length
-              : null;
-            return (
-              <button
-                key={m.id}
-                onClick={() => setOpenModule(m.id)}
-                aria-current={active ? 'page' : undefined}
-                className={`admin-navitem ${active ? 'active' : ''}`}
-              >
-                <Icon size={16} />
-                <span style={{ flex: 1, textAlign: 'left' }}>{m.title}</span>
-                {badge != null && badge > 0 && (
-                  <span className="admin-badge">{badge}</span>
-                )}
-              </button>
-            );
-          })}
-          <Link to="/admin/content" className="admin-navitem">
-            <BookOpen size={16} />
-            <span style={{ flex: 1, textAlign: 'left' }}>All content</span>
-          </Link>
+        <nav className="admin-side" aria-label="Admin sections">
+          {GROUPS.map((g) => (
+            <div key={g.label || 'top'} className="admin-group">
+              {g.label && <div className="admin-grouplabel">{g.label}</div>}
+              {g.items.map((m) => {
+                const Icon = m.icon;
+                const active = openModule === m.id;
+                const badge = m.id === 'requests' ? requests.length
+                  : m.id === 'errors' ? errors.length
+                  : m.id === 'capaudit' ? violations.length
+                  : null;
+                return (
+                  <button
+                    key={m.id}
+                    onClick={() => setOpenModule(m.id)}
+                    aria-current={active ? 'page' : undefined}
+                    className={`admin-navitem ${active ? 'active' : ''}`}
+                  >
+                    <Icon size={16} />
+                    <span style={{ flex: 1, textAlign: 'left' }}>{m.title}</span>
+                    {badge != null && badge > 0 && <span className="admin-badge">{badge}</span>}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
           <Link to="/studio" className="admin-navitem">
             <PenTool size={16} />
             <span style={{ flex: 1, textAlign: 'left' }}>Studio</span>
@@ -497,8 +505,22 @@ export default function AdminRoute() {
         </nav>
         <div className="admin-view">
 
+      <Module id="overview" openId={openModule}>
+        <h2 style={{ fontWeight: 800, fontSize: 20, margin: '4px 0 0' }}>Overview</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 8, marginTop: 12 }}>
+          {[
+            { id: 'requests', label: 'Staff requests waiting', n: requests.length },
+            { id: 'errors', label: 'Recent app errors', n: errors.length },
+            { id: 'capaudit', label: 'Cap violations', n: violations.length },
+          ].map((t) => (
+            <button key={t.id} onClick={() => setOpenModule(t.id)} style={{ ...card, textAlign: 'left', cursor: 'pointer', color: 'var(--text)' }}>
+              <div style={{ fontSize: 24, fontWeight: 800, color: t.n > 0 ? 'var(--u-warn-ink, #b45309)' : 'var(--u-good)' }}>{t.n}</div>
+              <div style={{ fontSize: 12, color: 'var(--text2)' }}>{t.label}</div>
+            </button>
+          ))}
+        </div>
       {stats && (
-        <div style={{ margin: '16px 0 0', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 16, display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12, textAlign: 'center' }}>
+        <div style={{ margin: '12px 0 0', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 16, display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12, textAlign: 'center' }}>
           <div>
             <div style={{ fontSize: 18, fontWeight: 800 }}>{stats.users}</div>
             <div style={{ fontSize: 11, color: 'var(--text2)' }}>Users</div>
@@ -526,7 +548,25 @@ export default function AdminRoute() {
         </div>
       )}
 
-      <Module id="analytics" title="Analytics" openId={openModule} onToggle={setOpenModule}>
+      </Module>
+
+      <Module id="content" openId={openModule}>
+        <AdminContentPanel />
+      </Module>
+
+      <Module id="hoc" openId={openModule}>
+        <div style={card}>
+          <div style={{ fontWeight: 800, fontSize: 16 }}>Class reps (HOC)</div>
+          <div style={{ fontSize: 12, color: 'var(--text2)', margin: '4px 0 10px' }}>A Head of Class can post to their class board. Enter the student's email.</div>
+          <input value={hocEmail} onChange={(e) => setHocEmail(e.target.value)} placeholder="student@email.com" type="email" style={{ ...input, width: '100%' }} />
+          <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
+            <button className="btn btn--amber btn--sm" disabled={!hocEmail.includes('@')} onClick={() => void grantHoc(false)}>Make HOC</button>
+            <button className="btn btn--white btn--sm" disabled={!hocEmail.includes('@')} onClick={() => void grantHoc(true)}>Remove HOC</button>
+          </div>
+        </div>
+      </Module>
+
+      <Module id="analytics" openId={openModule}>
         {!stats && !trends && (
           <div style={card}>
             <div style={{ fontSize: 13, color: 'var(--text2)' }}>Charts load with the panel data above.</div>
@@ -568,7 +608,7 @@ export default function AdminRoute() {
         )}
       </Module>
 
-      <Module id="models" title="AI models" badge={models.length} openId={openModule} onToggle={setOpenModule}>
+      <Module id="models" openId={openModule}>
       <div style={card}>
         <div style={{ fontSize: 13, color: 'var(--text2)', marginBottom: 8 }}>
           Provider: <strong>{provider || '—'}</strong> · Default: <strong>{defaultModel || '—'}</strong>
@@ -622,7 +662,7 @@ export default function AdminRoute() {
       </div>
       </Module>
 
-      <Module id="unis" title="Universities" badge={unis.length} openId={openModule} onToggle={setOpenModule}>
+      <Module id="unis" openId={openModule}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {unis.map((u) => (
           <div key={u.id} style={{ ...card, display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -643,7 +683,7 @@ export default function AdminRoute() {
       </div>
       </Module>
 
-      <Module id="courses" title="Courses per level" badge={courses.length} openId={openModule} onToggle={setOpenModule}>
+      <Module id="courses" openId={openModule}>
       <div style={{ ...card, display: 'flex', gap: 8, marginBottom: 8 }}>
         <input value={courseQ} onChange={(e) => setCourseQ(e.target.value)} placeholder="Search code or title…" style={{ ...input, flex: 1 }} />
       </div>
@@ -709,7 +749,7 @@ export default function AdminRoute() {
       </div>
       </Module>
 
-      <Module id="session" title="Academic session" openId={openModule} onToggle={setOpenModule}>
+      <Module id="session" openId={openModule}>
       <div style={card}>
         <div style={{ fontSize: 12, color: 'var(--text2)', marginBottom: 8 }}>Active semester — students only see this semester's courses.</div>
         <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
@@ -739,7 +779,7 @@ export default function AdminRoute() {
       </div>
       </Module>
 
-      <Module id="announce" title="Announce to users" openId={openModule} onToggle={setOpenModule}>
+      <Module id="announce" openId={openModule}>
       <div style={card}>
         <div style={{ fontSize: 12, color: 'var(--text2)', marginBottom: 8 }}>Lands on every user's bell instantly, and is emailed to every confirmed inbox.</div>
         <input value={announceTitle} onChange={(e) => setAnnounceTitle(e.target.value)} placeholder="Announcement title" style={{ ...input, width: '100%', marginBottom: 8 }} />
@@ -774,7 +814,7 @@ export default function AdminRoute() {
       </div>
       </Module>
 
-      <Module id="errors" title="App errors" badge={errors.length} openId={openModule} onToggle={setOpenModule}>
+      <Module id="errors" openId={openModule}>
       <div style={card}>
         <div style={{ fontSize: 12, color: 'var(--text2)', marginBottom: 8 }}>
           Render crashes from user devices (Sentry backup — newest first, 30-day window).
@@ -796,7 +836,7 @@ export default function AdminRoute() {
       </div>
       </Module>
 
-      <Module id="requests" title="Staff requests" badge={requests.length} openId={openModule} onToggle={setOpenModule}>
+      <Module id="requests" openId={openModule}>
       <div style={card}>
         <div style={{ fontSize: 12, color: 'var(--text2)', marginBottom: 8 }}>
           Lecturer/contributor applications. Approve grants the role + teaching courses (contributor 2-per-level cap enforced); both sides notify by bell + email.
@@ -847,7 +887,7 @@ export default function AdminRoute() {
       </div>
       </Module>
 
-      <Module id="users" title="Users & roles" badge={users.length} openId={openModule} onToggle={setOpenModule}>
+      <Module id="users" openId={openModule}>
       <div style={{ ...card, display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
         <input value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} placeholder="Invite by email…" style={{ ...input, flex: 2, minWidth: 140 }} />
         <Drop
@@ -1078,7 +1118,7 @@ export default function AdminRoute() {
       </Module>
         </div>
       </div>
-      <Module id="capaudit" title="Cap audit" badge={violations.length} openId={openModule} onToggle={setOpenModule}>
+      <Module id="capaudit" openId={openModule}>
       <div style={card}>
         <div style={{ fontSize: 12, color: 'var(--text2)', marginBottom: 8 }}>
           Contributors holding more than 2 teaching courses in any level (legacy rows predate the server gate). Trim keeps the earliest two per level.
