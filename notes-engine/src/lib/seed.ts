@@ -614,3 +614,79 @@ export async function ensureDefaultAdmin(): Promise<void> {
     await finish(found.id);
   }
 }
+
+// ---- Test accounts (QA only) ----
+// One account per role so every screen can be exercised without touching a
+// real user. OFF unless SEED_TEST_USERS=1 is set on the service, because
+// these share a known password: enable on a staging project, or switch the
+// flag off again (and delete the accounts) once testing is done.
+// Idempotent and non-destructive: existing accounts are adopted, their
+// passwords are never reset.
+const TEST_PASSWORD = process.env.SEED_TEST_PASSWORD || "Test@1234";
+const TEST_USERS: { email: string; name: string; role: "student" | "lecturer" | "contributor" | "admin"; isHoc?: boolean }[] = [
+  { email: "student@test.unify", name: "Test Student", role: "student" },
+  { email: "hoc@test.unify", name: "Test HOC", role: "student", isHoc: true },
+  { email: "lecturer@test.unify", name: "Test Lecturer", role: "lecturer" },
+  { email: "contributor@test.unify", name: "Test Contributor", role: "contributor" },
+  { email: "admin@test.unify", name: "Test Admin", role: "admin" },
+];
+
+export async function ensureTestUsers(): Promise<void> {
+  if (process.env.SEED_TEST_USERS !== "1") return;
+  const sb = supabaseAdmin();
+
+  const { data: courseRows } = await sb.from("course_levels").select("course").eq("level", "200 Level").limit(3);
+  const courses = ((courseRows as { course: string }[] | null) || []).map((r) => r.course);
+  const { data: uni } = await sb.from("universities").select("id,name").limit(1).maybeSingle();
+  const u = uni as { id?: string; name?: string } | null;
+
+  for (const t of TEST_USERS) {
+    let id: string | undefined;
+    const { data: existing } = await sb.from("profiles").select("id").eq("email", t.email).maybeSingle();
+    id = (existing as { id?: string } | null)?.id;
+    if (!id) {
+      const { data, error } = await sb.auth.admin.createUser({
+        email: t.email,
+        password: TEST_PASSWORD,
+        email_confirm: true,
+        user_metadata: { display_name: t.name },
+      });
+      if (error && !/already/i.test(error.message)) throw error;
+      id = (data as { user?: { id?: string } } | null)?.user?.id;
+      if (!id) {
+        const { data: listed } = await sb.auth.admin.listUsers({ perPage: 1000 });
+        id = ((listed as { users?: { id?: string; email?: string }[] } | null)?.users || []).find(
+          (x) => (x.email || "").toLowerCase() === t.email
+        )?.id;
+      }
+    }
+    if (!id) throw new Error(`test user ${t.email} could not be created`);
+
+    const isStudent = t.role === "student";
+    const { error: pErr } = await sb.from("profiles").upsert(
+      {
+        id,
+        first_name: t.name,
+        email: t.email,
+        role: t.role,
+        is_admin: t.role === "admin",
+        is_hoc: !!t.isHoc,
+        email_confirmed: true,
+        // Students need a university to count as onboarded.
+        ...(isStudent
+          ? { university: u?.name || "Test University", university_id: u?.id ?? null, faculty: "Engineering", department: "Chemical Engineering", level: "200 Level", semester: "First Semester" }
+          : {}),
+      },
+      { onConflict: "id" }
+    );
+    if (pErr) throw pErr;
+
+    if (isStudent && courses.length) {
+      const { error: eErr } = await sb
+        .from("enrollments")
+        .upsert(courses.map((course) => ({ user_id: id, course, kind: "taking" })), { onConflict: "user_id,course", ignoreDuplicates: true });
+      if (eErr) throw eErr;
+    }
+  }
+  console.info(`[seed] test users ready: ${TEST_USERS.map((t) => t.email).join(", ")}`);
+}

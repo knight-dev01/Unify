@@ -5,6 +5,18 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-11-09
+
+### Added
+- **Test accounts via deploy**: `ensureTestUsers()` in `notes-engine/src/lib/seed.ts` creates one confirmed account per role (`student@`, `hoc@`, `lecturer@`, `contributor@`, `admin@test.unify`, password `Test@1234` or `SEED_TEST_PASSWORD`) through the Supabase Auth admin API, enrols the student in three 200-level courses, and runs on boot **only when `SEED_TEST_USERS=1`**. Idempotent; never resets an existing password
+- **Desktop sidebar pills** (>=1024px, all roles): the bottom tab bar turned vertical, same icon-over-label pills and lit green active pill; the bottom bar is hidden at that width
+
+### Changed
+- Desktop no longer uses the phone column: `--shell` opens to 1040px (the old 720px desktop width never applied because `tokens.css` overrode it)
+- Welcome Skip now goes to the sign-up tab
+- Post-sign-in onboarding header is the flat brand-green band with Box Boy and black step bars (was an amber-to-emerald gradient); wizard capped at a readable width on desktop
+- All remaining emerald `#059669` accents are tokens; white-on-amber text fixed to black; amber-to-green gradients replaced by brand green
+
 ## [2.1.0] - 2026-11-09
 
 ### Added
@@ -23,6 +35,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **New `/screens` index**: every route grouped by area with role tags (shown on Me for admins and in dev)
 - `lib/routes.ts` is the single source of truth for paths
 - Lecturer stub replaced by the redesigned lecturer home
+
+### Added (entry flow)
+- **Welcome slides** (`/welcome`, S02-S05): four intro slides with Box Boy on the brand-green band, shown once per device before sign-up; `/auth` sends first-time visitors there, Skip and the last slide hand off to `/auth?tab=signin|signup`
+- Splash (S01) is now full brand green with black ink
+
+### Changed (brand green)
+- **One brand green everywhere**: `--u-green` (`#50ff90` light, `#4ade80` dark). `--u-green-accent` is now an alias; hard-coded `#4ade80`/`#50ff90`, the dark-green auth gradient and the emerald avatar gradients all use the token
+- Auth hero is the flat green band with black ink (Wordmark gained `onGreen`)
 
 ### Changed (buttons)
 - **Duolingo depth on every button variant**: `.btn--*` share one edge-and-press system; legacy `.btn-primary`, modal and EOQ buttons are amber with the same edge; inline buttons that carry a bottom edge get the press-down

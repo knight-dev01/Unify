@@ -62,6 +62,7 @@ const GROUPS: { title: string; entries: Entry[] }[] = [
   {
     title: 'Before sign-in',
     entries: [
+      { path: ROUTES.welcome, name: 'Welcome slides', note: 'Four intro slides, shown once per device', roles: ['any'] },
       { path: ROUTES.auth, name: 'Sign in / up', note: 'Box Boy splash first', roles: ['any'] },
       { path: ROUTES.onboarding, name: 'Onboarding', note: 'Full-screen Box Boy flow', roles: ['any'] },
       { path: ROUTES.persona, name: 'Persona picker', note: 'Choose your Box Boy', roles: ['any'] },

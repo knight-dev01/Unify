@@ -749,6 +749,8 @@ try {
   // free-tier boots a long retry tail before giving up for this boot.
   bootJob("seed check", () => seed.ensureSeeded(), [5000, 15000, 60000, 300000]);
   bootJob("default admin check", () => seed.ensureDefaultAdmin());
+  // QA accounts, one per role: only when SEED_TEST_USERS=1 is set on the service.
+  bootJob("test users", () => seed.ensureTestUsers());
 } catch (e) {
   logger.warn("seed skipped", { message: e && e.message });
 }
