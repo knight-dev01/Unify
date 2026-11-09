@@ -11,6 +11,7 @@ import { BoxBoySplash } from '../components/BoxBoySplash';
 import { supabaseBrowser, saveRememberSession, restoreRememberedSession, touchActivity, isSessionExpired, expireSession } from '../lib/supabase';
 import { api, clearMeCache } from '../lib/api';
 import { log } from '../lib/log';
+import { describeError } from '../lib/errors';
 
 // Note: no client-side persistence here. Rate limiting is enforced
 // server-side (API rate limits + Supabase Auth built-in limits).
@@ -156,7 +157,7 @@ export default function AuthRoute() {
     try {
       const { data, error: err } = await client.auth.signInWithPassword({ email, password });
       if (err) {
-        setError(err.message);
+        setError(describeError(err, 'sign in'));
         return;
       }
       if (data.session) {
@@ -164,7 +165,7 @@ export default function AuthRoute() {
         await routeToApp();
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Sign-in failed.');
+      setError(describeError(err, 'sign in'));
     } finally {
       setLoading(false);
     }
@@ -197,7 +198,7 @@ export default function AuthRoute() {
         },
       });
       if (err) {
-        setError(err.message);
+        setError(describeError(err, 'sign up'));
         return;
       }
       if (data.session) {
@@ -209,7 +210,7 @@ export default function AuthRoute() {
         setTab('signin');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Sign-up failed.');
+      setError(describeError(err, 'sign up'));
     } finally {
       setLoading(false);
     }
@@ -227,12 +228,12 @@ export default function AuthRoute() {
     try {
       const { error: err } = await client.auth.resend({ type: 'signup', email: pendingEmail });
       if (err) {
-        setError(err.message);
+        setError(describeError(err, 'resend the email'));
         return;
       }
       setSuccess(`Verification email re-sent to ${pendingEmail}. Check inbox and spam.`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Resend failed.');
+      setError(describeError(err, 'resend the email'));
     } finally {
       setLoading(false);
     }
@@ -254,12 +255,12 @@ export default function AuthRoute() {
         redirectTo: `${window.location.origin}/auth`,
       });
       if (err) {
-        setError(err.message);
+        setError(describeError(err, 'send the reset email'));
         return;
       }
       setSuccess('Reset link sent! Check your inbox (and spam folder).');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Reset failed.');
+      setError(describeError(err, 'send the reset email'));
     } finally {
       setLoading(false);
     }
@@ -283,7 +284,7 @@ export default function AuthRoute() {
     try {
       const { error: err } = await client.auth.updateUser({ password });
       if (err) {
-        setError(err.message);
+        setError(describeError(err, 'set your password'));
         return;
       }
       await client.auth.signOut({ scope: 'local' }).catch(() => {});
@@ -292,7 +293,7 @@ export default function AuthRoute() {
       setTab('signin');
       setSuccess('Password updated! Sign in with your new password.');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Update failed.');
+      setError(describeError(err, 'set your password'));
     } finally {
       setLoading(false);
     }
@@ -312,7 +313,7 @@ export default function AuthRoute() {
       // Success redirects to Google; the return leg routes via the session listener.
     } catch (err) {
       setGoogleLoading(false);
-      setError(err instanceof Error ? err.message : 'Google sign-in failed.');
+      setError(describeError(err, 'sign in with Google'));
     }
   };
 

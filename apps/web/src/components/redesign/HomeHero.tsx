@@ -5,18 +5,20 @@ import type { Profile } from '../../lib/api'
 interface HomeHeroProps {
   profile: Profile
   firstName: string
+  /** CGPA target + planner link: students only. */
+  showCgpa?: boolean
 }
 
 /**
  * S14: Home hero with semester week tracker + CGPA target
  * Replaces generic greeting card
  */
-export function HomeHero({ profile, firstName }: HomeHeroProps) {
+export function HomeHero({ profile, firstName, showCgpa = false }: HomeHeroProps) {
   // Calculate current week (1-12)
   const currentWeek = getCurrentWeek(profile.semester_start, profile.semester_weeks || 12)
   
   // CGPA target set?
-  const hasTarget = profile.cgpa_target != null
+  const hasTarget = showCgpa && profile.cgpa_target != null
   
   return (
     <div 
@@ -56,7 +58,8 @@ export function HomeHero({ profile, firstName }: HomeHeroProps) {
         <BoxBoy pose={hasTarget ? "targetSign" : "readingStanding"} width={72} style={{ flexShrink: 0 }} />
       </div>
 
-      {/* CGPA target / Set target - inside hero */}
+      {/* CGPA target / Set target - inside hero (students only) */}
+      {showCgpa && (
       <div style={{ marginTop: 20 }}>
         {hasTarget && !profile.hide_cgpa ? (
           <Link
@@ -72,7 +75,7 @@ export function HomeHero({ profile, firstName }: HomeHeroProps) {
               border: '1px solid var(--u-border)'
             }}
           >
-            <BoxBoy pose="targetSign" width={60} />
+            <BoxBoy full pose="targetSign" width={60} />
             <div style={{ flex: 1 }}>
               <div className="t-13 muted">CGPA Target</div>
               <div className="t-20 w-7">{profile.cgpa_target?.toFixed(2)}</div>
@@ -96,6 +99,7 @@ export function HomeHero({ profile, firstName }: HomeHeroProps) {
           </Link>
         )}
       </div>
+      )}
     </div>
   )
 }

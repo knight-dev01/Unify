@@ -45,6 +45,8 @@ model Profile {
   cgpaCurrent   Decimal?    @map("cgpa_current") @db.Decimal(3,2)
   cgpaTarget    Decimal?    @map("cgpa_target") @db.Decimal(3,2)
   hideCgpa      Boolean     @default(false) @map("hide_cgpa")
+  cgpaUnitsDone  Int?       @map("cgpa_units_done")
+  cgpaUnitsTotal Int?       @map("cgpa_units_total")
   attendanceFullName String? @map("attendance_full_name")
   attendanceMatric String? @map("attendance_matric")
   isHoc         Boolean     @default(false) @map("is_hoc")
@@ -207,6 +209,7 @@ model ClassSlot {
   startTime  String   @map("start_time")
   endTime    String   @map("end_time")
   venue      String    @default("")
+  meetLink   String    @default("") @map("meet_link")
   createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   @@unique([course, day, startTime])
@@ -332,6 +335,7 @@ model LecturerMaterial {
   weekNumber Int      @map("week_number")
   type       String
   fileUrl    String   @map("file_url")
+  title      String   @default("")
   createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   @@index([courseCode, weekNumber])

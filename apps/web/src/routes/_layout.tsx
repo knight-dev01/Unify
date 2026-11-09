@@ -5,7 +5,8 @@ import { supabaseBrowser, touchActivity, isSessionExpired, expireSession } from 
 import { pushSupported, enablePush } from '../lib/push';
 import ConfirmModal from '../components/ConfirmModal';
 import Wordmark from '../components/Wordmark';
-import { api } from '../lib/api';
+import { api, type Profile } from '../lib/api';
+import { PICTURE_EVENT, resolvePicture } from '../lib/picture';
 import { recordNav } from '../lib/navHistory';
 import { useFocusMode } from '../lib/focus';
 import OfflineBanner from '../components/OfflineBanner';
@@ -194,12 +195,27 @@ export default function Layout() {
     };
   }, []);
 
-  // Live avatar refresh: profile uploads broadcast so the header chip
-  // updates without a reload (the URL itself cache-busts server-side).
+  // Live picture refresh: an upload or a new Box Boy broadcasts so the header
+  // chip updates without a reload (the URL itself cache-busts server-side).
+  const [picProfile, setPicProfile] = useState<Pick<Profile, 'avatar_url' | 'box_boy_persona'> | null>(null);
   useEffect(() => {
-    const onAvatar = (e: Event) => setAvatar((e as CustomEvent<string>).detail || '');
+    const onAvatar = (e: Event) => {
+      const url = (e as CustomEvent<string>).detail || '';
+      setAvatar(url);
+      setPicProfile((p) => ({ ...(p || {}), avatar_url: url }));
+    };
+    const refresh = () => {
+      api.me().then((m) => {
+        setAvatar(m.avatar || '');
+        setPicProfile({ avatar_url: m.profile?.avatar_url, box_boy_persona: m.profile?.box_boy_persona });
+      }).catch(() => {});
+    };
     window.addEventListener('unify:avatar', onAvatar);
-    return () => window.removeEventListener('unify:avatar', onAvatar);
+    window.addEventListener(PICTURE_EVENT, refresh);
+    return () => {
+      window.removeEventListener('unify:avatar', onAvatar);
+      window.removeEventListener(PICTURE_EVENT, refresh);
+    };
   }, []);
 
   useEffect(() => {
@@ -217,6 +233,7 @@ export default function Layout() {
         const r = me.profile?.role || 'student';
         setRole(r);
         setAvatar(me.avatar || '');
+        setPicProfile({ avatar_url: me.profile?.avatar_url, box_boy_persona: me.profile?.box_boy_persona });
         try {
           localStorage.setItem('unify.role.v1', r);
         } catch {
@@ -301,6 +318,7 @@ export default function Layout() {
 
   const isAuthor = role === 'lecturer' || role === 'contributor';
   const tabs: Tab[] = role === 'lecturer' ? LECTURER_TABS : isAuthor ? AUTHOR_TABS : role === 'admin' ? ADMIN_TABS : STUDENT_TABS;
+  const pic = resolvePicture(picProfile, avatar);
   const showSkeletonNav = authed === null || (authed && !roleLoaded);
 
   return (
@@ -337,7 +355,7 @@ export default function Layout() {
               width: 32,
               height: 32,
               borderRadius: 9999,
-              background: avatar ? 'transparent' : 'var(--u-green)',
+              background: pic.src ? 'transparent' : 'var(--u-green)',
               color: 'var(--u-black)',
               display: 'flex',
               alignItems: 'center',
@@ -348,7 +366,7 @@ export default function Layout() {
               overflow: 'hidden',
             }}
           >
-            {avatar ? <img src={avatar} alt="" style={{ width: 32, height: 32, objectFit: 'cover' }} /> : (initial || 'U')}
+            {pic.src ? <img src={pic.src} alt="" style={{ width: 32, height: 32, objectFit: 'cover' }} /> : (initial || 'U')}
           </Link>
           </>
         ) : (

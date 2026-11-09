@@ -9,6 +9,7 @@ import { BoxBoy } from '../components/redesign/brand';
 import Typewriter from '../components/Typewriter';
 import { greeting } from '../lib/greet';
 import Flash from '../components/Flash';
+import { describeError } from '../lib/errors';
 
 type Uni = { id: string; name: string; shortName?: string };
 type Role = 'student' | 'lecturer' | 'contributor' | 'admin';
@@ -154,7 +155,7 @@ export default function OnboardingRoute() {
       }
       navigate('/home');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
+      setError(describeError(err, 'finish that'));
       setLoading(false);
     }
   };
@@ -290,7 +291,7 @@ export default function OnboardingRoute() {
               <BoxBoy pose="readingStanding" width={70} />
             </div>
             {isEdit && (
-              <div style={{ background: 'var(--u-good-tint)', border: '1px solid var(--u-good)', borderRadius: 12, padding: 10, fontSize: 13, color: '#065f46', textAlign: 'center' }}>
+              <div style={{ background: 'var(--u-good-tint)', border: '1px solid var(--u-good)', borderRadius: 12, padding: 10, fontSize: 13, color: 'var(--u-good)', textAlign: 'center' }}>
                 Role{originalRole ? ` (${originalRole})` : ''} can't be changed here.
               </div>
             )}

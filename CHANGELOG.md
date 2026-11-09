@@ -5,6 +5,38 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.0] - 2026-11-09
+
+### Added
+- **CGPA planner works end to end**: it was reading and writing `profiles`, `enrollments`, `courses` and `course_status` straight from the browser, where row-level security returned nothing and silently ignored saves ("CGPA target set!" saved nothing). It now uses `GET/PUT /v1/cgpa` (student-only, scoped to the signed-in student, only their enrolled courses). The math was also wrong: it only counted this semester's courses, so with nothing marked done "needed GPA" ignored the current CGPA. Step 1 now takes units completed and degree total (prefilled from level) and the needed GPA is computed over what is actually left; units sanity checks added; plan guarded for zero units left
+- **Pick a Box Boy as your picture** (Me): five personas, saved through `PUT /v1/persona`; picture order is uploaded photo, chosen Box Boy, Google photo, initial; the header chip updates live. The old persona screen also saved through a browser-side write that RLS ignored, so no persona ever persisted
+- **Install on Android and iPhone**: the page never linked a web manifest or Apple touch icon, so Chrome could not offer install and iPhone had no icon; added both, rebuilt the manifest (current name, `/home` start, Timetable and Mark attendance shortcuts, separate maskable icon) and regenerated brand icons. Me has a permanent "Install Unify" button (Android prompt, or the iPhone Add to Home Screen steps)
+- **Half-body Box Boy** by default (upper body fading out, works on any background), with `full` for the splash
+
+### Changed
+- **Brand loading screen** everywhere pages load: Box Boy hopping with "Unify. Learn" beneath, nothing else (caption is screen-reader only); splash matches
+- **One typeface**: Nunito everywhere; Playfair Display is the wordmark only (Bowlby and DM Sans dropped)
+- **CGPA is students only**: hidden on Home, Me and the planner route for lecturers, contributors and admins (the planner no longer lets admins through)
+- Box Boy centered on empty and error states
+- Service worker cache `unify-app-v12`
+- Migration 0029 also adds `profiles.cgpa_units_done/total` and enables RLS on `course_status` (it exposed every student's grades through the public key)
+
+## [2.4.0] - 2026-11-09
+
+### Added
+- **Rotating attendance code + QR**: the 6-digit code now changes every 30 seconds (an HMAC of the session and the time window, nothing stored) and shows as a QR that opens the app with the code filled in and checks the student in automatically. The current and previous window are accepted so typing across the boundary still works; a photo of the screen goes stale within a minute
+- **Online class links on the schedule**: the lecturer pastes a Google Meet (or any https) link when adding a weekly slot, or adds or changes it later; students get a **Join** button on the Timetable and the lecturer hub. Links only: nothing else to set up
+- **Materials as links**: lecturers share slides, notes and past papers by week (Drive, OneDrive, any https link) from My classes; enrolled students see them on the course page
+- Migration `0029_meet_links_materials`; `PATCH /v1/timetable/:id`; `/v1/materials`
+
+### Fixed
+- **Raw error text everywhere**: 55 more places (sign-in, sign-up, password reset, Google sign-in, admin, studio, classes, notifications...) showed library or server text such as "Invalid login credentials" or "API 404: ..."; all go through the friendly layer now, and the `API nnn:` prefix is stripped
+- **Stale profile after a write**: `me()` was memoised for 15s and never cleared after onboarding, profile edits, enrolment or role changes, so a fast finisher could be bounced back to onboarding; any successful write now clears it
+- Splash replayed on every visit to /auth (including right after the welcome slides); now once per session
+- Home and course pages no longer crash if the API omits `weeks`
+- Attendance rate limits were per IP, which would lock out a lecture hall on shared campus Wi-Fi; check-in is now limited per signed-in student and the general cap is generous
+- Remaining `#065f46` / emerald accents tokenised
+
 ## [2.3.0] - 2026-11-09
 
 ### Added

@@ -10,7 +10,7 @@
    4. NEW screens import from @/components/redesign and use redesign/ styles
    
    USER DECISIONS (Nov 2, 2026):
-   - Typography: HYBRID — Keep Playfair/DM Sans/Nunito, add Bowlby for new screens
+   - Typography: Nunito everywhere; Playfair Display for the wordmark only
    - Primary CTA: AMBER #fbbf24 (replaces emerald)
    - Dark mode: KEEP LIVE (Classic/Story design switch removed; Dark/Light only)
    - Avatars: Box Boy personas (5) + optional photo upload in Settings
@@ -18,7 +18,6 @@
 
 @import url('./tokens.css');
 @import url('./ui.css');
-@import url('https://fonts.googleapis.com/css2?family=Bowlby+One+SC&display=swap');
 
 /* Dark mode support (keeping it live per user decision) */
 [data-theme="dark"] {

@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from "express";
 import rateLimit from "express-rate-limit";
-import { randomInt } from "node:crypto";
+import { createHmac } from "node:crypto";
 import { z } from "zod";
 import { supabaseAdmin } from "../lib/supabase";
 import { requireAuth, type AuthedRequest } from "../middleware/requireAuth";
@@ -8,15 +8,28 @@ import { requireAuth, type AuthedRequest } from "../middleware/requireAuth";
 // Classroom features on top of v1: Head-of-Class posts and in-person
 // attendance by session code. Mounted at /v1 (see server.ts).
 //
-// Attendance model: a lecturer opens a session for a course they teach and
-// gets a 6-digit code that stays valid for N minutes; enrolled students
-// enter it on their phone. One record per student per session.
+// Attendance model: a lecturer opens a session for a course they teach (open
+// for N minutes). The 6-digit code ROTATES every ROTATE_SECONDS: it is an
+// HMAC of the session id and the current time window, so nothing is stored
+// and a code photographed or shared in a group chat dies within a minute.
+// The current and previous window are both accepted so a student who is
+// mid-typing at the boundary isn't rejected. Students enter the code or scan
+// the QR (a link that opens the app with the code filled in). One record per
+// student per session.
 const router = Router();
 
-const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 300, standardHeaders: true, legacyHeaders: false });
-// Codes are 6 digits, so guesses must be expensive: tight per-IP cap on check-in.
-const checkinLimiter = rateLimit({ windowMs: 10 * 60 * 1000, max: 25, standardHeaders: true, legacyHeaders: false });
-router.use(["/hoc", "/attendance"], limiter);
+// A lecture hall shares one campus IP, so per-IP caps would lock out a class:
+// the general cap is generous, and check-in is limited per signed-in student.
+const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 1500, standardHeaders: true, legacyHeaders: false });
+const checkinLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  // Runs after requireAuth, so userId is set; one student can't guess codes.
+  keyGenerator: (req) => (req as AuthedRequest).userId || "anon",
+});
+router.use(["/hoc", "/attendance", "/materials"], limiter);
 
 type Prof = {
   id: string;
@@ -43,6 +56,14 @@ const fail = (res: Response, status: number, message: string) => res.status(stat
 const dbFail = (res: Response, e: unknown) =>
   res.status(500).json({ error: "Database error", message: e instanceof Error ? e.message : String(e) });
 // Course codes appear both as "CHE 201" and "CHE201": match either.
+const ROTATE_SECONDS = 30;
+const attendanceKey = () =>
+  process.env.ATTENDANCE_SECRET || process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || "unify-dev-attendance";
+const windowNow = () => Math.floor(Date.now() / 1000 / ROTATE_SECONDS);
+function codeFor(sessionId: string, windowIdx: number): string {
+  const h = createHmac("sha256", attendanceKey()).update(`${sessionId}:${windowIdx}`).digest();
+  return String(h.readUInt32BE(0) % 1000000).padStart(6, "0");
+}
 const variants = (code: string) => [...new Set([code, code.replace(/\s/g, "")])];
 
 // ---------- Head of Class ----------
@@ -287,15 +308,22 @@ async function rosterFor(session: SessionRow) {
   return rows.map((r) => ({ studentId: r.student_id, at: r.scanned_at, name: info[r.student_id]?.name || "Student", matric: info[r.student_id]?.matric || "" }));
 }
 
-const sessionOut = (s: SessionRow) => ({
-  id: s.id,
-  course: s.course_code,
-  code: s.code,
-  week: s.week,
-  opensAt: s.opens_at,
-  closesAt: s.closes_at,
-  open: !s.closed_at && new Date(s.closes_at).getTime() > Date.now(),
-});
+const sessionOut = (s: SessionRow) => {
+  const open = !s.closed_at && new Date(s.closes_at).getTime() > Date.now();
+  const w = windowNow();
+  return {
+    id: s.id,
+    course: s.course_code,
+    // Only open sessions expose a code; a closed one shows nothing to copy.
+    code: open ? codeFor(s.id, w) : "",
+    rotatesAt: new Date((w + 1) * ROTATE_SECONDS * 1000).toISOString(),
+    rotateSeconds: ROTATE_SECONDS,
+    week: s.week,
+    opensAt: s.opens_at,
+    closesAt: s.closes_at,
+    open,
+  };
+};
 
 // Lecturer: open a session. Replaces any session of theirs still open for the course.
 router.post("/attendance/sessions", requireAuth, async (req: Request, res: Response) => {
@@ -314,21 +342,10 @@ router.post("/attendance/sessions", requireAuth, async (req: Request, res: Respo
       .eq("created_by", me.id)
       .in("course_code", variants(course))
       .is("closed_at", null);
-    // A code must be unique among open sessions or a student could land in the wrong class.
-    let code = "";
-    for (let i = 0; i < 10; i++) {
-      const c = String(randomInt(100000, 1000000));
-      const { data: clash } = await sb.from("attendance_sessions").select("id").eq("code", c).is("closed_at", null).gt("closes_at", new Date().toISOString()).limit(1);
-      if (!clash || !clash.length) {
-        code = c;
-        break;
-      }
-    }
-    if (!code) return fail(res, 503, "Couldn't make a code just now. Try again.");
     const closesAt = new Date(Date.now() + (parsed.data.minutes ?? 15) * 60 * 1000).toISOString();
     const { data, error } = await sb
       .from("attendance_sessions")
-      .insert({ course_code: course, created_by: me.id, code, week: parsed.data.week ?? null, closes_at: closesAt })
+      .insert({ course_code: course, created_by: me.id, code: "", week: parsed.data.week ?? null, closes_at: closesAt })
       .select("id,course_code,created_by,code,week,opens_at,closes_at,closed_at")
       .single();
     if (error) throw error;
@@ -385,23 +402,27 @@ router.post("/attendance/checkin", requireAuth, checkinLimiter, async (req: Requ
     const me = await getProfile(uid(req));
     if (!me) return fail(res, 404, "Finish onboarding first.");
     const sb = supabaseAdmin();
-    const { data } = await sb
+    // Find the open session whose current (or previous) rotating code matches
+    // AND that the student is enrolled in: two sessions sharing a code in the
+    // same window (1 in a million) can't send them to the wrong class.
+    const { data: openRows } = await sb
       .from("attendance_sessions")
       .select("id,course_code,created_by,code,week,opens_at,closes_at,closed_at")
-      .eq("code", parsed.data.code)
       .is("closed_at", null)
       .gt("closes_at", new Date().toISOString())
-      .limit(1);
-    const s = ((data ?? []) as SessionRow[])[0];
-    if (!s) return fail(res, 404, "That code isn't open. Check it with your lecturer.");
-    const { data: enr } = await sb
-      .from("enrollments")
-      .select("course")
-      .eq("user_id", me.id)
-      .eq("kind", "taking")
-      .in("course", variants(s.course_code))
-      .limit(1);
-    if (!enr || !enr.length) return fail(res, 403, `You're not enrolled in ${s.course_code}. Add it from Class first.`);
+      .limit(500);
+    const w = windowNow();
+    const matches = ((openRows ?? []) as SessionRow[]).filter((r) => {
+      const c = parsed.data.code;
+      return codeFor(r.id, w) === c || codeFor(r.id, w - 1) === c;
+    });
+    if (!matches.length) return fail(res, 404, "That code isn't open any more. Codes change every 30 seconds: check the screen again.");
+    let s: SessionRow | undefined;
+    for (const m of matches) {
+      const { data: e } = await sb.from("enrollments").select("course").eq("user_id", me.id).eq("kind", "taking").in("course", variants(m.course_code)).limit(1);
+      if (e && e.length) { s = m; break; }
+    }
+    if (!s) return fail(res, 403, `You're not enrolled in ${matches[0].course_code}. Add it from Class first.`);
     const { error } = await sb
       .from("attendance_records")
       .insert({ student_id: me.id, course_code: s.course_code, scanned_by: s.created_by, verified: true, week: s.week, session_id: s.id });
@@ -442,6 +463,229 @@ router.get("/attendance/mine", requireAuth, async (req: Request, res: Response) 
       out.push({ course, held: count ?? 0, attended: records.filter((r) => norm(r.course_code) === norm(course)).length });
     }
     res.json({ courses: out, recent: records.slice(0, 10).map((r) => ({ course: r.course_code, at: r.scanned_at })) });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
+// ---------- Lecturer materials (shared as links) ----------
+
+const MATERIAL_TYPES = ["slides", "notes", "past-paper"] as const;
+
+// Anyone signed in can read a course's materials (links to Drive, OneDrive, ...).
+router.get("/materials", requireAuth, async (req: Request, res: Response) => {
+  const course = clean(req.query.course);
+  if (!course) return fail(res, 400, "Pass ?course=CODE.");
+  try {
+    const sb = supabaseAdmin();
+    const { data, error } = await sb
+      .from("lecturer_materials")
+      .select("id,uploaded_by,course_code,week_number,type,title,file_url,created_at")
+      .in("course_code", variants(course))
+      .order("week_number", { ascending: true })
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (error) throw error;
+    const me = uid(req);
+    res.json({
+      materials: ((data ?? []) as { id: string; uploaded_by: string; week_number: number; type: string; title: string | null; file_url: string; created_at: string }[]).map((m) => ({
+        id: m.id,
+        week: m.week_number,
+        type: m.type,
+        title: m.title || "",
+        url: m.file_url,
+        createdAt: m.created_at,
+        mine: m.uploaded_by === me,
+      })),
+    });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
+const materialSchema = z.object({
+  course: z.string().min(1).max(20),
+  week: z.number().int().min(1).max(30),
+  type: z.enum(MATERIAL_TYPES),
+  title: z.string().trim().min(1).max(120),
+  url: z.string().trim().max(500).url().refine((u) => /^https:\/\//i.test(u), "Use an https link."),
+});
+
+router.post("/materials", requireAuth, async (req: Request, res: Response) => {
+  const parsed = materialSchema.safeParse(req.body);
+  if (!parsed.success) return fail(res, 400, "Add a title and paste a full https link.");
+  try {
+    const me = await getProfile(uid(req));
+    const course = clean(parsed.data.course);
+    if (!me || !(await canTeach(me, course))) return fail(res, 403, "You can only share materials for courses you teach.");
+    const { data, error } = await supabaseAdmin()
+      .from("lecturer_materials")
+      .insert({ uploaded_by: me.id, course_code: course, week_number: parsed.data.week, type: parsed.data.type, title: parsed.data.title, file_url: parsed.data.url })
+      .select("id")
+      .single();
+    if (error) throw error;
+    res.json({ ok: true, id: (data as { id: string }).id });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
+router.delete("/materials/:id", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const me = await getProfile(uid(req));
+    const sb = supabaseAdmin();
+    const { data } = await sb.from("lecturer_materials").select("uploaded_by").eq("id", req.params.id).single();
+    const owner = (data as { uploaded_by?: string } | null)?.uploaded_by;
+    if (!owner) return fail(res, 404, "That item is gone.");
+    if (owner !== me?.id && !me?.is_admin) return fail(res, 403, "You can only remove your own materials.");
+    const { error } = await sb.from("lecturer_materials").delete().eq("id", req.params.id);
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
+// ---------- CGPA planner (students) ----------
+// The planner used to read and write these tables straight from the browser,
+// where row-level security silently returned nothing and ignored writes.
+// Everything goes through here now, scoped to the signed-in student.
+
+router.use("/cgpa", limiter);
+
+async function requireStudent(req: Request, res: Response): Promise<Prof | null> {
+  const me = await getProfile(uid(req));
+  if (!me) {
+    fail(res, 404, "Finish onboarding first.");
+    return null;
+  }
+  if ((me.role || "student") !== "student") {
+    fail(res, 403, "The CGPA planner is for students.");
+    return null;
+  }
+  return me;
+}
+
+router.get("/cgpa", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const me = await requireStudent(req, res);
+    if (!me) return;
+    const sb = supabaseAdmin();
+    const { data: prof } = await sb
+      .from("profiles")
+      .select("cgpa_current,cgpa_target,hide_cgpa,cgpa_units_done,cgpa_units_total,level")
+      .eq("id", me.id)
+      .single();
+    const p = (prof ?? {}) as { cgpa_current: number | null; cgpa_target: number | null; hide_cgpa: boolean | null; cgpa_units_done: number | null; cgpa_units_total: number | null; level: string | null };
+    const { data: enr } = await sb.from("enrollments").select("course").eq("user_id", me.id).eq("kind", "taking");
+    const codes = ((enr ?? []) as { course: string }[]).map((r) => r.course);
+    const titles: Record<string, string> = {};
+    if (codes.length) {
+      const { data: cs } = await sb.from("courses").select("code,title").in("code", codes);
+      for (const c of (cs ?? []) as { code: string; title: string }[]) titles[c.code] = c.title;
+    }
+    const saved: Record<string, { status: string; units: number; grade: number | null }> = {};
+    if (codes.length) {
+      const { data: st } = await sb.from("course_status").select("course_code,status,units,grade").eq("user_id", me.id).in("course_code", codes);
+      for (const r of (st ?? []) as { course_code: string; status: string; units: number; grade: number | null }[]) saved[r.course_code] = r;
+    }
+    res.json({
+      cgpaCurrent: p.cgpa_current != null ? Number(p.cgpa_current) : null,
+      cgpaTarget: p.cgpa_target != null ? Number(p.cgpa_target) : null,
+      hideCgpa: !!p.hide_cgpa,
+      unitsDone: p.cgpa_units_done,
+      unitsTotal: p.cgpa_units_total,
+      level: p.level,
+      courses: codes.map((code) => ({
+        code,
+        title: titles[code] || code,
+        status: saved[code]?.status || "not_yet",
+        units: saved[code]?.units || 3,
+        grade: saved[code]?.grade != null ? Number(saved[code].grade) : null,
+      })),
+    });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
+const cgpaSchema = z
+  .object({
+    cgpaCurrent: z.number().min(0).max(5).optional(),
+    cgpaTarget: z.number().min(0.5).max(5).optional(),
+    unitsDone: z.number().int().min(0).max(400).optional(),
+    unitsTotal: z.number().int().min(1).max(500).optional(),
+    hide: z.boolean().optional(),
+    courses: z
+      .array(
+        z.object({
+          code: z.string().min(1).max(20),
+          status: z.enum(["done", "priority", "not_yet"]),
+          units: z.number().int().min(1).max(8),
+          grade: z.number().min(0).max(5).nullish(),
+        })
+      )
+      .max(60)
+      .optional(),
+  })
+  .refine((v) => v.unitsDone == null || v.unitsTotal == null || v.unitsTotal >= v.unitsDone, {
+    message: "Total units can't be less than the units you've completed.",
+  });
+
+router.put("/cgpa", requireAuth, async (req: Request, res: Response) => {
+  const parsed = cgpaSchema.safeParse(req.body);
+  if (!parsed.success) return fail(res, 400, parsed.error.issues[0]?.message || "Check the numbers and try again.");
+  try {
+    const me = await requireStudent(req, res);
+    if (!me) return;
+    const sb = supabaseAdmin();
+    const d = parsed.data;
+    const patch: Record<string, unknown> = {};
+    if (d.cgpaCurrent != null) patch.cgpa_current = Math.round(d.cgpaCurrent * 100) / 100;
+    if (d.cgpaTarget != null) patch.cgpa_target = Math.round(d.cgpaTarget * 100) / 100;
+    if (d.unitsDone != null) patch.cgpa_units_done = d.unitsDone;
+    if (d.unitsTotal != null) patch.cgpa_units_total = d.unitsTotal;
+    if (d.hide != null) patch.hide_cgpa = d.hide;
+    if (Object.keys(patch).length) {
+      const { error } = await sb.from("profiles").update(patch).eq("id", me.id);
+      if (error) throw error;
+    }
+    if (d.courses && d.courses.length) {
+      // Only courses the student is actually enrolled in: no arbitrary codes.
+      const { data: enr } = await sb.from("enrollments").select("course").eq("user_id", me.id).eq("kind", "taking");
+      const mine = new Set(((enr ?? []) as { course: string }[]).map((r) => r.course));
+      const rows = d.courses
+        .filter((c) => mine.has(c.code))
+        .map((c) => ({ user_id: me.id, course_code: c.code, status: c.status, units: c.units, grade: c.grade ?? null, updated_at: new Date().toISOString() }));
+      if (rows.length) {
+        const { error } = await sb.from("course_status").upsert(rows, { onConflict: "user_id,course_code" });
+        if (error) throw error;
+      }
+    }
+    res.json({ ok: true });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
+// ---------- Persona (profile picture) ----------
+// Everyone can pick one of the five Box Boy personas as their picture.
+// This replaces a browser-side profiles update that row-level security
+// silently ignored, so personas never actually saved.
+const PERSONA_KEYS = ["go-getter", "comeback", "curious", "team-player", "on-the-move"] as const;
+
+router.put("/persona", requireAuth, async (req: Request, res: Response) => {
+  const parsed = z
+    .object({ persona: z.enum(PERSONA_KEYS), clearPhoto: z.boolean().optional() })
+    .safeParse(req.body);
+  if (!parsed.success) return fail(res, 400, "Pick one of the Box Boys.");
+  try {
+    const patch: Record<string, unknown> = { box_boy_persona: parsed.data.persona };
+    // "Use my Box Boy instead": drop the uploaded photo so the persona shows.
+    if (parsed.data.clearPhoto) patch.avatar_url = "";
+    const { error } = await supabaseAdmin().from("profiles").update(patch).eq("id", uid(req));
+    if (error) throw error;
+    res.json({ ok: true });
   } catch (e) {
     dbFail(res, e);
   }

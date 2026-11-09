@@ -2131,12 +2131,12 @@ router.get("/timetable", requireAuth, async (req: Request, res: Response) => {
     const sb = supabaseAdmin();
     const { data, error } = await sb
       .from("class_slots")
-      .select("id,course,lecturer_id,day,start_time,end_time,venue")
+      .select("id,course,lecturer_id,day,start_time,end_time,venue,meet_link")
       .eq("course", course)
       .order("day")
       .order("start_time");
     if (error) throw error;
-    const rows = ((data ?? []) as { id: string; course: string; lecturer_id: string; day: number; start_time: string; end_time: string; venue: string }[]);
+    const rows = ((data ?? []) as { id: string; course: string; lecturer_id: string; day: number; start_time: string; end_time: string; venue: string; meet_link: string | null }[]);
     let names: Record<string, string> = {};
     const ids = [...new Set(rows.map((r) => r.lecturer_id))];
     if (ids.length) {
@@ -2153,6 +2153,7 @@ router.get("/timetable", requireAuth, async (req: Request, res: Response) => {
         start: r.start_time,
         end: r.end_time,
         venue: r.venue,
+        meetLink: r.meet_link || "",
         lecturer: names[r.lecturer_id] || "",
       })),
     });
@@ -2167,6 +2168,8 @@ const slotSchema = z.object({
   start: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),
   end: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),
   venue: z.string().max(120).default(""),
+  // Optional online-class link; only https URLs are accepted.
+  meetLink: z.string().trim().max(300).url().refine((u) => /^https:\/\//i.test(u), "Use an https link.").or(z.literal("")).default(""),
 });
 
 // Add a weekly slot (teaching lecturer or admin).
@@ -2208,6 +2211,7 @@ router.post("/timetable", requireAuth, requireAuthor, async (req: Request, res: 
         start_time: parsed.data.start,
         end_time: parsed.data.end,
         venue: parsed.data.venue,
+        meet_link: parsed.data.meetLink,
       })
       .select("id")
       .single();
@@ -2219,6 +2223,38 @@ router.post("/timetable", requireAuth, requireAuthor, async (req: Request, res: 
       throw error;
     }
     res.json({ ok: true, id: (data as { id: string }).id });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// Set or clear the online-class link on a slot (course lecturer or admin).
+router.patch("/timetable/:id", requireAuth, requireAuthor, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  const parsed = z
+    .object({ meetLink: z.string().trim().max(300).url().refine((u) => /^https:\/\//i.test(u), "Use an https link.").or(z.literal("")) })
+    .safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Paste a full https link (for example your Google Meet link)." });
+    return;
+  }
+  try {
+    const sb = supabaseAdmin();
+    const { data: slot } = await sb.from("class_slots").select("id,course,lecturer_id").eq("id", req.params.id).single();
+    const s = slot as { id: string; course: string; lecturer_id: string } | null;
+    if (!s) {
+      res.status(404).json({ error: "Slot not found." });
+      return;
+    }
+    const { data: pprof } = await sb.from("profiles").select("role").eq("id", userId).single();
+    const role = (pprof as { role?: string } | null)?.role;
+    if (!(role === "lecturer" || role === "admin") || (s.lecturer_id !== userId && !(await canManageCourse(userId, s.course)))) {
+      res.status(403).json({ error: "Only the course lecturer changes a slot." });
+      return;
+    }
+    const { error } = await sb.from("class_slots").update({ meet_link: parsed.data.meetLink }).eq("id", req.params.id);
+    if (error) throw error;
+    res.json({ ok: true });
   } catch (e) {
     res.status(500).json(dbError(e));
   }
