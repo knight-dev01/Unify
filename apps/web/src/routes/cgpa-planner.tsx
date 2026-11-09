@@ -314,12 +314,12 @@ function EnterCGPA({
 }) {
   return (
     <div className="stack" style={{ gap: 32, flex: 1 }}>
-      <div className="stack center" style={{ gap: 16 }}>
+      <div className="stack center" style={{ gap: 16, alignItems: 'center' }}>
         <BoxBoy pose="readingStanding" width={120} />
         <h1 className="display center" style={{ fontSize: 26 }}>
           WHAT'S YOUR<br />CURRENT CGPA?
         </h1>
-        <p className="t-14 muted center" style={{ maxWidth: 300 }}>
+        <p className="t-14 muted center" style={{ maxWidth: 300, margin: 0, textAlign: 'center' }}>
           Not per-course grades. Just your overall CGPA so far.
         </p>
       </div>
@@ -420,11 +420,11 @@ function CourseStatus({
   
   return (
     <div className="stack" style={{ gap: 24, flex: 1 }}>
-      <div className="stack center" style={{ gap: 12 }}>
+      <div className="stack center" style={{ gap: 12, alignItems: 'center' }}>
         <h1 className="display center" style={{ fontSize: 24 }}>
           MARK YOUR<br />COURSES
         </h1>
-        <p className="t-14 muted center" style={{ maxWidth: 320 }}>
+        <p className="t-14 muted center" style={{ maxWidth: 320, margin: 0, textAlign: 'center' }}>
           Done ✓ / Priority (compulsory) / Not yet
         </p>
       </div>
@@ -521,11 +521,11 @@ function TargetPicker({
 }) {
   return (
     <div className="stack" style={{ gap: 32, flex: 1 }}>
-      <div className="stack center" style={{ gap: 12 }}>
+      <div className="stack center" style={{ gap: 12, alignItems: 'center' }}>
         <h1 className="display center" style={{ fontSize: 24 }}>
           PICK YOUR<br />TARGET
         </h1>
-        <p className="t-14 muted center" style={{ maxWidth: 300 }}>
+        <p className="t-14 muted center" style={{ maxWidth: 300, margin: 0, textAlign: 'center' }}>
           Honest labels. No sugar-coating.
         </p>
       </div>

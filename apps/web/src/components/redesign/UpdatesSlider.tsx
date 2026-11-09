@@ -47,13 +47,14 @@ export function UpdatesSlider({ slides }: { slides: UpdateSlide[] }) {
       <div ref={ref} className="upd-track">
         {slides.map((s, k) => (
           <article key={s.id} className="upd-card" aria-hidden={k !== i} aria-roledescription="slide">
-            <div className="upd-art"><BoxBoy full pose={s.pose} width={68} /></div>
-            <div style={{ flex: 1, minWidth: 0 }}>
+            <div className="upd-body">
               <div className="eyebrow" style={{ color: 'var(--green-deep)' }}>{s.tag}</div>
-              <div className="t-15 w-7" style={{ marginTop: 2 }}>{s.title}</div>
-              <div className="t-13 muted" style={{ marginTop: 3, lineHeight: 1.4 }}>{s.body}</div>
-              {s.to && <Link to={s.to} className="upd-cta" tabIndex={k === i ? 0 : -1}>{s.cta || 'Open'}</Link>}
+              <h3 className="display upd-title">{s.title}</h3>
+              <p className="t-13 muted upd-text">{s.body}</p>
+              {s.to && <Link to={s.to} className="btn btn--amber btn--sm" style={{ marginTop: 10 }} tabIndex={k === i ? 0 : -1}>{s.cta || 'Open'}</Link>}
             </div>
+            <div className="upd-art"><BoxBoy full pose={s.pose} width={92} /></div>
+            <div className="kente-edge" aria-hidden="true" />
           </article>
         ))}
       </div>

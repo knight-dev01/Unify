@@ -5,6 +5,14 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.13.2] - 2026-11-09
+
+### Changed
+- **Logo** is back to "Unify" in Playfair with the green dot and "Learn" in Nunito
+- **Updates slider** now matches the app: green-tint cards with the kente edge, an uppercase heading, an amber button and a larger Box Boy
+- **Set my target** on Home is a compact goal card with the target-sign Box Boy, instead of a full-width button
+- **CGPA planner**: the explainer lines under each heading are centred with the heading and mascot (they sat off to the left on desktop)
+
 ## [2.13.1] - 2026-11-09
 
 ### Changed

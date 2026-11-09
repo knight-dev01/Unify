@@ -111,6 +111,7 @@ export function Wordmark({ size = 16, color }: { size?: number; color?: string }
   return (
     <span className="wordmark" style={{ fontSize: size, color, fontWeight: 900 }}>
       Unify<span className="dot-breathe" style={{ color: 'var(--u-green)', display: 'inline-block' }}>.</span>
+      <span style={{ fontFamily: 'var(--font-body)', fontWeight: 800 }}> Learn</span>
     </span>
   );
 }
