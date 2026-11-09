@@ -33,7 +33,9 @@ const RATIO: Partial<Record<Pose, number>> = {
  * Poses that are already seated or peeking are never cropped.
  */
 export function BoxBoy({ pose, width, style, full = false }: { pose: Pose; width: number; style?: CSSProperties; full?: boolean }) {
-  const img = <img src={POSES[pose]} alt="" width={width} style={{ width, height: 'auto', display: 'block' }} draggable={false} />;
+  // Below-the-fold art decodes off the main thread and loads lazily; the
+  // loading screen and splash (`full`) are the first paint, so they stay eager.
+  const img = <img src={POSES[pose]} alt="" width={width} loading={full ? 'eager' : 'lazy'} decoding="async" style={{ width, height: 'auto', display: 'block' }} draggable={false} />;
   const ratio = RATIO[pose];
   if (full || !ratio) return <span style={{ display: 'inline-block', lineHeight: 0, ...style }}>{img}</span>;
   const fade = 'linear-gradient(to bottom, #000 58%, transparent 100%)';

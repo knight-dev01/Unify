@@ -36,7 +36,7 @@ export function BoxBoySplash({ onDone }: { onDone?: () => void }) {
   }, []);
   if (!visible) return null;
   return (
-    <div role="status" aria-label="Loading" style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'var(--u-green)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 20 }}>
+    <div role="status" aria-label="Loading" className="african-band" style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'var(--u-green)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 20 }}>
       <span className="boxboy--hop" style={{ display: 'inline-block', lineHeight: 0 }}>
         <BoxBoy full pose="readingStanding" width={150} />
       </span>

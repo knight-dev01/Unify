@@ -10,7 +10,6 @@ import { BoxBoy } from '../components/redesign/brand';
 import Typewriter from '../components/Typewriter';
 import Flash from '../components/Flash';
 import ConfirmModal from '../components/ConfirmModal';
-import { greeting, dailyLine, dailyKey, daypart } from '../lib/greet';
 import { HomeHero } from '../components/redesign/HomeHero';
 import Loading from '../components/Loading';
 

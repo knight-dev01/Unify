@@ -5,6 +5,20 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.6.0] - 2026-11-09
+
+### Added
+- **Desktop shell**: the header merges into a sidebar that is a slim icon rail (brand mark on top, nav pills, bell and avatar at the bottom). It opens on hover or keyboard focus and closes when the pointer leaves, over the page, so content never shifts. Immersive screens (the note reader in focus mode, and any `/chat` screen) hide the sidebar and header on desktop and the header and bottom bar on phones
+- **One motion language** (`motion.css`): shared easing and duration tokens; screens ease up on every route change, lists stagger in, dropdowns pop from their trigger, toasts spring in, progress bars glide, chips and links respond; all of it collapses under reduced-motion
+- **African design language**: an Adire-inspired pattern and a kente stripe on the brand-green bands (auth, welcome, onboarding, splash), the desktop auth panel and the Home hero, plus a barely-visible pattern behind the whole app (light and dark)
+- **Nigerian voice**: greetings rotate daily through Yoruba, Igbo, Hausa and Pidgin (English alongside) on Home and onboarding, the auth hero welcomes in three languages, and the Home hero shows a daily proverb or value (patience, hard work, integrity, respect, community) instead of generic motivation and trivia. The Yoruba, Igbo and Hausa lines need a native-speaker read before launch
+
+### Changed
+- **Offline-first API reads**: the service worker keeps a per-user copy of each GET and serves it after 4 seconds of waiting on the network (or at once when offline), refreshing in the background. Copies are partitioned by user, so a shared phone never hands one student another's data; signing out wipes them; live attendance codes and admin data are never cached; 401s always pass through
+- Dropdown rows are a uniform 44px with an even 2px gap (they were 31px and fractional)
+- Box Boy images lazy-load and decode off the main thread (the loader and splash stay eager); Nunito weights trimmed; images and icons get edge caching; legacy `.html` redirects point at the new routes
+- Service worker cache `unify-app-v13`
+
 ## [2.5.0] - 2026-11-09
 
 ### Added

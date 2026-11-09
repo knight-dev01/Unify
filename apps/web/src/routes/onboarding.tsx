@@ -7,7 +7,7 @@ import { api, type University } from '../lib/api';
 import Loading from '../components/Loading';
 import { BoxBoy } from '../components/redesign/brand';
 import Typewriter from '../components/Typewriter';
-import { greeting } from '../lib/greet';
+import { localGreeting } from '../lib/naija';
 import Flash from '../components/Flash';
 import { describeError } from '../lib/errors';
 
@@ -42,7 +42,7 @@ export default function OnboardingRoute() {
   const [department, setDepartment] = useState<string | null>(null);
   const [level, setLevel] = useState<string | null>(null);
   const [gradTarget, setGradTarget] = useState<number | null>(null);
-  const daypart = greeting();
+  const daypart = localGreeting().text;
   const [activeSemester, setActiveSemester] = useState('First Semester');
   const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
   const [availableCourses, setAvailableCourses] = useState<{ code: string; title: string }[]>([]);
@@ -268,7 +268,7 @@ export default function OnboardingRoute() {
 
   return (
     <div style={{ maxWidth: 'min(var(--shell, 480px), 560px)', margin: '0 auto', minHeight: '100vh', background: 'var(--u-page)' }}>
-      <div style={{ background: 'var(--u-green)', color: 'var(--u-black)', padding: '20px 20px 24px', borderRadius: '0 0 32px 32px' }}>
+      <div className="african-band" style={{ background: 'var(--u-green)', color: 'var(--u-black)', padding: '20px 20px 24px', borderRadius: '0 0 32px 32px' }}>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div className="eyebrow" style={{ opacity: 0.7 }}>{left.s}</div>
