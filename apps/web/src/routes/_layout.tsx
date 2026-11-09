@@ -440,7 +440,7 @@ export default function Layout() {
                     </div>
                   </>
                 )
-                : tabs.map((t) => {
+                : tabs.filter((t) => t.to !== '/me').map((t) => {
                     const active = t.match.some((m) => pathname === m || pathname.startsWith(m + '/'));
                     const Icon = t.icon;
                     return (
@@ -458,7 +458,7 @@ export default function Layout() {
                 </span>
                 <span className="side-label">Notifications</span>
               </Link>
-              <Link to="/me" className="side-pill side-me" aria-label="Me">
+              <Link to="/me" className={'side-pill side-me' + (pathname === '/me' || pathname.startsWith('/me/') ? ' is-active' : '')} aria-current={pathname === '/me' ? 'page' : undefined} aria-label="Me">
                 <span className="side-ico side-avatar">{pic.src ? <img src={pic.src} alt="" /> : (initial || 'U')}</span>
                 <span className="side-label">Me</span>
               </Link>

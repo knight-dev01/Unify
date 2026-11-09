@@ -19,6 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Contributors, lecturers and admins**: browsing courses and content no longer lights the Studio tab. You stay on Home (or Classroom for lecturers)
 - Phone bottom-nav tabs now tell screen readers which one is current
 
+- **Desktop sidebar** now has one "Me" item, the profile picture, instead of two
+- **Loading screen on desktop** is centred in the page (it was stuck near the top) and the mascot is about twice as big
+
 ### Removed
 - Narrator audio uploads in the note builder (the reader still plays any audio already attached)
 

@@ -104,3 +104,8 @@ html[data-rail="1"] .nb-nav { bottom: 12px; }
 .btn:active:not(:disabled) { transform: translateY(2px) scale(.985); }
 .stagger > * { animation-duration: .5s; }
 @media (prefers-reduced-motion: reduce) { .dot-breathe, .splash, .splash > *, .soft-in { animation: none; } .splash--out { animation: none; opacity: 0; } }
+
+/* Loading screen: centred in the page (not stuck under the header) with a larger mascot on wide screens. */
+.loading-screen { min-height: calc(100vh - 220px) !important; min-height: calc(100dvh - 220px) !important; }
+.loading-screen img { width: clamp(110px, 15vw, 200px) !important; }
+@media (min-width: 900px) { .loading-screen { min-height: 100vh !important; min-height: 100dvh !important; gap: 24px !important; } .loading-screen .wordmark, .loading-screen > span:nth-of-type(2) { font-size: 1.15em; } }
