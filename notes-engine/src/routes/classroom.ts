@@ -278,6 +278,20 @@ async function canTeach(me: Prof, course: string): Promise<boolean> {
   return !!(data && data.length);
 }
 
+// Lecturers teach it; admins always; a class rep (HOC) may scan for a course they take.
+async function canScan(me: Prof, course: string): Promise<boolean> {
+  if (await canTeach(me, course)) return true;
+  if (!me.is_hoc) return false;
+  const { data } = await supabaseAdmin()
+    .from("enrollments")
+    .select("course")
+    .eq("user_id", me.id)
+    .eq("kind", "taking")
+    .in("course", variants(course))
+    .limit(1);
+  return !!(data && data.length);
+}
+
 async function enrolledCount(course: string): Promise<number> {
   const { count } = await supabaseAdmin()
     .from("enrollments")
@@ -325,6 +339,14 @@ const sessionOut = (s: SessionRow) => {
   };
 };
 
+// Who started it, so the other person sees "Started by Dr Ade" and both are in sync.
+async function sessionView(s: SessionRow, meId: string) {
+  const { data } = await supabaseAdmin().from("profiles").select("first_name,role,is_hoc").eq("id", s.created_by).maybeSingle();
+  const p = data as { first_name: string | null; role: string | null; is_hoc: boolean | null } | null;
+  const role = p?.role === "lecturer" ? "lecturer" : p?.is_hoc ? "class rep" : p?.role === "admin" ? "admin" : "";
+  return { ...sessionOut(s), startedBy: { name: p?.first_name || "Your lecturer", role, mine: s.created_by === meId } };
+}
+
 // Lecturer: open a session. Replaces any session of theirs still open for the course.
 router.post("/attendance/sessions", requireAuth, async (req: Request, res: Response) => {
   const parsed = z
@@ -334,12 +356,28 @@ router.post("/attendance/sessions", requireAuth, async (req: Request, res: Respo
   try {
     const me = await getProfile(uid(req));
     const course = clean(parsed.data.course);
-    if (!me || !(await canTeach(me, course))) return fail(res, 403, "You can only take attendance for courses you teach.");
+    if (!me || !(await canScan(me, course))) return fail(res, 403, "You can only take attendance for courses you teach or represent.");
     const sb = supabaseAdmin();
+    // ONE live session per course, shared by the lecturer and the class rep: if
+    // either of them already opened it, the other joins it (same QR, same
+    // register) instead of starting a rival one that would split the class.
+    const { data: live } = await sb
+      .from("attendance_sessions")
+      .select("id,course_code,created_by,code,week,opens_at,closes_at,closed_at")
+      .in("course_code", variants(course))
+      .is("closed_at", null)
+      .gt("closes_at", new Date().toISOString())
+      .order("opens_at", { ascending: false })
+      .limit(1);
+    const joined = ((live ?? []) as SessionRow[])[0];
+    if (joined) {
+      res.json({ session: await sessionView(joined, me.id), present: await rosterFor(joined), enrolled: await enrolledCount(course), joined: true });
+      return;
+    }
+    // Tidy any expired-but-unclosed leftovers for this course.
     await sb
       .from("attendance_sessions")
       .update({ closed_at: new Date().toISOString() })
-      .eq("created_by", me.id)
       .in("course_code", variants(course))
       .is("closed_at", null);
     const closesAt = new Date(Date.now() + (parsed.data.minutes ?? 15) * 60 * 1000).toISOString();
@@ -349,7 +387,7 @@ router.post("/attendance/sessions", requireAuth, async (req: Request, res: Respo
       .select("id,course_code,created_by,code,week,opens_at,closes_at,closed_at")
       .single();
     if (error) throw error;
-    res.json({ session: sessionOut(data as SessionRow), present: [], enrolled: await enrolledCount(course) });
+    res.json({ session: await sessionView(data as SessionRow, me.id), present: [], enrolled: await enrolledCount(course) });
   } catch (e) {
     dbFail(res, e);
   }
@@ -361,7 +399,7 @@ router.get("/attendance/sessions", requireAuth, async (req: Request, res: Respon
   if (!course) return fail(res, 400, "Pass ?course=CODE.");
   try {
     const me = await getProfile(uid(req));
-    if (!me || !(await canTeach(me, course))) return fail(res, 403, "You can only view attendance for courses you teach.");
+    if (!me || !(await canScan(me, course))) return fail(res, 403, "You can only view attendance for courses you teach or represent.");
     const { data } = await supabaseAdmin()
       .from("attendance_sessions")
       .select("id,course_code,created_by,code,week,opens_at,closes_at,closed_at")
@@ -373,7 +411,7 @@ router.get("/attendance/sessions", requireAuth, async (req: Request, res: Respon
       res.json({ session: null, present: [], enrolled: await enrolledCount(course) });
       return;
     }
-    res.json({ session: sessionOut(s), present: await rosterFor(s), enrolled: await enrolledCount(course) });
+    res.json({ session: await sessionView(s, me.id), present: await rosterFor(s), enrolled: await enrolledCount(course) });
   } catch (e) {
     dbFail(res, e);
   }
@@ -386,7 +424,8 @@ router.post("/attendance/sessions/:id/close", requireAuth, async (req: Request, 
     const { data } = await sb.from("attendance_sessions").select("id,course_code,created_by").eq("id", req.params.id).single();
     const s = data as { id: string; course_code: string; created_by: string } | null;
     if (!s) return fail(res, 404, "Session not found.");
-    if (s.created_by !== me?.id && !me?.is_admin) return fail(res, 403, "That isn't your session.");
+    // The session is shared: the lecturer or the class rep for this course can end it.
+    if (!me || !(await canScan(me, s.course_code))) return fail(res, 403, "You can't end this session.");
     await sb.from("attendance_sessions").update({ closed_at: new Date().toISOString() }).eq("id", s.id);
     res.json({ ok: true });
   } catch (e) {

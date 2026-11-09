@@ -5,6 +5,13 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.10.0] - 2026-11-09
+
+### Changed
+- **Attendance is QR-first.** The lecturer (or class rep) shows one large rotating QR (a new one every 30 seconds) and students scan it with the in-app camera on the attendance screen; the app reads the code out of it and marks them present. The 6-digit code is now small and secondary, for students without a camera or with the camera blocked. Scanning the QR with a phone's own camera app still works. The scanner uses the browser's built-in QR reader where it exists and a small fallback library otherwise (iPhone)
+- **Lecturer and class rep stay in sync.** There is one live attendance session per course: if either starts it, the other joins the same session (same QR, same register, "Started by Dr Ade (lecturer)" shown) instead of opening a rival one, and either can end it. The screens check for a session the other person started every few seconds. Class reps can now run attendance for the courses they take
+- **Contributor pipeline** on the Studio: per course, each week is shown by stage (materials in, writing, live); tap a week to load it into the composer
+
 ## [2.9.0] - 2026-11-09
 
 ### Changed
