@@ -5,6 +5,23 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.13.0] - 2026-11-09
+
+### Added
+- **Notification help that fits your browser**: if the permission box is blocked, closed or unsupported, Unify now says exactly what to do for your device (Chrome, Edge, Firefox, Safari, Samsung Internet, Brave, and in-app browsers like Facebook and WhatsApp). iPhones are told to add Unify to the Home Screen first. It also copes with older Safari. The bell and email always keep working
+- **Updates slider on Home**: swipeable cards, each with a different Box Boy, for resuming a course, marking attendance, class notices and a daily fact. The CGPA target now sits as its own card under the greeting
+- **Note builder, one section at a time**: manual mode now walks through Week, then each topic's details, each part, recall cards and pulse check, then the quiz, with Back and Next and a step counter
+- **Equation builder overlay**: opens full screen over everything with a live "how students will see it" preview, plus symbols (relations, degree, infinity, arrows), functions (sin, log, lim and more) and extra Greek letters. Cancel puts the old equation back
+- **Soft fades**: the first-load screen, onboarding slides, loading screens and the Home greeting fade in and out gently; the logo's green dot breathes
+
+### Changed
+- **Logo** is now just "Unify" with the green dot, in Playfair. The app icon is a green tile with a black Playfair "U."
+- **Contributors, lecturers and admins**: browsing courses and content no longer lights the Studio tab. You stay on Home (or Classroom for lecturers)
+- Phone bottom-nav tabs now tell screen readers which one is current
+
+### Removed
+- Narrator audio uploads in the note builder (the reader still plays any audio already attached)
+
 ## [2.12.1] - 2026-11-09
 
 ### Changed
