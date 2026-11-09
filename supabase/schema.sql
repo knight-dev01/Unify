@@ -336,3 +336,6 @@ do $$ begin
     on storage.objects for delete using (bucket_id = 'avatars' and auth.role() = 'authenticated');
 exception when duplicate_object then null;
 end $$;
+
+-- Course length in years (4, 5 or 6): drives the CGPA path (migration 0030).
+alter table profiles add column if not exists degree_years smallint check (degree_years between 3 and 7);

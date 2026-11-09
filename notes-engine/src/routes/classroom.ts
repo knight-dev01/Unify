@@ -61,6 +61,14 @@ const dbFail = (res: Response, e: unknown) =>
 const ROTATE_SECONDS = 30;
 const attendanceKey = () =>
   process.env.ATTENDANCE_SECRET || process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || "unify-dev-attendance";
+// In-room sessions rotate every 30 s (a photo of the screen goes stale). An ONLINE class has no
+// screen to scan: the lecturer pastes the code into the meeting chat, so it has to survive long
+// enough to be typed, and rotates every 10 minutes instead. Online sessions are marked by the
+// `code` column holding "online" (the column is otherwise unused, so no migration is needed).
+const ONLINE_ROTATE_SECONDS = 600;
+const isOnline = (s: { code?: string | null }) => s.code === "online";
+const rotateOf = (s: { code?: string | null }) => (isOnline(s) ? ONLINE_ROTATE_SECONDS : ROTATE_SECONDS);
+const windowOf = (s: { code?: string | null }, now = Date.now()) => Math.floor(now / 1000 / rotateOf(s));
 const windowNow = () => Math.floor(Date.now() / 1000 / ROTATE_SECONDS);
 function codeFor(sessionId: string, windowIdx: number): string {
   const h = createHmac("sha256", attendanceKey()).update(`${sessionId}:${windowIdx}`).digest();
@@ -410,14 +418,16 @@ async function rosterFor(session: SessionRow) {
 
 const sessionOut = (s: SessionRow) => {
   const open = !s.closed_at && new Date(s.closes_at).getTime() > Date.now();
-  const w = windowNow();
+  const rot = rotateOf(s);
+  const w = windowOf(s);
   return {
     id: s.id,
     course: s.course_code,
+    online: isOnline(s),
     // Only open sessions expose a code; a closed one shows nothing to copy.
     code: open ? codeFor(s.id, w) : "",
-    rotatesAt: new Date((w + 1) * ROTATE_SECONDS * 1000).toISOString(),
-    rotateSeconds: ROTATE_SECONDS,
+    rotatesAt: new Date((w + 1) * rot * 1000).toISOString(),
+    rotateSeconds: rot,
     week: s.week,
     opensAt: s.opens_at,
     closesAt: s.closes_at,
@@ -429,6 +439,28 @@ const sessionOut = (s: SessionRow) => {
 // rep are always together: a lecturer starting it notifies the course's class
 // reps; a class rep starting it notifies the lecturers who teach the course.
 // In-app bell + push. Never allowed to fail the request.
+// Online class: tell the students taking the course it is live, with the Meet link, so they
+// join, get the code from the meeting chat, and come back to Unify to mark themselves present.
+async function notifyOnline(me: Prof, session: SessionRow, meetLink?: string): Promise<void> {
+  try {
+    const sb = supabaseAdmin();
+    const course = session.course_code;
+    const { data: taking } = await sb.from("enrollments").select("user_id").eq("kind", "taking").in("course", variants(course)).limit(2000);
+    const ids = [...new Set(((taking ?? []) as { user_id: string }[]).map((r) => r.user_id))].filter((id) => id !== me.id);
+    if (!ids.length) return;
+    const who = me.first_name || "Your lecturer";
+    const title = `${course} online class is live`;
+    const body = `${who} started it. Join the meeting, then enter the attendance code shared there.`;
+    const link = `/attendance/pass?online=1&course=${encodeURIComponent(course)}${meetLink ? `&m=${encodeURIComponent(meetLink)}` : ""}`;
+    for (let i = 0; i < ids.length; i += 500) {
+      await sb.from("notifications").insert(ids.slice(i, i + 500).map((user_id) => ({ user_id, type: "online_class", title, body, course, link })));
+    }
+    await sendPushToUsers(ids, { title, body, url: link });
+  } catch {
+    // starting the class must not fail because a notification did
+  }
+}
+
 async function notifyPair(me: Prof, session: SessionRow): Promise<void> {
   try {
     const sb = supabaseAdmin();
@@ -472,7 +504,13 @@ async function sessionView(s: SessionRow, meId: string) {
 // Lecturer: open a session. Replaces any session of theirs still open for the course.
 router.post("/attendance/sessions", requireAuth, async (req: Request, res: Response) => {
   const parsed = z
-    .object({ course: z.string().min(1).max(20), week: z.number().int().min(1).max(30).optional(), minutes: z.number().int().min(1).max(60).optional() })
+    .object({
+      course: z.string().min(1).max(20),
+      week: z.number().int().min(1).max(30).optional(),
+      minutes: z.number().int().min(1).max(180).optional(),
+      online: z.boolean().optional(),
+      meetLink: z.string().trim().max(300).url().refine((u) => /^https:\/\//i.test(u), "Use a link that starts with https://").optional(),
+    })
     .safeParse(req.body);
   if (!parsed.success) return fail(res, 400, "Pick a course.");
   try {
@@ -502,14 +540,18 @@ router.post("/attendance/sessions", requireAuth, async (req: Request, res: Respo
       .update({ closed_at: new Date().toISOString() })
       .in("course_code", variants(course))
       .is("closed_at", null);
-    const closesAt = new Date(Date.now() + (parsed.data.minutes ?? 15) * 60 * 1000).toISOString();
+    // In-room sessions are short (up to an hour); an online lecture can run up to three.
+    const online = !!parsed.data.online;
+    const mins = Math.min(parsed.data.minutes ?? (online ? 90 : 15), online ? 180 : 60);
+    const closesAt = new Date(Date.now() + mins * 60 * 1000).toISOString();
     const { data, error } = await sb
       .from("attendance_sessions")
-      .insert({ course_code: course, created_by: me.id, code: "", week: parsed.data.week ?? null, closes_at: closesAt })
+      .insert({ course_code: course, created_by: me.id, code: online ? "online" : "", week: parsed.data.week ?? null, closes_at: closesAt })
       .select("id,course_code,created_by,code,week,opens_at,closes_at,closed_at")
       .single();
     if (error) throw error;
     void notifyPair(me, data as SessionRow);
+    if (online) void notifyOnline(me, data as SessionRow, parsed.data.meetLink);
     res.json({ session: await sessionView(data as SessionRow, me.id), present: [], enrolled: await enrolledCount(course) });
   } catch (e) {
     dbFail(res, e);
@@ -575,12 +617,12 @@ router.post("/attendance/checkin", requireAuth, checkinLimiter, async (req: Requ
       .is("closed_at", null)
       .gt("closes_at", new Date().toISOString())
       .limit(500);
-    const w = windowNow();
     const matches = ((openRows ?? []) as SessionRow[]).filter((r) => {
       const c = parsed.data.code;
+      const w = windowOf(r);
       return codeFor(r.id, w) === c || codeFor(r.id, w - 1) === c;
     });
-    if (!matches.length) return fail(res, 404, "That code isn't open any more. Codes change every 30 seconds: check the screen again.");
+    if (!matches.length) return fail(res, 404, "That code isn't open any more. Codes change often: check the screen (or the meeting chat) again.");
     let s: SessionRow | undefined;
     for (const m of matches) {
       const { data: e } = await sb.from("enrollments").select("course").eq("user_id", me.id).eq("kind", "taking").in("course", variants(m.course_code)).limit(1);
@@ -757,10 +799,10 @@ router.get("/cgpa", requireAuth, async (req: Request, res: Response) => {
     const sb = supabaseAdmin();
     const { data: prof } = await sb
       .from("profiles")
-      .select("cgpa_current,cgpa_target,hide_cgpa,cgpa_units_done,cgpa_units_total,level")
+      .select("cgpa_current,cgpa_target,hide_cgpa,cgpa_units_done,cgpa_units_total,level,degree_years")
       .eq("id", me.id)
       .single();
-    const p = (prof ?? {}) as { cgpa_current: number | null; cgpa_target: number | null; hide_cgpa: boolean | null; cgpa_units_done: number | null; cgpa_units_total: number | null; level: string | null };
+    const p = (prof ?? {}) as { cgpa_current: number | null; cgpa_target: number | null; hide_cgpa: boolean | null; cgpa_units_done: number | null; cgpa_units_total: number | null; level: string | null; degree_years?: number | null };
     const { data: enr } = await sb.from("enrollments").select("course").eq("user_id", me.id).eq("kind", "taking");
     const codes = ((enr ?? []) as { course: string }[]).map((r) => r.course);
     const titles: Record<string, string> = {};
@@ -779,6 +821,7 @@ router.get("/cgpa", requireAuth, async (req: Request, res: Response) => {
       hideCgpa: !!p.hide_cgpa,
       unitsDone: p.cgpa_units_done,
       unitsTotal: p.cgpa_units_total,
+      degreeYears: p.degree_years ?? null,
       level: p.level,
       courses: codes.map((code) => ({
         code,
@@ -799,6 +842,7 @@ const cgpaSchema = z
     cgpaTarget: cgpaNumber(0.5).optional(),
     unitsDone: z.number().int().min(0).max(400).optional(),
     unitsTotal: z.number().int().min(1).max(500).optional(),
+    degreeYears: z.number().int().min(3).max(7).optional(),
     hide: z.boolean().optional(),
     courses: z
       .array(
@@ -841,6 +885,7 @@ router.put("/cgpa", requireAuth, async (req: Request, res: Response) => {
     if (d.cgpaTarget != null) patch.cgpa_target = Math.round(d.cgpaTarget * 100) / 100;
     if (d.unitsDone != null) patch.cgpa_units_done = d.unitsDone;
     if (d.unitsTotal != null) patch.cgpa_units_total = d.unitsTotal;
+    if (d.degreeYears != null) patch.degree_years = d.degreeYears;
     if (d.hide != null) patch.hide_cgpa = d.hide;
     if (Object.keys(patch).length) {
       const { error } = await sb.from("profiles").update(patch).eq("id", me.id);

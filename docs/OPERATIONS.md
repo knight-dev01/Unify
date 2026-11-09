@@ -54,3 +54,10 @@ Admin, Announcements: tick "Also show it on everyone's Home slider" on the annou
 ## Backups
 
 Supabase's free tier has no point-in-time recovery. Before real use, either move to a plan with backups or schedule a regular `pg_dump` and test a restore at least once. Prisma migrations in `notes-engine/prisma/migrations` rebuild the schema; they do not restore data.
+
+## Online classes (Google Meet)
+
+Lecturers and class reps start an online class from Take attendance, Online class tab. The app does not create Meet links by itself (that needs each lecturer to sign in with Google and a Google Calendar API app registered with Google); the Create button opens Google's own new-meeting page and the link is pasted back. If you later want one-tap creation, the route is Google OAuth with the Calendar `events.insert` call and `conferenceData`, stored per lecturer.
+
+Online sessions are marked by `code = 'online'` in `attendance_sessions` (no migration) and use a 10-minute code window instead of 30 seconds. Sessions can run up to 3 hours. Students taking the course get a bell and push notification with the meeting link when it starts.
+

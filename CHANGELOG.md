@@ -5,13 +5,35 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.16.0] - 2026-11-09
+
+### Added
+- **Online classes with Google Meet**: lecturers and class reps get an **Online class** tab in Take attendance. **Create a Google Meet** opens Google's new-meeting page in another tab (the app stays open), you copy the link and tap **Paste link** (it cleans whatever you paste and warns if it is not a Meet link). Creating the meeting fully automatically would need each lecturer to sign in with Google and a Google Calendar API app, which is not set up; this is the dependable route until then
+- **Attendance that works while students are in the meeting**: an online class has no screen to scan, so the code is shared in the meeting chat and lasts 10 minutes at a time (in-room codes still change every 30 seconds). **Copy message for the chat** gives the lecturer a ready-made line. Students are notified (bell and push) when the class goes live, with the meeting link
+- **Joining from the Timetable keeps Unify open**: Join opens the meeting in its own tab and this tab goes to the attendance step (selfie, then type the code from the meeting chat) with an **Open the meeting** button, so students are not lost when they leave the app
+- **Meet link field** (create, paste, validate) in the timetable's add and edit forms too
+
+### Changed
+- **Review is greyed out until the note is complete** (Studio): the Review tab and Continue to review stay disabled until every required field is filled (title, subtitle, learning outcome, every topic, part, quick check, recall card, pulse check and all ten quiz questions). The page says what is still missing
+- Notifications for online classes use a video icon; `/online-class` now sends lecturers to the Online class tab
+
+## [2.15.0] - 2026-11-09
+
+### Added
+- **Course length (4, 5 or 6 years)**: the CGPA planner asks how long your course is, starting from a sensible guess for your faculty (engineering, architecture, pharmacy, law and similar are 5 years, medicine 6, most others 4). The path to graduation, the unit total and the milestones follow it: 8, 10 or 12 semesters, ending at 400, 500 or 600 Level. Stored on your profile (migration `0030_degree_years`)
+- **First-load splash is the whole Box Boy crew**: the characters pop in one after another, "Unify. Learn" arrives, everyone waits a moment, then it fades into sign-in. Tap to skip. Plays once per session
+
+### Changed
+- **Home order**: the stats strip (CGPA target, XP, Streak, Courses) now comes before the updates slider. There is one CGPA target on Home (in that strip, with a "Set" link until you have one), not two
+- **"Finish your profile" only shows when something is really missing**: it checks name, university, faculty, department, level (students) and a picture (an upload, a chosen Box Boy or your sign-in photo all count), and says exactly what is missing instead of always asking for a photo
+
 ## [2.14.3] - 2026-11-09
 
 ### Changed
 - **No GPA above 5.00 anywhere**: "You'd need a 5.33 GPA each semester" can no longer happen. The picker, the roadmap and the what-if all stop at 5.00, and an impossible target says so instead of showing a bigger number. The roadmap's running CGPA now reflects what is actually achievable
 - **Slider thumb** is plain yellow with the button-style edge, no white ring; the empty part of the track is darker so it is easy to see
 - **Duolingo-style bars and slider**: chunky, rounded, with a highlight stripe on the fill and a solid darker edge underneath (the same pressed edge as the buttons). The CGPA slider, the recall and Studio progress bars, the attendance bars, the sign-up password strength bar, and the step indicators in the CGPA planner and onboarding all share it
-- **Roadmap is now a path**: a timeline from "You are here" through every remaining semester (numbered, with the GPA to aim for and the CGPA after it) to "Graduate with your target". It stops at 500 Level, adds milestones ("Welcome to 400 Level", "Halfway to graduation") with a short motivating note on each, and a "Your climb" bar showing how far along you are
+- **Roadmap is now a path**: a timeline from "You are here" through every remaining semester (numbered, with the GPA to aim for and the CGPA after it) to "Graduate with your target". It stops where your course ends (see 2.15.0), adds milestones ("Welcome to 400 Level", "Halfway to graduation") with a short motivating note on each, and a "Your climb" bar showing how far along you are
 - **Colours you can read**: the grey for labels and hints is darker (about 5:1 contrast instead of 2.7:1) across the whole app, and the target labels use solid, readable colours (green, amber-brown, orange, dark grey) with white text instead of pale amber or grey
 
 ## [2.14.2] - 2026-11-09

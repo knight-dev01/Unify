@@ -47,6 +47,7 @@ model Profile {
   hideCgpa      Boolean     @default(false) @map("hide_cgpa")
   cgpaUnitsDone  Int?       @map("cgpa_units_done")
   cgpaUnitsTotal Int?       @map("cgpa_units_total")
+  degreeYears    Int?       @map("degree_years")
   attendanceFullName String? @map("attendance_full_name")
   attendanceMatric String? @map("attendance_matric")
   isHoc         Boolean     @default(false) @map("is_hoc")
