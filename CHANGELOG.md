@@ -5,6 +5,21 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2026-11-09
+
+### Added
+- **Attendance that works** (replaces the demo scaffolds): a lecturer opens a session for a course they teach and gets a 6-digit code valid for 5-60 minutes; enrolled students enter it on **Mark attendance**; the lecturer watches the register fill live and ends the session. One record per student per session. Students see attended vs held per course on **My attendance**. Check-in is rate-limited (6-digit codes)
+- **Class board / HOC**: students read posts for their department + level; the Head of Class (and admins) post announcements, tips and questions and delete their own; announcements notify the class. Students can request HOC (admins are notified); admins grant or remove it from the board page
+- **Classroom hub** (`/lecturer`): today's classes for the courses you teach, one-tap Take attendance, My classes, Studio, Browse; lecturers get a Classroom tab
+- Backend: `src/routes/classroom.ts` (`/v1/hoc/*`, `/v1/attendance/*`), migration `0028_attendance_sessions`, test lecturer/contributor seeded with teaching enrolments
+- Timetable page links Mark attendance, My attendance and Class board
+
+### Changed
+- Online class page is honest ("coming") instead of showing fake check-ins; the demo crypto scanner is gone
+
+### Security
+- Migration 0028 enables row-level security on the 0027 tables (`device_keys`, `attendance_records`, `hoc_posts`, `lecturer_materials`, `online_class_sessions`, `online_checkins`), which were readable through the public anon key. The API uses the service role, so nothing in the app changes
+
 ## [2.2.0] - 2026-11-09
 
 ### Added

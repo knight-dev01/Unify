@@ -161,6 +161,9 @@ app.get("/healthz", (req, res) => res.json({ ok: true, service: "unify-api" }));
 // v1 app API (Supabase-backed). Compiled to dist/src/routes/v1.js by tsc.
 const v1 = require("./src/routes/v1");
 app.use("/v1", v1.default || v1);
+// Head-of-Class posts + in-person attendance (separate file: v1.ts is already huge).
+const classroom = require("./src/routes/classroom");
+app.use("/v1", classroom.default || classroom);
 
 // Authoring guard: lecturers/contributors only (students get 403).
 // convert costs Claude money; save/upload cost disk. validate/render/sample

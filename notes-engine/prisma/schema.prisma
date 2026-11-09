@@ -304,6 +304,7 @@ model AttendanceRecord {
   scannedAt  DateTime @default(now()) @map("scanned_at") @db.Timestamptz(6)
   verified   Boolean  @default(false)
   week       Int?
+  sessionId  String?  @map("session_id") @db.Uuid
 
   @@index([studentId, courseCode])
   @@index([courseCode, scannedAt])
@@ -359,4 +360,18 @@ model OnlineCheckin {
 
   @@unique([sessionId, studentId])
   @@map("online_checkins")
+}
+
+model AttendanceSession {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  courseCode String    @map("course_code")
+  createdBy  String    @map("created_by") @db.Uuid
+  code       String
+  week       Int?
+  opensAt    DateTime  @default(now()) @map("opens_at") @db.Timestamptz(6)
+  closesAt   DateTime  @map("closes_at") @db.Timestamptz(6)
+  closedAt   DateTime? @map("closed_at") @db.Timestamptz(6)
+
+  @@index([courseCode, opensAt(sort: Desc)])
+  @@map("attendance_sessions")
 }

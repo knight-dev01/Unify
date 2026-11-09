@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, CalendarDays, Search, User, PenTool, Bell } from 'lucide-react';
+import { LayoutDashboard, CalendarDays, ClipboardCheck, Search, User, PenTool, Bell } from 'lucide-react';
 import { supabaseBrowser, touchActivity, isSessionExpired, expireSession } from '../lib/supabase';
 import { pushSupported, enablePush } from '../lib/push';
 import ConfirmModal from '../components/ConfirmModal';
@@ -28,6 +28,13 @@ const STUDENT_TABS: Tab[] = [
 const AUTHOR_TABS: Tab[] = [
   { to: '/home', label: 'Home', icon: LayoutDashboard, match: ['/home'] },
   { to: '/studio', label: 'Studio', icon: PenTool, match: ['/studio', '/browse', '/my-classes'] },
+  { to: '/me', label: 'Me', icon: User, match: ['/me'] },
+];
+
+const LECTURER_TABS: Tab[] = [
+  { to: '/home', label: 'Home', icon: LayoutDashboard, match: ['/home'] },
+  { to: '/lecturer', label: 'Classroom', icon: ClipboardCheck, match: ['/lecturer', '/attendance', '/my-classes'] },
+  { to: '/studio', label: 'Studio', icon: PenTool, match: ['/studio', '/browse'] },
   { to: '/me', label: 'Me', icon: User, match: ['/me'] },
 ];
 
@@ -293,7 +300,7 @@ export default function Layout() {
   }, [authed, pathname]);
 
   const isAuthor = role === 'lecturer' || role === 'contributor';
-  const tabs: Tab[] = isAuthor ? AUTHOR_TABS : role === 'admin' ? ADMIN_TABS : STUDENT_TABS;
+  const tabs: Tab[] = role === 'lecturer' ? LECTURER_TABS : isAuthor ? AUTHOR_TABS : role === 'admin' ? ADMIN_TABS : STUDENT_TABS;
   const showSkeletonNav = authed === null || (authed && !roleLoaded);
 
   return (

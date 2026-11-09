@@ -681,6 +681,13 @@ export async function ensureTestUsers(): Promise<void> {
     );
     if (pErr) throw pErr;
 
+    // Lecturer/contributor teach the same courses (needed to take attendance).
+    if ((t.role === "lecturer" || t.role === "contributor") && courses.length) {
+      const { error: tErr } = await sb
+        .from("enrollments")
+        .upsert(courses.map((course) => ({ user_id: id, course, kind: "teaching" })), { onConflict: "user_id,course", ignoreDuplicates: true });
+      if (tErr) throw tErr;
+    }
     if (isStudent && courses.length) {
       const { error: eErr } = await sb
         .from("enrollments")
