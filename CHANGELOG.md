@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.14.1] - 2026-11-09
 
 ### Changed
+- **Announcements and the Home slider are together**: in Admin, Announcements, tick "Also show it on everyone's Home slider" to post the same notice to the bell, email and the Home slider in one go. The slider editor sits right under the form
 - **Selfies are deleted when attendance closes.** The photo is only a live check; once the session ends and the attendance is recorded, it is removed (closing the session deletes it at once, and a sweep every 5 minutes covers sessions that simply time out). Only names and times stay in the register. This replaces the 30-day retention
 - **New app icon files** (`/icons/v2/`): black Playfair "U" and black dot on the brand green (the in-app name stays Unify, green dot, Learn). The new file names make installed copies fetch the new icon instead of reusing the cached one
 - **Note builder Next and Back** now return you (and keyboard focus) to the Week / Topics / Quiz header, so each new section starts in view instead of at the top of the whole page

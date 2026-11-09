@@ -37,7 +37,7 @@ Bump the version in four places and add a changelog entry (see the root `README.
 
 ## Home slider updates
 
-Admin, Announcements has a Home slider card: title, message, optional link (`/path` inside the app or `https://…`), button label, a Box Boy, and an optional end date. Up to 12 at a time. Everyone sees changes within about 30 seconds.
+Admin, Announcements: tick "Also show it on everyone's Home slider" on the announcement form to post one notice to the bell, email and Home together. Below the form, the Home slider card lets you post slider-only notices (and remove old ones): title, message, optional link (`/path` inside the app or `https://…`), button label, a Box Boy, and an optional end date. Up to 12 at a time. Everyone sees changes within about 30 seconds.
 
 ## Runbook
 
