@@ -1,3 +1,4 @@
+import { clientKey } from "../middleware/limits";
 import { Router, type Request, type Response } from "express";
 import rateLimit from "express-rate-limit";
 import { createHmac } from "node:crypto";
@@ -21,7 +22,7 @@ const router = Router();
 
 // A lecture hall shares one campus IP, so per-IP caps would lock out a class:
 // the general cap is generous, and check-in is limited per signed-in student.
-const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 1500, standardHeaders: true, legacyHeaders: false });
+const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 1500, standardHeaders: true, legacyHeaders: false, keyGenerator: clientKey });
 const checkinLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
   max: 20,
@@ -304,6 +305,71 @@ async function enrolledCount(course: string): Promise<number> {
 
 type SessionRow = { id: string; course_code: string; created_by: string; code: string; week: number | null; opens_at: string; closes_at: string; closed_at: string | null };
 
+// ---------- Attendance selfies ----------
+// A student confirms they are in the room with a quick photo. It is stored in a
+// PRIVATE bucket (never a public URL); only the lecturer or class rep running
+// that session sees it, through a link that expires in 10 minutes. Set
+// ATTENDANCE_SELFIE=off to make the photo optional.
+const SELFIE_BUCKET = "attendance-selfies";
+const selfieRequired = () => (process.env.ATTENDANCE_SELFIE || "on").toLowerCase() !== "off";
+let bucketReady = false;
+async function ensureSelfieBucket(): Promise<void> {
+  if (bucketReady) return;
+  const { error } = await supabaseAdmin().storage.createBucket(SELFIE_BUCKET, { public: false, fileSizeLimit: 300 * 1024 });
+  // "already exists" is the normal case after the first call
+  if (!error || /exist/i.test(error.message || "")) bucketReady = true;
+}
+const selfiePath = (sessionId: string, studentId: string) => `${sessionId}/${studentId}.jpg`;
+const urlCache = new Map<string, { url: string; exp: number }>();
+
+async function selfieUrls(sessionId: string, studentIds: string[]): Promise<Record<string, string>> {
+  const out: Record<string, string> = {};
+  if (!studentIds.length) return out;
+  const now = Date.now();
+  const need: string[] = [];
+  for (const id of studentIds) {
+    const hit = urlCache.get(selfiePath(sessionId, id));
+    if (hit && hit.exp > now) out[id] = hit.url;
+    else need.push(id);
+  }
+  if (need.length) {
+    try {
+      const { data } = await supabaseAdmin().storage.from(SELFIE_BUCKET).createSignedUrls(need.map((id) => selfiePath(sessionId, id)), 600);
+      for (const row of data ?? []) {
+        const id = row.path ? row.path.split("/")[1]?.replace(/\.jpg$/, "") : "";
+        if (id && row.signedUrl) {
+          out[id] = row.signedUrl;
+          urlCache.set(selfiePath(sessionId, id), { url: row.signedUrl, exp: now + 8 * 60 * 1000 });
+        }
+      }
+    } catch {
+      // thumbnails are a bonus; the register still works without them
+    }
+    if (urlCache.size > 4000) urlCache.clear();
+  }
+  return out;
+}
+
+// Selfies are deleted after SELFIE_RETENTION_DAYS (default 30): long enough to settle an
+// attendance dispute, short enough to respect privacy and to keep the storage bucket small.
+async function purgeOldSelfies(): Promise<void> {
+  try {
+    const days = Math.max(1, Number(process.env.SELFIE_RETENTION_DAYS) || 30);
+    const cutoff = new Date(Date.now() - days * 86400000).toISOString();
+    const sb = supabaseAdmin();
+    const { data } = await sb.from("attendance_sessions").select("id").lt("opens_at", cutoff).order("opens_at", { ascending: false }).limit(200);
+    for (const row of (data ?? []) as { id: string }[]) {
+      const { data: files } = await sb.storage.from(SELFIE_BUCKET).list(row.id, { limit: 500 });
+      const paths = (files ?? []).map((f) => `${row.id}/${f.name}`);
+      if (paths.length) await sb.storage.from(SELFIE_BUCKET).remove(paths);
+    }
+  } catch {
+    // retention is best effort; it runs again in a few hours
+  }
+}
+setTimeout(() => void purgeOldSelfies(), 3 * 60 * 1000).unref();
+setInterval(() => void purgeOldSelfies(), 6 * 60 * 60 * 1000).unref();
+
 async function rosterFor(session: SessionRow) {
   const sb = supabaseAdmin();
   const { data } = await sb
@@ -320,7 +386,8 @@ async function rosterFor(session: SessionRow) {
       info[p.id] = { name: p.attendance_full_name || p.first_name || "Student", matric: p.attendance_matric || "" };
     }
   }
-  return rows.map((r) => ({ studentId: r.student_id, at: r.scanned_at, name: info[r.student_id]?.name || "Student", matric: info[r.student_id]?.matric || "" }));
+  const photos = await selfieUrls(session.id, ids);
+  return rows.map((r) => ({ studentId: r.student_id, at: r.scanned_at, name: info[r.student_id]?.name || "Student", matric: info[r.student_id]?.matric || "", photo: photos[r.student_id] || null }));
 }
 
 const sessionOut = (s: SessionRow) => {
@@ -473,8 +540,9 @@ router.post("/attendance/sessions/:id/close", requireAuth, async (req: Request, 
 
 // Student: enter the code to be marked present.
 router.post("/attendance/checkin", requireAuth, checkinLimiter, async (req: Request, res: Response) => {
-  const parsed = z.object({ code: z.string().trim().regex(/^\d{6}$/) }).safeParse(req.body);
+  const parsed = z.object({ code: z.string().trim().regex(/^\d{6}$/), selfie: z.string().max(260000).optional() }).safeParse(req.body);
   if (!parsed.success) return fail(res, 400, "Enter the 6-digit code from your lecturer.");
+  if (selfieRequired() && !parsed.data.selfie) return fail(res, 400, "Take a quick photo of yourself to mark attendance.");
   try {
     const me = await getProfile(uid(req));
     if (!me) return fail(res, 404, "Finish onboarding first.");
@@ -500,6 +568,16 @@ router.post("/attendance/checkin", requireAuth, checkinLimiter, async (req: Requ
       if (e && e.length) { s = m; break; }
     }
     if (!s) return fail(res, 403, `You're not enrolled in ${matches[0].course_code}. Add it from Courses first.`);
+    // Save the selfie first, so a mark never exists without its photo.
+    if (parsed.data.selfie) {
+      const m = parsed.data.selfie.match(/^data:image\/jpe?g;base64,(.+)$/i);
+      if (!m) return fail(res, 400, "That photo could not be read. Take it again.");
+      const buf = Buffer.from(m[1], "base64");
+      if (buf.length < 800 || buf.length > 200 * 1024 || buf[0] !== 0xff || buf[1] !== 0xd8) return fail(res, 400, "That photo could not be read. Take it again.");
+      await ensureSelfieBucket();
+      const up = await sb.storage.from(SELFIE_BUCKET).upload(selfiePath(s.id, me.id), buf, { contentType: "image/jpeg", upsert: true });
+      if (up.error) return fail(res, 500, "Could not save your photo. Check your connection and try again.");
+    }
     const { error } = await sb
       .from("attendance_records")
       .insert({ student_id: me.id, course_code: s.course_code, scanned_by: s.created_by, verified: true, week: s.week, session_id: s.id });
@@ -628,6 +706,16 @@ router.delete("/materials/:id", requireAuth, async (req: Request, res: Response)
 // where row-level security silently returned nothing and ignored writes.
 // Everything goes through here now, scoped to the signed-in student.
 
+// A CGPA is a real number from 0.00 to 5.00 with at most two decimals. Anything
+// else is rejected, never silently rounded.
+const cgpaNumber = (min: number) =>
+  z
+    .number()
+    .finite()
+    .min(min)
+    .max(5)
+    .refine((v) => Math.abs(v * 100 - Math.round(v * 100)) < 1e-6, "Use at most two decimal places.");
+
 router.use("/cgpa", limiter);
 
 async function requireStudent(req: Request, res: Response): Promise<Prof | null> {
@@ -688,8 +776,8 @@ router.get("/cgpa", requireAuth, async (req: Request, res: Response) => {
 
 const cgpaSchema = z
   .object({
-    cgpaCurrent: z.number().min(0).max(5).optional(),
-    cgpaTarget: z.number().min(0.5).max(5).optional(),
+    cgpaCurrent: cgpaNumber(0).optional(),
+    cgpaTarget: cgpaNumber(0.5).optional(),
     unitsDone: z.number().int().min(0).max(400).optional(),
     unitsTotal: z.number().int().min(1).max(500).optional(),
     hide: z.boolean().optional(),

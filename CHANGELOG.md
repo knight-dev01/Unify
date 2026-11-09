@@ -5,6 +5,27 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.14.0] - 2026-11-09
+
+### Added
+- **Selfie attendance**: students take a quick selfie, then scan the QR. The photo is stored privately, shown only to the lecturer or class rep running that session (as a thumbnail in the roster), and deleted after 30 days. `ATTENDANCE_SELFIE=off` makes it optional
+- **Scanner animation**: a slow sweep line and breathing corner brackets on the QR viewfinder, and a pulsing guide ring on the selfie screen. Quiet, and off under reduced motion
+- **Live updates in the Home slider**: admins publish notices with a Box Boy, link, button and optional end date (Admin, Announcements). Everyone sees them first in the slider within about 30 seconds
+- **Documentation**: new `docs/OPERATIONS.md` and `docs/PRODUCTION-READINESS.md`, a new `notes-engine/README.md`, load-test tools in `notes-engine/scripts/loadtest/`, and refreshed root, web and setup docs
+
+### Changed
+- **CGPA is strict**: 0.00 to 5.00, numbers only, at most two decimals. The field cleans itself as you type and shows what is wrong; the server rejects anything else instead of rounding
+- **One CGPA target** everywhere: Profile and Home use the CGPA target (the separate "graduation target" is gone); the onboarding class-of-degree pick now sets it
+- **Profile pictures**: new on-device photo preparation (square crop, correct rotation, no black behind transparent PNGs, under about 60 KB) and long-lived caching of the stored picture
+- **Admin charts** redrawn: bars are never hairline-thin or chunky, long series merge into readable buckets, the line has a steady stroke with a soft fill, and hovering or touching shows exact values
+- **Loading states** share one structure: skeleton rows shaped like the real content plus a rotating line (`SectionSkeleton` for sections inside a page)
+- **Buttons**: only the main action is coloured; all other buttons read in the normal text colour. Full-width buttons cap at 380px on desktop
+
+### Fixed (production readiness)
+- The API allowed only 200 requests per 15 minutes **per IP**, which would lock a whole lecture hall out behind one campus network. Now 240 a minute per signed-in session
+- Every request called the Auth server; sessions are now remembered for up to 60 seconds
+- Responses are gzipped; the request body limit dropped from 50 MB to 12 MB
+
 ## [2.13.2] - 2026-11-09
 
 ### Changed

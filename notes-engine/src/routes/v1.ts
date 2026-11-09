@@ -1,3 +1,4 @@
+import { apiLimiter } from "../middleware/limits";
 import { noteClientError } from "../lib/alert";
 import { Router, type Request, type Response } from "express";
 import rateLimit from "express-rate-limit";
@@ -14,7 +15,9 @@ const router = Router();
 // /me SSO-picture backfill throttle: one Auth lookup per user per hour
 // while the profile has no picture (password users have none to find).
 const picBackfillAt = new Map<string, number>();
-router.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 200, standardHeaders: true, legacyHeaders: false }));
+// Per-session (not per-IP) limits: see middleware/limits.ts. The old 200 requests per 15 minutes
+// per IP would have locked a whole lecture hall out behind one campus IP.
+router.use(apiLimiter);
 
 const TOPIC_XP = 10;
 
@@ -55,7 +58,7 @@ const onboardingSchema = z.object({
   department: z.string().min(1).max(100).nullish(),
   level: z.string().min(1).max(40).nullish(),
   universityId: z.string().uuid().max(80).optional(),
-  gradTarget: z.number().min(0).max(5).optional(),
+  gradTarget: z.number().finite().min(0).max(5).refine((v) => Math.abs(v * 100 - Math.round(v * 100)) < 1e-6, "Use at most two decimal places.").optional(),
   role: z.enum(["student", "lecturer", "contributor"]).default("student"),
   semester: z.string().min(1).max(40).optional(),
   courses: z.array(z.string().min(1).max(20)).max(30).optional(),
@@ -397,6 +400,8 @@ router.put("/me", requireAuth, async (req: Request, res: Response) => {
           level: d.level,
           university_id: d.universityId,
           grad_target: d.gradTarget,
+          // The profile's one target is the CGPA target: the onboarding pick sets it too.
+          ...(d.gradTarget != null ? { cgpa_target: d.gradTarget } : {}),
           // role is immutable: never updated via PUT (see POST lock above)
           ...(typeof d.notifyNewNotes === "boolean" ? { notify_new_notes: d.notifyNewNotes } : {}),
           updated_at: new Date().toISOString(),
@@ -552,6 +557,7 @@ router.post("/onboarding", requireAuth, async (req: Request, res: Response) => {
           level: d.level,
           university_id: d.universityId ?? null,
           grad_target: d.gradTarget ?? null,
+          ...(d.gradTarget != null ? { cgpa_target: d.gradTarget } : {}),
           role: d.role,
           semester: d.semester ?? null,
           updated_at: new Date().toISOString(),
@@ -1535,6 +1541,8 @@ router.post("/avatar", requireAuth, async (req: Request, res: Response) => {
     const { error: upErr } = await supabaseAdmin().storage.from("avatars").upload(path, buf, {
       contentType,
       upsert: true,
+      // The URL carries ?v=<time>, so a long cache is safe and makes pictures instant on repeat views.
+      cacheControl: "31536000",
     });
     if (upErr) throw upErr;
     const { data } = supabaseAdmin().storage.from("avatars").getPublicUrl(path);
@@ -3108,6 +3116,81 @@ router.post("/admin/users/promote", requireAuth, async (req: Request, res: Respo
       else promoted += 1;
     }
     res.json({ ok: true, promoted, graduated });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// ---- Live updates shown in the Home slider (admin-managed) ----
+// Stored as one JSON list in app_settings (no migration). Everyone signed in
+// reads the active ones; only admins write. Reads are cached for 30 s so a
+// crowd opening Home at once costs one database read, not one each.
+const POSES = ["cheer", "armsCrossed", "peeking", "wavePhone", "thumbsUpPhone", "thumbsUp", "chairRelax", "readingStanding", "teaching", "targetSign", "phoneOut", "keyHandover", "sittingPhone"] as const;
+const updateItemSchema = z.object({
+  id: z.string().min(1).max(40),
+  title: z.string().min(1).max(80),
+  body: z.string().min(1).max(240),
+  link: z.string().max(300).optional(),
+  cta: z.string().max(24).optional(),
+  pose: z.enum(POSES).default("cheer"),
+  endsAt: z.string().max(40).optional(),
+  createdAt: z.string().max(40).optional(),
+});
+type UpdateItem = z.infer<typeof updateItemSchema>;
+let updatesCache: { at: number; items: UpdateItem[] } | null = null;
+
+async function readUpdates(): Promise<UpdateItem[]> {
+  if (updatesCache && Date.now() - updatesCache.at < 30000) return updatesCache.items;
+  let items: UpdateItem[] = [];
+  try {
+    const { data } = await supabaseAdmin().from("app_settings").select("value").eq("key", "home_updates").maybeSingle();
+    const raw = (data as { value?: string } | null)?.value;
+    if (raw) {
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)) items = arr.map((x) => updateItemSchema.safeParse(x)).filter((r) => r.success).map((r) => (r as { data: UpdateItem }).data);
+    }
+  } catch {
+    // no updates is a fine answer
+  }
+  updatesCache = { at: Date.now(), items };
+  return items;
+}
+
+router.get("/updates", requireAuth, async (_req: Request, res: Response) => {
+  const now = Date.now();
+  const items = (await readUpdates()).filter((u) => !u.endsAt || Number.isNaN(Date.parse(u.endsAt)) || Date.parse(u.endsAt) > now);
+  res.set("Cache-Control", "private, max-age=30");
+  res.json({ updates: items });
+});
+
+router.get("/admin/updates", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  updatesCache = null;
+  res.json({ updates: await readUpdates() });
+});
+
+router.put("/admin/updates", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  const parsed = z.object({ updates: z.array(updateItemSchema).max(12) }).safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid body", details: parsed.error.flatten() });
+    return;
+  }
+  // Links must stay inside the app (a path) or be https, never javascript: and friends.
+  const bad = parsed.data.updates.find((u) => u.link && !(u.link.startsWith("/") && !u.link.startsWith("//") && !u.link.includes("\\")) && !u.link.startsWith("https://"));
+  if (bad) {
+    res.status(400).json({ error: "A link must start with / (inside Unify) or https://" });
+    return;
+  }
+  try {
+    const { error } = await supabaseAdmin()
+      .from("app_settings")
+      .upsert({ key: "home_updates", value: JSON.stringify(parsed.data.updates), updated_at: new Date().toISOString() }, { onConflict: "key" });
+    if (error) throw error;
+    updatesCache = null;
+    res.json({ ok: true, updates: parsed.data.updates });
   } catch (e) {
     res.status(500).json(dbError(e));
   }

@@ -111,3 +111,26 @@ html[data-rail="1"] .nb-nav { bottom: 12px; }
 .loading-screen { min-height: calc(100vh - 220px) !important; min-height: calc(100dvh - 220px) !important; }
 .loading-screen img { width: clamp(110px, 15vw, 200px) !important; }
 @media (min-width: 900px) { .loading-screen { min-height: 100vh !important; min-height: 100dvh !important; gap: 24px !important; } .loading-screen .wordmark, .loading-screen > span:nth-of-type(2) { font-size: 1.15em; } }
+
+/* ---------- Attendance: scanner frame and selfie ----------
+   Quiet on purpose: a thin line sweeps the frame slowly and the corners breathe,
+   so it reads as "looking" without flashing. */
+.scan-frame { position: absolute; inset: 14%; pointer-events: none; }
+.scan-frame i { position: absolute; width: 26px; height: 26px; border: 3px solid var(--u-green); animation: scan-corner 2.8s ease-in-out infinite; }
+.scan-frame i:nth-child(1) { top: 0; left: 0; border-right: 0; border-bottom: 0; border-top-left-radius: 12px; }
+.scan-frame i:nth-child(2) { top: 0; right: 0; border-left: 0; border-bottom: 0; border-top-right-radius: 12px; }
+.scan-frame i:nth-child(3) { bottom: 0; left: 0; border-right: 0; border-top: 0; border-bottom-left-radius: 12px; }
+.scan-frame i:nth-child(4) { bottom: 0; right: 0; border-left: 0; border-top: 0; border-bottom-right-radius: 12px; }
+.scan-line { position: absolute; left: 4%; right: 4%; height: 2px; top: 0; border-radius: 2px; background: linear-gradient(90deg, transparent, var(--u-green), transparent); box-shadow: 0 0 14px 2px rgba(80, 255, 144, .45); animation: scan-sweep 2.6s cubic-bezier(.45, 0, .55, 1) infinite alternate; }
+@keyframes scan-sweep { from { top: 2%; opacity: .25; } 12% { opacity: 1; } 88% { opacity: 1; } to { top: 96%; opacity: .25; } }
+@keyframes scan-corner { 0%, 100% { opacity: .75; transform: scale(1); } 50% { opacity: 1; transform: scale(1.06); } }
+
+.selfie-stage { position: relative; width: 100%; max-width: 300px; aspect-ratio: 1 / 1; border-radius: 9999px; overflow: hidden; background: #0a0a0a; border: 3px solid var(--u-green); box-shadow: 0 0 0 6px var(--green-bg); }
+.selfie-video, .selfie-img { width: 100%; height: 100%; object-fit: cover; display: block; transform: scaleX(-1); }
+.selfie-ring { position: absolute; inset: 9%; border-radius: 9999px; border: 2px dashed rgba(255, 255, 255, .7); animation: selfie-pulse 3s ease-in-out infinite; pointer-events: none; }
+.selfie-wait { position: absolute; inset: 0; display: grid; place-items: center; color: #fff; font-size: 13px; opacity: .8; }
+.selfie-shutter { width: 64px; height: 64px; border-radius: 9999px; border: 4px solid var(--u-green); background: var(--u-card); color: var(--u-text); display: grid; place-items: center; transition: transform .12s ease; }
+.selfie-shutter:active:not(:disabled) { transform: scale(.92); }
+.selfie-shutter:disabled { opacity: .45; }
+@keyframes selfie-pulse { 0%, 100% { opacity: .5; transform: scale(1); } 50% { opacity: .95; transform: scale(1.025); } }
+@media (prefers-reduced-motion: reduce) { .scan-line, .scan-frame i, .selfie-ring { animation: none; } .scan-line { top: 50%; } }

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BoxBoy, type Pose } from './brand';
 
-export type UpdateSlide = { id: string; pose: Pose; tag: string; title: string; body: string; to?: string; cta?: string };
+export type UpdateSlide = { id: string; pose: Pose; tag: string; title: string; body: string; to?: string; href?: string; cta?: string };
 
 // Updates slider: one card at a time, a different Box Boy on each. Swipe or tap
 // the dots; it also drifts to the next card every 7 s until the person touches
@@ -52,6 +52,7 @@ export function UpdatesSlider({ slides }: { slides: UpdateSlide[] }) {
               <h3 className="display upd-title">{s.title}</h3>
               <p className="t-13 muted upd-text">{s.body}</p>
               {s.to && <Link to={s.to} className="btn btn--amber btn--sm" style={{ marginTop: 10 }} tabIndex={k === i ? 0 : -1}>{s.cta || 'Open'}</Link>}
+              {s.href && <a href={s.href} target="_blank" rel="noopener noreferrer" className="btn btn--amber btn--sm" style={{ marginTop: 10 }} tabIndex={k === i ? 0 : -1}>{s.cta || 'Open'}</a>}
             </div>
             <div className="upd-art"><BoxBoy full pose={s.pose} width={92} /></div>
             <div className="kente-edge" aria-hidden="true" />

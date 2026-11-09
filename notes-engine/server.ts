@@ -28,7 +28,10 @@ app.set("trust proxy", 1);
 
 const CORS_ORIGINS = (process.env.CORS_ORIGIN || "").split(",").map((s) => s.trim()).filter(Boolean);
 app.use(cors({ origin: CORS_ORIGINS.length ? CORS_ORIGINS : true }));
-app.use(express.json({ limit: "50mb" }));
+// Gzip JSON and text: notes and lists shrink about 5x, which matters on mobile data.
+app.use(require("compression")());
+// Big enough for an authored week with figures; far below the old 50mb that one bad request could use to eat memory.
+app.use(express.json({ limit: "12mb" }));
 // NOTE: the legacy public/ playground was removed; authoring lives in the
 // web Studio now. /uploads stays (authored figure images).
 app.use("/uploads", express.static("uploads"));

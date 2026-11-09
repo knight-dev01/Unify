@@ -14,6 +14,7 @@ import Drop from '../components/Drop';
 import { describeError } from '../lib/errors';
 import AdminContentPanel from './admin/content';
 import PerformancePanel from './admin/performance';
+import HomeUpdatesPanel from './admin/updates';
 import Typewriter from '../components/Typewriter';
 import { localGreeting, dailyProverb } from '../lib/naija';
 
@@ -802,6 +803,7 @@ export default function AdminRoute() {
       </Module>
 
       <Module id="announce" openId={openModule}>
+      <HomeUpdatesPanel />
       <div style={card}>
         <div style={{ fontSize: 12, color: 'var(--text2)', marginBottom: 8 }}>Lands on every user's bell instantly, and is emailed to every confirmed inbox.</div>
         <input value={announceTitle} onChange={(e) => setAnnounceTitle(e.target.value)} placeholder="Announcement title" style={{ ...input, width: '100%', marginBottom: 8 }} />

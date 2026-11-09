@@ -136,3 +136,19 @@ Settings → Environment Variables (Production + Preview):
 | Push notifications silent | Render needs `VAPID_PUBLIC_KEY` + `VAPID_PRIVATE_KEY` + `VAPID_SUBJECT` (generate: `npx web-push generate-vapid-keys` in `notes-engine`). Without them the backend logs and skips. Users opt in from Profile → Appearance. |
 | Prisma re-creates existing tables | You used path B already — run the baseline command from 1.5. |
 | `/v1/universities` returns `[]` | Seed not run yet — run `supabase/seed.sql`. |
+
+## Added in v2.x: extra environment and notes
+
+| Variable (Render) | Why |
+|---|---|
+| `ATTENDANCE_SELFIE` | `on` (default) requires a selfie at check-in. `off` makes it optional. The private `attendance-selfies` bucket is created automatically on first use. |
+| `SELFIE_RETENTION_DAYS` | How long selfies are kept (default 30). |
+| `ADMIN_EMAILS` + `BREVO_API_KEY` | Also where **alert emails** go. After setting, open Admin, Live performance and press **Send test alert**. |
+| `SEED_TEST_USERS` | Test accounts for QA only. Remove it afterwards and delete the accounts. |
+
+No new Supabase table is needed for the Home slider updates: they live in `app_settings` under `home_updates`.
+
+The web host must serve `/sw.js`, `/version.json` and `/manifest.json` with no-cache headers so installed copies of the app can update themselves (both `vercel.json` files already do).
+
+Running it day to day: `docs/OPERATIONS.md`. How ready it is for launch: `docs/PRODUCTION-READINESS.md`.
+
