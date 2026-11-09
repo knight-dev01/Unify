@@ -5,10 +5,18 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.14.2] - 2026-11-09
+
+### Changed
+- **Custom slider**: the CGPA target slider is now the app's own control (yellow filled track, round thumb with the same pressed edge as the buttons) instead of the browser's purple one. Sliders, checkboxes and radios everywhere use the brand yellow
+- **Picking a target**: it must be higher than your current CGPA, so the slider starts just above where you are and says so. The step shows an encouraging line that fits how big the goal is, and how far above your CGPA the target is. The server rejects a target at or below the current CGPA (unless you are already at 5.00)
+- **Roadmap** now starts from your real level and semester (from your profile): "300 Level · 1st semester" and onward, with a clear line on whether your target is possible from where you stand, or the most you could finish with if it is not
+- **App icon** is just the green "U" on the black tile, no dot (`/icons/v4/`)
+
 ## [2.14.1] - 2026-11-09
 
 ### Changed
-- **App icon is back to the black tile with a bold green Nunito "U"**, now with a green dot after it (`/icons/v3/`, new file names so installed copies refresh)
+- **App icon is back to the black tile with a bold green Nunito "U"** (see 2.14.2 for the final look)
 - **Announcements and the Home slider are together**: in Admin, Announcements, tick "Also show it on everyone's Home slider" to post the same notice to the bell, email and the Home slider in one go. The slider editor sits right under the form
 - **Selfies are deleted when attendance closes.** The photo is only a live check; once the session ends and the attendance is recorded, it is removed (closing the session deletes it at once, and a sweep every 5 minutes covers sessions that simply time out). Only names and times stay in the register. This replaces the 30-day retention
 - **Note builder Next and Back** now return you (and keyboard focus) to the Week / Topics / Quiz header, so each new section starts in view instead of at the top of the whole page

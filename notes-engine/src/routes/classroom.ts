@@ -824,6 +824,18 @@ router.put("/cgpa", requireAuth, async (req: Request, res: Response) => {
     if (!me) return;
     const sb = supabaseAdmin();
     const d = parsed.data;
+    // A target has to be a step up from where the student is now (unless they are already at 5.00).
+    if (d.cgpaTarget != null) {
+      let current = d.cgpaCurrent ?? null;
+      if (current == null) {
+        const { data: row } = await sb.from("profiles").select("cgpa_current").eq("id", me.id).single();
+        const v = (row as { cgpa_current: number | null } | null)?.cgpa_current;
+        current = v != null ? Number(v) : null;
+      }
+      if (current != null && current > 0 && current < 5 && d.cgpaTarget <= current) {
+        return fail(res, 400, `Pick a target higher than your current CGPA (${current.toFixed(2)}).`);
+      }
+    }
     const patch: Record<string, unknown> = {};
     if (d.cgpaCurrent != null) patch.cgpa_current = Math.round(d.cgpaCurrent * 100) / 100;
     if (d.cgpaTarget != null) patch.cgpa_target = Math.round(d.cgpaTarget * 100) / 100;
