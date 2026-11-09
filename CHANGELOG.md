@@ -5,6 +5,15 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.14.3] - 2026-11-09
+
+### Changed
+- **No GPA above 5.00 anywhere**: "You'd need a 5.33 GPA each semester" can no longer happen. The picker, the roadmap and the what-if all stop at 5.00, and an impossible target says so instead of showing a bigger number. The roadmap's running CGPA now reflects what is actually achievable
+- **Slider thumb** is plain yellow with the button-style edge, no white ring; the empty part of the track is darker so it is easy to see
+- **Duolingo-style bars and slider**: chunky, rounded, with a highlight stripe on the fill and a solid darker edge underneath (the same pressed edge as the buttons). The CGPA slider, the recall and Studio progress bars, the attendance bars, the sign-up password strength bar, and the step indicators in the CGPA planner and onboarding all share it
+- **Roadmap is now a path**: a timeline from "You are here" through every remaining semester (numbered, with the GPA to aim for and the CGPA after it) to "Graduate with your target". It stops at 500 Level, adds milestones ("Welcome to 400 Level", "Halfway to graduation") with a short motivating note on each, and a "Your climb" bar showing how far along you are
+- **Colours you can read**: the grey for labels and hints is darker (about 5:1 contrast instead of 2.7:1) across the whole app, and the target labels use solid, readable colours (green, amber-brown, orange, dark grey) with white text instead of pale amber or grey
+
 ## [2.14.2] - 2026-11-09
 
 ### Changed
