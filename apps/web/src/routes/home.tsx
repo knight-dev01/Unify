@@ -181,14 +181,18 @@ export default function HomeRoute() {
         // Streak heartbeat: showing up counts (server records one/day).
         void api.pingDaily();
         // Waiting-room lookup: students who applied for staff see status.
-        if ((me.profile?.role || 'student') === 'student') {
-          try {
-            const mine = await api.myRoleRequest();
-            if (mine.request && mine.request.status === 'pending') setPendingReq(mine.request);
-          } catch {
-            // no waiting room without a readable request
-          }
-        }
+        // Not awaited here: joins the panel batch below so it never delays the rest.
+        const roleReq =
+          (me.profile?.role || 'student') === 'student'
+            ? api
+                .myRoleRequest()
+                .then((mine) => {
+                  if (mine.request && mine.request.status === 'pending') setPendingReq(mine.request);
+                })
+                .catch(() => {
+                  // no waiting room without a readable request
+                })
+            : Promise.resolve();
         // BUG-012: one catalog fetch feeds every course card (title,
         // weeks, lecturers) — never one request per card.
         try {
@@ -219,43 +223,28 @@ export default function HomeRoute() {
           setCourses(stats.courses || []);
           setQuizzes({ taken: stats.quizzesTaken || 0, avg: stats.quizAvg || 0 });
         }
+        // Author + admin panels are independent: fire them all together
+        // (each failure leaves only its own panel empty).
+        const panels: Promise<unknown>[] = [roleReq];
         if (me.profile?.role === 'lecturer' || me.profile?.role === 'contributor') {
-          try {
-            const authored = await api.authored();
-            setNotes(authored.notes);
-          } catch {
-            // empty list stands
-          }
-          try {
-            setTeaching((await api.teaching()).courses || []);
-          } catch {
-            // My Classes card falls back to role-only
-          }
-          try {
-            setMyContribs((await api.contributions()).courses || []);
-          } catch {
-            // contributions stand empty
-          }
-          try {
-            setAstats(await api.authorStats());
-          } catch {
-            // stats stand empty
-          }
+          panels.push(
+            api.authored().then((a) => setNotes(a.notes)).catch(() => {}),
+            api.teaching().then((t) => setTeaching(t.courses || [])).catch(() => {}),
+            api.contributions().then((c) => setMyContribs(c.courses || [])).catch(() => {}),
+            api.authorStats().then(setAstats).catch(() => {}),
+          );
         }
         // Oversight loads for every effective admin, both dashboard views.
         if (me.isAdmin) {
-          try {
-            const s = await api.adminStats();
-            setPlatform({ users: s.users, weeks: s.weeks, topics: s.topics, courses: s.courses, xpTotal: s.xpTotal });
-          } catch {
-            // platform stats stand empty
-          }
-          try {
-            setActivity(await api.adminActivity());
-          } catch {
-            // activity stands empty
-          }
+          panels.push(
+            api
+              .adminStats()
+              .then((s) => setPlatform({ users: s.users, weeks: s.weeks, topics: s.topics, courses: s.courses, xpTotal: s.xpTotal }))
+              .catch(() => {}),
+            api.adminActivity().then(setActivity).catch(() => {}),
+          );
         }
+        await Promise.all(panels);
       } catch {
         setLoadError("Couldn't load your profile. Check your connection and try again.");
       } finally {

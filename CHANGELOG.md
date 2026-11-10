@@ -5,6 +5,17 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.17.0] - 2026-11-10
+
+### Changed
+- **Faster everywhere**: the browser now remembers the API's cross-site permission answer for 2 hours, so most requests no longer wait on an extra round trip first
+- **Faster dashboard**: the profile is fetched once on first load instead of 2–3 times at once; lecturer and admin panels (and a student's staff-request status) load together instead of one after another
+- **Faster API**: the profile, stats and week-of-notes endpoints run their database reads together instead of one by one; the admin-email check and the course-access role check are remembered briefly instead of looked up on every request
+- **Admin panel button removed from the admin profile page** (admins reach it from the sidebar/menu)
+
+### Fixed
+- A retried Studio conversion request now keeps its 60-second timeout instead of dropping to 30
+
 ## [2.16.0] - 2026-11-09
 
 ### Added

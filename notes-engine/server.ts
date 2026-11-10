@@ -27,7 +27,9 @@ const PORT = process.env.PORT || 3000;
 app.set("trust proxy", 1);
 
 const CORS_ORIGINS = (process.env.CORS_ORIGIN || "").split(",").map((s) => s.trim()).filter(Boolean);
-app.use(cors({ origin: CORS_ORIGINS.length ? CORS_ORIGINS : true }));
+// maxAge: browsers reuse the preflight answer for 2h (Chrome's cap) instead of
+// sending an OPTIONS round trip before nearly every authed call.
+app.use(cors({ origin: CORS_ORIGINS.length ? CORS_ORIGINS : true, maxAge: 7200 }));
 // Gzip JSON and text: notes and lists shrink about 5x, which matters on mobile data.
 app.use(require("compression")());
 // Big enough for an authored week with figures; far below the old 50mb that one bad request could use to eat memory.

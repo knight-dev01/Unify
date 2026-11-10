@@ -4,7 +4,7 @@ import { ProfileSkeleton } from '../components/Skeletons';
 import { toastError } from '../lib/toast';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { LogOut, Pencil, Shield, X, Sun, Moon, MessageCircle } from 'lucide-react';
+import { LogOut, Pencil, X, Sun, Moon, MessageCircle } from 'lucide-react';
 import BackButton from '../components/BackButton';
 import ConfirmModal from '../components/ConfirmModal';
 import Drop from '../components/Drop';
@@ -437,11 +437,6 @@ export default function MeRoute() {
         </div>
         {emailMsg && <div style={{ fontSize: 12, color: 'var(--u-good)', marginTop: 6 }}>{emailMsg}</div>}
       </div>
-      {isAdmin && (
-        <Link to="/admin" style={{ marginBottom: 8, padding: 14, background: '#111827', color: '#fff', borderRadius: 16, fontWeight: 800, textDecoration: 'none', textAlign: 'center', display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center' }}>
-          <Shield size={16} /> Admin panel
-        </Link>
-      )}
       {saveMsg && <Flash tone="success" message={saveMsg} onDismiss={() => setSaveMsg('')} />}
 
       {editing && (

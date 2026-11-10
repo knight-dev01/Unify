@@ -15,6 +15,20 @@ const router = Router();
 // /me SSO-picture backfill throttle: one Auth lookup per user per hour
 // while the profile has no picture (password users have none to find).
 const picBackfillAt = new Map<string, number>();
+// /me ADMIN_EMAILS check: the Auth email per user, remembered 10 min so a
+// non-admin's every /me no longer costs an Auth admin round trip. (Read from
+// Auth, never from the profile row, which the user may be able to edit.)
+const authEmailCache = new Map<string, { email: string; until: number }>();
+async function authEmailOf(userId: string): Promise<string> {
+  const now = Date.now();
+  const hit = authEmailCache.get(userId);
+  if (hit && hit.until > now) return hit.email;
+  const uRes = await supabaseAdmin().auth.admin.getUserById(userId);
+  const email = ((uRes.data as { user?: { email?: string } } | null)?.user?.email || "").toLowerCase();
+  if (authEmailCache.size >= 5000) authEmailCache.clear();
+  authEmailCache.set(userId, { email, until: now + 10 * 60 * 1000 });
+  return email;
+}
 // Per-session (not per-IP) limits: see middleware/limits.ts. The old 200 requests per 15 minutes
 // per IP would have locked a whole lecture hall out behind one campus IP.
 router.use(apiLimiter);
@@ -107,7 +121,13 @@ router.get("/universities", async (_req: Request, res: Response) => {
 router.get("/me", requireAuth, async (req: Request, res: Response) => {
   const userId = (req as AuthedRequest).userId as string;
   try {
-    const { data, error } = await supabaseAdmin().from("profiles").select("*").eq("id", userId).single();
+    // Profile, enrollments and saved position are independent: one round trip, not three.
+    const sbm = supabaseAdmin();
+    const [{ data, error }, { data: enrolled }, { data: saved }] = await Promise.all([
+      sbm.from("profiles").select("*").eq("id", userId).single(),
+      sbm.from("enrollments").select("course").eq("user_id", userId),
+      sbm.from("resume_state").select("course,week,topic,lecture_no").eq("user_id", userId).maybeSingle(),
+    ]);
     if (error || !data) {
       res.json({ onboarded: false, profile: null });
       return;
@@ -180,18 +200,13 @@ router.get("/me", requireAuth, async (req: Request, res: Response) => {
         .filter(Boolean);
       if (adminEmails.length) {
         try {
-          const uRes = await supabaseAdmin().auth.admin.getUserById(userId);
-          const email = ((uRes.data as { user?: { email?: string } } | null)?.user?.email || "").toLowerCase();
+          const email = await authEmailOf(userId);
           if (email && adminEmails.includes(email)) isAdmin = true;
         } catch {
           // stay non-admin
         }
       }
     }
-    const { data: enrolled } = await supabaseAdmin()
-      .from("enrollments")
-      .select("course")
-      .eq("user_id", userId);
     // Never hand blank codes to clients (they render as ghost courses).
     const courses = ((enrolled ?? []) as { course: string }[])
       .map((r) => r.course)
@@ -199,11 +214,6 @@ router.get("/me", requireAuth, async (req: Request, res: Response) => {
     // Resume: live position if tracked, else the most recently completed
     // topic (pre-tracking progress still resumes somewhere sensible).
     let resume: { course: string; week: number; topic: number; lecture: number } | null = null;
-    const { data: saved } = await supabaseAdmin()
-      .from("resume_state")
-      .select("course,week,topic,lecture_no")
-      .eq("user_id", userId)
-      .single();
     if (saved) {
       const r = saved as { course: string; week: number; topic: number; lecture_no?: number };
       if (r.course) resume = { course: r.course, week: r.week, topic: r.topic, lecture: r.lecture_no || 1 };
@@ -770,16 +780,21 @@ function courseVariants(code: string): string[] {
 
 async function topicRowsFor(course: string, week: number): Promise<TopicNoteRow[]> {
   const sb = supabaseAdmin();
+  // One query per code spelling, run together; results keep spelling order.
+  const results = await Promise.all(
+    courseVariants(course).map((v) =>
+      sb
+        .from("topic_notes")
+        .select("id,course,week,topic,lecture_no,version,title,note_json,author_id,created_at")
+        .eq("course", v)
+        .eq("week", week)
+        .order("lecture_no")
+        .order("topic")
+        .order("version", { ascending: false })
+    )
+  );
   const out: TopicNoteRow[] = [];
-  for (const v of courseVariants(course)) {
-    const { data, error } = await sb
-      .from("topic_notes")
-      .select("id,course,week,topic,lecture_no,version,title,note_json,author_id,created_at")
-      .eq("course", v)
-      .eq("week", week)
-      .order("lecture_no")
-      .order("topic")
-      .order("version", { ascending: false });
+  for (const { data, error } of results) {
     if (error) throw error;
     out.push(...((data ?? []) as TopicNoteRow[]));
   }
@@ -861,20 +876,18 @@ async function assembleWeek(
   week: number
 ): Promise<{ course: string; week: number; title: string; subtitle: string; note_json: unknown; topicMeta: TopicMeta[]; lectures: number[]; authors: { name: string; avatar: string }[] } | null> {
   const sb = supabaseAdmin();
-  let shell: { course: string; week: number; title: string; subtitle: string; note_json: unknown } | null = null;
-  for (const v of courseVariants(code)) {
-    const { data, error } = await sb
-      .from("weeks")
-      .select("course,week,title,subtitle,note_json")
-      .eq("course", v)
-      .eq("week", week)
-      .single();
-    if (!error && data) {
-      shell = data as { course: string; week: number; title: string; subtitle: string; note_json: unknown };
-      break;
-    }
-  }
-  const rows = await topicRowsFor(code, week);
+  type Shell = { course: string; week: number; title: string; subtitle: string; note_json: unknown };
+  // Shell lookups (every code spelling) and topic rows all run together;
+  // the first spelling that has a shell still wins, as before.
+  const [shells, rows] = await Promise.all([
+    Promise.all(
+      courseVariants(code).map((v) =>
+        sb.from("weeks").select("course,week,title,subtitle,note_json").eq("course", v).eq("week", week).maybeSingle()
+      )
+    ),
+    topicRowsFor(code, week),
+  ]);
+  const shell: Shell | null = (shells.find((r) => !r.error && r.data)?.data as Shell | undefined) ?? null;
   if (!shell && rows.length === 0) return null;
   if (rows.length === 0 && shell) {
     return { ...shell, topicMeta: [], lectures: [1], authors: [] };
@@ -1965,19 +1978,17 @@ router.get("/stats", requireAuth, async (req: Request, res: Response) => {
   const userId = (req as AuthedRequest).userId as string;
   try {
     const sb = supabaseAdmin();
-    const { data: xpRows } = await sb
-      .from("xp_events")
-      .select("amount,created_at")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false })
-      .limit(200);
+    // Three independent reads: run together.
+    const [{ data: xpRows }, { data: progRows }, { data: quizRows }] = await Promise.all([
+      sb.from("xp_events").select("amount,created_at").eq("user_id", userId).order("created_at", { ascending: false }).limit(200),
+      sb.from("topic_progress").select("course").eq("user_id", userId),
+      sb.from("quiz_attempts").select("score,total").eq("user_id", userId).limit(200),
+    ]);
     const rows = (xpRows ?? []) as { amount: number; created_at: string }[];
-    const { data: progRows } = await sb.from("topic_progress").select("course").eq("user_id", userId);
     const counts: Record<string, number> = {};
     for (const r of ((progRows ?? []) as { course: string }[])) {
       counts[r.course] = (counts[r.course] || 0) + 1;
     }
-    const { data: quizRows } = await sb.from("quiz_attempts").select("score,total").eq("user_id", userId).limit(200);
     const qa = ((quizRows ?? []) as { score: number; total: number }[]).filter((r) => r.total > 0);
     res.json({
       xp: rows.reduce((s, r) => s + (r.amount || 0), 0),

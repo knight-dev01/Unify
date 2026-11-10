@@ -7,6 +7,22 @@ import type { AuthedRequest } from "./requireAuth";
 // - lecturers teach broadly, students are gated client-side by enrollment,
 // - platform admins (flag, role, or ADMIN_EMAILS) go everywhere.
 // Reads the course from req.params.code, or from the note row for :id.
+// Role + admin flag per user, remembered 30 s: every week/note read passes
+// through here, and roles only change by admin action.
+const roleCache = new Map<string, { p: { role?: string; is_admin?: boolean } | null; until: number }>();
+async function roleOf(userId: string): Promise<{ role?: string; is_admin?: boolean } | null> {
+  const now = Date.now();
+  const hit = roleCache.get(userId);
+  if (hit && hit.until > now) return hit.p;
+  const { data, error } = await supabaseAdmin().from("profiles").select("role,is_admin").eq("id", userId).single();
+  const p = (data as { role?: string; is_admin?: boolean } | null) ?? null;
+  // A failed read behaves as before (no profile, pass) but is not remembered.
+  if (error && error.code !== "PGRST116") return p;
+  if (roleCache.size >= 5000) roleCache.clear();
+  roleCache.set(userId, { p, until: now + 30 * 1000 });
+  return p;
+}
+
 export async function requireCourseAccess(req: Request, res: Response, next: NextFunction): Promise<void> {
   const userId = (req as AuthedRequest).userId;
   if (!userId) {
@@ -15,12 +31,7 @@ export async function requireCourseAccess(req: Request, res: Response, next: Nex
   }
   try {
     const sb = supabaseAdmin();
-    const { data: prof } = await sb
-      .from("profiles")
-      .select("role,is_admin")
-      .eq("id", userId)
-      .single();
-    const p = prof as { role?: string; is_admin?: boolean } | null;
+    const p = await roleOf(userId);
     // Non-contributors pass here (lecturers teach broadly, students are
     // gated client-side by enrollment, admins of any kind go everywhere).
     if (!p || p.role !== "contributor" || p.is_admin) {
