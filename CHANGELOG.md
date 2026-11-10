@@ -5,6 +5,12 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.17.4] - 2026-11-10
+
+### Changed
+- **Admin Home slider editor uses the app's standard dropdowns** for the Box Boy pose and the button link (was a plain browser select and a free-text link box)
+- **Button link is picked from the app's pages**, for every role: Home, Notifications, Profile and Choose your Box Boy for everyone; My courses, Find courses, Timetable, CGPA planner, Mark attendance, My attendance and Become a class rep for students; Studio, Browse notes and My classes for lecturers and contributors; or a web link (https). Home shows the button only to people who can open that page, so nobody is bounced back (the card itself still shows for everyone)
+
 ## [2.17.3] - 2026-11-10
 
 ### Changed

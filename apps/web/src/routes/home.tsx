@@ -4,6 +4,7 @@ import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { BookOpen, ChevronRight, Trash2 } from 'lucide-react';
 import { supabaseBrowser } from '../lib/supabase';
 import { api, type Profile, type HomeUpdate } from '../lib/api';
+import { canOpenLink } from '../lib/updateLinks';
 import { profileGaps, gapsText } from '../lib/profileGaps';
 import { DashboardSkeleton } from '../components/Skeletons';
 import ErrorState from '../components/ErrorState';
@@ -424,7 +425,12 @@ export default function HomeRoute() {
         )}
       </div>
     );
-  const updateSlides: UpdateSlide[] = liveUpdates.map((u) => ({ id: 'live-' + u.id, pose: u.pose, tag: 'From Unify', title: u.title, body: u.body, to: u.link && u.link.startsWith('/') ? u.link : undefined, href: u.link && u.link.startsWith('https://') ? u.link : undefined, cta: u.cta || 'Open' }));
+  // Admin updates: the button shows only for viewers who can open its page
+  // (role-gated pages would bounce everyone else straight back to Home).
+  const updateSlides: UpdateSlide[] = liveUpdates.map((u) => {
+    const linkOk = canOpenLink(u.link, profile?.role, isAdmin);
+    return { id: 'live-' + u.id, pose: u.pose, tag: 'From Unify', title: u.title, body: u.body, to: linkOk && u.link && u.link.startsWith('/') ? u.link : undefined, href: u.link && u.link.startsWith('https://') ? u.link : undefined, cta: u.cta || 'Open' };
+  });
   if (resume && resume.course) updateSlides.push({ id: 'resume', pose: 'readingStanding', tag: 'Pick up', title: `${resume.course} · Week ${resume.week}`, body: 'You stopped here. A few minutes keeps the streak alive.', to: `/learn/${encodeURIComponent(resume.course.trim())}/week/${resume.week}`, cta: 'Resume' });
   if (shown.length === 0) updateSlides.push({ id: 'enroll', pose: 'peeking', tag: 'Start here', title: 'Add your courses', body: 'Find your department’s courses and the notes appear on Home.', to: '/courses/find', cta: 'Find courses' });
   updateSlides.push({ id: 'attend', pose: 'phoneOut', tag: 'In class', title: 'Mark your attendance', body: 'When your lecturer shows the QR code, scan it right from the app.', to: '/attendance/pass', cta: 'Scan' });
