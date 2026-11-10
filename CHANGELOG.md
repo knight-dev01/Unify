@@ -5,6 +5,11 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.17.5] - 2026-11-10
+
+### Changed
+- **Link preview redesigned in the app's own look**: white top band and brand-green bottom band (split horizontally), each with the app's Adire texture; the kente stripe from the app's green bands along the bottom; the app icon with a green U; the wordmark as in the app ("Unify" in Playfair with the green dot, "Learn" in Nunito). Box Boy still holds his phone out to the viewer. Image URL bumped to `?v=6`
+
 ## [2.17.4] - 2026-11-10
 
 ### Changed
