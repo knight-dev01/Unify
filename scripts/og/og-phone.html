@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<!-- Link preview (og-image.jpg): 1200x630, horizontal. Render with
+     render-og.ps1, then save as a JPEG under ~100 KB so WhatsApp keeps the large card. -->
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Playfair+Display:wght@900&display=block" rel="stylesheet"/>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; }
+  body { background: #50ff90; font-family: 'Nunito', Arial, sans-serif; position: relative; color: #0a0a0a; }
+  .logo { position: absolute; top: 64px; left: 72px; width: 104px; height: 104px; border-radius: 22px; background: #0a0a0a;
+          color: #fff; font-family: 'Nunito'; font-weight: 900; font-size: 74px; display: flex; align-items: center; justify-content: center; }
+  .wordmark { position: absolute; top: 60px; left: 202px; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 74px; letter-spacing: -1px; }
+  .tagline { position: absolute; top: 160px; left: 205px; font-weight: 800; font-size: 20px; letter-spacing: 4.6px; color: #0d3b24; }
+  h1 { position: absolute; top: 244px; left: 72px; font-weight: 900; font-size: 68px; line-height: 1.08; letter-spacing: -1px; }
+  h1 .w { color: #fff; text-shadow: 0 4px 0 #0a0a0a, 3px 0 0 #0a0a0a, -3px 0 0 #0a0a0a, 0 -3px 0 #0a0a0a, 3px 4px 0 #0a0a0a, -3px 4px 0 #0a0a0a; }
+  .sub { position: absolute; top: 470px; left: 72px; font-weight: 800; font-size: 25px; line-height: 1.4; }
+  .chips { position: absolute; top: 548px; left: 72px; display: flex; gap: 14px; }
+  .chip { background: #0a0a0a; color: #50ff90; border-radius: 999px; padding: 9px 22px; font-weight: 800; font-size: 19px; }
+  .glow { position: absolute; right: 70px; bottom: 30px; width: 420px; height: 420px; border-radius: 50%;
+          background: radial-gradient(circle, rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 68%); }
+  .mascot { position: absolute; right: 96px; bottom: 16px; height: 548px; }
+  .stripe { position: absolute; left: 0; right: 0; bottom: 0; height: 16px;
+            background: repeating-linear-gradient(90deg, #0a0a0a 0 60px, #fbbf24 60px 120px); }
+</style>
+</head>
+<body>
+  <div class="logo">U</div>
+  <div class="wordmark">Unify Learn</div>
+  <div class="tagline">BUILT FOR THE ONES WHO BUILD</div>
+  <h1>Study smarter.<br/><span class="w">Own your journey.</span></h1>
+  <div class="sub">Guided notes, attendance, a timetable<br/>and a CGPA path for your whole course.</div>
+  <div class="chips"><span class="chip">Free for students</span><span class="chip">Works offline</span></div>
+  <div class="glow"></div>
+  <img class="mascot" src="mascot-phone.png" alt=""/>
+  <div class="stripe"></div>
+</body>
+</html>

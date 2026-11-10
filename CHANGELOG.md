@@ -5,6 +5,11 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.17.3] - 2026-11-10
+
+### Changed
+- **New link preview**: shared Unify links show a horizontal 1200x630 card with a single Box Boy holding his phone out (was three Box Boys). Still a JPEG under 100 KB so WhatsApp keeps the large picture-first card. Image URL bumped to `?v=5` so apps fetch the new picture. Source: `scripts/og/og-phone.html`
+
 ## [2.17.2] - 2026-11-10
 
 ### Changed
