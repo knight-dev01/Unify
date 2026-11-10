@@ -5,6 +5,15 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.17.1] - 2026-11-10
+
+### Fixed
+- **Reader zoom is desktop-only and notes-only**: phones always show notes at normal size (even after zooming on a computer), and the loading screen is never zoomed — only the note itself keeps the desktop zoom
+
+### Changed
+- **Any photo works as a profile picture**: no more "pick a JPG, PNG or WEBP" refusal. Photos are converted on the device to a small JPEG, including iPhone HEIC/HEIF photos on Android and computers (the converter downloads only when such a photo is picked). Attendance selfies get the same conversion
+- **Box Boy art is 82% lighter**: mascot images now load as WebP (1.6 MB → 0.29 MB) with no visible change; the old PNGs stay in place for any saved links
+
 ## [2.17.0] - 2026-11-10
 
 ### Changed

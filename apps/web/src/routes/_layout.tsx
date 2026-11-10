@@ -407,8 +407,8 @@ export default function Layout() {
       </header>
       )}
       <OfflineBanner />
-      {/* Content column: desktop zoom targets this element only — the
-          sticky header and bottom nav keep their normal size. */}
+      {/* Content column. Reader zoom is NOT applied here: it targets only
+          the note body (.reader-zoom in learn/week.tsx), desktop only. */}
       <div style={{ display: isDesktop ? 'flex' : 'block', alignItems: 'flex-start', minHeight: isDesktop ? 'calc(100vh - 56px)' : 'auto' }}>
         {isDesktop && authed && !immersive && (
           <aside className="side-pills" aria-label="Main">
