@@ -287,7 +287,17 @@ export default function Layout() {
       api
         .notifications(1)
         .then((res) => {
-          if (!cancelled) setUnread(res.unread || 0);
+          if (cancelled) return;
+          const n = res.unread || 0;
+          setUnread(n);
+          // Installed app: unread count on the home-screen icon (where supported).
+          try {
+            const nav = navigator as Navigator & { setAppBadge?: (n?: number) => Promise<void>; clearAppBadge?: () => Promise<void> };
+            if (n > 0) void nav.setAppBadge?.(n).catch(() => {});
+            else void nav.clearAppBadge?.().catch(() => {});
+          } catch {
+            // badges unsupported
+          }
         })
         .catch(() => {});
     };
@@ -297,7 +307,13 @@ export default function Layout() {
       if (e && e.data && (e.data as { type?: string }).type === 'unify-notif') load();
     };
     const onFocus = () => load();
+    // Phones reopening the installed app fire visibilitychange, not always focus.
+    const onVisible = () => {
+      if (!document.hidden) load();
+    };
     window.addEventListener('focus', onFocus);
+    window.addEventListener('online', onFocus);
+    document.addEventListener('visibilitychange', onVisible);
     try {
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.addEventListener('message', onPush as EventListener);
@@ -309,6 +325,8 @@ export default function Layout() {
       cancelled = true;
       clearInterval(t);
       window.removeEventListener('focus', onFocus);
+      window.removeEventListener('online', onFocus);
+      document.removeEventListener('visibilitychange', onVisible);
       try {
         if ('serviceWorker' in navigator) {
           navigator.serviceWorker.removeEventListener('message', onPush as EventListener);

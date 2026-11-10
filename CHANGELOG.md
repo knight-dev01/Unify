@@ -5,6 +5,12 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.17.2] - 2026-11-10
+
+### Changed
+- **Bell count refreshes the moment you reopen the installed app** (and when the connection returns), not only on the 5-minute check: phones send no focus signal when an app comes back from the background
+- **Unread count on the home-screen icon** for the installed app where the phone supports it (iPhone home-screen apps on iOS 16.4+, installed desktop apps; some Android launchers); a push marks the icon even while the app is closed
+
 ## [2.17.1] - 2026-11-10
 
 ### Fixed
