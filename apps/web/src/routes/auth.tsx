@@ -321,12 +321,8 @@ export default function AuthRoute() {
 
   if (welcomeBack)
     return (
-      // A see-through layer over soft green blobs.
-      <div style={{ position: 'relative', overflow: 'hidden', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, maxWidth: 'var(--shell, 480px)', margin: '0 auto', background: 'var(--surface)', padding: 24, textAlign: 'center', isolation: 'isolate' }}>
-        <span className="welcome-blob" aria-hidden="true" style={{ width: 260, height: 260, top: '8%', left: '-18%' }} />
-        <span className="welcome-blob" aria-hidden="true" style={{ width: 220, height: 220, top: '34%', right: '-16%', animationDelay: '-3s' }} />
-        <span className="welcome-blob" aria-hidden="true" style={{ width: 300, height: 300, bottom: '-10%', left: '18%', animationDelay: '-6s' }} />
-        <span aria-hidden="true" style={{ position: 'absolute', inset: 0, zIndex: -1, background: 'color-mix(in srgb, var(--surface) 45%, transparent)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)' }} />
+      // See-through: the page's Adire pattern shows through a light layer.
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, maxWidth: 'var(--shell, 480px)', margin: '0 auto', background: 'color-mix(in srgb, var(--surface) 55%, transparent)', padding: 24, textAlign: 'center' }}>
         <BoxBoy pose="cheer" width={112} />
         <h1 style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 28 }}>Own your journey.</h1>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', color: 'var(--text2)', fontSize: 13, fontWeight: 600 }}>

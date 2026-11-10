@@ -357,8 +357,3 @@ sticky icon sidebar; phones get a horizontal pill rail on top. */
 /* Studio review: the actions stay in reach above the bottom nav (or the desktop rail). */
 .studio-actions{position:sticky;bottom:calc(var(--nav-h) - 6px + env(safe-area-inset-bottom));z-index:30;margin-top:20px;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow)}
 [data-rail="1"] .studio-actions{bottom:12px}
-
-/* "Own your journey." welcome: soft green blobs drifting under a frosted layer */
-.welcome-blob{position:absolute;z-index:-2;border-radius:50%;background:var(--u-green);opacity:.55;filter:blur(38px);animation:blob-drift 9s ease-in-out infinite alternate;pointer-events:none}
-@keyframes blob-drift{from{transform:translate(0,0) scale(1)}to{transform:translate(18px,-22px) scale(1.12)}}
-@media (prefers-reduced-motion:reduce){.welcome-blob{animation:none}}
