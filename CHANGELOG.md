@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Next in the notes lands on the topic head**: the Topic 1 / Topic 2 tabs with the topic's title under them, not the week's hero above
+
 ### Added
 - **Number and maths answers in week quizzes** (S30, S31). A number question accepts the answer within the author's tolerance (1% by default) and shows the unit; '1,250 kW' and '1250' both count. A maths question is checked by value, not spelling, so (8/27)ρV³, 8ρV³/27 and 0.296ρV³ are all right; an on-screen keypad adds the symbols a phone keyboard hides (^, √, π, ρ, brackets). A missed one shows the right answer after Check score. Quizzes still have 10 questions; at least 6 must be multiple choice and the rest can be fill-in, number or maths
 - **Lecturer setup** (L01–L06): a short first-time flow (what Unify does for lecturers, department, the courses Unify has assigned, how students see your name, all set). Classroom shows 'Finish setting up' until the department is set
