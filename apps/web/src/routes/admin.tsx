@@ -220,6 +220,9 @@ export default function AdminRoute() {
       setDefaultModel(m.default);
       if (t) setTrends(t);
       if (st.currentSemester) setCurrentSemester(st.currentSemester);
+      const cal = st as { semesterStart?: string | null; semesterWeeks?: number };
+      setSemStart(cal.semesterStart || '');
+      setSemWeeks(cal.semesterWeeks || 12);
     } catch (err) {
       setError(describeError(err, 'load that'));
     }
@@ -337,6 +340,19 @@ export default function AdminRoute() {
       await refresh();
     } catch (err) {
       setError(describeError(err, 'update that'));
+    }
+  };
+
+  // Semester calendar: Week 1's start date and teaching weeks ("Week 3 of 12" on Home, attendance weeks).
+  const [semStart, setSemStart] = useState('');
+  const [semWeeks, setSemWeeks] = useState(12);
+  const saveCalendar = async () => {
+    setError('');
+    try {
+      await api.adminSetSemester(currentSemester, { start: semStart || undefined, weeks: semWeeks });
+      setSuccess(semStart ? `Semester calendar saved: Week 1 starts ${new Date(semStart).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}, ${semWeeks} weeks.` : 'Saved.');
+    } catch (err) {
+      setError(describeError(err, 'save the calendar'));
     }
   };
 
@@ -806,6 +822,18 @@ export default function AdminRoute() {
           {promoting ? 'Promoting…' : 'Promote all students one level'}
         </button>
         <div style={{ fontSize: 11, color: 'var(--text2)', marginTop: 6 }}>500 Level graduates; enrollments reset for promoted students.</div>
+        <div style={{ borderTop: '1px solid var(--border)', marginTop: 14, paddingTop: 12 }}>
+          <div style={{ fontSize: 12, color: 'var(--text2)', marginBottom: 8 }}>Semester calendar: when Week 1 starts and how many teaching weeks. Students see "Week 3 of 12" on Home, and attendance is filed by week.</div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <label style={{ fontSize: 12, fontWeight: 700, flex: '1 1 160px' }}>Week 1 starts
+              <input type="date" value={semStart} onChange={(e) => setSemStart(e.target.value)} style={{ display: 'block', width: '100%', marginTop: 4, padding: 10, borderRadius: 10, border: '1px solid var(--border)', background: 'var(--surface)', color: 'var(--text)' }} />
+            </label>
+            <label style={{ fontSize: 12, fontWeight: 700, flex: '0 1 110px' }}>Weeks
+              <input type="number" min={6} max={26} value={semWeeks} onChange={(e) => setSemWeeks(Math.max(6, Math.min(26, Number(e.target.value) || 12)))} style={{ display: 'block', width: '100%', marginTop: 4, padding: 10, borderRadius: 10, border: '1px solid var(--border)', background: 'var(--surface)', color: 'var(--text)' }} />
+            </label>
+          </div>
+          <button onClick={() => void saveCalendar()} style={{ ...primaryBtn, width: '100%', marginTop: 10 }}>Save calendar</button>
+        </div>
       </div>
       </Module>
 

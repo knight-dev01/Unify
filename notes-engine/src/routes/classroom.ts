@@ -6,6 +6,7 @@ import { z } from "zod";
 import { supabaseAdmin } from "../lib/supabase";
 import { requireAuth, type AuthedRequest } from "../middleware/requireAuth";
 import { sendPushToUsers } from "../lib/push";
+import { currentSemesterWeek } from "../lib/calendar";
 import { ENTRY_COLS, entryOfStudent, expectedEntries, institutionOf, listForClass, listsForCourse, notTaking, type EntryRow } from "../lib/classlist";
 
 // Classroom features on top of v1: Head-of-Class posts and in-person
@@ -638,7 +639,8 @@ router.post("/attendance/sessions", requireAuth, async (req: Request, res: Respo
     const closesAt = new Date(Date.now() + mins * 60 * 1000).toISOString();
     const { data, error } = await sb
       .from("attendance_sessions")
-      .insert({ course_code: course, created_by: me.id, code: online ? "online" : "", week: parsed.data.week ?? null, closes_at: closesAt, slot_id: slotId, label })
+      // No week given (started from the scanner, not a course week): file it under this week of the semester.
+      .insert({ course_code: course, created_by: me.id, code: online ? "online" : "", week: parsed.data.week ?? (await currentSemesterWeek()), closes_at: closesAt, slot_id: slotId, label })
       .select(SESSION_COLS)
       .single();
     if (error) throw error;

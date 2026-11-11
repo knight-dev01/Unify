@@ -4,6 +4,7 @@ import { Router, type Request, type Response } from "express";
 import rateLimit from "express-rate-limit";
 import { z } from "zod";
 import { supabaseAdmin } from "../lib/supabase";
+import { getSemesterCalendar, forgetSemesterCalendar } from "../lib/calendar";
 import { notifyCoursePublished, notifyInAppNewNote } from "../lib/email";
 import { pushNewNote, pushAnnounce, pushToUser } from "../lib/push";
 import { requireAuth, type AuthedRequest } from "../middleware/requireAuth";
@@ -61,6 +62,7 @@ async function getCurrentSemester(): Promise<string> {
   }
   return "First Semester";
 }
+
 
 const onboardingSchema = z.object({
   firstName: z.string().min(1).max(60),
@@ -249,6 +251,16 @@ router.get("/me", requireAuth, async (req: Request, res: Response) => {
         }
       }
     }
+    // Week of the semester: the admin sets the semester's start date once (Admin
+    // → Academic session); a profile's own date, if any, wins.
+    const prof = data as { semester_start?: string | null; semester_weeks?: number | null };
+    if (!prof.semester_start) {
+      const cal = await getSemesterCalendar();
+      if (cal.start) {
+        prof.semester_start = cal.start;
+        prof.semester_weeks = cal.weeks;
+      }
+    }
     // Effective admin: the is_admin flag, ADMIN_EMAILS, or the admin role.
     // (Admin is a first-class role now; the flag stays for older accounts.)
     let isAdmin = Boolean(p.is_admin) || p.role === "admin";
@@ -294,7 +306,8 @@ router.get("/me", requireAuth, async (req: Request, res: Response) => {
 
 // Public: platform settings students need (active semester picker source).
 router.get("/settings", async (_req: Request, res: Response) => {
-  res.json({ currentSemester: await getCurrentSemester() });
+  const cal = await getSemesterCalendar();
+  res.json({ currentSemester: await getCurrentSemester(), semesterStart: cal.start, semesterWeeks: cal.weeks });
 });
 
 // Authed: enroll/unenroll in a course (taking for students, teaching for
@@ -724,30 +737,27 @@ router.get("/courses", async (req: Request, res: Response) => {
     for (const w of ((weekRows ?? []) as { course: string }[])) {
       weeksByCourse[w.course] = (weeksByCourse[w.course] || 0) + 1;
     }
-    // BUG-012: staff ride the catalog too (dashboard cards show avatars
-    // of everyone assigned — lecturers AND contributors). Uploaded picture
-    // wins, Gravatar-by-email is the automatic fallback. Batched, no N+1.
-    const staffByCourse: Record<string, { name: string; avatar: string }[]> = {};
+    // Course cards show the course's LECTURER (review p.4: "Show the lecturer's
+    // name, not the contributor's"), capitalised ("Dr Yussuf", not "dr yussuf"),
+    // with their uploaded photo or their Box Boy persona (no generated patterns).
+    // Batched, no N+1.
+    const staffByCourse: Record<string, { name: string; avatar: string; persona: string }[]> = {};
+    const titleCase = (s: string) => s.trim().replace(/\s+/g, " ").toLowerCase().replace(/(^|[\s'’\-.])([a-z])/g, (_, a, b) => a + b.toUpperCase());
     try {
       const { data: teaching } = await sb.from("enrollments").select("course,user_id").eq("kind", "teaching").limit(2000);
       const ids = [...new Set(((teaching ?? []) as { course: string; user_id: string }[]).map((t) => t.user_id))].slice(0, 500);
       if (ids.length) {
-        const { data: profs } = await sb.from("profiles").select("id,first_name,email,avatar_url").in("id", ids);
-        const byId: Record<string, { name: string; email: string; avatar: string }> = {};
-        for (const p of ((profs ?? []) as { id: string; first_name: string; email: string; avatar_url: string }[])) {
-          if (p.first_name) byId[p.id] = { name: p.first_name, email: p.email || "", avatar: p.avatar_url || "" };
+        const { data: profs } = await sb.from("profiles").select("id,first_name,avatar_url,box_boy_persona,role").in("id", ids).eq("role", "lecturer");
+        const byId: Record<string, { name: string; avatar: string; persona: string }> = {};
+        for (const p of ((profs ?? []) as { id: string; first_name: string; avatar_url: string; box_boy_persona: string | null }[])) {
+          if (p.first_name) byId[p.id] = { name: titleCase(p.first_name), avatar: p.avatar_url || "", persona: p.box_boy_persona || "" };
         }
-        const { createHash } = await import("node:crypto");
         for (const t of ((teaching ?? []) as { course: string; user_id: string }[])) {
           const who = byId[t.user_id];
           if (!who) continue;
           const list = (staffByCourse[t.course] = staffByCourse[t.course] || []);
           if (list.some((s) => s.name === who.name) || list.length >= 4) continue;
-          let avatar = who.avatar;
-          if (!avatar && who.email) {
-            avatar = `https://www.gravatar.com/avatar/${createHash("md5").update(who.email.trim().toLowerCase()).digest("hex")}?d=identicon&s=128`;
-          }
-          list.push({ name: who.name, avatar });
+          list.push(who);
         }
       }
     } catch {
@@ -3182,19 +3192,26 @@ router.post("/admin/users/invite", requireAuth, async (req: Request, res: Respon
 router.put("/admin/settings/semester", requireAuth, async (req: Request, res: Response) => {
   const adminId = await requireAdminUser(req, res);
   if (!adminId) return;
-  const parsed = z.object({ semester: z.enum(SEMESTERS) }).safeParse(req.body);
+  const parsed = z
+    .object({
+      semester: z.enum(SEMESTERS),
+      // When teaching started (Week 1's Monday) and how many teaching weeks.
+      start: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+      weeks: z.number().int().min(6).max(26).optional(),
+    })
+    .safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: "Invalid body", details: parsed.error.flatten() });
     return;
   }
   try {
-    const { error } = await supabaseAdmin()
-      .from("app_settings")
-      .upsert(
-        { key: "current_semester", value: parsed.data.semester, updated_at: new Date().toISOString() },
-        { onConflict: "key" }
-      );
+    const now = new Date().toISOString();
+    const rows: { key: string; value: string; updated_at: string }[] = [{ key: "current_semester", value: parsed.data.semester, updated_at: now }];
+    if (parsed.data.start) rows.push({ key: "semester_start", value: parsed.data.start, updated_at: now });
+    if (parsed.data.weeks) rows.push({ key: "semester_weeks", value: String(parsed.data.weeks), updated_at: now });
+    const { error } = await supabaseAdmin().from("app_settings").upsert(rows, { onConflict: "key" });
     if (error) throw error;
+    forgetSemesterCalendar();
     res.json({ ok: true, currentSemester: parsed.data.semester });
   } catch (e) {
     res.status(500).json(dbError(e));

@@ -351,7 +351,7 @@ export type HomeUpdate = { id: string; title: string; body: string; link?: strin
 
 export const api = {
   universities: () => apiFetch<University[]>("/v1/universities"),
-  settings: () => apiFetch<{ currentSemester: string }>("/v1/settings"),
+  settings: () => apiFetch<{ currentSemester: string; semesterStart?: string | null; semesterWeeks?: number }>("/v1/settings"),
   me: () => {
     if (meCache && Date.now() - meCache.at < 15000) return Promise.resolve(meCache.data);
     if (meInflight) return meInflight;
@@ -552,8 +552,8 @@ export const api = {
     apiFetch<{ courses: { course: string; kind: string }[] }>(`/v1/admin/users/${id}/courses`),
   adminSetUserCourses: (id: string, courses: string[]) =>
     apiFetch<{ ok: boolean; courses: string[] }>(`/v1/admin/users/${id}/courses`, { method: 'PUT', body: JSON.stringify({ courses }) }),
-  adminSetSemester: (semester: string) =>
-    apiFetch<{ ok: boolean; currentSemester: string }>('/v1/admin/settings/semester', { method: 'PUT', body: JSON.stringify({ semester }) }),
+  adminSetSemester: (semester: string, calendar?: { start?: string; weeks?: number }) =>
+    apiFetch<{ ok: boolean; currentSemester: string }>('/v1/admin/settings/semester', { method: 'PUT', body: JSON.stringify({ semester, ...(calendar || {}) }) }),
   adminPromote: () =>
     apiFetch<{ ok: boolean; promoted: number; graduated: number }>('/v1/admin/users/promote', { method: 'POST', body: JSON.stringify({}) }),
   adminDeleteUser: (id: string) => apiFetch<{ ok: boolean }>(`/v1/admin/users/${id}`, { method: 'DELETE' }),
@@ -570,7 +570,7 @@ export const api = {
     if (level) p.set('level', level);
     if (semester) p.set('semester', semester);
     const q = p.toString();
-    return apiFetch<{ code: string; title: string; levels: string[]; semesters: string[]; weeks: number; lecturers: string[]; staff: { name: string; avatar: string }[] }[]>(`/v1/courses${q ? `?${q}` : ''}`);
+    return apiFetch<{ code: string; title: string; levels: string[]; semesters: string[]; weeks: number; lecturers: string[]; staff: { name: string; avatar: string; persona?: string }[] }[]>(`/v1/courses${q ? `?${q}` : ''}`);
   },
   courseSearch: (q: string, level = '') => {
     const p = new URLSearchParams({ q });

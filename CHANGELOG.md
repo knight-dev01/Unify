@@ -16,7 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Delete my account** on Me (type DELETE to confirm). Profile, progress, CGPA plan and notifications go; attendance a class rep took stays on the class register under the class-list name, and that entry can be claimed again. Admins are removed by another admin
 - Class rep empty states: "You haven't added this week's classes yet" with Add class times, and "Post your first announcement to your class" with New post
 
+- **Semester calendar** in Admin → Academic session: the date Week 1 starts and the number of teaching weeks. Home then shows the week for everyone, the course page opens attendance on this week, and a register started without a week is filed under the current one. (The week counter existed but nothing ever set the start date, so it never showed)
+
 ### Changed
+- **Home greeting card** adds "Week 3 of 12 · 400L · department · faculty · LASU" (the greeting and proverb stay, as decided)
+- **Course cards** show the course's lecturer only (not contributors), with names capitalised ("Dr Yussuf"), and their photo or Box Boy persona instead of letter circles and generated patterns. No delete icon on the cards: courses are removed in Manage courses
 - **Sign-up**: "Where are you studying?" lists 15 popular Nigerian universities greyed out as "Coming soon" under LASU; inside LASU, Engineering is open, Environmental Sciences and Agriculture say "Coming very soon" and the other faculties "Coming soon". The name step has one Box Boy (the floating one is gone). "Continue with Google" uses Google's multicolour G
 - **Menu is Home · Timetable · Class · Me** (Courses came off; courses open from the cards on Home)
 - **Timetable shows classes only**: My pass, My attendance, Class board and My courses came off it. My pass is now at the top of the Class tab
