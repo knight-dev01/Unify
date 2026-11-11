@@ -5,7 +5,7 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.23.0] - 2026-11-11
 
 ### Fixed
 - **Next in the notes lands on the topic head**: the Topic 1 / Topic 2 tabs with the topic's title under them, not the week's hero above
