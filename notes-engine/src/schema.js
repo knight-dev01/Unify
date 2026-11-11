@@ -188,19 +188,27 @@ function validateUnifyNote(data) {
     });
   }
 
-  // Validate EOQ: exactly 10 questions (8 MCQ + 2 FITB)
+  // Validate EOQ: exactly 10 questions, at least 6 MCQ (others: fitb, number, maths)
   if (!data.eoq || !Array.isArray(data.eoq.questions)) {
     errors.push("EOQ section missing or questions array invalid.");
   } else if (data.eoq.questions.length !== 10) {
     errors.push(`EOQ must contain exactly 10 questions (got ${data.eoq.questions.length}).`);
   } else {
     let mcqCount = 0;
-    let fitbCount = 0;
+    let otherCount = 0;
 
     data.eoq.questions.forEach((q, idx) => {
       const qNum = q.number || (idx + 1);
       if (q.type === "mcq") mcqCount++;
-      if (q.type === "fitb") fitbCount++;
+      else if (q.type === "fitb" || q.type === "number" || q.type === "maths") otherCount++;
+      else errors.push(`EOQ Q${qNum}: type must be mcq, fitb, number or maths.`);
+      // Number: a numeric answer (tolerance and unit optional). Maths: at least one accepted expression.
+      if (q.type === "number" && !(typeof q.answer === "number" && Number.isFinite(q.answer))) {
+        errors.push(`EOQ Q${qNum}: a number question needs a numeric 'answer'.`);
+      }
+      if (q.type === "maths" && !(Array.isArray(q.acceptedAnswers) && q.acceptedAnswers.some((a) => typeof a === "string" && a.trim()))) {
+        errors.push(`EOQ Q${qNum}: a maths question needs at least one accepted expression.`);
+      }
 
       if (!q.question) errors.push(`EOQ Q${qNum}: missing question text.`);
       if (!q.feedback || (!q.feedback.correct && !q.feedback.c) || (!q.feedback.wrong && !q.feedback.w)) {
@@ -218,8 +226,9 @@ function validateUnifyNote(data) {
       );
     });
 
-    if (mcqCount !== 8 || fitbCount !== 2) {
-      errors.push(`EOQ must consist of 8 MCQ and 2 FITB questions (found ${mcqCount} MCQ, ${fitbCount} FITB).`);
+    // At least 6 multiple choice; the rest can be fill-in, number or maths answers.
+    if (mcqCount < 6 || mcqCount + otherCount !== 10) {
+      errors.push(`EOQ needs 10 questions with at least 6 multiple choice (found ${mcqCount} MCQ and ${otherCount} others).`);
     }
   }
 

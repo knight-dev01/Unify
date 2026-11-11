@@ -5,6 +5,12 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Number and maths answers in week quizzes** (S30, S31). A number question accepts the answer within the author's tolerance (1% by default) and shows the unit; '1,250 kW' and '1250' both count. A maths question is checked by value, not spelling, so (8/27)ρV³, 8ρV³/27 and 0.296ρV³ are all right; an on-screen keypad adds the symbols a phone keyboard hides (^, √, π, ρ, brackets). A missed one shows the right answer after Check score. Quizzes still have 10 questions; at least 6 must be multiple choice and the rest can be fill-in, number or maths
+- **Quiz results** (S32) show each question as right or wrong and how long the quiz took
+
 ## [2.22.3] - 2026-11-11
 
 ### Fixed

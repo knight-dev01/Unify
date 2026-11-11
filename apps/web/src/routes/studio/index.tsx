@@ -892,10 +892,11 @@ export default function StudioRoute() {
               ).length;
               const mcq = note.eoq.questions.filter((q) => q.type === 'mcq').length;
               const fitb = note.eoq.questions.length - mcq;
-              const quizOk = note.eoq.questions.length === 10 && mcq === 8 && fitb === 2;
+              // 10 questions, at least 6 multiple choice; the rest fill-in, number or maths.
+              const quizOk = note.eoq.questions.length === 10 && mcq >= 6;
               const rows: { ok: boolean; text: string }[] = [
                 { ok: note.topics.length > 0, text: `${note.topics.length} topic${note.topics.length === 1 ? '' : 's'} in Lecture${lectures.length === 1 ? '' : 's'} ${lectures.join(', ')}` },
-                { ok: quizOk, text: quizOk ? `Quiz complete: 10 questions (8 MCQ + 2 fill-in)` : `Quiz short: ${note.eoq.questions.length}/10 (${mcq} MCQ + ${fitb} fill-in) — regenerate or top up` },
+                { ok: quizOk, text: quizOk ? `Quiz complete: 10 questions (${mcq} multiple choice + ${fitb} written)` : `Quiz short: ${note.eoq.questions.length}/10 (${mcq} multiple choice + ${fitb} written; needs 10 with at least 6 multiple choice)` },
                 { ok: diagramsBare === 0, text: diagrams.length ? (diagramsBare ? `${diagramsBare} diagram${diagramsBare === 1 ? '' : 's'} still need${diagramsBare === 1 ? 's' : ''} uploaded images` : `All ${diagrams.length} diagrams have images`) : 'No diagrams called for' },
                 { ok: true, text: `${formulas} formula${formulas === 1 ? '' : 's'} — open each Reader preview to confirm the render` },
               ];
