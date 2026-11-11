@@ -242,6 +242,12 @@ export default function EoqQuiz({ eoq, course, week, preview = false }: { eoq: E
           {startedAt && finishedAt && (
             <div style={{ fontSize: 12, opacity: 0.75 }}>Finished in {Math.max(1, Math.round((finishedAt - startedAt) / 60000))} min</div>
           )}
+          {/* S75: offline, the score is kept on the phone and sent when the connection is back. */}
+          {!preview && typeof navigator !== 'undefined' && !navigator.onLine && (
+            <div style={{ fontSize: 12, marginTop: 6, padding: '6px 10px', borderRadius: 10, background: 'rgba(255,255,255,.08)' }}>
+              You're offline. Your score is saved on this phone and sends itself when you're back online.
+            </div>
+          )}
           <div className="result-msg">
             {passed
               ? `You scored ${pct}%. This week is yours — the next one builds on it.`

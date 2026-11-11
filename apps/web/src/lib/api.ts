@@ -693,7 +693,9 @@ export const api = {
   attendanceScan: (sessionId: string, input: { token: string } | { matric: string }) =>
     apiFetch<ScanResult>(`/v1/attendance/sessions/${sessionId}/scan`, { method: 'POST', body: JSON.stringify(input) }),
   attendanceMine: () =>
-    apiFetch<{ courses: { course: string; held: number; attended: number }[]; recent: { course: string; at: string }[] }>('/v1/attendance/mine'),
+    apiFetch<{ courses: { course: string; held: number; attended: number }[]; recent: { course: string; at: string; method?: string; by?: string }[] }>('/v1/attendance/mine'),
+  attendanceFlag: (payload: { course: string; at: string; by?: string; note?: string }) =>
+    apiFetch<{ ok: boolean }>('/v1/attendance/flag', { method: 'POST', body: JSON.stringify(payload) }),
   attendanceExport: (sessionId: string, course: string) =>
     apiDownload(`/v1/attendance/sessions/${sessionId}/register.csv`, `${course.replace(/\s+/g, '')}-register.csv`),
   // Learning (S23–S36)

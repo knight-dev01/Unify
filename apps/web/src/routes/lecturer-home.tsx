@@ -118,6 +118,14 @@ export default function LecturerHomeRoute() {
         )}
       </section>
 
+      {/* S76: a lecturer with no courses yet. */}
+      {today !== null && taught.length === 0 && role === 'lecturer' && (
+        <Card style={{ marginTop: 22, alignItems: 'center', textAlign: 'center' }}>
+          <BoxBoy pose="peeking" width={90} />
+          <div className="t-15 w-6">No courses assigned yet</div>
+          <div className="t-13 muted">The Unify team assigns the courses you teach. Tell them which from Me → Help, and they'll show up here with their weeks, reports and attendance.</div>
+        </Card>
+      )}
       {taught.length > 0 && (role === 'lecturer' || role === 'admin') && (
         <section style={{ marginTop: 22 }}>
           <Label>Your courses</Label>

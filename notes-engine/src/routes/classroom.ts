@@ -946,6 +946,31 @@ router.post("/attendance/checkin", requireAuth, checkinLimiter, async (req: Requ
 });
 
 // Student: attendance per enrolled course (attended / sessions held) + recent marks.
+// S62: "That wasn't my lecturer or class rep": tells the admins who marked a student, when.
+router.post("/attendance/flag", requireAuth, async (req: Request, res: Response) => {
+  const parsed = z.object({ course: z.string().min(1).max(20), at: z.string().max(40), by: z.string().max(120).optional(), note: z.string().trim().max(300).optional() }).safeParse(req.body);
+  if (!parsed.success) return fail(res, 400, "Say which mark looks wrong.");
+  try {
+    const me = await getProfile(uid(req));
+    if (!me) return fail(res, 404, "Finish onboarding first.");
+    const sb = supabaseAdmin();
+    const { data: admins } = await sb.from("profiles").select("id").eq("is_admin", true).limit(50);
+    const when = new Date(parsed.data.at).toLocaleString("en-GB", { timeZone: "Africa/Lagos", dateStyle: "medium", timeStyle: "short" });
+    const rows = ((admins ?? []) as { id: string }[]).map((a) => ({
+      user_id: a.id,
+      type: "attendance_flag",
+      title: `Attendance mark questioned: ${parsed.data.course}`,
+      body: `${me.first_name || "A student"} says the person who marked them at ${when}${parsed.data.by ? ` (${parsed.data.by})` : ""} isn't their lecturer or class rep.${parsed.data.note ? ` "${parsed.data.note}"` : ""}`,
+      course: parsed.data.course,
+      link: "/admin",
+    }));
+    if (rows.length) await sb.from("notifications").insert(rows);
+    res.json({ ok: true });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
 router.get("/attendance/mine", requireAuth, async (req: Request, res: Response) => {
   try {
     const sb = supabaseAdmin();
@@ -954,11 +979,20 @@ router.get("/attendance/mine", requireAuth, async (req: Request, res: Response) 
     const courses = ((enr ?? []) as { course: string }[]).map((r) => r.course);
     const { data: recs } = await sb
       .from("attendance_records")
-      .select("course_code,scanned_at")
+      .select("course_code,scanned_at,scanned_by,method")
       .eq("student_id", me)
       .order("scanned_at", { ascending: false })
       .limit(200);
-    const records = (recs ?? []) as { course_code: string; scanned_at: string }[];
+    const records = (recs ?? []) as { course_code: string; scanned_at: string; scanned_by: string | null; method: string | null }[];
+    // S62: who marked me (so a student can spot someone who isn't their lecturer or class rep).
+    const byIds = [...new Set(records.slice(0, 10).map((r) => r.scanned_by || "").filter(Boolean))];
+    const who: Record<string, string> = {};
+    if (byIds.length) {
+      const { data: ps } = await sb.from("profiles").select("id,first_name,role,is_hoc").in("id", byIds);
+      for (const p of (ps ?? []) as { id: string; first_name: string | null; role: string | null; is_hoc: boolean | null }[]) {
+        who[p.id] = `${p.first_name || "Someone"}${p.role === "lecturer" ? " (lecturer)" : p.is_hoc ? " (class rep)" : ""}`;
+      }
+    }
     const out = [] as { course: string; held: number; attended: number }[];
     for (const course of courses) {
       const { count } = await sb
@@ -968,7 +1002,10 @@ router.get("/attendance/mine", requireAuth, async (req: Request, res: Response) 
       const norm = (c: string) => c.replace(/\s/g, "").toUpperCase();
       out.push({ course, held: count ?? 0, attended: records.filter((r) => norm(r.course_code) === norm(course)).length });
     }
-    res.json({ courses: out, recent: records.slice(0, 10).map((r) => ({ course: r.course_code, at: r.scanned_at })) });
+    res.json({
+      courses: out,
+      recent: records.slice(0, 10).map((r) => ({ course: r.course_code, at: r.scanned_at, method: r.method || "code", by: r.method === "code" ? "" : who[r.scanned_by || ""] || "" })),
+    });
   } catch (e) {
     dbFail(res, e);
   }
