@@ -42,7 +42,8 @@ export default function CourseDetailRoute() {
   const [enrolling, setEnrolling] = useState(false);
   // Preview landings (admin/author browsing) go back to their hub, never
   // to the student My Courses module.
-  const [backTo, setBackTo] = useState('/courses');
+  // Students with no in-app trail (reopened, refreshed, from a notification) go Home.
+  const [backTo, setBackTo] = useState('/home');
   const [materials, setMaterials] = useState<Material[]>([]);
   const [slots, setSlots] = useState<{ day: number; start: string; end: string; venue: string; lecturer: string }[]>([]);
   const preview = searchParams.get('preview') === '1';
@@ -73,7 +74,7 @@ export default function CourseDetailRoute() {
                 : role === 'lecturer' || role === 'contributor'
                   ? '/browse'
                   : '/courses'
-              : '/courses'
+              : '/home'
           );
           if (preview) {
             setWeeks(res.weeks || []);
