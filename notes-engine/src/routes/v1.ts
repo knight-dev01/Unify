@@ -2216,9 +2216,10 @@ router.get("/timetable", requireAuth, async (req: Request, res: Response) => {
     let names: Record<string, string> = {};
     const ids = [...new Set(rows.map((r) => r.lecturer_id))];
     if (ids.length) {
-      const { data: profs } = await sb.from("profiles").select("id,first_name").in("id", ids);
-      for (const p of ((profs ?? []) as { id: string; first_name: string }[])) {
-        if (p.first_name) names[p.id] = p.first_name;
+      // lecturer_id is whoever added the slot; only a lecturer's name is shown as "the lecturer".
+      const { data: profs } = await sb.from("profiles").select("id,first_name,role").in("id", ids);
+      for (const p of ((profs ?? []) as { id: string; first_name: string; role?: string }[])) {
+        if (p.first_name && p.role === "lecturer") names[p.id] = p.first_name;
       }
     }
     res.json({
@@ -2248,8 +2249,29 @@ const slotSchema = z.object({
   meetLink: z.string().trim().max(300).url().refine((u) => /^https:\/\//i.test(u), "Use an https link.").or(z.literal("")).default(""),
 });
 
-// Add a weekly slot (teaching lecturer or admin).
-router.post("/timetable", requireAuth, requireAuthor, async (req: Request, res: Response) => {
+// Who sets a course's class times: its lecturer, an admin, or (review: "the HOC
+// sets the timetable") a class rep who takes the course. Contributors author
+// content but don't set class times.
+async function canSetTimetable(userId: string, course: string): Promise<boolean> {
+  const sb = supabaseAdmin();
+  const { data } = await sb.from("profiles").select("role,is_admin,is_hoc").eq("id", userId).maybeSingle();
+  const p = data as { role?: string; is_admin?: boolean; is_hoc?: boolean } | null;
+  if (!p) return false;
+  if (p.is_admin || p.role === "admin") return true;
+  if (p.role === "lecturer") return canManageCourse(userId, course);
+  if (!p.is_hoc) return false;
+  const { data: e } = await sb
+    .from("enrollments")
+    .select("course")
+    .eq("user_id", userId)
+    .eq("kind", "taking")
+    .in("course", [...new Set([course, course.replace(/\s/g, "")])])
+    .limit(1);
+  return !!(e && e.length);
+}
+
+// Add a weekly slot (lecturer, class rep or admin).
+router.post("/timetable", requireAuth, async (req: Request, res: Response) => {
   const userId = (req as AuthedRequest).userId as string;
   const parsed = slotSchema.safeParse(req.body);
   if (!parsed.success) {
@@ -2265,16 +2287,8 @@ router.post("/timetable", requireAuth, requireAuthor, async (req: Request, res: 
     res.status(400).json({ error: "End time must be after start time." });
     return;
   }
-  if (!(await canManageCourse(userId, course))) {
-    res.status(403).json({ error: "Only the course lecturer or an admin manages its timetable." });
-    return;
-  }
-  // Timetable is lecturer management: contributors author content, they
-  // don't set class times (even when assigned to the course).
-  const { data: tprof } = await supabaseAdmin().from("profiles").select("role,is_admin").eq("id", userId).single();
-  const tp = tprof as { role?: string; is_admin?: boolean } | null;
-  if (!(tp?.is_admin || tp?.role === "admin" || tp?.role === "lecturer")) {
-    res.status(403).json({ error: "Only the course lecturer or an admin manages its timetable." });
+  if (!(await canSetTimetable(userId, course))) {
+    res.status(403).json({ error: "Only your class rep or the course lecturer sets class times." });
     return;
   }
   try {
@@ -2304,8 +2318,8 @@ router.post("/timetable", requireAuth, requireAuthor, async (req: Request, res: 
   }
 });
 
-// Set or clear the online-class link on a slot (course lecturer or admin).
-router.patch("/timetable/:id", requireAuth, requireAuthor, async (req: Request, res: Response) => {
+// Set or clear the online-class link on a slot (lecturer, class rep or admin).
+router.patch("/timetable/:id", requireAuth, async (req: Request, res: Response) => {
   const userId = (req as AuthedRequest).userId as string;
   const parsed = z
     .object({ meetLink: z.string().trim().max(300).url().refine((u) => /^https:\/\//i.test(u), "Use an https link.").or(z.literal("")) })
@@ -2322,10 +2336,8 @@ router.patch("/timetable/:id", requireAuth, requireAuthor, async (req: Request, 
       res.status(404).json({ error: "Slot not found." });
       return;
     }
-    const { data: pprof } = await sb.from("profiles").select("role").eq("id", userId).single();
-    const role = (pprof as { role?: string } | null)?.role;
-    if (!(role === "lecturer" || role === "admin") || (s.lecturer_id !== userId && !(await canManageCourse(userId, s.course)))) {
-      res.status(403).json({ error: "Only the course lecturer changes a slot." });
+    if (!(await canSetTimetable(userId, s.course))) {
+      res.status(403).json({ error: "Only your class rep or the course lecturer changes class times." });
       return;
     }
     const { error } = await sb.from("class_slots").update({ meet_link: parsed.data.meetLink }).eq("id", req.params.id);
@@ -2336,8 +2348,8 @@ router.patch("/timetable/:id", requireAuth, requireAuthor, async (req: Request, 
   }
 });
 
-// Remove a slot (own slots, or any slot for admins).
-router.delete("/timetable/:id", requireAuth, requireAuthor, async (req: Request, res: Response) => {
+// Remove a slot (lecturer, class rep or admin).
+router.delete("/timetable/:id", requireAuth, async (req: Request, res: Response) => {
   const userId = (req as AuthedRequest).userId as string;
   try {
     const sb = supabaseAdmin();
@@ -2351,12 +2363,8 @@ router.delete("/timetable/:id", requireAuth, requireAuthor, async (req: Request,
       res.status(404).json({ error: "Slot not found." });
       return;
     }
-    // Lecturers only (owners may remove their own): admins work from the
-    // panel and content browser, not timetables.
-    const { data: dprof } = await sb.from("profiles").select("role").eq("id", userId).single();
-    const isLecturer = (dprof as { role?: string } | null)?.role === "lecturer";
-    if (!isLecturer || (s.lecturer_id !== userId && !(await canManageCourse(userId, s.course)))) {
-      res.status(403).json({ error: "Only the course lecturer removes slots." });
+    if (!(await canSetTimetable(userId, s.course))) {
+      res.status(403).json({ error: "Only your class rep or the course lecturer removes class times." });
       return;
     }
     const { error } = await sb.from("class_slots").delete().eq("id", req.params.id);

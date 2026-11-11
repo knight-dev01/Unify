@@ -125,10 +125,24 @@ router.get("/hoc/posts", requireAuth, async (req: Request, res: Response) => {
       const { data: authors } = await sb.from("profiles").select("id,first_name").in("id", ids);
       for (const a of (authors ?? []) as { id: string; first_name: string | null }[]) names[a.id] = a.first_name || "HOC";
     }
+    // Who a post reaches, shown to the class rep: "Posting to Chemical Engineering · 200L · 84 students".
+    // The class list is the count once it's up; before that, students in the class on Unify.
+    let audience: { students: number; fromList: boolean } | undefined;
+    if (me.is_hoc || me.is_admin) {
+      const list = await listForClass(institutionOf(), me.department, me.level);
+      if (list) {
+        const { count } = await sb.from("class_list_entries").select("id", { count: "exact", head: true }).eq("list_id", list.id).is("removed_at", null);
+        audience = { students: count ?? 0, fromList: true };
+      } else {
+        const { count } = await sb.from("profiles").select("id", { count: "exact", head: true }).eq("department", me.department).eq("level", me.level).eq("role", "student");
+        audience = { students: count ?? 0, fromList: false };
+      }
+    }
     res.json({
       isHoc: !!me.is_hoc,
       department: me.department,
       level: me.level,
+      audience,
       posts: rows.map((r) => ({
         id: r.id,
         type: r.type,
@@ -277,8 +291,8 @@ router.post("/hoc/grant", requireAuth, async (req: Request, res: Response) => {
       user_id: t.id,
       type: "role_update",
       title: revoke ? "HOC role removed" : "You're now your class's HOC",
-      body: revoke ? "You are no longer Head of Class." : "You can now post announcements and tips for your class.",
-      link: revoke ? "/me" : "/hoc",
+      body: revoke ? "You are no longer Head of Class." : "Start with your class list: tap to set up your class in four quick steps.",
+      link: revoke ? "/me" : "/hoc/welcome",
     });
     res.json({ ok: true, name: t.first_name, isHoc: !revoke });
   } catch (e) {

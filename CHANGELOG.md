@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Attendance on the course page.** Students see "Came to 3 of 4 classes held" and each week 1–12 at a glance (green all, amber some, red none). The class rep and lecturer get **Take attendance** there: pick the week and the class on the timetable (today's is preselected) or **Extra class**, and every past register is listed with its count; tap one to open it, see who was absent and download it. Each class gets its own register (migration 0034)
 
+- **Class rep setup**: after approval, four short screens (what you can do, upload the class list, add class times, post your first announcement), each marked Done when it is. The approval notification opens it, and the Class board shows "Finish setting up your class" until the class list is in
+- **Class reps set the timetable**: "Add a class time" on Timetable (course, day, times, venue), and remove a time. Lecturers still can too. The class rep's name isn't shown as the lecturer
+- **"Posting to Chemical Engineering · 200L · 84 students"** above the post box, counted from the class list (or classmates on Unify before it's uploaded)
+- Class rep empty states: "You haven't added this week's classes yet" with Add class times, and "Post your first announcement to your class" with New post
+
 ### Changed
 - **Menu is Home · Timetable · Class · Me** (Courses came off; courses open from the cards on Home)
 - **Timetable shows classes only**: My pass, My attendance, Class board and My courses came off it. My pass is now at the top of the Class tab
