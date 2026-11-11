@@ -5,6 +5,12 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.21.1] - 2026-11-11
+
+### Changed
+- **Box Boy keeps his place**: he shows more of his body everywhere and only the very bottom edge fades (was cropped at 84% and faded from 74%). On the phone sign-in header he's bigger and the extra fade is gone
+- The home-screen shortcut says "My pass" (was "Mark attendance")
+
 ## [2.21.0] - 2026-11-11
 
 ### Added
