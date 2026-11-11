@@ -178,6 +178,9 @@ app.use("/v1", classlist.default || classlist);
 // Scoped roles: level admins (class rep approval), HOD and Dean reports (counts only).
 const roles = require("./src/routes/roles");
 app.use("/v1", roles.default || roles);
+// Teaching side: content reports, lecturer posts, course report, attendance per student, lecturer profile.
+const teaching = require("./src/routes/teaching");
+app.use("/v1", teaching.default || teaching);
 // Live performance + browser vitals for the admin panel.
 const ops = require("./src/routes/ops");
 app.use("/v1", ops.default || ops);

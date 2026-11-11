@@ -49,6 +49,37 @@ async function pruneDead(endpoints: string[]): Promise<void> {
   }
 }
 
+// Quiet hours (Me → Settings → Notifications): no push between the person's
+// quiet_start and quiet_end, Lagos time. The bell still gets everything. Class
+// happening now (online class live, attendance open) always comes through.
+const ALWAYS = /online class is live|attendance is open/i;
+function lagosMinutes(now = new Date()): number {
+  const t = now.toLocaleTimeString("en-GB", { timeZone: "Africa/Lagos", hour12: false, hour: "2-digit", minute: "2-digit" });
+  const [h, m] = t.split(":").map(Number);
+  return (h % 24) * 60 + (m || 0);
+}
+const toMin = (s: string) => {
+  const m = /^(\d{1,2}):(\d{2})$/.exec(s);
+  return m ? Number(m[1]) * 60 + Number(m[2]) : null;
+};
+async function outsideQuietHours(userIds: string[], payload: PushPayload): Promise<string[]> {
+  if (ALWAYS.test(payload.title)) return userIds;
+  const now = lagosMinutes();
+  const quiet = new Set<string>();
+  const uniq = [...new Set(userIds)];
+  for (let i = 0; i < uniq.length; i += 500) {
+    const { data } = await supabaseAdmin().from("profiles").select("id,quiet_start,quiet_end").in("id", uniq.slice(i, i + 500)).not("quiet_start", "is", null);
+    for (const p of (data ?? []) as { id: string; quiet_start: string | null; quiet_end: string | null }[]) {
+      const a = toMin(p.quiet_start || "");
+      const b = toMin(p.quiet_end || "");
+      if (a == null || b == null || a === b) continue;
+      const inside = a < b ? now >= a && now < b : now >= a || now < b; // overnight ranges wrap midnight
+      if (inside) quiet.add(p.id);
+    }
+  }
+  return uniq.filter((id) => !quiet.has(id));
+}
+
 // Fire-and-forget fan-out to a set of users. Dead subscriptions (410/404
 // from the push service) are pruned so the table never rots.
 export async function sendPushToUsers(userIds: string[], payload: PushPayload): Promise<{ sent: number; pruned: number }> {
@@ -58,7 +89,7 @@ export async function sendPushToUsers(userIds: string[], payload: PushPayload): 
   }
   let subs: ({ user_id: string } & PushRow)[];
   try {
-    subs = await subscriptionsFor(userIds);
+    subs = await subscriptionsFor(await outsideQuietHours(userIds, payload));
   } catch (e) {
     console.warn("[push] subscription lookup failed", e instanceof Error ? e.message : e);
     return { sent: 0, pruned: 0 };

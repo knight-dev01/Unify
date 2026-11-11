@@ -51,6 +51,8 @@ model Profile {
   attendanceFullName String? @map("attendance_full_name")
   attendanceMatric String? @map("attendance_matric")
   isHoc         Boolean     @default(false) @map("is_hoc")
+  quietStart    String?     @map("quiet_start") // 0038: no push between quiet_start and quiet_end (Lagos, HH:MM)
+  quietEnd      String?     @map("quiet_end")
   hocApprovedAt DateTime?   @map("hoc_approved_at") @db.Timestamptz(6)
   hocApprovedBy String?     @map("hoc_approved_by") @db.Uuid
   createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -385,6 +387,38 @@ model AttendanceSession {
   @@index([courseCode, opensAt(sort: Desc)])
   @@index([courseCode, week], map: "attendance_sessions_course_week_idx")
   @@map("attendance_sessions")
+}
+
+// 0038: student "report a problem" + lecturer "review this week" (one queue)
+model ContentReport {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String?  @map("user_id") @db.Uuid
+  course     String
+  week       Int
+  topic      String   @default("")
+  kind       String   @default("problem") // problem | review
+  reason     String   @default("")
+  text       String
+  status     String   @default("open") // open | resolved
+  resolvedBy String?  @map("resolved_by") @db.Uuid
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([course, status, createdAt(sort: Desc)], map: "content_reports_course_idx")
+  @@map("content_reports")
+}
+
+// 0038: a lecturer's post to everyone taking a course
+model CoursePost {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  authorId  String?  @map("author_id") @db.Uuid
+  course    String
+  type      String   @default("announcement") // announcement | tip | reminder
+  title     String?
+  content   String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([course, createdAt(sort: Desc)], map: "course_posts_course_idx")
+  @@map("course_posts")
 }
 
 // Scoped roles (0036): level_admin (approves class reps for a department + level),

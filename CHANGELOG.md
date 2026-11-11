@@ -5,6 +5,16 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.22.0] - 2026-11-11
+
+Screens from the design prototype (docs/unify-learn-ui), built in the app's existing look: same fonts, colours and components, only the structure added.
+
+### Added
+- **Course page tabs: Weeks · Outline · Practice** (S23–S25). Each week shows your progress ("2 of 4 topics", "Done", best quiz score). Outline lists every week with its topics. Practice lists each week's quiz with your best score and attempts (past questions marked "coming once the Faculty approves them")
+- **Report a problem** on any week (S27): pick the topic and what's wrong; the week's authors, the course's lecturers and admins are told. Students stay anonymous. Authors and lecturers work through them at **Reports and reviews**, open in Studio, and mark them fixed
+- **Streak screen** (S34): current and longest streak, XP, quizzes, and the last five weeks as a calendar. The Streak number on Home opens it
+- **Revision** (S35–S36): 10 shuffled recall cards from topics you've finished; reveal, then "I knew it" / "Not yet"; the ones you missed come back in another round. Linked from Home and the streak screen
+
 ## [2.21.1] - 2026-11-11
 
 ### Changed

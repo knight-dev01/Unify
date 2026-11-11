@@ -466,10 +466,10 @@ export default function HomeRoute() {
           <div className="stat-num" style={{ fontSize: 18 }}>{xp}</div>
           <div style={{ fontSize: 11, color: 'var(--text2)' }}>XP</div>
         </div>
-        <div>
+        <Link to="/streak" style={{ color: 'inherit', textDecoration: 'none' }} aria-label={`Streak: ${streak} days. Open your streak`}>
           <div className="stat-num" style={{ fontSize: 18 }}>{streak}</div>
           <div style={{ fontSize: 11, color: 'var(--text2)' }}>Streak</div>
-        </div>
+        </Link>
         <div>
           <div className="stat-num" style={{ fontSize: 18 }}>{shown.length}</div>
           <div style={{ fontSize: 11, color: 'var(--text2)' }}>Courses</div>
@@ -482,6 +482,16 @@ export default function HomeRoute() {
         <div style={{ margin: '0 16px 12px', fontSize: 12, color: 'var(--text2)', textAlign: 'center' }}>
           {quizzes.taken} {quizzes.taken === 1 ? 'quiz' : 'quizzes'} taken · {quizzes.avg}% average
         </div>
+      )}
+      {profile?.role === 'student' && courses.some((c) => c.topics > 0) && (
+        <Link to="/revision" style={{ margin: '0 16px 12px', display: 'flex', gap: 12, alignItems: 'center', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 14, color: 'var(--text)', textDecoration: 'none' }}>
+          <BoxBoy pose="readingStanding" width={40} calm />
+          <span style={{ flex: 1 }}>
+            <span style={{ display: 'block', fontWeight: 800, fontSize: 14 }}>Revise what you've learned</span>
+            <span style={{ display: 'block', fontSize: 12, color: 'var(--text2)' }}>10 quick recall cards from topics you've finished</span>
+          </span>
+          <ChevronRight size={18} color="var(--u-good)" />
+        </Link>
       )}
 
       {gaps.length > 0 && (

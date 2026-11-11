@@ -81,7 +81,12 @@ const onboardingSchema = z.object({
   courses: z.array(z.string().min(1).max(20)).max(30).optional(),
 });
 
-const profileSchema = onboardingSchema.partial().extend({ notifyNewNotes: z.boolean().optional() });
+const profileSchema = onboardingSchema.partial().extend({
+  notifyNewNotes: z.boolean().optional(),
+  // Quiet hours for push (Lagos time). Both null to switch off.
+  quietStart: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/).nullable().optional(),
+  quietEnd: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/).nullable().optional(),
+});
 
 const progressSchema = z.object({
   course: z.string().min(1).max(20),
@@ -490,6 +495,8 @@ router.put("/me", requireAuth, async (req: Request, res: Response) => {
           ...(d.gradTarget != null ? { cgpa_target: d.gradTarget } : {}),
           // role is immutable: never updated via PUT (see POST lock above)
           ...(typeof d.notifyNewNotes === "boolean" ? { notify_new_notes: d.notifyNewNotes } : {}),
+          ...(d.quietStart !== undefined ? { quiet_start: d.quietStart } : {}),
+          ...(d.quietEnd !== undefined ? { quiet_end: d.quietEnd } : {}),
           updated_at: new Date().toISOString(),
         },
         { onConflict: "id" }
@@ -2124,6 +2131,126 @@ router.get("/progress", requireAuth, async (req: Request, res: Response) => {
       .eq("week", week);
     if (error) throw error;
     res.json({ done: ((data ?? []) as { topic: number; lecture_no?: number }[]).map((r) => ({ topic: r.topic, lecture: r.lecture_no || 1 })) });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// ---- Learning: course progress, activity/streak, revision (S23–S25, S34–S36) ----
+
+type AssembledTopic = { number?: number; lecture?: number; title?: string; activeRecall?: { question?: string; answer?: string; badge?: string }[] };
+const topicsOf = (noteJson: unknown): AssembledTopic[] => {
+  const t = (noteJson as { topics?: unknown } | null)?.topics;
+  return Array.isArray(t) ? (t as AssembledTopic[]) : [];
+};
+
+// My progress through one course, week by week: topics done of total and best quiz.
+router.get("/courses/:code/my-progress", requireAuth, requireCourseAccess, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  const code = cleanCode(decodeURIComponent(req.params.code));
+  if (!code) {
+    res.status(400).json({ error: "Invalid course" });
+    return;
+  }
+  try {
+    const sb = supabaseAdmin();
+    const variants = courseVariants(code);
+    const { data: weekRows } = await sb.from("weeks").select("week").in("course", variants).order("week");
+    const weeks = [...new Set(((weekRows ?? []) as { week: number }[]).map((w) => w.week))].sort((a, b) => a - b);
+    const [assembled, { data: prog }, { data: quiz }] = await Promise.all([
+      Promise.all(weeks.map((w) => assembleWeek(code, w).catch(() => null))),
+      sb.from("topic_progress").select("week,topic,lecture_no").eq("user_id", userId).in("course", variants),
+      sb.from("quiz_attempts").select("week,score,total").eq("user_id", userId).in("course", variants).limit(500),
+    ]);
+    const done = new Map<number, Set<string>>();
+    for (const p of (prog ?? []) as { week: number; topic: number; lecture_no: number | null }[]) {
+      const s = done.get(p.week) || new Set<string>();
+      s.add(`${p.lecture_no || 1}:${p.topic}`);
+      done.set(p.week, s);
+    }
+    const best = new Map<number, { score: number; total: number; attempts: number }>();
+    for (const q of (quiz ?? []) as { week: number; score: number; total: number }[]) {
+      const b = best.get(q.week);
+      const better = !b || q.score / (q.total || 1) > b.score / (b.total || 1);
+      best.set(q.week, { score: better ? q.score : b!.score, total: better ? q.total : b!.total, attempts: (b?.attempts || 0) + 1 });
+    }
+    res.json({
+      course: code,
+      weeks: weeks.map((w, i) => {
+        const a = assembled[i];
+        const topics = a ? topicsOf(a.note_json) : [];
+        const q = best.get(w);
+        return {
+          week: w,
+          title: a?.title || "",
+          topics: topics.length,
+          topicTitles: topics.map((t) => t.title || "").filter(Boolean).slice(0, 12),
+          done: Math.min(done.get(w)?.size || 0, topics.length || Infinity),
+          quiz: q ? { best: q.score, total: q.total, attempts: q.attempts } : null,
+          hasQuiz: !!(a?.note_json as { eoq?: { questions?: unknown[] } } | null)?.eoq?.questions?.length,
+        };
+      }),
+    });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// Days I studied (any XP) over the last N days, for the streak screen.
+router.get("/learn/activity", requireAuth, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  const days = Math.min(Math.max(Number(req.query.days) || 35, 7), 120);
+  try {
+    const since = new Date(Date.now() - days * 86400000).toISOString();
+    const { data } = await supabaseAdmin().from("xp_events").select("amount,created_at").eq("user_id", userId).gt("created_at", since).limit(2000);
+    const rows = (data ?? []) as { amount: number; created_at: string }[];
+    const byDay: Record<string, number> = {};
+    for (const r of rows) byDay[r.created_at.slice(0, 10)] = (byDay[r.created_at.slice(0, 10)] || 0) + (r.amount || 0);
+    // Longest run of consecutive study days in the window.
+    let longest = 0;
+    let run = 0;
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
+      run = byDay[d] ? run + 1 : 0;
+      longest = Math.max(longest, run);
+    }
+    res.json({ days: Object.entries(byDay).map(([date, xp]) => ({ date, xp })), streak: calcStreak(rows.map((r) => r.created_at)), longest });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// Revision: recall cards from topics I've finished, shuffled (S35).
+router.get("/learn/revision", requireAuth, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  const limit = Math.min(Math.max(Number(req.query.limit) || 10, 3), 30);
+  const onlyCourse = cleanCode(String(req.query.course || ""));
+  try {
+    const sb = supabaseAdmin();
+    let q = sb.from("topic_progress").select("course,week,topic,lecture_no").eq("user_id", userId).limit(2000);
+    if (onlyCourse) q = q.in("course", courseVariants(onlyCourse));
+    const { data } = await q;
+    const done = (data ?? []) as { course: string; week: number; topic: number; lecture_no: number | null }[];
+    const weeks = [...new Set(done.map((d) => `${d.course}\u0000${d.week}`))].slice(0, 20);
+    const cards: { course: string; week: number; topic: string; question: string; answer: string; badge: string }[] = [];
+    const assembled = await Promise.all(weeks.map((k) => { const [c, w] = k.split("\u0000"); return assembleWeek(c, Number(w)).catch(() => null); }));
+    weeks.forEach((k, i) => {
+      const [c, w] = k.split("\u0000");
+      const a = assembled[i];
+      if (!a) return;
+      const mine = new Set(done.filter((d) => d.course === c && d.week === Number(w)).map((d) => `${d.lecture_no || 1}:${d.topic}`));
+      for (const t of topicsOf(a.note_json)) {
+        if (!mine.has(`${t.lecture || 1}:${t.number}`)) continue;
+        for (const r of t.activeRecall || []) {
+          if (r.question && r.answer) cards.push({ course: c, week: Number(w), topic: t.title || "", question: r.question, answer: r.answer, badge: r.badge || "" });
+        }
+      }
+    });
+    for (let i = cards.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [cards[i], cards[j]] = [cards[j], cards[i]];
+    }
+    res.json({ cards: cards.slice(0, limit), available: cards.length });
   } catch (e) {
     res.status(500).json(dbError(e));
   }
