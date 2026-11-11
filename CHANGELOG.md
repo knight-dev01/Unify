@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.23.0] - 2026-11-11
 
 ### Fixed
+- **Every new dropdown uses the platform's dropdown** (the floating Drop menu): week on the course page's Take attendance, course and day in Add a class time, topic in Report a problem, department on lecturer setup, and role/department/level on the admin roles page. They were plain browser selects
+
+### Fixed
 - **Next in the notes lands on the topic head**: the Topic 1 / Topic 2 tabs with the topic's title under them, not the week's hero above
 
 ### Added

@@ -8,6 +8,7 @@ import { errorToast } from '../lib/errors';
 import { toastSuccess } from '../lib/toast';
 import { ROUTES } from '../lib/routes';
 import ErrorState from '../components/ErrorState';
+import Drop from '../components/Drop';
 import { BoxBoy } from '../components/redesign/brand';
 import { Card, Chip, Chips, Label, ListCard, ListRow, Pill, Display } from '../components/redesign/ui';
 
@@ -223,16 +224,8 @@ function AddClassTime({ courses, day, onDone, onCancel }: { courses: string[]; d
     <Card style={{ marginTop: 14, gap: 10 }}>
       <div className="t-15 w-7">Add a class time</div>
       <div className="t-13 muted">It repeats every week and shows on everyone's timetable.</div>
-      <label className="t-13 w-6">Course
-        <select value={course} onChange={(e) => setCourse(e.target.value)} style={field}>
-          {courses.map((c) => <option key={c} value={c}>{c}</option>)}
-        </select>
-      </label>
-      <label className="t-13 w-6">Day
-        <select value={d} onChange={(e) => setD(Number(e.target.value))} style={field}>
-          {ORDER.map((x) => <option key={x} value={x}>{DAY_LONG[x]}</option>)}
-        </select>
-      </label>
+      <Drop value={course} onChange={setCourse} label="Course" options={courses.map((c) => ({ value: c, label: c }))} style={{ width: '100%' }} />
+      <Drop value={String(d)} onChange={(v) => setD(Number(v))} label="Day" options={ORDER.map((x) => ({ value: String(x), label: DAY_LONG[x] }))} style={{ width: '100%' }} />
       <div style={{ display: 'flex', gap: 8 }}>
         <label className="t-13 w-6" style={{ flex: 1 }}>Starts<input type="time" value={start} onChange={(e) => setStart(e.target.value)} style={field} /></label>
         <label className="t-13 w-6" style={{ flex: 1 }}>Ends<input type="time" value={end} onChange={(e) => setEnd(e.target.value)} style={field} /></label>

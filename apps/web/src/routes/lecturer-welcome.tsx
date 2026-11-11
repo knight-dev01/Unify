@@ -4,6 +4,7 @@ import { api } from '../lib/api';
 import { errorToast } from '../lib/errors';
 import { ROUTES } from '../lib/routes';
 import BackButton from '../components/BackButton';
+import Drop from '../components/Drop';
 import { BoxBoy } from '../components/redesign/brand';
 import { Card, Display, Label } from '../components/redesign/ui';
 
@@ -62,10 +63,7 @@ export default function LecturerWelcomeRoute() {
       {step === 1 && (
         <Card style={{ marginTop: 16, gap: 10 }}>
           <Display size={24}>Your department</Display>
-          <select value={dept} onChange={(e) => setDept(e.target.value)} aria-label="Department" style={field}>
-            <option value="">Pick one</option>
-            {DEPARTMENTS.map((d) => <option key={d}>{d}</option>)}
-          </select>
+          <Drop value={dept} onChange={setDept} label="Pick your department" options={DEPARTMENTS.map((d) => ({ value: d, label: d }))} style={{ width: '100%' }} />
           <button className="btn btn--amber btn--block" disabled={busy || !dept} onClick={() => void save({ department: dept, faculty: 'Faculty of Engineering', university: 'Lagos State University' }, 2)}>{busy ? 'Saving…' : 'Next'}</button>
         </Card>
       )}
