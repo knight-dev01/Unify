@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Delete my account** on Me (type DELETE to confirm). Profile, progress, CGPA plan and notifications go; attendance a class rep took stays on the class register under the class-list name, and that entry can be claimed again. Admins are removed by another admin
 - Class rep empty states: "You haven't added this week's classes yet" with Add class times, and "Post your first announcement to your class" with New post
 
+- **Level admins approve class reps** (review p.7-9). An admin gives the role to an existing account for one department + level (Admin → Class reps → Level admins, HODs and deans). "Are you your class rep?" now files a request (with an optional note) that the class's level admin and the Unify admins are told about and answer in **Class rep requests**, which shows how many reps the class already has (max 3). Admins can still grant by email
+- **Attendance reports for heads of department and the Dean, counts only**: per class (department · level), students on the list and on Unify, and per course the classes held, marks and attendance rate. No names. Admins see every class (migration 0036)
 - **Semester calendar** in Admin → Academic session: the date Week 1 starts and the number of teaching weeks. Home then shows the week for everyone, the course page opens attendance on this week, and a register started without a week is filed under the current one. (The week counter existed but nothing ever set the start date, so it never showed)
 
 ### Changed

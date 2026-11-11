@@ -2,6 +2,7 @@ import { AdminSkeleton } from '../components/Skeletons';
 import { toastError } from '../lib/toast';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { ROUTES } from '../lib/routes';
 import { Shield, Trash2, PenTool, BookOpen, ChevronDown, ChevronRight, BarChart3, UserCheck, Users, LibraryBig, Cpu, Building2, CalendarDays, Megaphone, AlertTriangle, Scale, LayoutGrid, GraduationCap, Menu, X } from 'lucide-react';
 import { supabaseBrowser } from '../lib/supabase';
 import { api, type AdminUser } from '../lib/api';
@@ -601,6 +602,11 @@ export default function AdminRoute() {
       </Module>
 
       <Module id="hoc" openId={openModule}>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
+          <Link to={ROUTES.hocRequests} className="btn btn--amber btn--sm">Class rep requests</Link>
+          <Link to={ROUTES.adminRoles} className="btn btn--white btn--sm">Level admins, HODs and deans</Link>
+          <Link to={ROUTES.reports} className="btn btn--white btn--sm">Attendance reports</Link>
+        </div>
         <div style={card}>
           <div style={{ fontWeight: 800, fontSize: 16 }}>Class reps (HOC)</div>
           <div style={{ fontSize: 12, color: 'var(--text2)', margin: '4px 0 10px' }}>A Head of Class can post to their class board. Enter the student's email.</div>

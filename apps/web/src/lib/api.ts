@@ -654,7 +654,18 @@ export const api = {
   hocPost: (payload: { type: HocPost['type']; title?: string; content: string }) =>
     apiFetch<{ ok: boolean; id: string }>('/v1/hoc/posts', { method: 'POST', body: JSON.stringify(payload) }),
   hocDelete: (id: string) => apiFetch<{ ok: boolean }>(`/v1/hoc/posts/${id}`, { method: 'DELETE' }),
-  hocRequest: () => apiFetch<{ ok: boolean }>('/v1/hoc/request', { method: 'POST', body: '{}' }),
+  hocRequest: (note?: string) => apiFetch<{ ok: boolean; already?: boolean }>('/v1/hoc/request', { method: 'POST', body: JSON.stringify({ note }) }),
+  // Scoped roles: level admins, heads of department, deans
+  rolesMine: () => apiFetch<{ admin: boolean; grants: { id: string; role: 'level_admin' | 'hod' | 'dean'; faculty: string; department: string; level: string }[]; canApproveHocs: boolean; canSeeReports: boolean }>('/v1/roles/mine'),
+  hocRequests: () => apiFetch<{ requests: { id: string; name: string; email: string; department: string; level: string; note: string; status: 'pending' | 'approved' | 'rejected'; at: string; repsInClass: number }[] }>('/v1/hoc/requests'),
+  hocAnswer: (id: string, approve: boolean, note?: string) =>
+    apiFetch<{ ok: boolean }>(`/v1/hoc/requests/${id}`, { method: 'POST', body: JSON.stringify({ approve, note }) }),
+  roleGrants: () => apiFetch<{ grants: { id: string; role: 'level_admin' | 'hod' | 'dean'; faculty: string; department: string; level: string; name: string; email: string }[] }>('/v1/admin/role-grants'),
+  roleGrant: (payload: { email: string; role: 'level_admin' | 'hod' | 'dean'; faculty?: string; department?: string; level?: string }) =>
+    apiFetch<{ ok: boolean; name: string }>('/v1/admin/role-grants', { method: 'POST', body: JSON.stringify(payload) }),
+  roleRevoke: (id: string) => apiFetch<{ ok: boolean }>(`/v1/admin/role-grants/${id}`, { method: 'DELETE' }),
+  attendanceReport: () =>
+    apiFetch<{ scope: string; classes: { department: string; level: string; students: number; onUnify: number; courses: { course: string; held: number; marks: number; rate: number | null }[] }[] }>('/v1/reports/attendance'),
   hocGrant: (email: string, revoke = false) =>
     apiFetch<{ ok: boolean; name: string | null; isHoc: boolean }>('/v1/hoc/grant', { method: 'POST', body: JSON.stringify({ email, revoke }) }),
   // Attendance

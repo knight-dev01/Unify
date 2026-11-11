@@ -386,6 +386,40 @@ model AttendanceSession {
   @@map("attendance_sessions")
 }
 
+// Scoped roles (0036): level_admin (approves class reps for a department + level),
+// hod (department), dean (faculty). Reports to hod/dean are counts only.
+model RoleGrant {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  role        String
+  institution String   @default("LASU")
+  faculty     String   @default("")
+  department  String   @default("")
+  level       String   @default("")
+  grantedBy   String?  @map("granted_by") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@unique([userId, role, institution, faculty, department, level], map: "role_grants_unique")
+  @@index([role, institution, department, level], map: "role_grants_scope_idx")
+  @@map("role_grants")
+}
+
+model HocRequest {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String    @map("user_id") @db.Uuid
+  institution String    @default("LASU")
+  department  String
+  level       String
+  note        String    @default("")
+  status      String    @default("pending")
+  decidedBy   String?   @map("decided_by") @db.Uuid
+  decidedAt   DateTime? @map("decided_at") @db.Timestamptz(6)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([status, department, level], map: "hoc_requests_scope_idx")
+  @@map("hoc_requests")
+}
+
 // Class lists (0032). One list per class: institution + department + level.
 model ClassList {
   id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid

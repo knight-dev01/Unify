@@ -231,22 +231,38 @@ router.delete("/hoc/posts/:id", requireAuth, async (req: Request, res: Response)
   }
 });
 
-// A student asks to be their class's HOC: admins get a notification and
-// approve it with /hoc/grant.
+// A student asks to be their class's rep: the request goes in the queue that
+// their class's level admin answers (Unify admins can too), and both are told.
 router.post("/hoc/request", requireAuth, async (req: Request, res: Response) => {
+  const note = z.object({ note: z.string().trim().max(300).optional() }).safeParse(req.body ?? {});
   try {
     const me = await getProfile(uid(req));
     if (!me) return fail(res, 404, "Finish onboarding first.");
     if (me.is_hoc) return fail(res, 400, "You are already a Head of Class.");
     if (me.role !== "student") return fail(res, 400, "Only students can be Head of Class.");
+    if (!me.department || !me.level) return fail(res, 400, "Set your department and level in Me first.");
     const sb = supabaseAdmin();
+    const { error: reqErr } = await sb
+      .from("hoc_requests")
+      .insert({ user_id: me.id, institution: institutionOf(), department: me.department, level: me.level, note: note.success ? note.data.note || "" : "" });
+    if (reqErr) {
+      if ((reqErr as { code?: string }).code === "23505") return res.json({ ok: true, already: true });
+      throw reqErr;
+    }
     const { data: admins } = await sb.from("profiles").select("id").eq("is_admin", true);
-    const rows = ((admins ?? []) as { id: string }[]).map((a) => ({
-      user_id: a.id,
+    const { data: levelAdmins } = await sb
+      .from("role_grants")
+      .select("user_id")
+      .eq("role", "level_admin")
+      .eq("department", me.department)
+      .eq("level", me.level);
+    const ids = [...new Set([...((admins ?? []) as { id: string }[]).map((a) => a.id), ...((levelAdmins ?? []) as { user_id: string }[]).map((a) => a.user_id)])];
+    const rows = ids.map((user_id) => ({
+      user_id,
       type: "role_request",
-      title: `HOC request: ${me.first_name || "Unnamed"}`,
-      body: `${me.first_name || "A student"} (${me.department || "no department"} · ${me.level || "no level"}) asks to be Head of Class. Grant it from the HOC section of the admin panel.`,
-      link: "/admin",
+      title: `Class rep request: ${me.first_name || "Unnamed"}`,
+      body: `${me.first_name || "A student"} (${me.department} · ${me.level}) asks to be class rep. Answer it in Class rep requests.`,
+      link: "/hoc/requests",
     }));
     if (rows.length) await sb.from("notifications").insert(rows);
     res.json({ ok: true });

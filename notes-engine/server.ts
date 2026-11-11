@@ -175,6 +175,9 @@ app.use("/v1", classroom.default || classroom);
 // Class lists: HOC uploads, student claims, the HOC's claim inbox.
 const classlist = require("./src/routes/classlist");
 app.use("/v1", classlist.default || classlist);
+// Scoped roles: level admins (class rep approval), HOD and Dean reports (counts only).
+const roles = require("./src/routes/roles");
+app.use("/v1", roles.default || roles);
 // Live performance + browser vitals for the admin panel.
 const ops = require("./src/routes/ops");
 app.use("/v1", ops.default || ops);

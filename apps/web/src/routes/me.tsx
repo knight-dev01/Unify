@@ -61,6 +61,34 @@ function SupportRow() {
   );
 }
 
+// Level admins, heads of department and deans: links to what their role unlocks.
+function ScopedRoleLinks() {
+  const [r, setR] = useState<{ canApproveHocs: boolean; canSeeReports: boolean; label: string } | null>(null);
+  useEffect(() => {
+    api.rolesMine().then((x) => {
+      const names = x.grants.map((g) => (g.role === 'level_admin' ? `Level admin · ${g.department} ${g.level}` : g.role === 'hod' ? `Head of department · ${g.department}` : `Dean · ${g.faculty}`));
+      if (x.grants.length) setR({ canApproveHocs: x.canApproveHocs, canSeeReports: x.canSeeReports, label: names.join(' · ') });
+    }).catch(() => {});
+  }, []);
+  if (!r) return null;
+  const row: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 14, marginBottom: 8, color: 'var(--text)', textDecoration: 'none' };
+  return (
+    <>
+      <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: 1, color: 'var(--text2)', margin: '4px 0 6px' }}>{r.label.toUpperCase()}</div>
+      {r.canApproveHocs && (
+        <Link to={ROUTES.hocRequests} style={row}>
+          <span style={{ fontSize: 13, fontWeight: 700 }}>Class rep requests</span><span aria-hidden="true" style={{ color: 'var(--text3)' }}>›</span>
+        </Link>
+      )}
+      {r.canSeeReports && (
+        <Link to={ROUTES.reports} style={row}>
+          <span style={{ fontSize: 13, fontWeight: 700 }}>Attendance reports (counts only)</span><span aria-hidden="true" style={{ color: 'var(--text3)' }}>›</span>
+        </Link>
+      )}
+    </>
+  );
+}
+
 // Delete my account: a quiet link that opens a sheet, and the person types DELETE.
 function DeleteAccount({ onDeleted }: { onDeleted: () => void }) {
   const [open, setOpen] = useState(false);
@@ -456,6 +484,7 @@ export default function MeRoute() {
           <span aria-hidden="true" style={{ color: 'var(--text3)' }}>›</span>
         </Link>
       )}
+      <ScopedRoleLinks />
       {saveMsg && <Flash tone="success" message={saveMsg} onDismiss={() => setSaveMsg('')} />}
 
       {editing && (
