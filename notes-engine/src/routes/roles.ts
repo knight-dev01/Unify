@@ -12,7 +12,7 @@ import { DEFAULT_INSTITUTION, ENTRY_COLS, type EntryRow, type ListRow, LIST_COLS
 //  - hod / dean: attendance reports for their department / faculty, counts only;
 //  - Unify admins grant these by email, and can do everything a scoped role can.
 const router = Router();
-router.use(["/roles", "/hoc/requests", "/reports", "/admin/role-grants"], rateLimit({ windowMs: 15 * 60 * 1000, max: 600, standardHeaders: true, legacyHeaders: false, keyGenerator: clientKey }));
+router.use(["/roles", "/hoc/requests", "/reports", "/admin/role-grants", "/admin/overview"], rateLimit({ windowMs: 15 * 60 * 1000, max: 600, standardHeaders: true, legacyHeaders: false, keyGenerator: clientKey }));
 
 type Grant = { id: string; user_id: string; role: "level_admin" | "hod" | "dean"; institution: string; faculty: string; department: string; level: string; created_at: string };
 type Me = { id: string; first_name: string | null; role: string | null; is_admin: boolean | null; is_hoc: boolean | null; department: string | null; level: string | null; faculty: string | null };
@@ -275,6 +275,93 @@ router.get("/reports/attendance", requireAuth, async (req: Request, res: Respons
       out.push({ department: l.department, level: l.level, students: entries.length, onUnify: entries.filter((e) => e.student_id).length, courses });
     }
     res.json({ scope: admin ? "all" : [...hod.map((d) => `Department: ${d}`), ...dean.map((f) => `Faculty: ${f}`)].join(" · "), classes: out });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
+// ---------- Admin overview: every module at a glance, plus what's new ----------
+// One call for the admin Overview so nothing new is missed: counts that need
+// attention (with where to act), this week's activity, setup gaps, and the
+// latest release notes from CHANGELOG.md.
+function releaseNotes(): { version: string; date: string; body: string }[] {
+  const fs = require("node:fs") as typeof import("node:fs");
+  const path = require("node:path") as typeof import("node:path");
+  const candidates = [
+    path.join(process.cwd(), "CHANGELOG.md"),
+    path.join(process.cwd(), "..", "CHANGELOG.md"),
+    path.join(__dirname, "..", "..", "..", "CHANGELOG.md"),
+    path.join(__dirname, "..", "..", "..", "..", "CHANGELOG.md"),
+  ];
+  for (const p of candidates) {
+    try {
+      const text = fs.readFileSync(p, "utf8");
+      const parts = text.split(/^## \[/m).slice(1, 6);
+      return parts.map((part) => {
+        const head = /^([^\]]+)\]\s*-?\s*([0-9-]*)/.exec(part);
+        return { version: head?.[1] || "", date: head?.[2] || "", body: part.slice(part.indexOf("\n") + 1).trim().slice(0, 6000) };
+      });
+    } catch {
+      // try the next place
+    }
+  }
+  return [];
+}
+
+router.get("/admin/overview", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const { me, admin } = await whoami(req);
+    if (!admin || !me) return fail(res, 403, "Admins only.");
+    const sb = supabaseAdmin();
+    const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString();
+    const monthAgo = new Date(Date.now() - 30 * 86400000).toISOString();
+    const count = async (q: PromiseLike<{ count: number | null }>) => (await q).count ?? 0;
+    const head = { count: "exact" as const, head: true };
+    const [
+      hocPending, reportsOpen, claimsOpen, lists, entries, claimed, sessionsWeek, marksWeek,
+      flags, changesWeek, postsWeek, levelAdmins, hods, deans, hocs, calendar,
+    ] = await Promise.all([
+      count(sb.from("hoc_requests").select("id", head).eq("status", "pending")),
+      count(sb.from("content_reports").select("id", head).eq("status", "open")),
+      count(sb.from("class_list_claims").select("id", head).eq("status", "open")),
+      count(sb.from("class_lists").select("id", head)),
+      count(sb.from("class_list_entries").select("id", head).is("removed_at", null)),
+      count(sb.from("class_list_entries").select("id", head).is("removed_at", null).not("student_id", "is", null)),
+      count(sb.from("attendance_sessions").select("id", head).gt("opens_at", weekAgo)),
+      count(sb.from("attendance_records").select("id", head).gt("scanned_at", weekAgo)),
+      count(sb.from("notifications").select("id", head).eq("user_id", me.id).eq("type", "attendance_flag").eq("read", false).gt("created_at", monthAgo)),
+      count(sb.from("slot_changes").select("id", head).gt("created_at", weekAgo)),
+      count(sb.from("course_posts").select("id", head).gt("created_at", weekAgo)),
+      count(sb.from("role_grants").select("id", head).eq("role", "level_admin")),
+      count(sb.from("role_grants").select("id", head).eq("role", "hod")),
+      count(sb.from("role_grants").select("id", head).eq("role", "dean")),
+      count(sb.from("profiles").select("id", head).eq("is_hoc", true)),
+      sb.from("app_settings").select("key,value").in("key", ["semester_start", "semester_weeks", "current_semester"]),
+    ]);
+    const cal: Record<string, string> = {};
+    for (const r of ((calendar as { data: unknown }).data ?? []) as { key: string; value: string }[]) cal[r.key] = r.value;
+    res.json({
+      attention: [
+        { key: "hoc", label: "Class rep requests waiting", n: hocPending, to: "/hoc/requests" },
+        { key: "reports", label: "Student reports on notes, open", n: reportsOpen, to: "/content-reports" },
+        { key: "claims", label: "Class-list requests waiting on class reps", n: claimsOpen, to: "" },
+        { key: "flags", label: "Attendance marks questioned, unread", n: flags, to: "/notifications" },
+      ],
+      modules: [
+        { key: "classlists", label: "Class lists", lines: [`${lists} class${lists === 1 ? "" : "es"} uploaded`, `${entries} students listed, ${claimed} on Unify`] },
+        { key: "attendance", label: "Attendance (last 7 days)", lines: [`${sessionsWeek} register${sessionsWeek === 1 ? "" : "s"} taken`, `${marksWeek} students marked`], to: "/reports" },
+        { key: "timetable", label: "Timetable (last 7 days)", lines: [`${changesWeek} class${changesWeek === 1 ? "" : "es"} cancelled, moved or unconfirmed`] },
+        { key: "lecturers", label: "Lecturer posts (last 7 days)", lines: [`${postsWeek} post${postsWeek === 1 ? "" : "s"} to students`] },
+        { key: "roles", label: "Roles", lines: [`${hocs} class reps`, `${levelAdmins} level admins · ${hods} HODs · ${deans} deans`], to: "/admin-roles" },
+      ],
+      setup: [
+        !cal.semester_start ? { label: "Set the semester calendar (Week 1 start) so Home shows the week and attendance files by week", to: "module:session" } : null,
+        levelAdmins === 0 ? { label: "No level admins yet: class rep requests come only to Unify admins", to: "/admin-roles" } : null,
+        lists === 0 ? { label: "No class lists uploaded yet: registers can't show who's absent", to: "" } : null,
+      ].filter(Boolean),
+      calendar: { start: cal.semester_start || null, weeks: Number(cal.semester_weeks) || 12, semester: cal.current_semester || "" },
+      releaseNotes: releaseNotes(),
+    });
   } catch (e) {
     dbFail(res, e);
   }

@@ -666,6 +666,14 @@ export const api = {
   hocRequests: () => apiFetch<{ requests: { id: string; name: string; email: string; department: string; level: string; note: string; status: 'pending' | 'approved' | 'rejected'; at: string; repsInClass: number }[] }>('/v1/hoc/requests'),
   hocAnswer: (id: string, approve: boolean, note?: string) =>
     apiFetch<{ ok: boolean }>(`/v1/hoc/requests/${id}`, { method: 'POST', body: JSON.stringify({ approve, note }) }),
+  adminOverview: () =>
+    apiFetch<{
+      attention: { key: string; label: string; n: number; to: string }[];
+      modules: { key: string; label: string; lines: string[]; to?: string }[];
+      setup: { label: string; to: string }[];
+      calendar: { start: string | null; weeks: number; semester: string };
+      releaseNotes: { version: string; date: string; body: string }[];
+    }>('/v1/admin/overview'),
   roleGrants: () => apiFetch<{ grants: { id: string; role: 'level_admin' | 'hod' | 'dean'; faculty: string; department: string; level: string; name: string; email: string }[] }>('/v1/admin/role-grants'),
   roleGrant: (payload: { email: string; role: 'level_admin' | 'hod' | 'dean'; faculty?: string; department?: string; level?: string }) =>
     apiFetch<{ ok: boolean; name: string }>('/v1/admin/role-grants', { method: 'POST', body: JSON.stringify(payload) }),
