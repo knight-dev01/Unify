@@ -741,6 +741,30 @@ router.post("/attendance/sessions/:id/close", requireAuth, async (req: Request, 
   }
 });
 
+// L19: keep an open class going longer (online lectures overrun). Same people who
+// can scan; up to 3 hours from when it opened.
+router.post("/attendance/sessions/:id/extend", requireAuth, async (req: Request, res: Response) => {
+  const parsed = z.object({ minutes: z.number().int().min(5).max(60) }).safeParse(req.body);
+  if (!parsed.success || !/^[0-9a-f-]{36}$/i.test(req.params.id)) return fail(res, 400, "Add between 5 and 60 minutes.");
+  try {
+    const me = await getProfile(uid(req));
+    const sb = supabaseAdmin();
+    const { data } = await sb.from("attendance_sessions").select(SESSION_COLS).eq("id", req.params.id).maybeSingle();
+    const s = data as SessionRow | null;
+    if (!s) return fail(res, 404, "Session not found.");
+    if (!me || !(await canScan(me, s.course_code))) return fail(res, 403, "You can't change this session.");
+    if (s.closed_at || new Date(s.closes_at).getTime() <= Date.now()) return fail(res, 409, "This session has ended. Start a new one.");
+    const opened = Date.parse(s.opens_at) || Date.now();
+    const cap = opened + 180 * 60 * 1000;
+    const next = Math.min(new Date(s.closes_at).getTime() + parsed.data.minutes * 60 * 1000, cap);
+    if (next <= new Date(s.closes_at).getTime()) return fail(res, 409, "A session can run for 3 hours at most.");
+    await sb.from("attendance_sessions").update({ closes_at: new Date(next).toISOString() }).eq("id", s.id);
+    res.json({ ok: true, closesAt: new Date(next).toISOString() });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
 // Student: my pass. The QR changes every PASS_SECONDS; the app fetches a new one at rotatesAt.
 router.get("/attendance/pass", requireAuth, async (req: Request, res: Response) => {
   try {

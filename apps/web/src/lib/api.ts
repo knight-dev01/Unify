@@ -680,6 +680,8 @@ export const api = {
   attendanceRegister: (course: string, sessionId?: string) =>
     apiFetch<AttendanceRegister>(`/v1/attendance/sessions?course=${encodeURIComponent(course)}${sessionId ? `&session=${encodeURIComponent(sessionId)}` : ''}`),
   attendanceCourse: (course: string) => apiFetch<CourseAttendance>(`/v1/attendance/course?course=${encodeURIComponent(course)}`),
+  attendanceExtend: (id: string, minutes = 30) =>
+    apiFetch<{ ok: boolean; closesAt: string }>(`/v1/attendance/sessions/${id}/extend`, { method: 'POST', body: JSON.stringify({ minutes }) }),
   attendanceClose: (id: string) => apiFetch<{ ok: boolean }>(`/v1/attendance/sessions/${id}/close`, { method: 'POST', body: '{}' }),
   // Online classes only: the code shared in the meeting chat.
   attendanceCheckin: (code: string) =>

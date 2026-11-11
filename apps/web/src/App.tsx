@@ -33,6 +33,7 @@ const ContentReportsRoute = lazyRoute(() => import('./routes/content-reports'));
 const LecturerCourseRoute = lazyRoute(() => import('./routes/lecturer-course'));
 const LecturerProfileRoute = lazyRoute(() => import('./routes/lecturer-profile'));
 const SettingsRoute = lazyRoute(() => import('./routes/settings'));
+const LecturerWelcomeRoute = lazyRoute(() => import('./routes/lecturer-welcome'));
 const NotificationSettingsRoute = lazyRoute(() => import('./routes/settings').then((m) => ({ default: m.NotificationSettingsRoute })));
 const OnlineClassRoute = lazyRoute(() => import('./routes/online-class'));
 const LecturerHomeRoute = lazyRoute(() => import('./routes/lecturer-home'));
@@ -356,6 +357,7 @@ export default function App() {
           <Route path="/lecturer/course/:code" element={<RequireAuth><LecturerCourseRoute /></RequireAuth>} />
           <Route path="/lecturer/profile/:id" element={<RequireAuth><LecturerProfileRoute /></RequireAuth>} />
           <Route path="/settings" element={<RequireAuth><SettingsRoute /></RequireAuth>} />
+          <Route path="/lecturer/welcome" element={<RequireAuth><LecturerWelcomeRoute /></RequireAuth>} />
           <Route path="/settings/notifications" element={<RequireAuth><NotificationSettingsRoute /></RequireAuth>} />
           <Route path="/online-class" element={<RequireAuth><OnlineClassRoute /></RequireAuth>} />
           <Route path="/lecturer" element={<RequireAuth><LecturerHomeRoute /></RequireAuth>} />
