@@ -815,8 +815,13 @@ export default function StudioRoute() {
                     Continue to review <ArrowRight size={18} />
                   </button>
                   {!reviewReady && (
-                    <div role="status" style={{ fontSize: 12, color: 'var(--text2)', textAlign: 'center', marginTop: -4 }}>
-                      Review unlocks when every field is filled in. Still to do: {gapsSummary(gaps, 3)}.
+                    // C05: the full list of what's left, not just the first few.
+                    <div role="status" style={{ fontSize: 13, color: 'var(--u-warn-ink)', background: 'var(--u-warn-tint)', borderRadius: 12, padding: 12 }}>
+                      <div style={{ fontWeight: 800, marginBottom: 4 }}>{gaps.length} thing{gaps.length === 1 ? '' : 's'} to fix before review</div>
+                      <ul style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        {gaps.slice(0, 12).map((g) => <li key={g}>{g}</li>)}
+                        {gaps.length > 12 && <li>…and {gaps.length - 12} more</li>}
+                      </ul>
                     </div>
                   )}
                 </>

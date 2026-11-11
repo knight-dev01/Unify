@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Lecturer setup** (L01–L06): a short first-time flow (what Unify does for lecturers, department, the courses Unify has assigned, how students see your name, all set). Classroom shows 'Finish setting up' until the department is set
 - **Class time on Classroom** (L08): when one of your classes is on (or starts within 15 minutes) a card shows it with Take attendance for that class, Open the meeting and Post to students
 - **Add 30 min** to an online class that's running over (L19), up to 3 hours from the start
+- **Studio quiz builder** (C04): Number questions (answer, ± tolerance, unit) and Maths questions (accepted expressions; Studio warns if one can't be read by the checker) alongside MCQ and fill-in; the count line shows multiple choice (at least 6) and written
+- **Studio lists everything left to fix** (C05) before Review unlocks, as a card, instead of the first three in one line
 - **Quiz results** (S32) show each question as right or wrong and how long the quiz took
 
 ## [2.22.3] - 2026-11-11
