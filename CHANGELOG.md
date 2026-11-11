@@ -5,6 +5,11 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.22.2] - 2026-11-11
+
+### Changed
+- **Home course cards follow the design** (S19), in the app's own look: one card per row with the lecturer's Box Boy avatar, the course code (with a PRIORITY tag for a course from another level), title and lecturer, an In progress / Not started / Done pill, a progress bar of topics done, and 'Week 3 of 12 · 5 of 18 topics'. The whole card opens the course
+
 ## [2.22.1] - 2026-11-11
 
 ### Fixed
