@@ -29,6 +29,56 @@ type Activity = {
 // Admin oversight: platform totals + latest signups + latest published
 // notes in one dark card. Main admin (role) gets the manage link,
 // normal admins (flag) get the view-only notes link.
+// C01 for authors: the next week to write in each course (with the lecturer's
+// materials for it, when they've shared some) and open student reports.
+function AuthorNextUp({ courses }: { courses: string[] }) {
+  const [rows, setRows] = useState<{ course: string; next: number; material: string }[]>([]);
+  const [reports, setReports] = useState(0);
+  useEffect(() => {
+    let gone = false;
+    (async () => {
+      const out: { course: string; next: number; material: string }[] = [];
+      for (const c of courses.slice(0, 4)) {
+        try {
+          const [w, m] = await Promise.all([api.courseWeeks(c), api.materials(c).catch(() => ({ materials: [] as { week: number; title: string }[] }))]);
+          const have = new Set(w.weeks.map((x) => x.week));
+          const next = Array.from({ length: 15 }, (_, i) => i + 1).find((n) => !have.has(n));
+          if (next) out.push({ course: c, next, material: m.materials.find((x) => x.week === next)?.title || '' });
+        } catch {
+          // a course that fails just doesn't show
+        }
+      }
+      if (!gone) setRows(out);
+      api.contentReports().then((r) => { if (!gone) setReports(r.reports.filter((x) => x.status === 'open').length); }).catch(() => {});
+    })();
+    return () => { gone = true; };
+  }, [courses.join('|')]);
+  if (!rows.length && !reports) return null;
+  return (
+    <div style={{ margin: '16px 16px 0', display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <h2 style={{ fontFamily: 'var(--fd)', fontWeight: 800 }}>Next up</h2>
+      {rows.map((r) => (
+        <Link key={r.course} to={`/studio?course=${encodeURIComponent(r.course)}&week=${r.next}`} style={{ padding: 12, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, display: 'flex', gap: 10, alignItems: 'center', textDecoration: 'none', color: 'var(--text)' }}>
+          <span style={{ flex: 1, minWidth: 0 }}>
+            <span style={{ display: 'block', fontWeight: 800, fontSize: 14 }}>{r.course} · Week {r.next}</span>
+            <span style={{ display: 'block', fontSize: 12, color: 'var(--text2)' }}>{r.material ? `Lecturer's material ready: ${r.material}` : 'Waiting for the lecturer’s materials, or start from your own notes'}</span>
+          </span>
+          <ChevronRight size={16} color="var(--u-good)" />
+        </Link>
+      ))}
+      {reports > 0 && (
+        <Link to="/content-reports" style={{ padding: 12, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, display: 'flex', gap: 10, alignItems: 'center', textDecoration: 'none', color: 'var(--text)' }}>
+          <span style={{ flex: 1 }}>
+            <span style={{ display: 'block', fontWeight: 800, fontSize: 14 }}>Student reports</span>
+            <span style={{ display: 'block', fontSize: 12, color: 'var(--text2)' }}>{reports} to look at</span>
+          </span>
+          <ChevronRight size={16} color="var(--u-good)" />
+        </Link>
+      )}
+    </div>
+  );
+}
+
 function OversightCard({ platform, activity, mainAdmin }: { platform: Platform; activity: Activity | null; mainAdmin: boolean }) {
   return (
     <div style={{ margin: '12px 16px 0', background: '#111827', borderRadius: 12, padding: 16, color: '#fff' }}>
@@ -346,6 +396,9 @@ export default function HomeRoute() {
             <ChevronRight size={16} />
           </Link>
         ) : null}
+        {(profile?.role === 'contributor' || profile?.role === 'lecturer') && myContribs.some((c) => c.assigned) && (
+          <AuthorNextUp courses={myContribs.filter((c) => c.assigned).map((c) => c.course)} />
+        )}
         {(profile?.role === 'contributor' || profile?.role === 'lecturer') && (
           <div style={{ margin: '16px 16px 0' }}>
             <h2 style={{ fontFamily: 'var(--fd)', fontWeight: 800 }}>My contributions</h2>

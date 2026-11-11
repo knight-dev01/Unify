@@ -22,6 +22,7 @@ Screens from the design prototype (docs/unify-learn-ui), built in the app's exis
 - Classroom has "Reports and reviews"
 - **Settings** (S48), opened from a new row on Me: profile and picture, attendance details, class rep, CGPA plan, notifications, theme, version
 - **Notification settings** (S49): push on this phone, new-note emails, and **quiet hours** (no push between, say, 22:00 and 07:00 Lagos time; everything still waits in Notifications, and a class going live always comes through)
+- **Contributor studio, closer to the design** (C01, C06): Home shows **Next up** for each assigned course (the next unwritten week, and the lecturer's material for it when shared), opening Studio with the course and week filled in; open **Student reports** show beside it. After publishing, the "Week N is live" screen says who can read it and offers **Start Week N+1**. Studio's Compose/Review/Live steps, AI/Manual/External modes and publish checklist were already in place and are unchanged
 - **States**: a course link that doesn't exist says "We can't find MEE 999" with Manage courses (S73); My pass offline past its grace window shows "Reconnect to refresh your pass" instead of a code that would be refused (S74); a wrong online-class code says why under the box (S72)
 - **Revision** (S35–S36): 10 shuffled recall cards from topics you've finished; reveal, then "I knew it" / "Not yet"; the ones you missed come back in another round. Linked from Home and the streak screen
 

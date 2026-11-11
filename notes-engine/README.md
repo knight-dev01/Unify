@@ -20,6 +20,7 @@ server.ts                 app wiring: compression, CORS, body limit (12 MB), log
 src/routes/v1.ts          profiles, onboarding, courses, weeks, notes, progress, publish, admin, announcements, Home updates
 src/routes/classroom.ts   timetable, class board, attendance sessions, pass scanning, register + CSV, online code check-in, CGPA planner, materials
 src/routes/roles.ts       level admins (class rep requests), HOD/Dean attendance reports (counts only), admin role grants
+src/routes/teaching.ts    content reports (report a problem / review a week), lecturer posts, counts-only course report, attendance per student, lecturer profile
 src/lib/calendar.ts       semester calendar (Week 1 start + weeks) from app_settings
 src/routes/classlist.ts   class lists: HOC upload/parse/review, edits and history, student claims, LASU email codes, HOC inbox
 src/lib/classlist.ts      claiming entries, attaching attendance, which lists a course's register uses
