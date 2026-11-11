@@ -5,6 +5,12 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.21.0] - 2026-11-11
+
+### Security
+- **Row-level security on every table** (migration 0033). The app only reaches the database through the API's service key, so nothing changes in the app; the public keys can no longer read or write any table directly
+- **Storage writes narrowed**: only lecturers, contributors and admins can upload Studio diagrams, and only the uploader can replace or delete their own. Before, any signed-in student could upload to, overwrite or delete files in the avatars, audio and diagrams buckets. Public reading is unchanged
+
 ## [2.20.1] - 2026-11-11
 
 ### Changed
