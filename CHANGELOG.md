@@ -5,6 +5,12 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.22.3] - 2026-11-11
+
+### Fixed
+- **Loading facts and proverbs are always visible**: on full-page loading screens the rotating line now sits at the top instead of under the placeholder rows, where longer layouts pushed it behind the bottom tab bar
+- **Next in the notes goes back to the header**: Next, a topic tab and back-to-top now land on the week title with the Topic 1 / Topic 2 tabs under it (they landed below the tabs, hiding which topic you were on), and wait for the new topic to draw before scrolling
+
 ## [2.22.2] - 2026-11-11
 
 ### Changed
