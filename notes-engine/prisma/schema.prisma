@@ -205,7 +205,7 @@ model ResumeState {
 model ClassSlot {
   id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   course     String
-  lecturerId String   @map("lecturer_id") @db.Uuid
+  lecturerId String?  @map("lecturer_id") @db.Uuid // whoever added it; null once that account is deleted (0035)
   day        Int
   startTime  String   @map("start_time")
   endTime    String   @map("end_time")
@@ -304,7 +304,7 @@ model AttendanceRecord {
   id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   studentId  String?  @map("student_id") @db.Uuid // null: typed from the class list before the student joined
   courseCode String   @map("course_code")
-  scannedBy  String   @map("scanned_by") @db.Uuid
+  scannedBy  String?  @map("scanned_by") @db.Uuid // null once that account is deleted (0035)
   scannedAt  DateTime @default(now()) @map("scanned_at") @db.Timestamptz(6)
   verified   Boolean  @default(false)
   week       Int?
@@ -372,7 +372,7 @@ model OnlineCheckin {
 model AttendanceSession {
   id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   courseCode String    @map("course_code")
-  createdBy  String    @map("created_by") @db.Uuid
+  createdBy  String?   @map("created_by") @db.Uuid // null once that account is deleted (0035)
   code       String
   week       Int?
   opensAt    DateTime  @default(now()) @map("opens_at") @db.Timestamptz(6)

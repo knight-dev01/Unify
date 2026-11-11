@@ -61,6 +61,54 @@ function SupportRow() {
   );
 }
 
+// Delete my account: a quiet link that opens a sheet, and the person types DELETE.
+function DeleteAccount({ onDeleted }: { onDeleted: () => void }) {
+  const [open, setOpen] = useState(false);
+  const [typed, setTyped] = useState('');
+  const [busy, setBusy] = useState(false);
+  const go = async () => {
+    setBusy(true);
+    try {
+      await api.deleteMyAccount();
+      toastSuccess('Your account was deleted.');
+      onDeleted();
+    } catch (e) {
+      errorToast(e, 'delete your account');
+      setBusy(false);
+    }
+  };
+  return (
+    <>
+      <button onClick={() => { setTyped(''); setOpen(true); }} style={{ display: 'block', margin: '16px auto 0', fontSize: 12, fontWeight: 700, color: 'var(--text3)', textDecoration: 'underline', background: 'transparent' }}>
+        Delete my account
+      </button>
+      {open && (
+        <ConfirmModal
+          title="Delete your account?"
+          body={
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <span>Your profile, progress, CGPA plan and notifications are deleted and you're signed out. This can't be undone.</span>
+              <span>Attendance your class rep took stays on the class register under your name from the class list.</span>
+              <input
+                value={typed}
+                onChange={(e) => setTyped(e.target.value)}
+                placeholder="Type DELETE"
+                aria-label="Type DELETE to confirm"
+                autoCapitalize="characters"
+                style={{ padding: 12, borderRadius: 10, border: '1px solid var(--border)', background: 'var(--surface)', color: 'var(--text)', fontSize: 15, textAlign: 'center' }}
+              />
+            </div>
+          }
+          confirmLabel="Delete account"
+          busy={busy}
+          onConfirm={() => { if (typed.trim() === 'DELETE') void go(); else errorToast(new Error('Type DELETE in capitals to confirm.'), 'delete your account'); }}
+          onCancel={() => setOpen(false)}
+        />
+      )}
+    </>
+  );
+}
+
 export default function MeRoute() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -555,6 +603,7 @@ export default function MeRoute() {
           Install Unify on this device
         </button>
       )}
+      {!isAdmin && <DeleteAccount onDeleted={() => void doLogout()} />}
       {(isAdmin || import.meta.env.DEV) && (
         <Link to="/screens" className="btn btn--white btn--sm" style={{ marginTop: 16, display: 'flex', width: 'fit-content', marginInline: 'auto' }}>
           All screens

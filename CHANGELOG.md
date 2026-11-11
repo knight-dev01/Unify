@@ -13,11 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Class rep setup**: after approval, four short screens (what you can do, upload the class list, add class times, post your first announcement), each marked Done when it is. The approval notification opens it, and the Class board shows "Finish setting up your class" until the class list is in
 - **Class reps set the timetable**: "Add a class time" on Timetable (course, day, times, venue), and remove a time. Lecturers still can too. The class rep's name isn't shown as the lecturer
 - **"Posting to Chemical Engineering · 200L · 84 students"** above the post box, counted from the class list (or classmates on Unify before it's uploaded)
+- **Delete my account** on Me (type DELETE to confirm). Profile, progress, CGPA plan and notifications go; attendance a class rep took stays on the class register under the class-list name, and that entry can be claimed again. Admins are removed by another admin
 - Class rep empty states: "You haven't added this week's classes yet" with Add class times, and "Post your first announcement to your class" with New post
 
 ### Changed
 - **Menu is Home · Timetable · Class · Me** (Courses came off; courses open from the cards on Home)
 - **Timetable shows classes only**: My pass, My attendance, Class board and My courses came off it. My pass is now at the top of the Class tab
+
+### Fixed
+- **Deleting an account no longer deletes the class's records** (migration 0035): before, removing a class rep or lecturer deleted every attendance mark they scanned and every register they started, and removing whoever added a class time took it off everyone's timetable. An admin who had approved a class rep couldn't be deleted at all. Those links are now cleared instead
+- Timetable error message showed "couldn2019t"
 
 ### Security
 - **Row-level security on every table** (migration 0033). The app only reaches the database through the API's service key, so nothing changes in the app; the public keys can no longer read or write any table directly

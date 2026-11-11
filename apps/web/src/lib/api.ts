@@ -677,6 +677,7 @@ export const api = {
     apiFetch<{ courses: { course: string; held: number; attended: number }[]; recent: { course: string; at: string }[] }>('/v1/attendance/mine'),
   attendanceExport: (sessionId: string, course: string) =>
     apiDownload(`/v1/attendance/sessions/${sessionId}/register.csv`, `${course.replace(/\s+/g, '')}-register.csv`),
+  deleteMyAccount: () => apiFetch<{ ok: boolean }>('/v1/me', { method: 'DELETE', body: JSON.stringify({ confirm: 'DELETE' }) }, 0),
   // Class lists: student side
   classListMe: () => apiFetch<ClassListMe>('/v1/class-list/me'),
   classListClaim: (matric: string, ask?: { fullName: string; note?: string }) =>

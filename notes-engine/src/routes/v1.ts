@@ -139,6 +139,43 @@ router.get("/universities", async (_req: Request, res: Response) => {
   }
 });
 
+// Delete my account (review: "In-app account deletion stays"). The person types
+// DELETE to confirm. Their profile, progress, notes history, notifications and
+// sign-in go. What belongs to the class stays: attendance taken against their
+// class-list entry keeps the entry (name + matric, from the class rep's list)
+// without the account, and the entry is free to be claimed again. Platform
+// admins are removed by another admin, so the panel is never left without one.
+router.delete("/me", requireAuth, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  const parsed = z.object({ confirm: z.literal("DELETE") }).safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Type DELETE to confirm." });
+    return;
+  }
+  try {
+    const sb = supabaseAdmin();
+    const { data: prof } = await sb.from("profiles").select("is_admin,role").eq("id", userId).maybeSingle();
+    const p = prof as { is_admin?: boolean; role?: string } | null;
+    if (p?.is_admin || p?.role === "admin") {
+      res.status(403).json({ error: "Admins are removed by another admin from the admin panel." });
+      return;
+    }
+    // Class register entries stay with the class list; everything else cascades with the profile.
+    await sb.from("attendance_records").update({ student_id: null }).eq("student_id", userId).not("entry_id", "is", null);
+    await sb.from("class_list_entries").update({ student_id: null, claimed_at: null, claim_method: null, verified_email: null }).eq("student_id", userId);
+    const { error } = await sb.from("profiles").delete().eq("id", userId);
+    if (error) throw error;
+    try {
+      await sb.auth.admin.deleteUser(userId);
+    } catch {
+      // profile is gone; a leftover auth row can only sign in to onboarding
+    }
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
 // Authed: own profile, or onboarded:false when missing.
 router.get("/me", requireAuth, async (req: Request, res: Response) => {
   const userId = (req as AuthedRequest).userId as string;
@@ -2214,9 +2251,9 @@ router.get("/timetable", requireAuth, async (req: Request, res: Response) => {
     if (error) throw error;
     const rows = ((data ?? []) as { id: string; course: string; lecturer_id: string; day: number; start_time: string; end_time: string; venue: string; meet_link: string | null }[]);
     let names: Record<string, string> = {};
-    const ids = [...new Set(rows.map((r) => r.lecturer_id))];
+    const ids = [...new Set(rows.map((r) => r.lecturer_id).filter(Boolean))];
     if (ids.length) {
-      // lecturer_id is whoever added the slot; only a lecturer's name is shown as "the lecturer".
+      // lecturer_id is whoever added the slot (null once their account is deleted); only a lecturer's name is shown as "the lecturer".
       const { data: profs } = await sb.from("profiles").select("id,first_name,role").in("id", ids);
       for (const p of ((profs ?? []) as { id: string; first_name: string; role?: string }[])) {
         if (p.first_name && p.role === "lecturer") names[p.id] = p.first_name;
