@@ -5,6 +5,11 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.20.1] - 2026-11-11
+
+### Changed
+- **Link preview matches the new look**: "Unify Learn" wordmark in Playfair, "Own your academic journey" headline, "Everything for your course, together" under the wordmark (was "Unify. Learn" and "Built for the ones who build"). Still a JPEG under 100 KB; image URL bumped to `?v=7` so WhatsApp and others fetch the new picture. Page title and share text updated to match. Source: `scripts/og/og-phone.html`
+
 ## [2.20.0] - 2026-11-11
 
 ### Added

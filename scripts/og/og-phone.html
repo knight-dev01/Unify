@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <!-- Link preview (og-image.jpg): 1200x630, horizontal. White top band + brand-green
      bottom band, both with the app's Adire texture, kente edge like the app's green
-     bands. Wordmark and icon match components/redesign/brand.tsx (Wordmark, AppIcon).
+     bands. Wordmark ("Unify Learn", Playfair 900) and icon match components/redesign/brand.tsx (Wordmark, AppIcon).
      Render headless at 1200x630, save as JPEG under ~100 KB (WhatsApp large card). -->
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Playfair+Display:wght@900&display=block" rel="stylesheet"/>
 <style>
@@ -18,9 +18,7 @@
   .icon { position: absolute; top: 58px; left: 72px; width: 106px; height: 106px; border-radius: 23px; background: #0a0a0a;
            display: grid; place-items: center; font-weight: 900; font-size: 60px; line-height: 1; color: #50ff90; }
   .wordmark { position: absolute; top: 52px; left: 204px; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 76px; letter-spacing: -1px; white-space: nowrap; }
-  .wordmark .dot { color: #22c55e; }
-  .wordmark .learn { font-family: 'Nunito', Arial, sans-serif; font-weight: 800; }
-  .tagline { position: absolute; top: 152px; left: 208px; font-weight: 800; font-size: 19px; letter-spacing: 4.6px; color: #3f3f46; }
+  .tagline { position: absolute; top: 152px; left: 208px; font-weight: 800; font-size: 17px; letter-spacing: 2.6px; color: #3f3f46; }
   h1 { position: absolute; top: 262px; left: 72px; font-weight: 900; font-size: 66px; line-height: 1.08; letter-spacing: -1px; }
   h1 .w { color: #fff; text-shadow: 0 4px 0 #0a0a0a, 3px 0 0 #0a0a0a, -3px 0 0 #0a0a0a, 0 -3px 0 #0a0a0a, 3px 4px 0 #0a0a0a, -3px 4px 0 #0a0a0a; }
   .sub { position: absolute; top: 432px; left: 72px; font-weight: 800; font-size: 25px; line-height: 1.4; }
@@ -35,10 +33,10 @@
   <div class="top"></div>
   <div class="bottom"></div>
   <div class="icon">U</div>
-  <div class="wordmark">Unify<span class="dot">.</span><span class="learn"> Learn</span></div>
-  <div class="tagline">BUILT FOR THE ONES WHO BUILD</div>
-  <h1>Study smarter.<br/><span class="w">Own your journey.</span></h1>
-  <div class="sub">Guided notes, attendance, a timetable<br/>and a CGPA path for your whole course.</div>
+  <div class="wordmark">Unify Learn</div>
+  <div class="tagline">EVERYTHING FOR YOUR COURSE, TOGETHER</div>
+  <h1>Own your<br/><span class="w">academic journey.</span></h1>
+  <div class="sub">Notes, quizzes, attendance, a timetable<br/>and a CGPA path, in one place.</div>
   <div class="chips"><span class="chip">Free for students</span><span class="chip">Works offline</span></div>
   <img class="mascot" src="mascot-phone.png" alt=""/>
   <div class="kente"></div>
