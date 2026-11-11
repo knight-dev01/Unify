@@ -309,6 +309,7 @@ model AttendanceRecord {
   verified   Boolean  @default(false)
   week       Int?
   sessionId  String?  @map("session_id") @db.Uuid
+  method     String   @default("code") // scan (pass scanned) | typed (matric typed by HOC/lecturer) | code (online code)
 
   @@index([studentId, courseCode])
   @@index([courseCode, scannedAt])

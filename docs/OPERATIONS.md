@@ -19,7 +19,6 @@ Bump the version in four places and add a changelog entry (see the root `README.
 | `ADMIN_EMAILS` | Comma-separated bootstrap admins. Also where alert emails go. |
 | `BREVO_API_KEY`, `EMAIL_FROM` | Email (new-note mail, announcements, **alert emails**). `EMAIL_FROM` must be a sender verified in Brevo. Without the key, alerts still appear in Admin, marked "not emailed". |
 | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | Web Push. The public key must match the one in the web app. |
-| `ATTENDANCE_SELFIE` | `on` (default) requires a selfie to mark attendance; `off` makes it optional. |
 | `SEED_TEST_USERS` | `1` creates `*.test.unify` accounts for testing. **Remove after testing and delete those accounts.** |
 | `CORS_ORIGIN` | Comma-separated web origins allowed to call the API. |
 | `SENTRY_DSN` | Optional crash reporting. |
@@ -33,7 +32,7 @@ Bump the version in four places and add a changelog entry (see the root `README.
 ## Pictures and privacy
 
 - **Profile pictures** go to the public `avatars` bucket, 320 px JPEG, normally under 60 KB, cached for a year (the URL carries a version stamp).
-- **Attendance selfies** are a live check that the student is in the room. They go to the **private** `attendance-selfies` bucket and only the lecturer or class rep running that session sees them, through links that expire in 10 minutes. **They are deleted the moment the session is closed** (and a sweep every 5 minutes removes photos from sessions that simply timed out). Only the student's name and the time stay in the register. The selfie screen tells students this. Record the purpose (attendance verification) in your privacy notice.
+- **Attendance takes no photos** (selfies were dropped in 2.19.0). Students show a QR pass that changes every 30 seconds and the class rep or lecturer scans it. The register keeps the student's name, matric, time, how they were marked (scanned, typed in, online code) and who marked them. Photos left from earlier versions in the private `attendance-selfies` bucket are swept automatically.
 
 ## Home slider updates
 
@@ -45,11 +44,11 @@ Admin, Announcements: tick "Also show it on everyone's Home slider" on the annou
 |---|---|
 | Everything is slow, first request takes 30 to 60 s | Render free instances sleep after about 15 minutes idle. The web app warms `/healthz`; a paid always-on instance removes it. |
 | Many users see "You're going a bit fast" | Rate limit is 240 requests a minute per signed-in session. A single user hitting it means a client bug (look for a loop in Admin, Errors). |
-| Attendance "photo could not be saved" | The `attendance-selfies` bucket is created on first use with the service role; check Supabase Storage and the API logs. |
+| Scanner says "That pass has expired" for everyone | The scanner's phone or the server clock is off by more than 30 seconds, or the student's app is offline (My pass needs a connection to fetch a fresh QR). |
 | Alerts say "not emailed" | `BREVO_API_KEY` or `ADMIN_EMAILS` missing, or the sender is not verified. |
 | A user cannot sign in right after being removed | A signed-out or revoked session can stay valid for up to 60 seconds (auth cache). |
 | Installed app shows an old icon or screen | It updates itself on next open while online. If stuck, remove and reinstall the PWA. |
-| Out of Supabase storage | Selfies clean themselves up when a session ends; check the `avatars` and `diagrams` buckets, and that sessions are being closed or timing out. |
+| Out of Supabase storage | Check the `avatars` and `diagrams` buckets. |
 
 ## Backups
 

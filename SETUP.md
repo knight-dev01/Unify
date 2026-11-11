@@ -141,7 +141,7 @@ Settings → Environment Variables (Production + Preview):
 
 | Variable (Render) | Why |
 |---|---|
-| `ATTENDANCE_SELFIE` | `on` (default) requires a selfie at check-in. `off` makes it optional. The private `attendance-selfies` bucket is created automatically on first use. Selfies are deleted as soon as the session ends; only the student's name stays in the register. |
+| `ATTENDANCE_SECRET` | Optional. Signs attendance passes and online codes; falls back to the Supabase secret key. |
 | `ADMIN_EMAILS` + `BREVO_API_KEY` | Also where **alert emails** go. After setting, open Admin, Live performance and press **Send test alert**. |
 | `SEED_TEST_USERS` | Test accounts for QA only. Remove it afterwards and delete the accounts. |
 

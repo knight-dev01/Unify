@@ -5,6 +5,18 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.19.0] - 2026-11-11
+
+### Changed
+- **Attendance works the right way round: students show, the class rep or lecturer scans.** Students open **My pass**: a QR with their name, matric, level and department that changes every 30 seconds (a screenshot stops working within a minute; the screen stays awake while it's up). The HOC or lecturer starts a session and their screen becomes a scanner showing each student's Box Boy, name, level and department with "Marked present", "Already scanned" or "Not taking this course"
+- **Phone dead?** The scanner has a matric box; that student is marked "typed in"
+- **The register shows how and by whom** each student was marked (scanned, typed in, online code)
+- **In-class sessions no longer show a code**, so nobody can mark themselves from outside the room. Online classes still use the code shared in the meeting chat ("Online class? Enter the code" on My pass)
+- "Mark attendance" is now "My pass" on Timetable, Home, My attendance and the admin page picker
+
+### Removed
+- **Attendance selfies.** No photo is taken; photos left from earlier sessions are deleted by the existing sweep. `ATTENDANCE_SELFIE` is no longer used
+
 ## [2.18.0] - 2026-11-11
 
 ### Added

@@ -1,7 +1,7 @@
 import { clientKey } from "../middleware/limits";
 import { Router, type Request, type Response } from "express";
 import rateLimit from "express-rate-limit";
-import { createHmac } from "node:crypto";
+import { createHmac, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import { supabaseAdmin } from "../lib/supabase";
 import { requireAuth, type AuthedRequest } from "../middleware/requireAuth";
@@ -10,14 +10,15 @@ import { sendPushToUsers } from "../lib/push";
 // Classroom features on top of v1: Head-of-Class posts and in-person
 // attendance by session code. Mounted at /v1 (see server.ts).
 //
-// Attendance model: a lecturer opens a session for a course they teach (open
-// for N minutes). The 6-digit code ROTATES every ROTATE_SECONDS: it is an
-// HMAC of the session id and the current time window, so nothing is stored
-// and a code photographed or shared in a group chat dies within a minute.
-// The current and previous window are both accepted so a student who is
-// mid-typing at the boundary isn't rejected. Students enter the code or scan
-// the QR (a link that opens the app with the code filled in). One record per
-// student per session.
+// Attendance model: the lecturer or the class rep (HOC) opens a session for a
+// course (open for N minutes). In class, students never scan: each student
+// shows MY PASS, a QR that rotates every PASS_SECONDS (an HMAC of their id and
+// the time window, so nothing is stored and a screenshot sent to a friend dies
+// within a minute), and the HOC or lecturer scans it. A student with a dead
+// phone is typed in by matric number and marked "typed". Online classes have no
+// room to scan in, so the lecturer shares a 6-digit code (an HMAC of the
+// session id and a 10-minute window) in the meeting chat and students type it.
+// One record per student per session. No photos are taken.
 const router = Router();
 
 // A lecture hall shares one campus IP, so per-IP caps would lock out a class:
@@ -75,6 +76,27 @@ function codeFor(sessionId: string, windowIdx: number): string {
   return String(h.readUInt32BE(0) % 1000000).padStart(6, "0");
 }
 const variants = (code: string) => [...new Set([code, code.replace(/\s/g, "")])];
+
+// ---------- Student pass ----------
+// QR text: UP1.<studentId>.<window>.<signature>. The scanner accepts the current
+// window and one either side (a pass shown at the boundary, or clocks a little apart).
+const PASS_SECONDS = 30;
+const passWindow = (now = Date.now()) => Math.floor(now / 1000 / PASS_SECONDS);
+const passSig = (studentId: string, w: number) =>
+  createHmac("sha256", attendanceKey()).update(`pass:${studentId}:${w}`).digest("base64url").slice(0, 16);
+const passToken = (studentId: string, w: number) => `UP1.${studentId}.${w}.${passSig(studentId, w)}`;
+const PASS_RE = /^UP1\.([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\.(\d{1,12})\.([A-Za-z0-9_-]{16})$/i;
+function readPass(token: string): { id: string } | { error: string } {
+  const m = PASS_RE.exec(token.trim());
+  if (!m) return { error: "That isn't a Unify pass. Ask them to open My pass in the app." };
+  const [, id, wRaw, sig] = m;
+  const w = Number(wRaw);
+  const want = Buffer.from(passSig(id.toLowerCase(), w));
+  const got = Buffer.from(sig);
+  if (want.length !== got.length || !timingSafeEqual(want, got)) return { error: "That pass isn't valid. Ask them to reopen My pass." };
+  if (Math.abs(passWindow() - w) > 1) return { error: "That pass has expired. Ask them to reopen My pass and scan again." };
+  return { id: id.toLowerCase() };
+}
 
 // ---------- Head of Class ----------
 
@@ -313,64 +335,17 @@ async function enrolledCount(course: string): Promise<number> {
 
 type SessionRow = { id: string; course_code: string; created_by: string; code: string; week: number | null; opens_at: string; closes_at: string; closed_at: string | null };
 
-// ---------- Attendance selfies ----------
-// A student confirms they are in the room with a quick photo. It is stored in a
-// PRIVATE bucket (never a public URL); only the lecturer or class rep running
-// that session sees it, through a link that expires in 10 minutes, and it is deleted when the session ends. Set
-// ATTENDANCE_SELFIE=off to make the photo optional.
+// ---------- Old attendance selfies ----------
+// Selfies are no longer taken (dropped 2026-11-11). Photos left from earlier
+// sessions sit in a private bucket; the sweep below deletes them, and closing a
+// session still clears its folder.
 const SELFIE_BUCKET = "attendance-selfies";
-const selfieRequired = () => (process.env.ATTENDANCE_SELFIE || "on").toLowerCase() !== "off";
-let bucketReady = false;
-async function ensureSelfieBucket(): Promise<void> {
-  if (bucketReady) return;
-  const { error } = await supabaseAdmin().storage.createBucket(SELFIE_BUCKET, { public: false, fileSizeLimit: 300 * 1024 });
-  // "already exists" is the normal case after the first call
-  if (!error || /exist/i.test(error.message || "")) bucketReady = true;
-}
-const selfiePath = (sessionId: string, studentId: string) => `${sessionId}/${studentId}.jpg`;
-const urlCache = new Map<string, { url: string; exp: number }>();
-
-async function selfieUrls(sessionId: string, studentIds: string[]): Promise<Record<string, string>> {
-  const out: Record<string, string> = {};
-  if (!studentIds.length) return out;
-  const now = Date.now();
-  const need: string[] = [];
-  for (const id of studentIds) {
-    const hit = urlCache.get(selfiePath(sessionId, id));
-    if (hit && hit.exp > now) out[id] = hit.url;
-    else need.push(id);
-  }
-  if (need.length) {
-    try {
-      const { data } = await supabaseAdmin().storage.from(SELFIE_BUCKET).createSignedUrls(need.map((id) => selfiePath(sessionId, id)), 600);
-      for (const row of data ?? []) {
-        const id = row.path ? row.path.split("/")[1]?.replace(/\.jpg$/, "") : "";
-        if (id && row.signedUrl) {
-          out[id] = row.signedUrl;
-          urlCache.set(selfiePath(sessionId, id), { url: row.signedUrl, exp: now + 8 * 60 * 1000 });
-        }
-      }
-    } catch {
-      // thumbnails are a bonus; the register still works without them
-    }
-    if (urlCache.size > 4000) urlCache.clear();
-  }
-  return out;
-}
-
-// A selfie is only a live check that the student is in the room. Once the session ends and
-// the attendance is recorded (the name stays in the register), the photo is deleted:
-//  - closing the session deletes its photos straight away;
-//  - sessions that simply time out are swept every 5 minutes.
 async function deleteSessionSelfies(sessionId: string): Promise<void> {
   try {
     const sb = supabaseAdmin();
     const { data: files } = await sb.storage.from(SELFIE_BUCKET).list(sessionId, { limit: 1000 });
     const paths = (files ?? []).map((f) => `${sessionId}/${f.name}`);
-    if (paths.length) {
-      await sb.storage.from(SELFIE_BUCKET).remove(paths);
-      for (const p of paths) urlCache.delete(p);
-    }
+    if (paths.length) await sb.storage.from(SELFIE_BUCKET).remove(paths);
   } catch {
     // the next sweep tries again
   }
@@ -395,25 +370,47 @@ async function sweepEndedSelfies(days: number): Promise<void> {
 setTimeout(() => void sweepEndedSelfies(14), 60 * 1000).unref();
 setInterval(() => void sweepEndedSelfies(3), 5 * 60 * 1000).unref();
 
+type StudentCard = { id: string; name: string; matric: string; level: string; department: string; avatar: string; persona: string };
+type CardRow = { id: string; first_name: string | null; attendance_full_name: string | null; attendance_matric: string | null; level: string | null; department: string | null; avatar_url: string | null; box_boy_persona: string | null };
+const CARD_COLS = "id,first_name,attendance_full_name,attendance_matric,level,department,avatar_url,box_boy_persona";
+const toCard = (p: CardRow): StudentCard => ({
+  id: p.id,
+  name: p.attendance_full_name || p.first_name || "Student",
+  matric: p.attendance_matric || "",
+  level: p.level || "",
+  department: p.department || "",
+  avatar: p.avatar_url || "",
+  persona: p.box_boy_persona || "",
+});
+
 async function rosterFor(session: SessionRow) {
   const sb = supabaseAdmin();
   const { data } = await sb
     .from("attendance_records")
-    .select("student_id,scanned_at")
+    .select("student_id,scanned_at,scanned_by,method")
     .eq("session_id", session.id)
     .order("scanned_at", { ascending: true });
-  const rows = (data ?? []) as { student_id: string; scanned_at: string }[];
-  const ids = rows.map((r) => r.student_id);
-  const info: Record<string, { name: string; matric: string }> = {};
+  const rows = (data ?? []) as { student_id: string; scanned_at: string; scanned_by: string; method: string | null }[];
+  const ids = [...new Set([...rows.map((r) => r.student_id), ...rows.map((r) => r.scanned_by)])];
+  const info: Record<string, StudentCard> = {};
   if (ids.length) {
-    const { data: ps } = await sb.from("profiles").select("id,first_name,attendance_full_name,attendance_matric").in("id", ids);
-    for (const p of (ps ?? []) as { id: string; first_name: string | null; attendance_full_name: string | null; attendance_matric: string | null }[]) {
-      info[p.id] = { name: p.attendance_full_name || p.first_name || "Student", matric: p.attendance_matric || "" };
-    }
+    const { data: ps } = await sb.from("profiles").select(CARD_COLS).in("id", ids);
+    for (const p of (ps ?? []) as CardRow[]) info[p.id] = toCard(p);
   }
-  const live = !session.closed_at && new Date(session.closes_at).getTime() > Date.now();
-  const photos = live ? await selfieUrls(session.id, ids) : {};
-  return rows.map((r) => ({ studentId: r.student_id, at: r.scanned_at, name: info[r.student_id]?.name || "Student", matric: info[r.student_id]?.matric || "", photo: photos[r.student_id] || null }));
+  return rows.map((r) => {
+    const c = info[r.student_id];
+    return {
+      studentId: r.student_id,
+      at: r.scanned_at,
+      name: c?.name || "Student",
+      matric: c?.matric || "",
+      avatar: c?.avatar || "",
+      persona: c?.persona || "",
+      method: (r.method || "code") as "scan" | "typed" | "code",
+      // Who marked them (the online code marks the student themselves).
+      by: r.method === "code" ? "" : info[r.scanned_by]?.name || "",
+    };
+  });
 }
 
 const sessionOut = (s: SessionRow) => {
@@ -424,8 +421,8 @@ const sessionOut = (s: SessionRow) => {
     id: s.id,
     course: s.course_code,
     online: isOnline(s),
-    // Only open sessions expose a code; a closed one shows nothing to copy.
-    code: open ? codeFor(s.id, w) : "",
+    // Only an open ONLINE class has a code to share; in class, passes are scanned.
+    code: open && isOnline(s) ? codeFor(s.id, w) : "",
     rotatesAt: new Date((w + 1) * rot * 1000).toISOString(),
     rotateSeconds: rot,
     week: s.week,
@@ -483,7 +480,7 @@ async function notifyPair(me: Prof, session: SessionRow): Promise<void> {
     if (!recipients.length) return;
     const who = me.first_name || (starterIsTeacher ? "Your lecturer" : "Your class rep");
     const title = `Attendance is open for ${course}`;
-    const body = `${who} started it. Open it to show the QR and watch the register.`;
+    const body = `${who} started it. Open it to scan passes and watch the register.`;
     await sb.from("notifications").insert(
       recipients.map((user_id) => ({ user_id, type: "attendance_started", title, body, course, link: "/attendance/scanner" }))
     );
@@ -599,21 +596,110 @@ router.post("/attendance/sessions/:id/close", requireAuth, async (req: Request, 
   }
 });
 
-// Student: enter the code to be marked present.
+// Student: my pass. The QR changes every PASS_SECONDS; the app fetches a new one at rotatesAt.
+router.get("/attendance/pass", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const { data } = await supabaseAdmin().from("profiles").select(CARD_COLS).eq("id", uid(req)).maybeSingle();
+    if (!data) return fail(res, 404, "Finish onboarding first.");
+    const w = passWindow();
+    res.json({
+      token: passToken(uid(req).toLowerCase(), w),
+      rotatesAt: new Date((w + 1) * PASS_SECONDS * 1000).toISOString(),
+      rotateSeconds: PASS_SECONDS,
+      student: toCard(data as CardRow),
+    });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
+// HOC or lecturer: scan a student's pass, or type their matric (dead phone) into an open session.
+router.post("/attendance/sessions/:id/scan", requireAuth, async (req: Request, res: Response) => {
+  const parsed = z
+    .object({ token: z.string().trim().min(1).max(200).optional(), matric: z.string().trim().min(3).max(30).optional() })
+    .refine((b) => !!b.token !== !!b.matric)
+    .safeParse(req.body);
+  if (!parsed.success) return fail(res, 400, "Scan a pass or type a matric number.");
+  if (!/^[0-9a-f-]{36}$/i.test(req.params.id)) return fail(res, 404, "Session not found.");
+  try {
+    const me = await getProfile(uid(req));
+    const sb = supabaseAdmin();
+    const { data } = await sb
+      .from("attendance_sessions")
+      .select("id,course_code,created_by,code,week,opens_at,closes_at,closed_at")
+      .eq("id", req.params.id)
+      .maybeSingle();
+    const s = data as SessionRow | null;
+    if (!s) return fail(res, 404, "Session not found.");
+    if (!me || !(await canScan(me, s.course_code))) return fail(res, 403, "You can only take attendance for courses you teach or represent.");
+    if (s.closed_at || new Date(s.closes_at).getTime() <= Date.now()) return fail(res, 409, "This session has ended. Start a new one to keep marking.");
+
+    const takers = async (ids: string[]) => {
+      if (!ids.length) return [] as string[];
+      const { data: e } = await sb.from("enrollments").select("user_id").eq("kind", "taking").in("course", variants(s.course_code)).in("user_id", ids);
+      return [...new Set(((e ?? []) as { user_id: string }[]).map((r) => r.user_id))];
+    };
+
+    let studentId: string;
+    const method = parsed.data.token ? "scan" : "typed";
+    if (parsed.data.token) {
+      const p = readPass(parsed.data.token);
+      if ("error" in p) return fail(res, 400, p.error);
+      studentId = p.id;
+    } else {
+      const matric = clean(parsed.data.matric);
+      const { data: ps } = await sb.from("profiles").select("id").eq("attendance_matric", matric).limit(5);
+      const ids = ((ps ?? []) as { id: string }[]).map((r) => r.id);
+      if (!ids.length) return fail(res, 404, `No student has set up ${matric} in Unify yet. Check the number.`);
+      const inCourse = await takers(ids);
+      if (inCourse.length > 1) return fail(res, 409, `More than one account uses ${matric}. Scan their pass instead.`);
+      studentId = inCourse[0] || ids[0];
+    }
+
+    const { data: prof } = await sb.from("profiles").select(CARD_COLS).eq("id", studentId).maybeSingle();
+    if (!prof) return fail(res, 404, "That student's account no longer exists.");
+    const student = toCard(prof as CardRow);
+    if (!(await takers([studentId])).length) {
+      res.json({ status: "not_enrolled", course: s.course_code, student });
+      return;
+    }
+    const { error } = await sb.from("attendance_records").insert({
+      student_id: studentId,
+      course_code: s.course_code,
+      scanned_by: me.id,
+      verified: method === "scan",
+      method,
+      week: s.week,
+      session_id: s.id,
+    });
+    if (error) {
+      if ((error as { code?: string }).code === "23505") {
+        res.json({ status: "already", course: s.course_code, student });
+        return;
+      }
+      throw error;
+    }
+    res.json({ status: "marked", method, course: s.course_code, student });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
+// Student, online class only: type the code shared in the meeting chat.
 router.post("/attendance/checkin", requireAuth, checkinLimiter, async (req: Request, res: Response) => {
-  const parsed = z.object({ code: z.string().trim().regex(/^\d{6}$/), selfie: z.string().max(260000).optional() }).safeParse(req.body);
-  if (!parsed.success) return fail(res, 400, "Enter the 6-digit code from your lecturer.");
-  if (selfieRequired() && !parsed.data.selfie) return fail(res, 400, "Take a quick photo of yourself to mark attendance.");
+  const parsed = z.object({ code: z.string().trim().regex(/^\d{6}$/) }).safeParse(req.body);
+  if (!parsed.success) return fail(res, 400, "Enter the 6-digit code from the meeting chat.");
   try {
     const me = await getProfile(uid(req));
     if (!me) return fail(res, 404, "Finish onboarding first.");
     const sb = supabaseAdmin();
-    // Find the open session whose current (or previous) rotating code matches
+    // Find the open online session whose current (or previous) rotating code matches
     // AND that the student is enrolled in: two sessions sharing a code in the
     // same window (1 in a million) can't send them to the wrong class.
     const { data: openRows } = await sb
       .from("attendance_sessions")
       .select("id,course_code,created_by,code,week,opens_at,closes_at,closed_at")
+      .eq("code", "online")
       .is("closed_at", null)
       .gt("closes_at", new Date().toISOString())
       .limit(500);
@@ -622,26 +708,16 @@ router.post("/attendance/checkin", requireAuth, checkinLimiter, async (req: Requ
       const w = windowOf(r);
       return codeFor(r.id, w) === c || codeFor(r.id, w - 1) === c;
     });
-    if (!matches.length) return fail(res, 404, "That code isn't open any more. Codes change often: check the screen (or the meeting chat) again.");
+    if (!matches.length) return fail(res, 404, "That code isn't open any more. Codes change every 10 minutes: check the meeting chat again.");
     let s: SessionRow | undefined;
     for (const m of matches) {
       const { data: e } = await sb.from("enrollments").select("course").eq("user_id", me.id).eq("kind", "taking").in("course", variants(m.course_code)).limit(1);
       if (e && e.length) { s = m; break; }
     }
     if (!s) return fail(res, 403, `You're not enrolled in ${matches[0].course_code}. Add it from Courses first.`);
-    // Save the selfie first, so a mark never exists without its photo.
-    if (parsed.data.selfie) {
-      const m = parsed.data.selfie.match(/^data:image\/jpe?g;base64,(.+)$/i);
-      if (!m) return fail(res, 400, "That photo could not be read. Take it again.");
-      const buf = Buffer.from(m[1], "base64");
-      if (buf.length < 800 || buf.length > 200 * 1024 || buf[0] !== 0xff || buf[1] !== 0xd8) return fail(res, 400, "That photo could not be read. Take it again.");
-      await ensureSelfieBucket();
-      const up = await sb.storage.from(SELFIE_BUCKET).upload(selfiePath(s.id, me.id), buf, { contentType: "image/jpeg", upsert: true });
-      if (up.error) return fail(res, 500, "Could not save your photo. Check your connection and try again.");
-    }
     const { error } = await sb
       .from("attendance_records")
-      .insert({ student_id: me.id, course_code: s.course_code, scanned_by: s.created_by, verified: true, week: s.week, session_id: s.id });
+      .insert({ student_id: me.id, course_code: s.course_code, scanned_by: s.created_by, verified: true, method: "code", week: s.week, session_id: s.id });
     if (error) {
       if ((error as { code?: string }).code === "23505") {
         res.json({ ok: true, already: true, course: s.course_code });

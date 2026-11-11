@@ -18,7 +18,7 @@ Health: `GET /healthz`. Environment is validated at build by `scripts/check-env.
 ```
 server.ts                 app wiring: compression, CORS, body limit (12 MB), logging, metrics, routers, error handler
 src/routes/v1.ts          profiles, onboarding, courses, weeks, notes, progress, publish, admin, announcements, Home updates
-src/routes/classroom.ts   timetable, class board, attendance sessions + check-in (selfies), CGPA planner, materials
+src/routes/classroom.ts   timetable, class board, attendance sessions, pass scanning, online code check-in, CGPA planner, materials
 src/routes/ops.ts         /admin/metrics, /admin/alerts/test, /metrics/vitals
 src/middleware/           requireAuth (60 s session cache), limits (per-session rate limits), requireAdmin, logger
 src/lib/                  supabase clients, metrics, alert (email watchdog), push, email (Brevo), ai (provider adapter)
@@ -30,14 +30,14 @@ scripts/                  check-env, copy-js, loadtest/
 
 - **Auth.** Every `/v1` request carries a Supabase access token. `requireAuth` confirms it with the Auth server and remembers the answer for up to 60 seconds (never past the token's expiry), so a busy session makes one Auth call a minute. A revoked session can therefore linger for up to a minute.
 - **Rate limits.** `/v1`: 240 requests a minute per signed-in session, 120 per IP when anonymous. Per session, not per IP, because a lecture hall shares one public IP. Attendance check-in: 20 per 10 minutes per student. CGPA: 1500 per 15 minutes per session. Vitals: 90 a minute.
-- **Attendance.** Rotating HMAC code (30 s windows, current and previous accepted). One shared open session per course. Check-in needs a selfie unless `ATTENDANCE_SELFIE=off`; it is saved to the private `attendance-selfies` bucket (created on first use) as `sessionId/studentId.jpg`, and the roster returns links that expire in 10 minutes. The photos are deleted when the session is closed (or within 5 minutes of it timing out); only names and times stay in the register.
+- **Attendance.** One shared open session per course. In class, `GET /v1/attendance/pass` gives the student a signed pass (`UP1.<id>.<window>.<hmac>`, 30 s windows, one either side accepted) and the HOC or lecturer posts it to `POST /v1/attendance/sessions/:id/scan`, or a matric number for a dead phone (`method` = `scan` or `typed`). Online classes use a rotating 6-digit code (10 min windows) typed at `POST /v1/attendance/checkin` (`method` = `code`). No photos; leftover selfies from before 2.19 are swept from the private `attendance-selfies` bucket.
 - **Home updates.** `GET /v1/updates` (everyone), `GET`/`PUT /v1/admin/updates` (admin). Stored as one JSON value in `app_settings` under `home_updates`, cached 30 s in memory. Links must start with `/` or `https://`.
 - **CGPA.** Current and target are numbers from 0 to 5 (target from 0.5) with at most two decimals; anything else is a 400, never rounded.
 - **Metrics and alerts.** In-memory per-minute buckets for 3 hours (a restart clears them). The watchdog emails admins on crashes, error spikes, slow responses, database trouble, high memory, event-loop stalls and bursts of browser errors. Needs `BREVO_API_KEY` and `ADMIN_EMAILS`.
 
 ## Environment
 
-See `SETUP.md` for the full table. Notable: `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `DATABASE_URL` (pooler), `DIRECT_URL`, `CORS_ORIGIN`, `ADMIN_EMAILS`, `BREVO_API_KEY` + `EMAIL_FROM`, `VAPID_*`, `ATTENDANCE_SELFIE` (`on` by default), `GEMINI_API_KEY`, `SENTRY_DSN`.
+See `SETUP.md` for the full table. Notable: `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `DATABASE_URL` (pooler), `DIRECT_URL`, `CORS_ORIGIN`, `ADMIN_EMAILS`, `BREVO_API_KEY` + `EMAIL_FROM`, `VAPID_*`, `GEMINI_API_KEY`, `SENTRY_DSN`.
 
 ## Load testing
 
