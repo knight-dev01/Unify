@@ -13,6 +13,13 @@ Screens from the design prototype (docs/unify-learn-ui), built in the app's exis
 - **Course page tabs: Weeks · Outline · Practice** (S23–S25). Each week shows your progress ("2 of 4 topics", "Done", best quiz score). Outline lists every week with its topics. Practice lists each week's quiz with your best score and attempts (past questions marked "coming once the Faculty approves them")
 - **Report a problem** on any week (S27): pick the topic and what's wrong; the week's authors, the course's lecturers and admins are told. Students stay anonymous. Authors and lecturers work through them at **Reports and reviews**, open in Studio, and mark them fixed
 - **Streak screen** (S34): current and longest streak, XP, quizzes, and the last five weeks as a calendar. The Streak number on Home opens it
+- **Lecturer course page** (L10–L12, L15, L16), reached from a new "Your courses" list on Classroom (everything already there is unchanged):
+  - **Weeks**: open any published week; "Review this week" in the reader sends errors or suggestions to the authors, signed (L13)
+  - **Report**: per week, how many students studied it and the quiz average and attempts. Counts only, never names (L11)
+  - **Attendance**: each student's classes attended of those held, lowest first, with "Under 75%" / "Under 50%" filters and a CSV download (L16)
+  - **Post**: an announcement, tip or reminder to everyone taking the course; it lands in their notifications and on the course page under "From your lecturer" (L15)
+- **Lecturer profile** (S53): the course page says "Taught by Dr Ade"; tap for their department and courses
+- Classroom has "Reports and reviews"
 - **Revision** (S35–S36): 10 shuffled recall cards from topics you've finished; reveal, then "I knew it" / "Not yet"; the ones you missed come back in another round. Linked from Home and the streak screen
 
 ## [2.21.1] - 2026-11-11

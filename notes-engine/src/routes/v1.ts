@@ -2157,11 +2157,20 @@ router.get("/courses/:code/my-progress", requireAuth, requireCourseAccess, async
     const variants = courseVariants(code);
     const { data: weekRows } = await sb.from("weeks").select("week").in("course", variants).order("week");
     const weeks = [...new Set(((weekRows ?? []) as { week: number }[]).map((w) => w.week))].sort((a, b) => a - b);
-    const [assembled, { data: prog }, { data: quiz }] = await Promise.all([
+    const [assembled, { data: prog }, { data: quiz }, { data: teach }] = await Promise.all([
       Promise.all(weeks.map((w) => assembleWeek(code, w).catch(() => null))),
       sb.from("topic_progress").select("week,topic,lecture_no").eq("user_id", userId).in("course", variants),
       sb.from("quiz_attempts").select("week,score,total").eq("user_id", userId).in("course", variants).limit(500),
+      sb.from("enrollments").select("user_id").eq("kind", "teaching").in("course", variants).limit(20),
     ]);
+    // The course's lecturers (S53: tap through to their profile).
+    const teachIds = [...new Set(((teach ?? []) as { user_id: string }[]).map((t) => t.user_id))];
+    const lecturers: { id: string; name: string }[] = [];
+    if (teachIds.length) {
+      const { data: ps } = await sb.from("profiles").select("id,first_name,role").in("id", teachIds).eq("role", "lecturer");
+      const tc = (s: string) => s.trim().toLowerCase().replace(/(^|[\s'’\-.])([a-z])/g, (_, a, b) => a + b.toUpperCase());
+      for (const p of (ps ?? []) as { id: string; first_name: string | null }[]) if (p.first_name) lecturers.push({ id: p.id, name: tc(p.first_name) });
+    }
     const done = new Map<number, Set<string>>();
     for (const p of (prog ?? []) as { week: number; topic: number; lecture_no: number | null }[]) {
       const s = done.get(p.week) || new Set<string>();
@@ -2176,6 +2185,7 @@ router.get("/courses/:code/my-progress", requireAuth, requireCourseAccess, async
     }
     res.json({
       course: code,
+      lecturers,
       weeks: weeks.map((w, i) => {
         const a = assembled[i];
         const topics = a ? topicsOf(a.note_json) : [];

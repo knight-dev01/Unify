@@ -391,7 +391,7 @@ export default function LearnPage() {
             <Share2 size={14} /> Share
           </button>
         )}
-        {!previewMode && (
+        {(!previewMode || viewer?.role === 'lecturer') && (
           <button onClick={() => setReporting(true)} style={{ display: 'flex', gap: 6, alignItems: 'center', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 9999, padding: '8px 16px', fontSize: 13, fontWeight: 700, color: 'var(--text2)' }}>
             <Flag size={14} /> {viewer?.role === 'lecturer' ? 'Review this week' : 'Report'}
           </button>

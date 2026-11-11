@@ -30,6 +30,8 @@ const AdminRolesRoute = lazyRoute(() => import('./routes/admin-roles'));
 const StreakRoute = lazyRoute(() => import('./routes/streak'));
 const RevisionRoute = lazyRoute(() => import('./routes/revision'));
 const ContentReportsRoute = lazyRoute(() => import('./routes/content-reports'));
+const LecturerCourseRoute = lazyRoute(() => import('./routes/lecturer-course'));
+const LecturerProfileRoute = lazyRoute(() => import('./routes/lecturer-profile'));
 const OnlineClassRoute = lazyRoute(() => import('./routes/online-class'));
 const LecturerHomeRoute = lazyRoute(() => import('./routes/lecturer-home'));
 const BecomeHocRoute = lazyRoute(() => import('./routes/become-hoc'));
@@ -349,6 +351,8 @@ export default function App() {
           <Route path="/streak" element={<RequireAuth><StreakRoute /></RequireAuth>} />
           <Route path="/revision" element={<RequireAuth><RevisionRoute /></RequireAuth>} />
           <Route path="/content-reports" element={<RequireAuth><ContentReportsRoute /></RequireAuth>} />
+          <Route path="/lecturer/course/:code" element={<RequireAuth><LecturerCourseRoute /></RequireAuth>} />
+          <Route path="/lecturer/profile/:id" element={<RequireAuth><LecturerProfileRoute /></RequireAuth>} />
           <Route path="/online-class" element={<RequireAuth><OnlineClassRoute /></RequireAuth>} />
           <Route path="/lecturer" element={<RequireAuth><LecturerHomeRoute /></RequireAuth>} />
           <Route path={ROUTES.screens} element={<RequireAuth><ScreensRoute /></RequireAuth>} />

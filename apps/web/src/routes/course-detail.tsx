@@ -50,6 +50,7 @@ export default function CourseDetailRoute() {
   const initialTab = searchParams.get('tab');
   const [tab, setTab] = useState<'weeks' | 'outline' | 'practice'>(initialTab === 'outline' || initialTab === 'practice' ? initialTab : 'weeks');
   const [progress, setProgress] = useState<Awaited<ReturnType<typeof api.myCourseProgress>>['weeks'] | null>(null);
+  const [lecturers, setLecturers] = useState<{ id: string; name: string }[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -89,7 +90,7 @@ export default function CourseDetailRoute() {
         // them under My Classes). Failure never blocks the weeks.
         api.timetable(courseCode).then((tt) => setSlots(tt.slots || [])).catch(() => {});
         api.materials(courseCode).then((r) => setMaterials(r.materials || [])).catch(() => {});
-        api.myCourseProgress(courseCode).then((r) => setProgress(r.weeks)).catch(() => {});
+        api.myCourseProgress(courseCode).then((r) => { setProgress(r.weeks); setLecturers(r.lecturers || []); }).catch(() => {});
       } catch (err) {
         setError(describeError(err, 'load weeks'));
       } finally {
@@ -164,6 +165,14 @@ export default function CourseDetailRoute() {
       <p style={{ color: 'var(--text2)', marginTop: 6, fontSize: 13 }}>
         {weeks.length} {weeks.length === 1 ? 'week' : 'weeks'} · pick one to start learning
       </p>
+      {lecturers.length > 0 && (
+        <p style={{ marginTop: 4, fontSize: 13 }}>
+          Taught by{' '}
+          {lecturers.map((l, i) => (
+            <span key={l.id}>{i > 0 ? ', ' : ''}<Link to={`/lecturer/profile/${l.id}`} style={{ color: 'var(--u-good)', fontWeight: 700 }}>{l.name}</Link></span>
+          ))}
+        </p>
+      )}
       {!preview && <LecturerPosts course={courseCode} />}
       {!preview && <CourseAttendance course={courseCode} totalWeeks={sem.total} currentWeek={sem.week} />}
       {/* S23–S25: Weeks · Outline · Practice */}
