@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Level admins approve class reps** (review p.7-9). An admin gives the role to an existing account for one department + level (Admin → Class reps → Level admins, HODs and deans). "Are you your class rep?" now files a request (with an optional note) that the class's level admin and the Unify admins are told about and answer in **Class rep requests**, which shows how many reps the class already has (max 3). Admins can still grant by email
 - **Attendance reports for heads of department and the Dean, counts only**: per class (department · level), students on the list and on Unify, and per course the classes held, marks and attendance rate. No names. Admins see every class (migration 0036)
+- **"From Unify" label and pinning in Notifications** (review p.5): announcements from Unify carry a FROM UNIFY tag; the admin can pin one to the top of everyone's list ("Clear all" keeps pinned ones; each can still be deleted). Announcements no longer email everyone by default: tick "Also email everyone" for what really matters (migration 0037)
 - **Semester calendar** in Admin → Academic session: the date Week 1 starts and the number of teaching weeks. Home then shows the week for everyone, the course page opens attendance on this week, and a register started without a week is filed under the current one. (The week counter existed but nothing ever set the start date, so it never showed)
 
 ### Changed

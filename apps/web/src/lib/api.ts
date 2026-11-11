@@ -211,6 +211,7 @@ export type NotificationItem = {
   topic?: number | null;
   link?: string | null;
   read?: boolean;
+  pinned?: boolean;
   created_at?: string;
 };
 
@@ -518,8 +519,8 @@ export const api = {
     apiFetch<{ links: { token: string; course: string; week: number; expires_at: string; views: number; created_at: string }[] }>('/v1/share/mine'),
   shareDelete: (token: string) =>
     apiFetch<{ ok: boolean }>(`/v1/share/${encodeURIComponent(token)}`, { method: 'DELETE' }),
-  adminAnnounce: (title: string, body: string, link?: string) =>
-    apiFetch<{ ok: boolean; reached: number; emailTo?: number }>('/v1/admin/announce', { method: 'POST', body: JSON.stringify({ title, body, link }) }),
+  adminAnnounce: (title: string, body: string, link?: string, opts?: { pin?: boolean; email?: boolean }) =>
+    apiFetch<{ ok: boolean; reached: number; emailTo?: number }>('/v1/admin/announce', { method: 'POST', body: JSON.stringify({ title, body, link, ...(opts || {}) }) }),
   adminEmailTest: (to: string) =>
     apiFetch<{ ok: boolean; status: number; body: string; sender: string; keySet: boolean; fromSet: boolean }>('/v1/admin/email/test', { method: 'POST', body: JSON.stringify({ to }) }),
   adminContent: () =>

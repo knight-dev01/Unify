@@ -511,8 +511,9 @@ router.get("/notifications", requireAuth, async (req: Request, res: Response) =>
     const sb = supabaseAdmin();
     const { data, error } = await sb
       .from("notifications")
-      .select("id,type,title,body,course,week,topic,link,read,created_at")
+      .select("id,type,title,body,course,week,topic,link,read,pinned,created_at")
       .eq("user_id", userId)
+      .order("pinned", { ascending: false })
       .order("created_at", { ascending: false })
       .limit(limit);
     if (error) throw error;
@@ -571,11 +572,12 @@ router.delete("/notifications/:id", requireAuth, async (req: Request, res: Respo
   }
 });
 
-// Authed: clear all of my notifications, including ones past the page's list limit.
+// Authed: clear all of my notifications, including ones past the page's list
+// limit. Pinned messages from Unify stay (delete those one at a time).
 router.delete("/notifications", requireAuth, async (req: Request, res: Response) => {
   const userId = (req as AuthedRequest).userId as string;
   try {
-    const { error } = await supabaseAdmin().from("notifications").delete().eq("user_id", userId);
+    const { error } = await supabaseAdmin().from("notifications").delete().eq("user_id", userId).eq("pinned", false);
     if (error) throw error;
     res.json({ ok: true });
   } catch (e) {
@@ -3333,6 +3335,10 @@ router.post("/admin/announce", requireAuth, async (req: Request, res: Response) 
       title: z.string().min(1).max(120),
       body: z.string().min(1).max(500),
       link: z.string().max(300).optional(),
+      // Pinned: stays on top of everyone's Notifications. Email: only for what really
+      // matters (review p.5); older clients that don't send it keep emailing.
+      pin: z.boolean().optional(),
+      email: z.boolean().optional(),
     })
     .safeParse(req.body);
   if (!parsed.success) {
@@ -3376,6 +3382,7 @@ router.post("/admin/announce", requireAuth, async (req: Request, res: Response) 
       title: parsed.data.title,
       body: parsed.data.body,
       link: parsed.data.link || "/dashboard",
+      pinned: !!parsed.data.pin,
     }));
     for (let i = 0; i < rows.length; i += 200) {
       const { error: iErr } = await sb.from("notifications").insert(rows.slice(i, i + 200));
@@ -3385,7 +3392,8 @@ router.post("/admin/announce", requireAuth, async (req: Request, res: Response) 
     // Email leg runs after the response (an announcement to a few thousand
     // inboxes outlives a request), but every outcome is logged with Brevo's
     // own reason and the final tally: "sent X/Y".
-    void (async () => {
+    const emailIt = parsed.data.email !== false;
+    if (emailIt) void (async () => {
       try {
         const { sendSimpleEmail } = await import("../lib/email");
         const base = (process.env.CORS_ORIGIN || "").split(",")[0].trim() || "https://unify-virid.vercel.app";
@@ -3409,7 +3417,7 @@ router.post("/admin/announce", requireAuth, async (req: Request, res: Response) 
         console.warn("[email] announce leg failed", e instanceof Error ? e.message : e);
       }
     })();
-    res.json({ ok: true, reached: ids.length, emailTo: inboxes.length });
+    res.json({ ok: true, reached: ids.length, emailTo: emailIt ? inboxes.length : 0 });
   } catch (e) {
     res.status(500).json(dbError(e));
   }

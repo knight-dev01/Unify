@@ -259,6 +259,7 @@ model Notification {
   topic     Int?
   link      String?
   read      Boolean  @default(false)
+  pinned    Boolean  @default(false) // 0037: important "From Unify" messages stay on top
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   @@index([userId, createdAt(sort: Desc)], map: "notifications_user_idx")

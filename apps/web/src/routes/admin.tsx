@@ -399,6 +399,8 @@ export default function AdminRoute() {
   const [announceBody, setAnnounceBody] = useState('');
   const [announcing, setAnnouncing] = useState(false);
   const [alsoHome, setAlsoHome] = useState(false);
+  const [pinIt, setPinIt] = useState(false);
+  const [emailIt, setEmailIt] = useState(false);
   const [updatesKey, setUpdatesKey] = useState(0);
   const [testEmail, setTestEmail] = useState('');
   const [testing, setTesting] = useState(false);
@@ -413,7 +415,7 @@ export default function AdminRoute() {
     setAnnouncing(true);
     setError('');
     try {
-      const res = await api.adminAnnounce(announceTitle.trim(), announceBody.trim());
+      const res = await api.adminAnnounce(announceTitle.trim(), announceBody.trim(), undefined, { pin: pinIt, email: emailIt });
       if (alsoHome) {
         // Same notice on everyone's Home slider (the slider has shorter limits).
         const cur = await api.adminUpdates();
@@ -851,6 +853,14 @@ export default function AdminRoute() {
         <label style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 13, margin: '0 0 8px', color: 'var(--text)' }}>
           <input type="checkbox" checked={alsoHome} onChange={(e) => setAlsoHome(e.target.checked)} />
           Also show it on everyone's Home slider
+        </label>
+        <label style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 13, margin: '0 0 8px', color: 'var(--text)' }}>
+          <input type="checkbox" checked={pinIt} onChange={(e) => setPinIt(e.target.checked)} />
+          Pin it to the top of Notifications ("Clear all" keeps it)
+        </label>
+        <label style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 13, margin: '0 0 8px', color: 'var(--text)' }}>
+          <input type="checkbox" checked={emailIt} onChange={(e) => setEmailIt(e.target.checked)} />
+          Also email everyone (only for things that really matter: account, security, big news)
         </label>
         <button onClick={() => setConfirm({ title: 'Send to everyone?', body: 'This announcement lands on every user\u2019s bell instantly.', label: 'Send', run: () => void announce() })} disabled={announcing} style={{ ...primaryBtn, width: '100%', opacity: announcing ? 0.6 : 1 }}>
           {announcing ? 'Sending…' : 'Send to all users'}
