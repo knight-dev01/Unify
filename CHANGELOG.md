@@ -5,6 +5,12 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.22.1] - 2026-11-11
+
+### Fixed
+- **Installed app icon refreshes**: the green-U icon files moved to a new address (`/icons/v5/`), which makes Android re-download the home-screen icon on its next manifest check (usually within a day of opening the app). iPhones never update a home-screen icon: remove it and Add to Home Screen again
+- **Course cards on Home** show a round Box Boy avatar when the lecturer has no photo or persona (the full-body figure was cropped badly in the small circle); the Revise card uses the same avatar
+
 ## [2.22.0] - 2026-11-11
 
 Screens from the design prototype (docs/unify-learn-ui), built in the app's existing look: same fonts, colours and components, only the structure added.
