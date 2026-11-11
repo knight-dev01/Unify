@@ -5,6 +5,19 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.18.0] - 2026-11-11
+
+### Added
+- **Delete a notification, or clear them all**: each notification has a delete button; "Clear all" (with a confirm step) empties your own list. The bell count updates straight away
+
+### Fixed
+- **Roles are set by the server only**: sign-up and profile edits can no longer choose a role. The role step and staff request screen are gone from onboarding; existing lecturers and staff keep their role
+- **HOCs can't move class**: an HOC's university, faculty, department and level are locked on Profile and in the API (403), so a class rep can't switch to another class's board
+- **Google sign-in lands on the right screen** (Home, or onboarding for new accounts) and doesn't leave the sign-in page in history
+- **Back no longer bounces between two screens**: the app keeps a trail of screens and Back walks it
+- **Home**: the "continue where you left off" card shows once, as the first slide, opening the exact topic; "1 weeks" now reads "1 week"
+- **Sign-up**: the headline no longer duplicates or overlaps Box Boy; full name is asked once (in onboarding); the Adire pattern shows in light mode
+
 ## [2.17.5] - 2026-11-10
 
 ### Changed

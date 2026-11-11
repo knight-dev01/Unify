@@ -73,7 +73,8 @@ const onboardingSchema = z.object({
   level: z.string().min(1).max(40).nullish(),
   universityId: z.string().uuid().max(80).optional(),
   gradTarget: z.number().finite().min(0).max(5).refine((v) => Math.abs(v * 100 - Math.round(v * 100)) < 1e-6, "Use at most two decimal places.").optional(),
-  role: z.enum(["student", "lecturer", "contributor"]).default("student"),
+  // No role here on purpose: every signup is a student (the column default)
+  // and other roles are granted server-side. The client never sends its own.
   semester: z.string().min(1).max(40).optional(),
   courses: z.array(z.string().min(1).max(20)).max(30).optional(),
 });
@@ -90,6 +91,27 @@ const progressSchema = z.object({
 function dbError(e: unknown): { error: string; message: string } {
   return { error: "Database error", message: e instanceof Error ? e.message : String(e) };
 }
+
+// A Head of Class posts to their own class, and class is read from the profile:
+// letting an HOC edit it would let them post to any class. Throws on a failed
+// lookup so a database blip can never wave the change through.
+async function hocClassChangeBlocked(
+  userId: string,
+  d: { university?: string | null; faculty?: string | null; department?: string | null; level?: string | null }
+): Promise<boolean> {
+  const { data, error } = await supabaseAdmin()
+    .from("profiles")
+    .select("is_hoc,university,faculty,department,level")
+    .eq("id", userId)
+    .maybeSingle();
+  if (error) throw error;
+  const p = data as { is_hoc?: boolean; university?: string | null; faculty?: string | null; department?: string | null; level?: string | null } | null;
+  if (!p?.is_hoc) return false;
+  return (["university", "faculty", "department", "level"] as const).some(
+    (k) => d[k] !== undefined && (d[k] ?? null) !== (p[k] ?? null)
+  );
+}
+const HOC_CLASS_LOCKED = "Your class is locked while you're Head of Class. Contact Unify support to change it.";
 
 function calcStreak(dateIsos: string[]): number {
   const days = new Set(dateIsos.map((d) => d.slice(0, 10)));
@@ -398,6 +420,10 @@ router.put("/me", requireAuth, async (req: Request, res: Response) => {
   const userId = (req as AuthedRequest).userId as string;
   const d = parsed.data;
   try {
+    if (await hocClassChangeBlocked(userId, d)) {
+      res.status(403).json({ error: HOC_CLASS_LOCKED });
+      return;
+    }
     const { data, error } = await supabaseAdmin()
       .from("profiles")
       .upsert(
@@ -477,6 +503,36 @@ router.post("/notifications/read", requireAuth, async (req: Request, res: Respon
   }
 });
 
+// Authed: delete one of my notifications. Scoped to the caller, so someone
+// else's id simply matches nothing.
+router.delete("/notifications/:id", requireAuth, async (req: Request, res: Response) => {
+  const parsed = z.string().uuid().safeParse(req.params.id);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid notification id" });
+    return;
+  }
+  const userId = (req as AuthedRequest).userId as string;
+  try {
+    const { error } = await supabaseAdmin().from("notifications").delete().eq("user_id", userId).eq("id", parsed.data);
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// Authed: clear all of my notifications, including ones past the page's list limit.
+router.delete("/notifications", requireAuth, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  try {
+    const { error } = await supabaseAdmin().from("notifications").delete().eq("user_id", userId);
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
 // ---- Web Push subscriptions (browser push, third notify leg) ----
 const pushSubSchema = z.object({
   endpoint: z.string().url().max(1000),
@@ -536,7 +592,8 @@ router.post("/onboarding", requireAuth, async (req: Request, res: Response) => {
   }
   const userId = (req as AuthedRequest).userId as string;
   const d = parsed.data;
-  // Roles are immutable: new profiles may set one, existing ones keep theirs.
+  // Role is never written here: a new row takes the column default (student)
+  // and an existing row keeps whatever the server granted it.
   let isNewProfile = true;
   try {
     const { data: existing } = await supabaseAdmin()
@@ -544,17 +601,16 @@ router.post("/onboarding", requireAuth, async (req: Request, res: Response) => {
       .select("role")
       .eq("id", userId)
       .single();
-    const current = (existing as { role?: string } | null)?.role;
-    if (current && d.role !== current) {
-      res.status(403).json({ error: "Role cannot be changed once assigned" });
-      return;
-    }
-    isNewProfile = !current;
+    isNewProfile = !(existing as { role?: string } | null)?.role;
   } catch {
     // No existing profile (or lookup failed) -> treat as new, continue.
     isNewProfile = true;
   }
   try {
+    if (await hocClassChangeBlocked(userId, d)) {
+      res.status(403).json({ error: HOC_CLASS_LOCKED });
+      return;
+    }
     const { data, error } = await supabaseAdmin()
       .from("profiles")
       .upsert(
@@ -568,7 +624,6 @@ router.post("/onboarding", requireAuth, async (req: Request, res: Response) => {
           university_id: d.universityId ?? null,
           grad_target: d.gradTarget ?? null,
           ...(d.gradTarget != null ? { cgpa_target: d.gradTarget } : {}),
-          role: d.role,
           semester: d.semester ?? null,
           updated_at: new Date().toISOString(),
         },
@@ -577,13 +632,14 @@ router.post("/onboarding", requireAuth, async (req: Request, res: Response) => {
       .select("*")
       .single();
     if (error) throw error;
+    const isStudent = ((data as { role?: string } | null)?.role || "student") === "student";
     // Enrollments: full replace (taking for students, teaching for authors).
     if (d.courses && d.courses.length) {
       const sb2 = supabaseAdmin();
       const codes = [...new Set(d.courses.map((c) => String(c).trim().toUpperCase()).filter(Boolean))];
       const { data: known } = await sb2.from("courses").select("code").in("code", codes);
       const valid = new Set(((known ?? []) as { code: string }[]).map((r) => r.code));
-      const kind = d.role === "student" ? "taking" : "teaching";
+      const kind = isStudent ? "taking" : "teaching";
       await sb2.from("enrollments").delete().eq("user_id", userId);
       const rows = codes.filter((c) => valid.has(c)).map((course) => ({ user_id: userId, course, kind }));
       if (rows.length) {
@@ -594,15 +650,14 @@ router.post("/onboarding", requireAuth, async (req: Request, res: Response) => {
     // First onboarding ever: drop a welcome notification (re-saves skip it).
     if (isNewProfile) {
       try {
-        const student = d.role === "student";
         await supabaseAdmin().from("notifications").insert({
           user_id: userId,
           type: "welcome",
           title: "Welcome to Unify Learn",
-          body: student
+          body: isStudent
             ? "Your courses are set. Open Week 1 of any course and mark your first topic complete."
             : "Your author account is ready. Open the Studio to publish your first topic.",
-          link: student ? "/course" : "/studio",
+          link: isStudent ? "/course" : "/studio",
         });
       } catch {
         // onboarding must never fail on a nicety
