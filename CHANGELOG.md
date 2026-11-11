@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Class rep empty states: "You haven't added this week's classes yet" with Add class times, and "Post your first announcement to your class" with New post
 
 ### Changed
+- **Sign-up**: "Where are you studying?" lists 15 popular Nigerian universities greyed out as "Coming soon" under LASU; inside LASU, Engineering is open, Environmental Sciences and Agriculture say "Coming very soon" and the other faculties "Coming soon". The name step has one Box Boy (the floating one is gone). "Continue with Google" uses Google's multicolour G
 - **Menu is Home · Timetable · Class · Me** (Courses came off; courses open from the cards on Home)
 - **Timetable shows classes only**: My pass, My attendance, Class board and My courses came off it. My pass is now at the top of the Class tab
 
