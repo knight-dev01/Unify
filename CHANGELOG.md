@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Semester calendar** in Admin → Academic session: the date Week 1 starts and the number of teaching weeks. Home then shows the week for everyone, the course page opens attendance on this week, and a register started without a week is filed under the current one. (The week counter existed but nothing ever set the start date, so it never showed)
 
 ### Changed
+- **Me shows your picture; tap it to change** (Box Boy or a photo). The persona picker no longer sits open at the top
 - **Home greeting card** adds "Week 3 of 12 · 400L · department · faculty · LASU" (the greeting and proverb stay, as decided)
 - **Course cards** show the course's lecturer only (not contributors), with names capitalised ("Dr Yussuf"), and their photo or Box Boy persona instead of letter circles and generated patterns. No delete icon on the cards: courses are removed in Manage courses
 - **Sign-up**: "Where are you studying?" lists 15 popular Nigerian universities greyed out as "Coming soon" under LASU; inside LASU, Engineering is open, Environmental Sciences and Agriculture say "Coming very soon" and the other faculties "Coming soon". The name step has one Box Boy (the floating one is gone). "Continue with Google" uses Google's multicolour G
