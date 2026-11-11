@@ -378,8 +378,11 @@ model AttendanceSession {
   opensAt    DateTime  @default(now()) @map("opens_at") @db.Timestamptz(6)
   closesAt   DateTime  @map("closes_at") @db.Timestamptz(6)
   closedAt   DateTime? @map("closed_at") @db.Timestamptz(6)
+  slotId     String?   @map("slot_id") @db.Uuid // class_slots.id: which timetabled class this register is for
+  label      String    @default("") // "Extra class", or the slot's day and time
 
   @@index([courseCode, opensAt(sort: Desc)])
+  @@index([courseCode, week], map: "attendance_sessions_course_week_idx")
   @@map("attendance_sessions")
 }
 

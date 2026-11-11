@@ -81,9 +81,10 @@ export default function HocDashboardRoute() {
         </div>
       </div>
 
-      {(isHoc || isAdmin) && (
-        <Link to={ROUTES.classList} className="btn btn--white btn--block" style={{ marginTop: 16 }}>Class list</Link>
-      )}
+      <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+        <Link to={ROUTES.attendancePass} className="btn btn--amber" style={{ flex: 1 }}>My pass</Link>
+        {(isHoc || isAdmin) && <Link to={ROUTES.classList} className="btn btn--white" style={{ flex: 1 }}>Class list</Link>}
+      </div>
       {(isHoc || isAdmin) && (
         <Card style={{ marginTop: 16, gap: 10 }}>
           <Label>Post to your class</Label>

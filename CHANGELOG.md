@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.21.0] - 2026-11-11
 
+### Added
+- **Attendance on the course page.** Students see "Came to 3 of 4 classes held" and each week 1–12 at a glance (green all, amber some, red none). The class rep and lecturer get **Take attendance** there: pick the week and the class on the timetable (today's is preselected) or **Extra class**, and every past register is listed with its count; tap one to open it, see who was absent and download it. Each class gets its own register (migration 0034)
+
+### Changed
+- **Menu is Home · Timetable · Class · Me** (Courses came off; courses open from the cards on Home)
+- **Timetable shows classes only**: My pass, My attendance, Class board and My courses came off it. My pass is now at the top of the Class tab
+
 ### Security
 - **Row-level security on every table** (migration 0033). The app only reaches the database through the API's service key, so nothing changes in the app; the public keys can no longer read or write any table directly
 - **Storage writes narrowed**: only lecturers, contributors and admins can upload Studio diagrams, and only the uploader can replace or delete their own. Before, any signed-in student could upload to, overwrite or delete files in the avatars, audio and diagrams buckets. Public reading is unchanged

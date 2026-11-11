@@ -160,47 +160,6 @@ export default function TimetableRoute() {
         )}
       </div>
 
-      <ListCard style={{ marginTop: 16 }}>
-        <Link to={ROUTES.attendancePass} className="row" style={{ gap: 12, padding: '14px 16px', textDecoration: 'none', color: 'var(--u-text)' }}>
-          <ClipboardCheck size={20} />
-          <div className="grow stack" style={{ gap: 2 }}>
-            <div className="t-15 w-6">My pass</div>
-            <div className="t-13 muted">Show your QR to your class rep or lecturer</div>
-          </div>
-          <ChevronRight size={18} />
-        </Link>
-        <Link to={ROUTES.attendanceMine} className="row" style={{ gap: 12, padding: '14px 16px', textDecoration: 'none', color: 'var(--u-text)' }}>
-          <CalendarCheck size={20} />
-          <div className="grow stack" style={{ gap: 2 }}>
-            <div className="t-15 w-6">My attendance</div>
-            <div className="t-13 muted">Attended vs held, per course</div>
-          </div>
-          <ChevronRight size={18} />
-        </Link>
-        <Link to={ROUTES.hoc} className="row" style={{ gap: 12, padding: '14px 16px', textDecoration: 'none', color: 'var(--u-text)' }}>
-          <Megaphone size={20} />
-          <div className="grow stack" style={{ gap: 2 }}>
-            <div className="t-15 w-6">Class board</div>
-            <div className="t-13 muted">Announcements and tips from your HOC</div>
-          </div>
-          <ChevronRight size={18} />
-        </Link>
-      </ListCard>
-
-      {courses.length > 0 && (
-        <Link
-          to={ROUTES.courses}
-          className="card"
-          style={{ marginTop: 16, display: 'flex', gap: 12, alignItems: 'center', textDecoration: 'none', color: 'var(--u-text)' }}
-        >
-          <BookOpen size={20} />
-          <div style={{ flex: 1 }}>
-            <div className="t-15 w-6">My courses</div>
-            <div className="t-13 muted">{courses.length} enrolled · open notes and quizzes</div>
-          </div>
-          <ChevronRight size={18} />
-        </Link>
-      )}
     </div>
   );
 }

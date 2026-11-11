@@ -354,7 +354,12 @@ async function enrolledCount(course: string): Promise<number> {
   return count ?? 0;
 }
 
-type SessionRow = { id: string; course_code: string; created_by: string; code: string; week: number | null; opens_at: string; closes_at: string; closed_at: string | null };
+type SessionRow = {
+  id: string; course_code: string; created_by: string; code: string; week: number | null;
+  opens_at: string; closes_at: string; closed_at: string | null; slot_id?: string | null; label?: string | null;
+};
+const SESSION_COLS = "id,course_code,created_by,code,week,opens_at,closes_at,closed_at,slot_id,label";
+const DAY_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 // ---------- Old attendance selfies ----------
 // Selfies are no longer taken (dropped 2026-11-11). Photos left from earlier
@@ -487,6 +492,8 @@ const sessionOut = (s: SessionRow) => {
     rotatesAt: new Date((w + 1) * rot * 1000).toISOString(),
     rotateSeconds: rot,
     week: s.week,
+    label: s.label || "",
+    slotId: s.slot_id || "",
     opensAt: s.opens_at,
     closesAt: s.closes_at,
     open,
@@ -568,6 +575,9 @@ router.post("/attendance/sessions", requireAuth, async (req: Request, res: Respo
       minutes: z.number().int().min(1).max(180).optional(),
       online: z.boolean().optional(),
       meetLink: z.string().trim().max(300).url().refine((u) => /^https:\/\//i.test(u), "Use a link that starts with https://").optional(),
+      // Which class on the timetable this register is for, or an extra class.
+      slotId: z.string().uuid().optional(),
+      extra: z.boolean().optional(),
     })
     .safeParse(req.body);
   if (!parsed.success) return fail(res, 400, "Pick a course.");
@@ -581,7 +591,7 @@ router.post("/attendance/sessions", requireAuth, async (req: Request, res: Respo
     // register) instead of starting a rival one that would split the class.
     const { data: live } = await sb
       .from("attendance_sessions")
-      .select("id,course_code,created_by,code,week,opens_at,closes_at,closed_at")
+      .select(SESSION_COLS)
       .in("course_code", variants(course))
       .is("closed_at", null)
       .gt("closes_at", new Date().toISOString())
@@ -591,6 +601,16 @@ router.post("/attendance/sessions", requireAuth, async (req: Request, res: Respo
     if (joined) {
       res.json({ session: await sessionView(joined, me.id), ...(await registerFor(joined)), enrolled: await enrolledCount(course), joined: true });
       return;
+    }
+    // Which class this new register is for (checked only when starting one, never when joining).
+    let slotId: string | null = null;
+    let label = parsed.data.extra ? "Extra class" : "";
+    if (parsed.data.slotId && !parsed.data.extra) {
+      const { data: slot } = await sb.from("class_slots").select("id,course,day,start_time").eq("id", parsed.data.slotId).maybeSingle();
+      const sl = slot as { id: string; course: string; day: number; start_time: string } | null;
+      if (!sl || (!variants(course).includes(sl.course) && !variants(sl.course).includes(course))) return fail(res, 400, "That class isn't on this course's timetable.");
+      slotId = sl.id;
+      label = `${DAY_SHORT[sl.day] || ""} ${sl.start_time}`.trim();
     }
     // Tidy any expired-but-unclosed leftovers for this course.
     await sb
@@ -604,8 +624,8 @@ router.post("/attendance/sessions", requireAuth, async (req: Request, res: Respo
     const closesAt = new Date(Date.now() + mins * 60 * 1000).toISOString();
     const { data, error } = await sb
       .from("attendance_sessions")
-      .insert({ course_code: course, created_by: me.id, code: online ? "online" : "", week: parsed.data.week ?? null, closes_at: closesAt })
-      .select("id,course_code,created_by,code,week,opens_at,closes_at,closed_at")
+      .insert({ course_code: course, created_by: me.id, code: online ? "online" : "", week: parsed.data.week ?? null, closes_at: closesAt, slot_id: slotId, label })
+      .select(SESSION_COLS)
       .single();
     if (error) throw error;
     void notifyPair(me, data as SessionRow);
@@ -623,12 +643,11 @@ router.get("/attendance/sessions", requireAuth, async (req: Request, res: Respon
   try {
     const me = await getProfile(uid(req));
     if (!me || !(await canScan(me, course))) return fail(res, 403, "You can only view attendance for courses you teach or represent.");
-    const { data } = await supabaseAdmin()
-      .from("attendance_sessions")
-      .select("id,course_code,created_by,code,week,opens_at,closes_at,closed_at")
-      .in("course_code", variants(course))
-      .order("opens_at", { ascending: false })
-      .limit(1);
+    // ?session=ID opens one past register (from the course page); otherwise the latest.
+    const sid = String(req.query.session || "");
+    let q = supabaseAdmin().from("attendance_sessions").select(SESSION_COLS).in("course_code", variants(course));
+    if (/^[0-9a-f-]{36}$/i.test(sid)) q = q.eq("id", sid);
+    const { data } = await q.order("opens_at", { ascending: false }).limit(1);
     const s = ((data ?? []) as SessionRow[])[0];
     if (!s) {
       res.json({ session: null, present: [], absent: [], listed: null, lists: [], enrolled: await enrolledCount(course) });
@@ -647,7 +666,7 @@ router.get("/attendance/sessions/:id/register.csv", requireAuth, async (req: Req
     const me = await getProfile(uid(req));
     const { data } = await supabaseAdmin()
       .from("attendance_sessions")
-      .select("id,course_code,created_by,code,week,opens_at,closes_at,closed_at")
+      .select(SESSION_COLS)
       .eq("id", req.params.id)
       .maybeSingle();
     const s = data as SessionRow | null;
@@ -720,7 +739,7 @@ router.post("/attendance/sessions/:id/scan", requireAuth, async (req: Request, r
     const sb = supabaseAdmin();
     const { data } = await sb
       .from("attendance_sessions")
-      .select("id,course_code,created_by,code,week,opens_at,closes_at,closed_at")
+      .select(SESSION_COLS)
       .eq("id", req.params.id)
       .maybeSingle();
     const s = data as SessionRow | null;
@@ -836,7 +855,7 @@ router.post("/attendance/checkin", requireAuth, checkinLimiter, async (req: Requ
     // same window (1 in a million) can't send them to the wrong class.
     const { data: openRows } = await sb
       .from("attendance_sessions")
-      .select("id,course_code,created_by,code,week,opens_at,closes_at,closed_at")
+      .select(SESSION_COLS)
       .eq("code", "online")
       .is("closed_at", null)
       .gt("closes_at", new Date().toISOString())
@@ -894,6 +913,86 @@ router.get("/attendance/mine", requireAuth, async (req: Request, res: Response) 
       out.push({ course, held: count ?? 0, attended: records.filter((r) => norm(r.course_code) === norm(course)).length });
     }
     res.json({ courses: out, recent: records.slice(0, 10).map((r) => ({ course: r.course_code, at: r.scanned_at })) });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
+// Course page: my attendance in this course week by week ("Came to 3 of 4
+// classes held"), and for the class rep / lecturer the timetable classes to
+// start a register for plus every register so far.
+router.get("/attendance/course", requireAuth, async (req: Request, res: Response) => {
+  const course = clean(req.query.course);
+  if (!course) return fail(res, 400, "Pass ?course=CODE.");
+  try {
+    const me = await getProfile(uid(req));
+    if (!me) return fail(res, 404, "Finish onboarding first.");
+    const sb = supabaseAdmin();
+    const { data: sess } = await sb
+      .from("attendance_sessions")
+      .select(SESSION_COLS)
+      .in("course_code", variants(course))
+      .order("opens_at", { ascending: false })
+      .limit(500);
+    const sessions = (sess ?? []) as SessionRow[];
+    const ids = sessions.map((s) => s.id);
+
+    // Mine: by account, or by my class-list entry (typed in before I joined).
+    const entry = await entryOfStudent(me.id);
+    const mineSet = new Set<string>();
+    for (let i = 0; i < ids.length; i += 300) {
+      const chunk = ids.slice(i, i + 300);
+      const { data } = await sb
+        .from("attendance_records")
+        .select("session_id")
+        .in("session_id", chunk)
+        .or(entry ? `student_id.eq.${me.id},entry_id.eq.${entry.id}` : `student_id.eq.${me.id}`);
+      for (const r of (data ?? []) as { session_id: string }[]) mineSet.add(r.session_id);
+    }
+    const byWeek = new Map<number, { held: number; attended: number }>();
+    for (const s of sessions) {
+      const w = s.week ?? 0;
+      const row = byWeek.get(w) || { held: 0, attended: 0 };
+      row.held++;
+      if (mineSet.has(s.id)) row.attended++;
+      byWeek.set(w, row);
+    }
+    const mine = {
+      held: sessions.length,
+      attended: sessions.filter((s) => mineSet.has(s.id)).length,
+      weeks: [...byWeek].map(([week, v]) => ({ week, ...v })).sort((a, b) => a.week - b.week),
+    };
+
+    const canTake = await canScan(me, course);
+    if (!canTake) {
+      res.json({ course, canTake, mine, slots: [], registers: [] });
+      return;
+    }
+    const { data: slotRows } = await sb.from("class_slots").select("id,day,start_time,end_time,venue").in("course", variants(course)).order("day").order("start_time");
+    const counts = new Map<string, number>();
+    for (let i = 0; i < ids.length; i += 300) {
+      const { data } = await sb.from("attendance_records").select("session_id").in("session_id", ids.slice(i, i + 300)).limit(20000);
+      for (const r of (data ?? []) as { session_id: string }[]) counts.set(r.session_id, (counts.get(r.session_id) || 0) + 1);
+    }
+    const cl = await listsForCourse(course);
+    const listed = cl.lists.length ? (await expectedEntries(cl)).length : null;
+    res.json({
+      course,
+      canTake,
+      mine,
+      listed,
+      slots: ((slotRows ?? []) as { id: string; day: number; start_time: string; end_time: string; venue: string }[]).map((s) => ({
+        id: s.id, day: s.day, start: s.start_time, end: s.end_time, venue: s.venue || "",
+      })),
+      registers: sessions.map((s) => ({
+        id: s.id,
+        week: s.week,
+        label: s.label || (isOnline(s) ? "Online class" : ""),
+        opensAt: s.opens_at,
+        open: !s.closed_at && new Date(s.closes_at).getTime() > Date.now(),
+        present: counts.get(s.id) || 0,
+      })),
+    });
   } catch (e) {
     dbFail(res, e);
   }
