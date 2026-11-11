@@ -87,6 +87,10 @@ const profileSchema = onboardingSchema.partial().extend({
   // Quiet hours for push (Lagos time). Both null to switch off.
   quietStart: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/).nullable().optional(),
   quietEnd: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/).nullable().optional(),
+  // Onboarding S09/S10.
+  studyGoal: z.enum(["grades", "habit", "understand", "together", "balance"]).optional(),
+  studyTime: z.enum(["morning", "afternoon", "evening", "night", "any"]).optional(),
+  focusMinutes: z.number().int().min(10).max(120).optional(),
 });
 
 const progressSchema = z.object({
@@ -498,6 +502,9 @@ router.put("/me", requireAuth, async (req: Request, res: Response) => {
           ...(typeof d.notifyNewNotes === "boolean" ? { notify_new_notes: d.notifyNewNotes } : {}),
           ...(d.quietStart !== undefined ? { quiet_start: d.quietStart } : {}),
           ...(d.quietEnd !== undefined ? { quiet_end: d.quietEnd } : {}),
+          ...(d.studyGoal ? { study_goal: d.studyGoal } : {}),
+          ...(d.studyTime ? { study_time: d.studyTime } : {}),
+          ...(d.focusMinutes ? { focus_minutes: d.focusMinutes } : {}),
           updated_at: new Date().toISOString(),
         },
         { onConflict: "id" }

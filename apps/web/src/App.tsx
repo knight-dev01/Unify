@@ -35,6 +35,7 @@ const LecturerProfileRoute = lazyRoute(() => import('./routes/lecturer-profile')
 const SettingsRoute = lazyRoute(() => import('./routes/settings'));
 const LecturerWelcomeRoute = lazyRoute(() => import('./routes/lecturer-welcome'));
 const ClassDetailRoute = lazyRoute(() => import('./routes/class-detail'));
+const OnboardingFinishRoute = lazyRoute(() => import('./routes/onboarding-finish'));
 const NotificationSettingsRoute = lazyRoute(() => import('./routes/settings').then((m) => ({ default: m.NotificationSettingsRoute })));
 const OnlineClassRoute = lazyRoute(() => import('./routes/online-class'));
 const LecturerHomeRoute = lazyRoute(() => import('./routes/lecturer-home'));
@@ -227,6 +228,7 @@ export default function App() {
             </RequireAuth>
           }
         />
+        <Route path="/onboarding/finish" element={<RequireAuth><OnboardingFinishRoute /></RequireAuth>} />
         <Route element={<Layout />}>
           <Route path="/" element={<Navigate to="/auth" replace />} />
           <Route

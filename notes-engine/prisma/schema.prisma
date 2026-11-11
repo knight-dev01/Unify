@@ -53,6 +53,9 @@ model Profile {
   isHoc         Boolean     @default(false) @map("is_hoc")
   quietStart    String?     @map("quiet_start") // 0038: no push between quiet_start and quiet_end (Lagos, HH:MM)
   quietEnd      String?     @map("quiet_end")
+  studyGoal     String?     @map("study_goal") // 0040: onboarding S09
+  studyTime     String?     @map("study_time") // 0040: onboarding S10
+  focusMinutes  Int?        @map("focus_minutes")
   hocApprovedAt DateTime?   @map("hoc_approved_at") @db.Timestamptz(6)
   hocApprovedBy String?     @map("hoc_approved_by") @db.Uuid
   createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)

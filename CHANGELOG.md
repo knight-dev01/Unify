@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Class detail** (S41): tap a class on the Timetable for its time, venue, lecturer, this week's status, Open the course and Join online
 - **This week's class can be cancelled, moved or not confirmed** by the class rep or lecturer (from the class detail); everyone taking the course gets a notification. The Timetable shows it: red bar and 'Cancelled', black bar and 'Moved' with the new time/room, amber dashed bar and 'Not confirmed'. Only that week changes; 'Back to normal' undoes it (migration 0039)
 - **Class board filters** (S42): All, Announcements, Tips, Questions
+- **End of onboarding** (S09–S13): after the Box Boy picker (which new students now actually reach), four short screens: what you're working towards this semester, when you read best and how long you can focus, 'Want a little push?' to turn on reminders, and 'Bag that first class' opening your first course. Answers are saved to shape reminders (migration 0040)
 - **Quiz results** (S32) show each question as right or wrong and how long the quiz took
 
 ## [2.22.3] - 2026-11-11
