@@ -18,7 +18,10 @@ Health: `GET /healthz`. Environment is validated at build by `scripts/check-env.
 ```
 server.ts                 app wiring: compression, CORS, body limit (12 MB), logging, metrics, routers, error handler
 src/routes/v1.ts          profiles, onboarding, courses, weeks, notes, progress, publish, admin, announcements, Home updates
-src/routes/classroom.ts   timetable, class board, attendance sessions, pass scanning, online code check-in, CGPA planner, materials
+src/routes/classroom.ts   timetable, class board, attendance sessions, pass scanning, register + CSV, online code check-in, CGPA planner, materials
+src/routes/classlist.ts   class lists: HOC upload/parse/review, edits and history, student claims, LASU email codes, HOC inbox
+src/lib/classlist.ts      claiming entries, attaching attendance, which lists a course's register uses
+src/lib/classlistParse.ts reads CSV, .xlsx, .docx, PDF (unpdf) and pasted text into name + matric rows
 src/routes/ops.ts         /admin/metrics, /admin/alerts/test, /metrics/vitals
 src/middleware/           requireAuth (60 s session cache), limits (per-session rate limits), requireAdmin, logger
 src/lib/                  supabase clients, metrics, alert (email watchdog), push, email (Brevo), ai (provider adapter)

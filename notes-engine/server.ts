@@ -172,6 +172,9 @@ app.use("/v1", v1.default || v1);
 // Head-of-Class posts + in-person attendance (separate file: v1.ts is already huge).
 const classroom = require("./src/routes/classroom");
 app.use("/v1", classroom.default || classroom);
+// Class lists: HOC uploads, student claims, the HOC's claim inbox.
+const classlist = require("./src/routes/classlist");
+app.use("/v1", classlist.default || classlist);
 // Live performance + browser vitals for the admin panel.
 const ops = require("./src/routes/ops");
 app.use("/v1", ops.default || ops);

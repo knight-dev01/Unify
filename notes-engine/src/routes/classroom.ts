@@ -6,6 +6,7 @@ import { z } from "zod";
 import { supabaseAdmin } from "../lib/supabase";
 import { requireAuth, type AuthedRequest } from "../middleware/requireAuth";
 import { sendPushToUsers } from "../lib/push";
+import { ENTRY_COLS, entryOfStudent, expectedEntries, institutionOf, listForClass, listsForCourse, notTaking, type EntryRow } from "../lib/classlist";
 
 // Classroom features on top of v1: Head-of-Class posts and in-person
 // attendance by session code. Mounted at /v1 (see server.ts).
@@ -253,6 +254,20 @@ router.post("/hoc/grant", requireAuth, async (req: Request, res: Response) => {
     if (!t) return fail(res, 404, "No account with that email.");
     if (t.role !== "student") return fail(res, 400, "Only students can be Head of Class.");
     const revoke = !!parsed.data.revoke;
+    // At most 3 class reps per class (department + level).
+    if (!revoke) {
+      const { data: tp } = await sb.from("profiles").select("department,level").eq("id", t.id).maybeSingle();
+      const cls = tp as { department: string | null; level: string | null } | null;
+      if (!cls?.department || !cls.level) return fail(res, 400, "They need a department and level on their profile first.");
+      const { count } = await sb
+        .from("profiles")
+        .select("id", { count: "exact", head: true })
+        .eq("is_hoc", true)
+        .eq("department", cls.department)
+        .eq("level", cls.level)
+        .neq("id", t.id);
+      if ((count ?? 0) >= 3) return fail(res, 409, `${cls.department} ${cls.level} already has 3 class reps. Remove one first.`);
+    }
     const { error } = await sb
       .from("profiles")
       .update({ is_hoc: !revoke, hoc_approved_at: revoke ? null : new Date().toISOString(), hoc_approved_by: revoke ? null : me.id })
@@ -285,6 +300,12 @@ router.put("/attendance/profile", requireAuth, async (req: Request, res: Respons
     .safeParse(req.body);
   if (!parsed.success) return fail(res, 400, "Enter your full name and matric number.");
   try {
+    // Once the class rep has uploaded the class list, the name and matric come
+    // from the list: the student claims their entry instead (/class-list/claim).
+    const me = await getProfile(uid(req));
+    if (me?.department && me.level && (await listForClass(institutionOf(), me.department, me.level))) {
+      return res.status(409).json({ error: "Your class list is up. Find yourself on it with your matric number.", classList: true });
+    }
     const { error } = await supabaseAdmin()
       .from("profiles")
       .update({ attendance_full_name: parsed.data.fullName, attendance_matric: parsed.data.matric.toUpperCase() })
@@ -383,34 +404,74 @@ const toCard = (p: CardRow): StudentCard => ({
   persona: p.box_boy_persona || "",
 });
 
-async function rosterFor(session: SessionRow) {
+type PresentRow = {
+  studentId: string;
+  entryId: string;
+  at: string;
+  name: string;
+  matric: string;
+  avatar: string;
+  persona: string;
+  method: "scan" | "typed" | "code";
+  by: string;
+  // null: the class rep hasn't uploaded a class list for this course yet.
+  onList: boolean | null;
+};
+
+async function rosterFor(session: SessionRow, listIds?: Set<string>): Promise<PresentRow[]> {
   const sb = supabaseAdmin();
+  if (!listIds) listIds = new Set((await listsForCourse(session.course_code)).lists.map((l) => l.id));
   const { data } = await sb
     .from("attendance_records")
-    .select("student_id,scanned_at,scanned_by,method")
+    .select("student_id,entry_id,scanned_at,scanned_by,method")
     .eq("session_id", session.id)
     .order("scanned_at", { ascending: true });
-  const rows = (data ?? []) as { student_id: string; scanned_at: string; scanned_by: string; method: string | null }[];
-  const ids = [...new Set([...rows.map((r) => r.student_id), ...rows.map((r) => r.scanned_by)])];
+  const rows = (data ?? []) as { student_id: string | null; entry_id: string | null; scanned_at: string; scanned_by: string; method: string | null }[];
+  const ids = [...new Set([...rows.map((r) => r.student_id || ""), ...rows.map((r) => r.scanned_by)].filter(Boolean))];
   const info: Record<string, StudentCard> = {};
   if (ids.length) {
     const { data: ps } = await sb.from("profiles").select(CARD_COLS).in("id", ids);
     for (const p of (ps ?? []) as CardRow[]) info[p.id] = toCard(p);
   }
+  const entryIds = [...new Set(rows.map((r) => r.entry_id || "").filter(Boolean))];
+  const entries: Record<string, EntryRow> = {};
+  for (let i = 0; i < entryIds.length; i += 300) {
+    const { data: es } = await sb.from("class_list_entries").select(ENTRY_COLS).in("id", entryIds.slice(i, i + 300));
+    for (const e of (es ?? []) as EntryRow[]) entries[e.id] = e;
+  }
   return rows.map((r) => {
-    const c = info[r.student_id];
+    const c = r.student_id ? info[r.student_id] : undefined;
+    const e = r.entry_id ? entries[r.entry_id] : undefined;
     return {
-      studentId: r.student_id,
+      studentId: r.student_id || "",
+      entryId: r.entry_id || "",
       at: r.scanned_at,
-      name: c?.name || "Student",
-      matric: c?.matric || "",
+      // The class list is the source of truth for names on the register.
+      name: e?.full_name || c?.name || "Student",
+      matric: e?.matric || c?.matric || "",
       avatar: c?.avatar || "",
       persona: c?.persona || "",
       method: (r.method || "code") as "scan" | "typed" | "code",
       // Who marked them (the online code marks the student themselves).
       by: r.method === "code" ? "" : info[r.scanned_by]?.name || "",
+      onList: listIds!.size ? !!e && listIds!.has(e.list_id) : null,
     };
   });
+}
+
+// The full register: who's present, and (once a class list exists) who's absent.
+async function registerFor(session: SessionRow) {
+  const cl = await listsForCourse(session.course_code);
+  const listIds = new Set(cl.lists.map((l) => l.id));
+  const present = await rosterFor(session, listIds);
+  if (!cl.lists.length) return { present, absent: [] as { entryId: string; name: string; matric: string; joined: boolean; notTaking: boolean }[], listed: null as number | null, lists: [] as string[] };
+  const expected = await expectedEntries(cl);
+  const here = new Set(present.map((p) => p.entryId).filter(Boolean));
+  const hereStudents = new Set(present.map((p) => p.studentId).filter(Boolean));
+  const absent = expected
+    .filter((e) => !here.has(e.id) && !(e.student_id && hereStudents.has(e.student_id)))
+    .map((e) => ({ entryId: e.id, name: e.full_name, matric: e.matric, joined: !!e.student_id, notTaking: notTaking(cl, e) }));
+  return { present, absent, listed: expected.length, lists: cl.lists.map((l) => `${l.department} · ${l.level}`) };
 }
 
 const sessionOut = (s: SessionRow) => {
@@ -528,7 +589,7 @@ router.post("/attendance/sessions", requireAuth, async (req: Request, res: Respo
       .limit(1);
     const joined = ((live ?? []) as SessionRow[])[0];
     if (joined) {
-      res.json({ session: await sessionView(joined, me.id), present: await rosterFor(joined), enrolled: await enrolledCount(course), joined: true });
+      res.json({ session: await sessionView(joined, me.id), ...(await registerFor(joined)), enrolled: await enrolledCount(course), joined: true });
       return;
     }
     // Tidy any expired-but-unclosed leftovers for this course.
@@ -549,7 +610,7 @@ router.post("/attendance/sessions", requireAuth, async (req: Request, res: Respo
     if (error) throw error;
     void notifyPair(me, data as SessionRow);
     if (online) void notifyOnline(me, data as SessionRow, parsed.data.meetLink);
-    res.json({ session: await sessionView(data as SessionRow, me.id), present: [], enrolled: await enrolledCount(course) });
+    res.json({ session: await sessionView(data as SessionRow, me.id), ...(await registerFor(data as SessionRow)), enrolled: await enrolledCount(course) });
   } catch (e) {
     dbFail(res, e);
   }
@@ -570,10 +631,43 @@ router.get("/attendance/sessions", requireAuth, async (req: Request, res: Respon
       .limit(1);
     const s = ((data ?? []) as SessionRow[])[0];
     if (!s) {
-      res.json({ session: null, present: [], enrolled: await enrolledCount(course) });
+      res.json({ session: null, present: [], absent: [], listed: null, lists: [], enrolled: await enrolledCount(course) });
       return;
     }
-    res.json({ session: await sessionView(s, me.id), present: await rosterFor(s), enrolled: await enrolledCount(course) });
+    res.json({ session: await sessionView(s, me.id), ...(await registerFor(s)), enrolled: await enrolledCount(course) });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
+// The register as a spreadsheet: present and absent, one row each.
+router.get("/attendance/sessions/:id/register.csv", requireAuth, async (req: Request, res: Response) => {
+  if (!/^[0-9a-f-]{36}$/i.test(req.params.id)) return fail(res, 404, "Session not found.");
+  try {
+    const me = await getProfile(uid(req));
+    const { data } = await supabaseAdmin()
+      .from("attendance_sessions")
+      .select("id,course_code,created_by,code,week,opens_at,closes_at,closed_at")
+      .eq("id", req.params.id)
+      .maybeSingle();
+    const s = data as SessionRow | null;
+    if (!s) return fail(res, 404, "Session not found.");
+    if (!me || !(await canScan(me, s.course_code))) return fail(res, 403, "You can only export registers for courses you teach or represent.");
+    const reg = await registerFor(s);
+    const how = { scan: "Pass scanned", typed: "Matric typed", code: "Online code" } as const;
+    const esc = (v: string) => (/[",\n\r]/.test(v) || /^[=+\-@]/.test(v) ? `"${(/^[=+\-@]/.test(v) ? "'" : "") + v.replace(/"/g, '""')}"` : v);
+    const lagos = (iso: string) => new Date(iso).toLocaleString("en-GB", { timeZone: "Africa/Lagos", hour12: false });
+    const lines = [["Name", "Matric", "Status", "How", "Time (Lagos)", "Marked by", "On class list"].join(",")];
+    for (const p of [...reg.present].sort((a, b) => a.name.localeCompare(b.name))) {
+      lines.push([p.name, p.matric, "Present", how[p.method] || p.method, lagos(p.at), p.by, p.onList === null ? "" : p.onList ? "Yes" : "No"].map(esc).join(","));
+    }
+    for (const a of reg.absent) lines.push([a.name, a.matric, "Absent", a.notTaking ? "Hasn't added this course on Unify" : "", "", "", "Yes"].map(esc).join(","));
+    const day = new Date(s.opens_at).toLocaleDateString("en-CA", { timeZone: "Africa/Lagos" });
+    const file = `${s.course_code.replace(/\s+/g, "")}-register-${day}.csv`;
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader("Content-Disposition", `attachment; filename="${file}"`);
+    res.setHeader("Cache-Control", "no-store");
+    res.send("﻿" + lines.join("\r\n"));
   } catch (e) {
     dbFail(res, e);
   }
@@ -640,31 +734,75 @@ router.post("/attendance/sessions/:id/scan", requireAuth, async (req: Request, r
       return [...new Set(((e ?? []) as { user_id: string }[]).map((r) => r.user_id))];
     };
 
-    let studentId: string;
+    // Once the class rep has uploaded a class list, the register is the list:
+    // a typed matric must be on it, and a scanned pass is matched to its entry.
+    const cl = await listsForCourse(s.course_code);
+    const listIds = cl.lists.map((l) => l.id);
+    const blankCard = (name: string, matric: string): StudentCard => ({ id: "", name, matric, level: "", department: "", avatar: "", persona: "" });
+
+    let studentId: string | null = null;
+    let entry: EntryRow | null = null;
     const method = parsed.data.token ? "scan" : "typed";
     if (parsed.data.token) {
       const p = readPass(parsed.data.token);
       if ("error" in p) return fail(res, 400, p.error);
       studentId = p.id;
+      if (listIds.length) {
+        const { data: es } = await sb.from("class_list_entries").select(ENTRY_COLS).eq("student_id", studentId).in("list_id", listIds).is("removed_at", null).limit(1);
+        entry = ((es ?? []) as EntryRow[])[0] ?? null;
+      }
     } else {
-      const matric = clean(parsed.data.matric);
-      const { data: ps } = await sb.from("profiles").select("id").eq("attendance_matric", matric).limit(5);
-      const ids = ((ps ?? []) as { id: string }[]).map((r) => r.id);
-      if (!ids.length) return fail(res, 404, `No student has set up ${matric} in Unify yet. Check the number.`);
-      const inCourse = await takers(ids);
-      if (inCourse.length > 1) return fail(res, 409, `More than one account uses ${matric}. Scan their pass instead.`);
-      studentId = inCourse[0] || ids[0];
+      const matric = clean(parsed.data.matric).replace(/\s+/g, "");
+      if (listIds.length) {
+        const { data: es } = await sb.from("class_list_entries").select(ENTRY_COLS).eq("matric", matric).in("list_id", listIds).is("removed_at", null).limit(2);
+        entry = ((es ?? []) as EntryRow[])[0] ?? null;
+        if (!entry) {
+          res.json({ status: "not_on_list", course: s.course_code, student: blankCard("Not on this class list", matric) });
+          return;
+        }
+        studentId = entry.student_id;
+      } else {
+        const { data: ps } = await sb.from("profiles").select("id").eq("attendance_matric", matric).limit(5);
+        const ids = ((ps ?? []) as { id: string }[]).map((r) => r.id);
+        if (!ids.length) return fail(res, 404, `No student has set up ${matric} in Unify yet. Check the number.`);
+        const inCourse = await takers(ids);
+        if (inCourse.length > 1) return fail(res, 409, `More than one account uses ${matric}. Scan their pass instead.`);
+        studentId = inCourse[0] || ids[0];
+      }
     }
 
-    const { data: prof } = await sb.from("profiles").select(CARD_COLS).eq("id", studentId).maybeSingle();
-    if (!prof) return fail(res, 404, "That student's account no longer exists.");
-    const student = toCard(prof as CardRow);
-    if (!(await takers([studentId])).length) {
+    let student: StudentCard;
+    if (studentId) {
+      const { data: prof } = await sb.from("profiles").select(CARD_COLS).eq("id", studentId).maybeSingle();
+      if (!prof) return fail(res, 404, "That student's account no longer exists.");
+      student = toCard(prof as CardRow);
+      if (entry) student = { ...student, name: entry.full_name, matric: entry.matric };
+    } else {
+      // On the class list but not on Unify yet: marked against the entry.
+      student = blankCard(entry!.full_name, entry!.matric);
+    }
+    // A pass from someone not taking the course and not on its class list.
+    if (studentId && !entry && !(await takers([studentId])).length) {
       res.json({ status: "not_enrolled", course: s.course_code, student });
       return;
     }
+    const onList = listIds.length ? !!entry : null;
+    if (entry) {
+      // Same person, other route: typed by matric earlier, or scanned earlier.
+      const { data: dup } = await sb
+        .from("attendance_records")
+        .select("id")
+        .eq("session_id", s.id)
+        .or(studentId ? `entry_id.eq.${entry.id},student_id.eq.${studentId}` : `entry_id.eq.${entry.id}`)
+        .limit(1);
+      if (dup && dup.length) {
+        res.json({ status: "already", course: s.course_code, student, onList });
+        return;
+      }
+    }
     const { error } = await sb.from("attendance_records").insert({
       student_id: studentId,
+      entry_id: entry?.id ?? null,
       course_code: s.course_code,
       scanned_by: me.id,
       verified: method === "scan",
@@ -674,12 +812,12 @@ router.post("/attendance/sessions/:id/scan", requireAuth, async (req: Request, r
     });
     if (error) {
       if ((error as { code?: string }).code === "23505") {
-        res.json({ status: "already", course: s.course_code, student });
+        res.json({ status: "already", course: s.course_code, student, onList });
         return;
       }
       throw error;
     }
-    res.json({ status: "marked", method, course: s.course_code, student });
+    res.json({ status: "marked", method, course: s.course_code, student, onList });
   } catch (e) {
     dbFail(res, e);
   }
@@ -715,9 +853,10 @@ router.post("/attendance/checkin", requireAuth, checkinLimiter, async (req: Requ
       if (e && e.length) { s = m; break; }
     }
     if (!s) return fail(res, 403, `You're not enrolled in ${matches[0].course_code}. Add it from Courses first.`);
+    const entry = await entryOfStudent(me.id);
     const { error } = await sb
       .from("attendance_records")
-      .insert({ student_id: me.id, course_code: s.course_code, scanned_by: s.created_by, verified: true, method: "code", week: s.week, session_id: s.id });
+      .insert({ student_id: me.id, entry_id: entry?.id ?? null, course_code: s.course_code, scanned_by: s.created_by, verified: true, method: "code", week: s.week, session_id: s.id });
     if (error) {
       if ((error as { code?: string }).code === "23505") {
         res.json({ ok: true, already: true, course: s.course_code });

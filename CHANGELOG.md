@@ -5,6 +5,35 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.20.0] - 2026-11-11
+
+### Added
+- **Class lists.** The class rep uploads their class's names and matric numbers once, as Excel (.xlsx), Word (.docx), PDF, CSV or pasted text (photos can't be read). The app finds the name and matric columns, skips titles and serial numbers, and flags duplicates, matric numbers that look different from the rest, and lines without a matric before anything is saved. Uploading again only adds new names. The rep can edit, remove (kept, restorable) and add one student at a time; every change is in a history
+- **Students find themselves on the list** the first time they open My pass, by matric number; their register name then comes from the list. Verifying with the LASU student email (firstname.lastnameMATRIC@st.lasu.edu.ng, code by email) is offered but not required. Students whose matric they'd already typed into Unify are linked automatically when the list goes up, with the attendance they already have
+- **Class rep's inbox**: "I'm not on the list" and "someone else claimed my matric" go to the class rep, who adds them / gives them the entry or declines with a note. The student is told either way
+- **Register shows who's absent** (everyone on the class list not marked) and downloads as a CSV (name, matric, present or absent, how, time, who marked them)
+- **Typed matric numbers must be on the class list**: the scanner says "Not on this class list" and keeps the number in the box to fix. A student typed in before they joined Unify keeps that attendance when they join
+- At most 3 class reps per class
+- **Scan several passes at once**: a few students can hold their passes up together and each is marked (tested with 5 in one view). The last five results stack under the camera
+- Students who claimed their class-list entry but haven't added the course in Unify still count on the register, labelled "Hasn't added this course on Unify"
+
+### Changed
+- **Sign-in page**: headline "Own your academic journey" (Playfair, once per screen) with "Everything you need to keep up with your courses, plan your grades and stay ahead of class, in one place"; new cards (Everything for your course, together · Know where your CGPA is heading · Practice before the exam does it for you); the Sign In tab says "Welcome back". The splash uses the new line too
+- **Wordmark is "Unify Learn"** (both words in Playfair, no full stop between)
+- Graduation target: "Pass 1.50" is now "Third Class 1.50", with "Pass 1.00" added
+- Uploaded class-list files are never stored: they're read in memory and only the names and matric numbers are saved
+- Only the class's reps (and admins) see its class list; lecturers see names through the register of courses they teach
+- The Class board's "Take attendance (show QR)" button is now "Class list"; "Become your class HOC" moved to Me as "Are you your class rep?"
+- "Add courses" is now "Manage courses" everywhere; the empty timetable says "Your class rep hasn't posted times yet"
+- The lecturer's Take attendance card says "scan students' passes" (it still said "share the code")
+
+### Removed
+- "Change email" on Me
+
+### Notes
+- Migration 0032 adds the class-list tables (tagged with the institution, LASU for now, so other universities can be added later) and lets attendance records attach to a class-list entry
+- The API adds `unpdf` 1.9.1 to read PDF class lists
+
 ## [2.19.0] - 2026-11-11
 
 ### Changed

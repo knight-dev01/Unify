@@ -302,7 +302,7 @@ model DeviceKey {
 
 model AttendanceRecord {
   id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  studentId  String   @map("student_id") @db.Uuid
+  studentId  String?  @map("student_id") @db.Uuid // null: typed from the class list before the student joined
   courseCode String   @map("course_code")
   scannedBy  String   @map("scanned_by") @db.Uuid
   scannedAt  DateTime @default(now()) @map("scanned_at") @db.Timestamptz(6)
@@ -310,6 +310,7 @@ model AttendanceRecord {
   week       Int?
   sessionId  String?  @map("session_id") @db.Uuid
   method     String   @default("code") // scan (pass scanned) | typed (matric typed by HOC/lecturer) | code (online code)
+  entryId    String?  @map("entry_id") @db.Uuid // class_list_entries.id
 
   @@index([studentId, courseCode])
   @@index([courseCode, scannedAt])
@@ -380,4 +381,80 @@ model AttendanceSession {
 
   @@index([courseCode, opensAt(sort: Desc)])
   @@map("attendance_sessions")
+}
+
+// Class lists (0032). One list per class: institution + department + level.
+model ClassList {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  institution String   @default("LASU")
+  department  String
+  level       String
+  createdBy   String?  @map("created_by") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([institution, department, level], map: "class_lists_class_key")
+  @@map("class_lists")
+}
+
+model ClassListEntry {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  listId        String    @map("list_id") @db.Uuid
+  institution   String    @default("LASU")
+  matric        String
+  fullName      String    @map("full_name")
+  studentId     String?   @map("student_id") @db.Uuid
+  claimedAt     DateTime? @map("claimed_at") @db.Timestamptz(6)
+  claimMethod   String?   @map("claim_method") // matric | email | hoc | auto
+  verifiedEmail String?   @map("verified_email")
+  removedAt     DateTime? @map("removed_at") @db.Timestamptz(6)
+  addedBy       String?   @map("added_by") @db.Uuid
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@unique([listId, matric], map: "class_list_entries_matric_key")
+  @@index([institution, matric], map: "class_list_entries_matric_idx")
+  @@map("class_list_entries")
+}
+
+model ClassListLog {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  listId    String   @map("list_id") @db.Uuid
+  entryId   String?  @map("entry_id") @db.Uuid
+  actorId   String?  @map("actor_id") @db.Uuid
+  action    String
+  detail    Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([listId, createdAt(sort: Desc)], map: "class_list_log_list_idx")
+  @@map("class_list_log")
+}
+
+model ClassListClaim {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  listId        String    @map("list_id") @db.Uuid
+  studentId     String    @map("student_id") @db.Uuid
+  matric        String
+  fullName      String    @default("") @map("full_name")
+  reason        String // not_on_list | already_claimed
+  verifiedEmail String?   @map("verified_email")
+  note          String    @default("")
+  status        String    @default("open") // open | approved | rejected
+  resolvedBy    String?   @map("resolved_by") @db.Uuid
+  resolvedAt    DateTime? @map("resolved_at") @db.Timestamptz(6)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([listId, status, createdAt(sort: Desc)], map: "class_list_claims_open_idx")
+  @@map("class_list_claims")
+}
+
+model ClassClaimCode {
+  studentId String   @id @map("student_id") @db.Uuid
+  email     String
+  matric    String
+  codeHash  String   @map("code_hash")
+  attempts  Int      @default(0)
+  sentAt    DateTime @default(now()) @map("sent_at") @db.Timestamptz(6)
+  expiresAt DateTime @map("expires_at") @db.Timestamptz(6)
+
+  @@map("class_claim_codes")
 }

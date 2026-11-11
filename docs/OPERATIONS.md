@@ -33,6 +33,8 @@ Bump the version in four places and add a changelog entry (see the root `README.
 
 - **Profile pictures** go to the public `avatars` bucket, 320 px JPEG, normally under 60 KB, cached for a year (the URL carries a version stamp).
 - **Attendance takes no photos** (selfies were dropped in 2.19.0). Students show a QR pass that changes every 30 seconds and the class rep or lecturer scans it. The register keeps the student's name, matric, time, how they were marked (scanned, typed in, online code) and who marked them. Photos left from earlier versions in the private `attendance-selfies` bucket are swept automatically.
+- **Class lists** (2.20.0) hold names and matric numbers per class (`class_lists`, `class_list_entries`, tagged `institution = 'LASU'`). Only that class's HOCs and admins can read a list; lecturers see names only on the register of a course they teach. A course's register uses the lists for the course's level(s) in the departments of students taking it; a claimed student who doesn't take the course isn't counted absent. Removing an entry keeps it (and its attendance) and can be undone. Every change is in `class_list_log`.
+- **LASU email verification** for class-list claims is optional. It sends a 6-digit code through Brevo to `…@st.lasu.edu.ng`. Before relying on it, have a LASU student confirm the code arrives (school mail servers can block outside senders); if it doesn't, students still claim by matric and the class rep resolves disputes.
 
 ## Home slider updates
 
