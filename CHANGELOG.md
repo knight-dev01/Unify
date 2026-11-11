@@ -20,6 +20,9 @@ Screens from the design prototype (docs/unify-learn-ui), built in the app's exis
   - **Post**: an announcement, tip or reminder to everyone taking the course; it lands in their notifications and on the course page under "From your lecturer" (L15)
 - **Lecturer profile** (S53): the course page says "Taught by Dr Ade"; tap for their department and courses
 - Classroom has "Reports and reviews"
+- **Settings** (S48), opened from a new row on Me: profile and picture, attendance details, class rep, CGPA plan, notifications, theme, version
+- **Notification settings** (S49): push on this phone, new-note emails, and **quiet hours** (no push between, say, 22:00 and 07:00 Lagos time; everything still waits in Notifications, and a class going live always comes through)
+- **States**: a course link that doesn't exist says "We can't find MEE 999" with Manage courses (S73); My pass offline past its grace window shows "Reconnect to refresh your pass" instead of a code that would be refused (S74); a wrong online-class code says why under the box (S72)
 - **Revision** (S35–S36): 10 shuffled recall cards from topics you've finished; reveal, then "I knew it" / "Not yet"; the ones you missed come back in another round. Linked from Home and the streak screen
 
 ## [2.21.1] - 2026-11-11

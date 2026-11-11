@@ -51,6 +51,7 @@ export default function CourseDetailRoute() {
   const [tab, setTab] = useState<'weeks' | 'outline' | 'practice'>(initialTab === 'outline' || initialTab === 'practice' ? initialTab : 'weeks');
   const [progress, setProgress] = useState<Awaited<ReturnType<typeof api.myCourseProgress>>['weeks'] | null>(null);
   const [lecturers, setLecturers] = useState<{ id: string; name: string }[]>([]);
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -92,7 +93,9 @@ export default function CourseDetailRoute() {
         api.materials(courseCode).then((r) => setMaterials(r.materials || [])).catch(() => {});
         api.myCourseProgress(courseCode).then((r) => { setProgress(r.weeks); setLecturers(r.lecturers || []); }).catch(() => {});
       } catch (err) {
-        setError(describeError(err, 'load weeks'));
+        // S73: a course code that doesn't exist (old link, typo) gets its own state.
+        if ((err as { status?: number }).status === 404) setNotFound(true);
+        else setError(describeError(err, 'load weeks'));
       } finally {
         setLoading(false);
       }
@@ -123,6 +126,16 @@ export default function CourseDetailRoute() {
     log.warn('route', `course detail with empty code (url=${window.location.href})`);
     return <Navigate to="/courses" replace />;
   }
+  if (notFound)
+    return (
+      <div style={{ maxWidth: 'var(--shell, 480px)', margin: '0 auto', padding: '20px 16px 80px', textAlign: 'center' }}>
+        <BackButton to={backTo} />
+        <div style={{ display: 'flex', justifyContent: 'center' }}><BoxBoy pose="peeking" width={90} /></div>
+        <h1 style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 20, marginTop: 12 }}>We can't find {courseCode}</h1>
+        <p style={{ color: 'var(--text2)', fontSize: 14, margin: '8px 0 20px' }}>The link may be old, or the course isn't on Unify yet.</p>
+        <Link to="/courses/find" className="btn btn--amber">Manage courses</Link>
+      </div>
+    );
   if (blocked)
     return (
       <div style={{ maxWidth: 'var(--shell, 480px)', margin: '0 auto', padding: '20px 16px 80px', textAlign: 'center' }}>
