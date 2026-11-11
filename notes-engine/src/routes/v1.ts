@@ -6,7 +6,8 @@ import { z } from "zod";
 import { supabaseAdmin } from "../lib/supabase";
 import { getSemesterCalendar, forgetSemesterCalendar } from "../lib/calendar";
 import { notifyCoursePublished, notifyInAppNewNote } from "../lib/email";
-import { pushNewNote, pushAnnounce, pushToUser } from "../lib/push";
+import { pushNewNote, pushAnnounce, pushToUser, sendPushToUsers } from "../lib/push";
+const sendPushToUsersSafe = (ids: string[], p: { title: string; body: string; url: string }) => sendPushToUsers(ids, p).catch(() => {});
 import { requireAuth, type AuthedRequest } from "../middleware/requireAuth";
 import { requireAuthor } from "../middleware/requireAuthor";
 import { requireCourseAccess } from "../middleware/requireCourseAccess";
@@ -2382,6 +2383,92 @@ router.get("/teaching", requireAuth, async (req: Request, res: Response) => {
   }
 });
 
+// The date (YYYY-MM-DD, Lagos) of weekday `day` (0 Sun … 6 Sat) in the current Mon–Sun week.
+function thisWeekDate(day: number): string {
+  const today = new Date(new Date().toLocaleString("en-US", { timeZone: "Africa/Lagos" }));
+  const dow = today.getDay();
+  const mondayOffset = (dow + 6) % 7; // days since Monday
+  const target = (day + 6) % 7; // Monday-based index of the slot's day
+  const d = new Date(today);
+  d.setDate(today.getDate() - mondayOffset + target);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+// Class rep / lecturer: this week's class is cancelled, moved or not confirmed yet
+// (or back to normal with status "normal"). Students taking the course are told.
+router.post("/timetable/:id/change", requireAuth, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  const hhmm = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
+  const parsed = z
+    .object({
+      status: z.enum(["cancelled", "moved", "unconfirmed", "normal"]),
+      date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+      start: hhmm.optional(),
+      end: hhmm.optional(),
+      venue: z.string().trim().max(120).optional(),
+      note: z.string().trim().max(200).optional(),
+    })
+    .safeParse(req.body);
+  if (!parsed.success || !/^[0-9a-f-]{36}$/i.test(req.params.id)) {
+    res.status(400).json({ error: "Pick cancelled, moved, not confirmed or normal." });
+    return;
+  }
+  try {
+    const sb = supabaseAdmin();
+    const { data: slot } = await sb.from("class_slots").select("id,course,day,start_time,end_time,venue").eq("id", req.params.id).maybeSingle();
+    const s = slot as { id: string; course: string; day: number; start_time: string; end_time: string; venue: string } | null;
+    if (!s) {
+      res.status(404).json({ error: "Class not found." });
+      return;
+    }
+    if (!(await canSetTimetable(userId, s.course))) {
+      res.status(403).json({ error: "Only your class rep or the course lecturer changes class times." });
+      return;
+    }
+    const d = parsed.data;
+    const date = d.date || thisWeekDate(s.day);
+    if (d.status === "moved" && !d.start && !d.venue) {
+      res.status(400).json({ error: "Say where or when it moved to." });
+      return;
+    }
+    if (d.status === "normal") {
+      await sb.from("slot_changes").delete().eq("slot_id", s.id).eq("class_date", date);
+    } else {
+      const { error } = await sb.from("slot_changes").upsert(
+        { slot_id: s.id, class_date: date, status: d.status, new_start: d.start || null, new_end: d.end || null, new_venue: d.venue || null, note: d.note || "", changed_by: userId },
+        { onConflict: "slot_id,class_date" }
+      );
+      if (error) throw error;
+    }
+    // Tell everyone taking the course (bell + push). Never fails the change.
+    try {
+      const { data: takers } = await sb.from("enrollments").select("user_id").eq("kind", "taking").in("course", [...new Set([s.course, s.course.replace(/\s/g, "")])]).limit(3000);
+      const ids = [...new Set(((takers ?? []) as { user_id: string }[]).map((t) => t.user_id))].filter((x) => x !== userId);
+      const day = new Date(`${date}T12:00:00`).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
+      const title =
+        d.status === "cancelled" ? `${s.course} on ${day} is cancelled`
+        : d.status === "moved" ? `${s.course} on ${day} has moved`
+        : d.status === "unconfirmed" ? `${s.course} on ${day} isn't confirmed yet`
+        : `${s.course} on ${day} is back on as normal`;
+      const body = [
+        d.status === "moved" ? `Now ${d.start || s.start_time}${d.end ? `–${d.end}` : ""}${d.venue ? ` · ${d.venue}` : ""}.` : d.status === "normal" ? `${s.start_time}–${s.end_time}${s.venue ? ` · ${s.venue}` : ""}.` : "",
+        d.note || "",
+      ].filter(Boolean).join(" ");
+      if (ids.length) {
+        for (let i = 0; i < ids.length; i += 500) {
+          await sb.from("notifications").insert(ids.slice(i, i + 500).map((user_id) => ({ user_id, type: "class_change", title, body: body || "Check the timetable.", course: s.course, link: "/timetable" })));
+        }
+        void sendPushToUsersSafe(ids, { title, body: body || "Check the timetable.", url: "/timetable" });
+      }
+    } catch {
+      // the change is saved either way
+    }
+    res.json({ ok: true, date });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
 // Read a course timetable (every signed-in user: students see class times).
 router.get("/timetable", requireAuth, async (req: Request, res: Response) => {
   const course = cleanCode(String(req.query.course || ""));
@@ -2408,17 +2495,31 @@ router.get("/timetable", requireAuth, async (req: Request, res: Response) => {
         if (p.first_name && p.role === "lecturer") names[p.id] = p.first_name;
       }
     }
+    // This week's date for each slot (Mon–Sun, Lagos) and any one-off change for it.
+    const dates = rows.map((r) => thisWeekDate(r.day));
+    const changes: Record<string, { status: string; new_start: string | null; new_end: string | null; new_venue: string | null; note: string }> = {};
+    if (rows.length) {
+      const { data: ch } = await sb.from("slot_changes").select("slot_id,class_date,status,new_start,new_end,new_venue,note").in("slot_id", rows.map((r) => r.id)).in("class_date", [...new Set(dates)]);
+      for (const c of (ch ?? []) as { slot_id: string; class_date: string; status: string; new_start: string | null; new_end: string | null; new_venue: string | null; note: string }[]) {
+        changes[`${c.slot_id}|${c.class_date}`] = c;
+      }
+    }
     res.json({
-      slots: rows.map((r) => ({
-        id: r.id,
-        course: r.course,
-        day: r.day,
-        start: r.start_time,
-        end: r.end_time,
-        venue: r.venue,
-        meetLink: r.meet_link || "",
-        lecturer: names[r.lecturer_id] || "",
-      })),
+      slots: rows.map((r, i) => {
+        const c = changes[`${r.id}|${dates[i]}`];
+        return {
+          id: r.id,
+          course: r.course,
+          day: r.day,
+          start: r.start_time,
+          end: r.end_time,
+          venue: r.venue,
+          meetLink: r.meet_link || "",
+          lecturer: names[r.lecturer_id] || "",
+          date: dates[i],
+          change: c ? { status: c.status, start: c.new_start || "", end: c.new_end || "", venue: c.new_venue || "", note: c.note || "" } : null,
+        };
+      }),
     });
   } catch (e) {
     res.status(500).json(dbError(e));

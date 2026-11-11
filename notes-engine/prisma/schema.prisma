@@ -389,6 +389,23 @@ model AttendanceSession {
   @@map("attendance_sessions")
 }
 
+// 0039: this week's class cancelled / moved / not confirmed (the weekly slot is untouched)
+model SlotChange {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slotId    String   @map("slot_id") @db.Uuid
+  classDate DateTime @map("class_date") @db.Date
+  status    String // cancelled | moved | unconfirmed
+  newStart  String?  @map("new_start")
+  newEnd    String?  @map("new_end")
+  newVenue  String?  @map("new_venue")
+  note      String   @default("")
+  changedBy String?  @map("changed_by") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@unique([slotId, classDate], map: "slot_changes_one_per_date")
+  @@map("slot_changes")
+}
+
 // 0038: student "report a problem" + lecturer "review this week" (one queue)
 model ContentReport {
   id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid

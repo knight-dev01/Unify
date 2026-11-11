@@ -218,7 +218,8 @@ export type NotificationItem = {
 };
 
 export type NoteAuthor = { name: string; avatar: string };
-export type ClassSlot = { id: string; course: string; day: number; start: string; end: string; venue: string; lecturer: string; meetLink?: string };
+export type SlotChange = { status: 'cancelled' | 'moved' | 'unconfirmed'; start: string; end: string; venue: string; note: string };
+export type ClassSlot = { id: string; course: string; day: number; start: string; end: string; venue: string; lecturer: string; meetLink?: string; date?: string; change?: SlotChange | null };
 export type RosterStudent = { id: string; name: string; email: string; level: string; topicsDone: number; quizzesTaken: number; lastActive: string | null };
 export type AdminContentTopic = { topic: number; lecture: number; versions: number; title: string };
 export type AdminContentWeek = { week: number; title: string; topics: AdminContentTopic[] };
@@ -640,6 +641,8 @@ export const api = {
   materialAdd: (payload: { course: string; week: number; type: Material['type']; title: string; url: string }) =>
     apiFetch<{ ok: boolean; id: string }>('/v1/materials', { method: 'POST', body: JSON.stringify(payload) }),
   materialDelete: (id: string) => apiFetch<{ ok: boolean }>(`/v1/materials/${id}`, { method: 'DELETE' }),
+  slotChange: (id: string, payload: { status: SlotChange['status'] | 'normal'; start?: string; end?: string; venue?: string; note?: string }) =>
+    apiFetch<{ ok: boolean; date: string }>(`/v1/timetable/${id}/change`, { method: 'POST', body: JSON.stringify(payload) }),
   slotDelete: (id: string) =>
     apiFetch<{ ok: boolean }>(`/v1/timetable/${id}`, { method: 'DELETE' }),
   roster: (course: string) =>

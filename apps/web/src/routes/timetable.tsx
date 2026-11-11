@@ -126,24 +126,29 @@ export default function TimetableRoute() {
           <ListCard>
             {daySlots.map((s) => {
               const st = state(s);
+              const ch = s.change;
+              // Colour only means status (design S37): red cancelled, amber dashed not confirmed, black moved.
+              const bar = ch?.status === 'cancelled' ? '4px solid var(--u-red, #dc2626)' : ch?.status === 'unconfirmed' ? '4px dashed var(--u-amber)' : ch?.status === 'moved' ? '4px solid var(--text)' : '4px solid transparent';
               return (
+                <div key={s.id} style={{ borderLeft: bar }}>
                 <ListRow
-                  key={s.id}
-                  title={<span style={{ opacity: st === 'done' ? 0.5 : 1 }}>{s.course}</span>}
+                  onClick={() => navigate(`/timetable/class/${encodeURIComponent(s.course)}/${s.id}`)}
+                  title={<span style={{ opacity: st === 'done' || ch?.status === 'cancelled' ? 0.5 : 1 }}>{s.course}</span>}
                   sub={
                     <span style={{ display: 'inline-flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-                      <span>{s.start}–{s.end}</span>
-                      {s.venue && (
-                        <span style={{ display: 'inline-flex', gap: 3, alignItems: 'center' }}>
-                          <MapPin size={12} /> {s.venue}
+                      <span style={{ textDecoration: ch?.status === 'cancelled' || (ch?.status === 'moved' && ch.start) ? 'line-through' : undefined }}>{s.start}–{s.end}</span>
+                      {ch?.status === 'moved' && ch.start && <span style={{ fontWeight: 700 }}>{ch.start}{ch.end ? `–${ch.end}` : ''}</span>}
+                      {(ch?.status === 'moved' && ch.venue ? ch.venue : s.venue) && (
+                        <span style={{ display: 'inline-flex', gap: 3, alignItems: 'center', fontWeight: ch?.status === 'moved' && ch.venue ? 700 : undefined }}>
+                          <MapPin size={12} /> {ch?.status === 'moved' && ch.venue ? ch.venue : s.venue}
                         </span>
                       )}
                       {s.lecturer && <span>{s.lecturer}</span>}
                     </span>
                   }
                   right={
-                    <span style={{ display: 'inline-flex', gap: 8, alignItems: 'center' }}>
-                      {st === 'now' ? <Pill tone="good">Now</Pill> : st === 'next' ? <Pill tone="amber">Next</Pill> : null}
+                    <span style={{ display: 'inline-flex', gap: 8, alignItems: 'center' }} onClick={(e) => e.stopPropagation()}>
+                      {ch?.status === 'cancelled' ? <Pill tone="bad">Cancelled</Pill> : ch?.status === 'moved' ? <Pill tone="dark">Moved</Pill> : ch?.status === 'unconfirmed' ? <Pill tone="amber">Not confirmed</Pill> : st === 'now' ? <Pill tone="good">Now</Pill> : st === 'next' ? <Pill tone="amber">Next</Pill> : null}
                       {isHoc && (
                         <button
                           aria-label={`Remove ${s.course} ${DAY_SHORT[s.day]} ${s.start}`}
@@ -171,6 +176,7 @@ export default function TimetableRoute() {
                     </span>
                   }
                 />
+                </div>
               );
             })}
           </ListCard>

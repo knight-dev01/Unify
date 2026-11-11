@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Add 30 min** to an online class that's running over (L19), up to 3 hours from the start
 - **Studio quiz builder** (C04): Number questions (answer, ± tolerance, unit) and Maths questions (accepted expressions; Studio warns if one can't be read by the checker) alongside MCQ and fill-in; the count line shows multiple choice (at least 6) and written
 - **Studio lists everything left to fix** (C05) before Review unlocks, as a card, instead of the first three in one line
+- **Class detail** (S41): tap a class on the Timetable for its time, venue, lecturer, this week's status, Open the course and Join online
+- **This week's class can be cancelled, moved or not confirmed** by the class rep or lecturer (from the class detail); everyone taking the course gets a notification. The Timetable shows it: red bar and 'Cancelled', black bar and 'Moved' with the new time/room, amber dashed bar and 'Not confirmed'. Only that week changes; 'Back to normal' undoes it (migration 0039)
+- **Class board filters** (S42): All, Announcements, Tips, Questions
 - **Quiz results** (S32) show each question as right or wrong and how long the quiz took
 
 ## [2.22.3] - 2026-11-11
