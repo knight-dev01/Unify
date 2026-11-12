@@ -26,6 +26,7 @@ const HocDashboardRoute = lazyRoute(() => import('./routes/hoc-dashboard'));
 const ClassListRoute = lazyRoute(() => import('./routes/class-list'));
 const GuideRoute = lazyRoute(() => import('./routes/guide'));
 const KeywordsRoute = lazyRoute(() => import('./routes/learn/keywords'));
+const CrosswordRoute = lazyRoute(() => import('./routes/learn/crossword'));
 const ClassContributorsRoute = lazyRoute(() => import('./routes/class-contributors'));
 const HocWelcomeRoute = lazyRoute(() => import('./routes/hoc-welcome'));
 const HocRequestsRoute = lazyRoute(() => import('./routes/hoc-requests'));
@@ -364,6 +365,7 @@ export default function App() {
           <Route path="/class-list" element={<RequireAuth><ClassListRoute /></RequireAuth>} />
           <Route path="/guide" element={<RequireAuth><GuideRoute /></RequireAuth>} />
           <Route path="/learn/:courseCode/week/:week/keywords" element={<RequireAuth><KeywordsRoute /></RequireAuth>} />
+          <Route path="/learn/:courseCode/week/:week/crossword" element={<RequireAuth><CrosswordRoute /></RequireAuth>} />
           <Route path="/class/contributors" element={<RequireAuth><ClassContributorsRoute /></RequireAuth>} />
           <Route path="/hoc/welcome" element={<RequireAuth><HocWelcomeRoute /></RequireAuth>} />
           <Route path="/hoc/requests" element={<RequireAuth><HocRequestsRoute /></RequireAuth>} />

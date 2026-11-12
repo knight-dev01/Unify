@@ -681,6 +681,14 @@ export const api = {
   hocRequests: () => apiFetch<{ requests: { id: string; name: string; email: string; department: string; level: string; note: string; status: 'pending' | 'approved' | 'rejected'; at: string; repsInClass: number }[] }>('/v1/hoc/requests'),
   hocAnswer: (id: string, approve: boolean, note?: string) =>
     apiFetch<{ ok: boolean }>(`/v1/hoc/requests/${id}`, { method: 'POST', body: JSON.stringify({ approve, note }) }),
+  gameScore: (payload: { game: 'keywords' | 'crossword'; course: string; week: number; score: number; terms: number; hints: number; seconds: number }) =>
+    apiFetch<{ ok: boolean; best: number; newBest: boolean; xp: number }>('/v1/games/score', { method: 'POST', body: JSON.stringify(payload) }),
+  gameBoard: (q: { course: string; week?: number; game?: 'keywords' | 'crossword' }) =>
+    apiFetch<{ players: number; top: { rank: number; name: string; persona: string | null; score: number; terms: number; me: boolean }[]; me: { rank: number; score: number; terms: number } | null }>(
+      `/v1/games/leaderboard?course=${encodeURIComponent(q.course)}${q.week ? `&week=${q.week}` : ''}${q.game ? `&game=${q.game}` : ''}`
+    ),
+  gameMine: (course?: string) =>
+    apiFetch<{ termsMastered: number; weeks: { game: string; course: string; week: number; best: number; terms: number; plays: number }[] }>(`/v1/games/mine${course ? `?course=${encodeURIComponent(course)}` : ''}`),
   liveWires: () =>
     apiFetch<{ wires: LiveWire[]; targets: LiveWireTarget[] }>('/v1/livewire'),
   liveWireSend: (payload: Omit<LiveWireTarget, 'label'> & { message: string; minutes: number; label: LiveWire['label'] }) =>
@@ -702,6 +710,7 @@ export const api = {
       setup: { label: string; to: string }[];
       calendar: { start: string | null; weeks: number; semester: string };
       releaseNotes: { version: string; date: string; body: string }[];
+      liveWires: { id: string; message: string; by: string; to: string; endsAt: string }[];
     }>('/v1/admin/overview'),
   roleGrants: () => apiFetch<{ grants: { id: string; role: 'level_admin' | 'hod' | 'dean'; faculty: string; department: string; level: string; name: string; email: string }[] }>('/v1/admin/role-grants'),
   roleGrant: (payload: { email: string; role: 'level_admin' | 'hod' | 'dean'; faculty?: string; department?: string; level?: string }) =>

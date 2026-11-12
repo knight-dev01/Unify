@@ -1,7 +1,7 @@
 import { ReaderSkeleton } from '../../components/Skeletons';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams, useNavigate, Navigate, useSearchParams } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Check, Download, ArrowUp, Share2, Lock, Flag, Gamepad2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Check, Download, ArrowUp, Share2, Lock, Flag, Gamepad2, Grid3x3 } from 'lucide-react';
 import { ROUTES } from '../../lib/routes';
 import ReportSheet from '../../components/ReportSheet';
 import { api, type TopicMeta } from '../../lib/api';
@@ -407,6 +407,9 @@ export default function LearnPage() {
         )}
         <Link to={ROUTES.keywords(courseCode || '', weekNum)} style={{ display: 'flex', gap: 6, alignItems: 'center', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 9999, padding: '8px 16px', fontSize: 13, fontWeight: 700, color: 'var(--u-good)', textDecoration: 'none' }}>
           <Gamepad2 size={14} /> Keywords
+        </Link>
+        <Link to={ROUTES.crossword(courseCode || '', weekNum)} style={{ display: 'flex', gap: 6, alignItems: 'center', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 9999, padding: '8px 16px', fontSize: 13, fontWeight: 700, color: 'var(--u-good)', textDecoration: 'none' }}>
+          <Grid3x3 size={14} /> Crossword
         </Link>
       </div>
       {reporting && note && (

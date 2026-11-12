@@ -214,6 +214,9 @@ app.use("/v1", school.default || school);
 // Live wire: urgent messages with a countdown at the top of Home.
 const livewire = require("./src/routes/livewire");
 app.use("/v1", livewire.default || livewire);
+// Course games: best scores, leaderboards, key terms mastered, game XP.
+const games = require("./src/routes/games");
+app.use("/v1", games.default || games);
 // Live performance + browser vitals for the admin panel.
 const ops = require("./src/routes/ops");
 app.use("/v1", ops.default || ops);

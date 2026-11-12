@@ -320,6 +320,7 @@ router.get("/admin/overview", requireAuth, async (req: Request, res: Response) =
     const [
       hocPending, reportsOpen, claimsOpen, lists, entries, claimed, sessionsWeek, marksWeek,
       flags, changesWeek, postsWeek, levelAdmins, hods, deans, hocs, calendar,
+      wiresLive, wiresWeek, gamePlays, guideRow, wiresList, gameRows,
     ] = await Promise.all([
       count(sb.from("hoc_requests").select("id", head).eq("status", "pending")),
       count(sb.from("content_reports").select("id", head).eq("status", "open")),
@@ -337,6 +338,12 @@ router.get("/admin/overview", requireAuth, async (req: Request, res: Response) =
       count(sb.from("role_grants").select("id", head).eq("role", "dean")),
       count(sb.from("profiles").select("id", head).eq("is_hoc", true)),
       sb.from("app_settings").select("key,value").in("key", ["semester_start", "semester_weeks", "current_semester"]),
+      count(sb.from("live_wires").select("id", head).is("cancelled_at", null).gt("ends_at", new Date().toISOString())),
+      count(sb.from("live_wires").select("id", head).gt("created_at", weekAgo)),
+      count(sb.from("game_scores").select("id", head).gt("updated_at", weekAgo)),
+      sb.from("school_guides").select("updated_at,published").eq("institution", "LASU").maybeSingle(),
+      sb.from("live_wires").select("id,message,author_name,author_role,scope,course,department,level,ends_at").is("cancelled_at", null).gt("ends_at", new Date().toISOString()).order("ends_at", { ascending: true }).limit(20),
+      sb.from("game_scores").select("user_id").gt("updated_at", weekAgo).limit(5000),
     ]);
     const cal: Record<string, string> = {};
     for (const r of ((calendar as { data: unknown }).data ?? []) as { key: string; value: string }[]) cal[r.key] = r.value;
@@ -352,6 +359,9 @@ router.get("/admin/overview", requireAuth, async (req: Request, res: Response) =
         { key: "attendance", label: "Attendance (last 7 days)", lines: [`${sessionsWeek} register${sessionsWeek === 1 ? "" : "s"} taken`, `${marksWeek} students marked`], to: "/reports" },
         { key: "timetable", label: "Timetable (last 7 days)", lines: [`${changesWeek} class${changesWeek === 1 ? "" : "es"} cancelled, moved or unconfirmed`] },
         { key: "lecturers", label: "Lecturer posts (last 7 days)", lines: [`${postsWeek} post${postsWeek === 1 ? "" : "s"} to students`] },
+        { key: "livewire", label: "Live wire", lines: [`${wiresLive} running now`, `${wiresWeek} sent in the last 7 days`] },
+        { key: "games", label: "Games (last 7 days)", lines: [`${gamePlays} week games finished`, `${new Set(((gameRows as { data: unknown }).data as { user_id: string }[] | null ?? []).map((r) => r.user_id)).size} students playing`] },
+        { key: "guide", label: "Student guide", lines: [(guideRow as { data: { updated_at?: string; published?: boolean } | null }).data?.updated_at ? `Updated ${new Date((guideRow as { data: { updated_at: string } }).data.updated_at).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}${(guideRow as { data: { published?: boolean } }).data.published === false ? " · draft" : ""}` : "Not set up"], to: "module:guide" },
         { key: "roles", label: "Roles", lines: [`${hocs} class reps`, `${levelAdmins} level admins · ${hods} HODs · ${deans} deans`], to: "/admin-roles" },
       ],
       setup: [
@@ -360,6 +370,7 @@ router.get("/admin/overview", requireAuth, async (req: Request, res: Response) =
         lists === 0 ? { label: "No class lists uploaded yet: registers can't show who's absent", to: "" } : null,
       ].filter(Boolean),
       calendar: { start: cal.semester_start || null, weeks: Number(cal.semester_weeks) || 12, semester: cal.current_semester || "" },
+      liveWires: (((wiresList as { data: unknown }).data ?? []) as { id: string; message: string; author_name: string; author_role: string; scope: string; course: string; department: string; level: string; ends_at: string }[]).map((w) => ({ id: w.id, message: w.message, by: `${w.author_role}${w.author_name ? ` ${w.author_name}` : ""}`, to: w.scope === "course" ? w.course : w.scope === "class" ? `${w.level} ${w.department}` : w.scope === "all" ? "Everyone" : w.department || w.scope, endsAt: w.ends_at })),
       releaseNotes: releaseNotes(),
     });
   } catch (e) {

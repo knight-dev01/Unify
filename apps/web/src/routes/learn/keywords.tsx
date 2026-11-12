@@ -7,12 +7,13 @@ import type { UnifyNote } from '../../types/note';
 import BackButton from '../../components/BackButton';
 import { BoxBoy } from '../../components/redesign/brand';
 import { Card, Display, Label } from '../../components/redesign/ui';
+import GameFinish from '../../components/GameFinish';
 
 // Keywords: spell the week's key terms from a wheel of letters. Drag across
 // the letters (or tap them one by one, then tap the centre) to make a word.
 // The main word of each level is a term from the notes, with its clue; the
 // other boxes are words the notes use that fit the same letters.
-type Saved = { level: number; found: Record<number, string[]>; hints: Record<number, number>; bonus: number };
+type Saved = { level: number; found: Record<number, string[]>; hints: Record<number, number>; bonus: number; startedAt?: number; finishedSecs?: number };
 const HINTS = 3;
 const key = (c: string, w: number) => `unify:keywords:${c}:${w}`;
 
@@ -52,6 +53,15 @@ export default function KeywordsRoute() {
   const found = saved.found[li] || [];
   const hintsUsed = saved.hints[li] || 0;
   const done = !!lv && lv.slots.every((s) => found.includes(s));
+  // Time the run: from the first open to the last word of the last level.
+  useEffect(() => {
+    if (levels?.length && !saved.startedAt) setSaved((s) => ({ ...s, startedAt: Date.now() }));
+  }, [levels, saved.startedAt]);
+  useEffect(() => {
+    if (levels?.length && li === levels.length - 1 && done && saved.finishedSecs == null) {
+      setSaved((s) => ({ ...s, finishedSecs: Math.max(1, Math.round((Date.now() - (s.startedAt || Date.now())) / 1000)) }));
+    }
+  }, [levels, li, done, saved.finishedSecs]);
 
   useEffect(() => {
     if (lv) setOrder(lv.letters.map((_, i) => i));
@@ -148,6 +158,14 @@ export default function KeywordsRoute() {
   }
 
   const allDone = li === levels.length - 1 && done;
+  // Points: each key term 50 (less 15 per hint, never under 10), each other word 10, each bonus word 5.
+  const score = levels.reduce((sum, l, i) => {
+    const f = saved.found[i] || [];
+    const main = f.includes(l.term.word) ? Math.max(10, 50 - 15 * (saved.hints[i] || 0)) : 0;
+    return sum + main + 10 * f.filter((w) => w !== l.term.word).length;
+  }, 0) + 5 * saved.bonus;
+  const termsSolved = levels.filter((l, i) => (saved.found[i] || []).includes(l.term.word)).length;
+  const hintsTotal = Object.values(saved.hints).reduce((s, n) => s + n, 0);
   const pts = path.map((i) => pos(slotOf(i), lv.letters.length));
 
   return (
@@ -207,8 +225,9 @@ export default function KeywordsRoute() {
           {allDone ? (
             <>
               <div className="t-15 w-7">You've cracked every key term this week.</div>
+              {saved.finishedSecs != null && <GameFinish game="keywords" course={courseCode} week={weekNum} score={score} terms={termsSolved} hints={hintsTotal} seconds={saved.finishedSecs} />}
               <Link to={back} className="btn btn--amber btn--block">Back to the notes</Link>
-              <button className="btn btn--white btn--block" onClick={() => setSaved({ level: 0, found: {}, hints: {}, bonus: 0 })}>Play again</button>
+              <button className="btn btn--white btn--block" onClick={() => setSaved({ level: 0, found: {}, hints: {}, bonus: 0, startedAt: Date.now() })}>Play again</button>
             </>
           ) : (
             <button className="btn btn--amber btn--block" onClick={() => setSaved((s) => ({ ...s, level: li + 1 }))}>Next level</button>

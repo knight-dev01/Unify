@@ -11,6 +11,7 @@ import { api, NOTIFS_CHANGED, type Profile } from '../lib/api';
 import { PICTURE_EVENT, resolvePicture } from '../lib/picture';
 import { recordNav } from '../lib/navHistory';
 import { armSpokenWelcome } from '../lib/welcomeVoice';
+import { rememberLastName } from '../lib/lastName';
 import { useFocusMode } from '../lib/focus';
 import OfflineBanner from '../components/OfflineBanner';
 
@@ -240,6 +241,7 @@ export default function Layout() {
         setPicProfile({ avatar_url: me.profile?.avatar_url, box_boy_persona: me.profile?.box_boy_persona });
         // Spoken welcome (opt-in in Settings): speaks on the first tap, once a day.
         armSpokenWelcome(me.profile ?? null);
+        rememberLastName(me.profile?.first_name);
         try {
           localStorage.setItem('unify.role.v1', r);
         } catch {

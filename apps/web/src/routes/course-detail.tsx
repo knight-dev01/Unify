@@ -327,6 +327,20 @@ function Practice({ course, progress, preview }: { course: string; progress: Pro
           </div>
         </div>
       )}
+      {(progress || []).length > 0 && (
+        <div style={{ ...box, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <span>
+            <span style={{ display: 'block', fontWeight: 700 }}>Crossword</span>
+            <span style={{ fontSize: 12, color: 'var(--text2)' }}>The week's key terms crossing each other, with clues from the notes.</span>
+          </span>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {(progress || []).map((w) => (
+              <Link key={w.week} to={ROUTES.crossword(course, w.week)} className="chip chip--sm" style={{ textDecoration: 'none' }}>Week {w.week}</Link>
+            ))}
+          </div>
+        </div>
+      )}
+      {(progress || []).length > 0 && <CourseBoard course={course} />}
       {quizzes.map((w) => (
         <Link
           key={w.week}
@@ -343,6 +357,31 @@ function Practice({ course, progress, preview }: { course: string; progress: Pro
             <span style={{ fontSize: 12, fontWeight: 800, color: 'var(--u-good)' }}>Start</span>
           )}
         </Link>
+      ))}
+    </div>
+  );
+}
+
+// Games across the whole course: key terms mastered, and the course leaderboard.
+function CourseBoard({ course }: { course: string }) {
+  const [mine, setMine] = useState<number | null>(null);
+  const [board, setBoard] = useState<Awaited<ReturnType<typeof api.gameBoard>> | null>(null);
+  useEffect(() => {
+    api.gameMine(course).then((r) => setMine(r.termsMastered)).catch(() => {});
+    api.gameBoard({ course }).then(setBoard).catch(() => {});
+  }, [course]);
+  if (!mine && !board?.top.length) return null;
+  return (
+    <div style={{ ...box, display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <span style={{ fontWeight: 700 }}>Course leaderboard</span>
+      {mine != null && <span style={{ fontSize: 12, color: 'var(--text2)' }}>You've mastered {mine} key term{mine === 1 ? '' : 's'} in {course} so far{board?.me ? `, and you're number ${board.me.rank} of ${board.players}` : ''}.</span>}
+      {(board?.top || []).slice(0, 5).map((p) => (
+        <div key={p.rank} style={{ display: 'flex', gap: 8, fontSize: 13, fontWeight: p.me ? 800 : 500 }}>
+          <span style={{ width: 18, color: 'var(--text2)' }}>{p.rank}</span>
+          <span style={{ flex: 1 }}>{p.me ? 'You' : p.name}</span>
+          <span style={{ color: 'var(--text2)' }}>{p.terms} terms</span>
+          <span style={{ minWidth: 40, textAlign: 'right', fontWeight: 800 }}>{p.score}</span>
+        </div>
       ))}
     </div>
   );

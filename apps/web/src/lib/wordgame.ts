@@ -25,12 +25,12 @@ const lettersOf = (s: string) => s.toUpperCase().replace(/[^A-Z]/g, '');
 
 // A term can go on the wheel if it is a word or two made of letters only,
 // with 4 to 9 letters in all.
-function asTerm(raw: string, clue: string): Term | null {
+function asTerm(raw: string, clue: string, maxLen = 9): Term | null {
   const display = strip(raw).replace(/[.,;:!?]+$/, '').trim();
   if (!/^[A-Za-z][A-Za-z'’ -]*$/.test(display)) return null;
   if (display.split(/[\s-]+/).length > 2) return null;
   const word = lettersOf(display);
-  if (word.length < 4 || word.length > 9) return null;
+  if (word.length < 4 || word.length > maxLen) return null;
   let c = strip(noMaths(clue));
   // Never give the answer away in its own clue.
   const re = new RegExp(display.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
@@ -40,47 +40,48 @@ function asTerm(raw: string, clue: string): Term | null {
   return { word, display, clue: c };
 }
 
-export function extractTerms(note: UnifyNote): Term[] {
+export function extractTerms(note: UnifyNote, maxLen = 9): Term[] {
   const out: Term[] = [];
+  const term = (raw: string, clue: string) => asTerm(raw, clue, maxLen);
   const add = (t: Term | null) => { if (t && !out.some((x) => x.word === t.word)) out.push(t); };
   for (const topic of note.topics || []) {
     for (const sub of topic.subtopics || []) {
       for (const b of sub.content || []) {
-        if (b.type === 'symbol') add(asTerm(b.name, b.desc));
+        if (b.type === 'symbol') add(term(b.name, b.desc));
         // Bold terms in the text: the sentence they sit in is the clue.
         const texts = b.type === 'paragraph' || b.type === 'insight' || b.type === 'analogy' ? [b.text] : b.type === 'bullets' ? b.items : [];
         for (const text of texts) {
           for (const m of text.matchAll(/<(?:strong|b)>([^<]+)<\/(?:strong|b)>/gi)) {
             const sentence = text.split(/(?<=[.!?])\s+/).find((s) => s.includes(m[0])) || text;
-            add(asTerm(m[1], sentence));
+            add(term(m[1], sentence));
           }
         }
       }
       for (const q of sub.miniCheck?.questions || []) {
-        if (q.type === 'fitb') add(asTerm(q.acceptedAnswers?.[0] || '', q.question));
-        if (q.type === 'mcq') add(asTerm(q.options?.[q.correctIndex] || '', q.question));
+        if (q.type === 'fitb') add(term(q.acceptedAnswers?.[0] || '', q.question));
+        if (q.type === 'mcq') add(term(q.options?.[q.correctIndex] || '', q.question));
         if (q.type === 'reveal') {
           const m = /<strong>([^<]+)<\/strong>/i.exec(q.answer || '');
-          if (m) add(asTerm(m[1], q.question));
+          if (m) add(term(m[1], q.question));
         }
       }
     }
     for (const q of topic.pulseCheck?.questions || []) {
-      if (q.type === 'fitb') add(asTerm(q.acceptedAnswers?.[0] || '', q.question));
-      if (q.type === 'mcq') add(asTerm(q.options?.[q.correctIndex] || '', q.question));
+      if (q.type === 'fitb') add(term(q.acceptedAnswers?.[0] || '', q.question));
+      if (q.type === 'mcq') add(term(q.options?.[q.correctIndex] || '', q.question));
     }
     for (const r of topic.activeRecall || []) {
       // "What is a capacitor?" → the term is in the question, the clue is the answer.
       const m = /^(?:what|who)\s+(?:is|are|was|were)\s+(?:an?\s+|the\s+)?([^?]+)\?\s*$/i.exec(strip(r.question));
-      if (m) add(asTerm(m[1], r.answer));
+      if (m) add(term(m[1], r.answer));
     }
   }
   for (const q of note.eoq?.questions || []) {
-    if (q.type === 'fitb') add(asTerm(q.acceptedAnswers?.[0] || '', q.question));
+    if (q.type === 'fitb') add(term(q.acceptedAnswers?.[0] || '', q.question));
     if (q.type === 'mcq' && q.options && q.correct) {
       const idx = 'ABCDEFGH'.indexOf(q.correct.trim().toUpperCase());
       const opt = idx >= 0 ? q.options[idx] : q.options.find((o) => o.trim() === q.correct?.trim());
-      if (opt) add(asTerm(opt, q.question));
+      if (opt) add(term(opt, q.question));
     }
   }
   return out;
