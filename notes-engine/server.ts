@@ -60,17 +60,40 @@ const uploadStorage = multer.diskStorage({
 const upload = multer({ storage: uploadStorage });
 
 // Load system prompt rules files safely
-let rulesPath = path.join(__dirname, "UNIFY_RULES.md");
-if (!fs.existsSync(rulesPath)) {
-  rulesPath = path.join(__dirname, "foundation for Unify notes Engine", "UNIFY_RULES.md");
-}
-let mathRulesPath = path.join(__dirname, "UNIFY_MATHJAX_RULE.md");
-if (!fs.existsSync(mathRulesPath)) {
-  mathRulesPath = path.join(__dirname, "foundation for Unify notes Engine", "UNIFY_MATHJAX_RULE.md");
-}
+// dist/ copy first (production), then the repo's docs/ folder (local dev,
+// and where the foundation docs live since 2026-11-02).
+const firstFound = (...ps: string[]) => ps.find((p) => fs.existsSync(p)) || "";
+const rulesPath = firstFound(
+  path.join(__dirname, "UNIFY_RULES.md"),
+  path.join(__dirname, "..", "docs", "notes-engine-foundation", "UNIFY_RULES.md"),
+  path.join(__dirname, "..", "..", "docs", "notes-engine-foundation", "UNIFY_RULES.md"),
+  path.join(__dirname, "foundation for Unify notes Engine", "UNIFY_RULES.md"),
+);
+const mathRulesPath = firstFound(
+  path.join(__dirname, "UNIFY_MATHJAX_RULE.md"),
+  path.join(__dirname, "..", "docs", "UNIFY_MATHJAX_RULE.md"),
+  path.join(__dirname, "..", "..", "docs", "UNIFY_MATHJAX_RULE.md"),
+  path.join(__dirname, "foundation for Unify notes Engine", "UNIFY_MATHJAX_RULE.md"),
+);
 
-const unifyRules = fs.existsSync(rulesPath) ? fs.readFileSync(rulesPath, "utf-8") : "";
-const unifyMathRules = fs.existsSync(mathRulesPath) ? fs.readFileSync(mathRulesPath, "utf-8") : "";
+const unifyRules = rulesPath ? fs.readFileSync(rulesPath, "utf-8") : "";
+const unifyMathRules = mathRulesPath ? fs.readFileSync(mathRulesPath, "utf-8") : "";
+if (!unifyRules || !unifyMathRules) console.error("[ai] WARNING: note rules not found; Studio AI would write without them.");
+
+// The Unify voice for everything the AI writes: Nigerian English, Nigerian
+// settings, never Pidgin. It governs only what Unify adds around the
+// lecturer's content (analogies, insights, question scenarios, feedback);
+// the lecturer's facts, numbers and examples are never changed.
+const NIGERIAN_VOICE = `NIGERIAN VOICE (applies to every word you write):
+Write the way a sharp, warm Nigerian lecturer or a final-year student who has been through the course explains things to a junior at LASU: clear standard Nigerian English, friendly, direct, never stiff.
+- Spelling and usage: British/Nigerian English (colour, metre, programme, analyse, centre, labour, tyre, practise as the verb). Say "lecturer", "course", "level" (200 Level), "semester", "CGPA", "tutorial", "past questions".
+- Money is in naira, written ₦ (₦45,000, ₦2.5 million). Never dollars unless the notes say so.
+- When YOU add an analogy, insight, worked-example story or question scenario, set it in Nigeria: NEPA/PHCN light going and the generator or inverter coming on, a borehole and overhead tank, Lagos traffic on Third Mainland Bridge, a danfo or BRT, the Lekki toll gate, Dangote refinery, NNPC, a Lagos–Ibadan expressway, market prices at Balogun or Computer Village, a cassava or palm-oil processing mill, a 5 kVA solar setup, a building site in Ikorodu.
+- Use Nigerian names for people in examples and questions, mixed across the country: Tunde, Ngozi, Aisha, Emeka, Bisi, Chidi, Fatima, Seun, Halima, Ifeanyi, Kemi, Musa.
+- Where a standard or regulator fits, Nigerian ones: NERC, SON, COREN, NESREA, NCC, FRSC. Keep SI units.
+- NOT Pidgin. No "abeg", "wahala", "oya", "sabi", "na so", no slang spellings, no forced proverbs, no jokes about tribes or religion, no stereotypes. Warmth comes from familiar settings and plain, encouraging sentences, not from slang.
+- Never change the lecturer's facts, numbers, definitions or their own examples. Never replace a technical term with a local one. If the notes already give an example, keep it; add Nigerian colour only in what you create.
+- Keep it natural: at most one local reference per subtopic. Not every sentence needs one.`;
 
 const SCHEMA_SPEC = `
 {
@@ -145,6 +168,10 @@ const SYSTEM_PROMPT = `${unifyRules}
 ---
 
 ${unifyMathRules}
+
+---
+
+${NIGERIAN_VOICE}
 
 ---
 
