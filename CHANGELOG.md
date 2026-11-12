@@ -5,6 +5,14 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.26.0] - 2026-11-12
+
+### Changed
+- **Keywords and Crossword look like Duolingo**: chunky letter boxes, squares and keys on a solid bottom edge that sink when pressed, a glossy progress bar, result badges that pop in, and a clue card that slides in on each change
+- **Fluid word connections in Keywords**: each link draws itself in, a line follows your finger while dragging, the drawn line flashes green or red and fades when you let go, letters grow when picked and glide on Shuffle, found words flip in letter by letter. Crossword letters pop in, wrong squares shake, and a solved grid ripples green. All motion respects reduce-motion
+- **Fits the screen on phones and laptops**: the wheel, boxes and crossword squares size to the screen; from 1024px the puzzle sits left and the controls right, the crossword's on-screen keyboard hides and the clue list opens
+- Keywords can be typed on a keyboard (Enter to try, Backspace to undo); Crossword takes arrow keys to move and Space to switch across/down; hints now show the hinted letters faintly in the boxes
+
 ## [2.25.1] - 2026-11-12
 
 ### Fixed
