@@ -94,9 +94,9 @@ function NotFound() {
         <BoxBoy pose="wavePhone" width={120} />
       </div>
       <h1 style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 24 }}>Page not found</h1>
-      <p style={{ color: 'var(--text2)', fontSize: 14, margin: '8px 0 20px' }}>This link doesn't exist. Try one of these:</p>
+      <p style={{ color: 'var(--text2)', fontSize: 14, margin: '8px 0 20px' }}>This link doesn't go anywhere. It may be old or mistyped. Try one of these:</p>
       <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
-        <Link to="/course" style={link}>Learn</Link>
+        <Link to="/courses" style={link}>My courses</Link>
         <Link to="/auth" style={link}>Sign in</Link>
         <Link to="/home" style={link}>Home</Link>
       </div>

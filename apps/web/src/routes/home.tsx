@@ -721,7 +721,7 @@ export default function HomeRoute() {
         {shown.length === 0 ? (
           <div style={{ padding: 24, textAlign: 'center', color: 'var(--text2)', background: 'var(--surface)', border: '2px solid var(--border)', borderRadius: 16 }}>
             <BoxBoy pose="peeking" width={77} />
-            <div style={{ marginTop: 8 }}>No courses yet.</div>
+            <div style={{ marginTop: 8 }}>No courses yet. Add the ones you're taking this semester.</div>
             <Link to="/courses/find" style={{ display: 'inline-block', marginTop: 12, padding: '10px 22px', background: 'var(--u-amber)', color: 'var(--u-black)', borderRadius: 9999, textDecoration: 'none', fontWeight: 800, borderBottom: '4px solid #c69a1a' }}>
               Explore courses to enroll
             </Link>
@@ -749,7 +749,7 @@ export default function HomeRoute() {
       {confirmUnenroll && (
         <ConfirmModal
           title={`Remove ${confirmUnenroll}?`}
-          body="It leaves Home. Re-enroll anytime from Courses — your XP and progress stay."
+          body="It leaves Home. You can add it back any time from Courses, and your XP and progress stay."
           confirmLabel="Remove"
           busy={unenrolling}
           onConfirm={() => {

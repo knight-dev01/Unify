@@ -113,7 +113,7 @@ export default function CourseDetailRoute() {
       const res = await api.courseWeeks(courseCode);
       setWeeks(res.weeks || []);
     } catch (err) {
-      setError(describeError(err, 'enrollment that'));
+      setError(describeError(err, 'add that course'));
     } finally {
       setEnrolling(false);
     }
@@ -142,8 +142,8 @@ export default function CourseDetailRoute() {
       <div style={{ maxWidth: 'var(--shell, 480px)', margin: '0 auto', padding: '20px 16px 80px', textAlign: 'center' }}>
         <BackButton to={backTo} />
         <div style={{ display: 'flex', justifyContent: 'center' }}><BoxBoy pose="readingStanding" width={72} /></div>
-        <h1 style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 20, marginTop: 12 }}>You're not enrolled in {courseCode}</h1>
-        <p style={{ color: 'var(--text2)', fontSize: 14, margin: '8px 0 20px' }}>Enroll to unlock its weeks, topics and quizzes.</p>
+        <h1 style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 20, marginTop: 12 }}>{courseCode} isn't on your list yet</h1>
+        <p style={{ color: 'var(--text2)', fontSize: 14, margin: '8px 0 20px' }}>Add it to open its weeks, topics and quizzes. It takes a second.</p>
       {slots.length > 0 && (
         <div style={{ marginTop: 12, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 14 }}>
           <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: 1, color: 'var(--u-good)' }}>CLASS TIMES · REPEATS WEEKLY</div>
@@ -162,7 +162,7 @@ export default function CourseDetailRoute() {
         </div>
       )}
         <button onClick={enrollHere} disabled={enrolling} style={{ padding: '12px 28px', borderRadius: 9999, background: 'var(--u-amber)', color: 'var(--u-black)', border: 'none', borderBottom: '4px solid #c69a1a', fontWeight: 800, fontSize: 14, opacity: enrolling ? 0.6 : 1 }}>
-          {enrolling ? 'Enrolling…' : `Enroll in ${courseCode}`}
+          {enrolling ? 'Adding…' : `Add ${courseCode}`}
         </button>
         <div style={{ marginTop: 12 }}>
           <Link to="/courses/find" style={{ fontSize: 13, color: 'var(--u-good)', fontWeight: 700, textDecoration: 'none' }}>

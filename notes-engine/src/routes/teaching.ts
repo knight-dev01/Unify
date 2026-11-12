@@ -183,7 +183,7 @@ router.get("/course-posts", requireAuth, async (req: Request, res: Response) => 
   if (!course) return fail(res, 400, "Pass ?course=CODE.");
   try {
     const m = await me(req);
-    if (!m || !(isAdmin(m) || (await enrolled(m.id, course, "taking")) || (await teaches(m, course)))) return fail(res, 403, "Enroll in the course to see its posts.");
+    if (!m || !(isAdmin(m) || (await enrolled(m.id, course, "taking")) || (await teaches(m, course)))) return fail(res, 403, "Add this course to see its posts.");
     const sb = supabaseAdmin();
     const { data } = await sb.from("course_posts").select("*").in("course", variants(course)).order("created_at", { ascending: false }).limit(30);
     const rows = (data ?? []) as { id: string; author_id: string | null; type: string; title: string | null; content: string; created_at: string }[];

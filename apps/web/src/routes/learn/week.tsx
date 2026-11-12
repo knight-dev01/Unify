@@ -230,8 +230,8 @@ export default function LearnPage() {
     return (
       <div style={{ padding: 40, textAlign: 'center', color: 'var(--text2)', maxWidth: 'var(--shell, 480px)', margin: '0 auto' }}>
         <BoxBoy pose="readingStanding" width={72} />
-        <h1 style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 20, color: 'var(--text)', marginTop: 12 }}>You're not enrolled in {courseCode}</h1>
-        <p style={{ fontSize: 14, margin: '8px 0 20px' }}>Enroll to unlock its weeks, topics and quizzes.</p>
+        <h1 style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 20, color: 'var(--text)', marginTop: 12 }}>{courseCode} isn't on your list yet</h1>
+        <p style={{ fontSize: 14, margin: '8px 0 20px' }}>Add it to open its weeks, topics and quizzes. It takes a second.</p>
         <button
           onClick={async () => {
             setEnrolling(true);
@@ -245,11 +245,11 @@ export default function LearnPage() {
           disabled={enrolling}
           style={{ padding: '12px 28px', borderRadius: 9999, background: 'var(--u-amber)', color: 'var(--u-black)', border: 'none', borderBottom: '4px solid #c69a1a', fontWeight: 800, fontSize: 14, opacity: enrolling ? 0.6 : 1 }}
         >
-          {enrolling ? 'Enrolling…' : 'Enroll & continue'}
+          {enrolling ? 'Adding…' : 'Add course and continue'}
         </button>
         <div style={{ marginTop: 12 }}>
           <button onClick={() => navigate('/courses/find')} style={{ background: 'none', border: 'none', color: 'var(--u-good)', fontWeight: 700, fontSize: 13 }}>
-            or explore other courses
+            or find other courses
           </button>
         </div>
       </div>

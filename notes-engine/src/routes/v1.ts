@@ -722,7 +722,7 @@ router.post("/onboarding", requireAuth, async (req: Request, res: Response) => {
           type: "welcome",
           title: "Welcome to Unify Learn",
           body: isStudent
-            ? "Your courses are set. Open Week 1 of any course and mark your first topic complete."
+            ? "You're in. Open Week 1 of any of your courses and finish your first topic: a few minutes is enough to start."
             : "Your author account is ready. Open the Studio to publish your first topic.",
           link: isStudent ? "/course" : "/studio",
         });
