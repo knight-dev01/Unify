@@ -5,6 +5,11 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.25.0] - 2026-11-12
+
+### Added
+- **Play with a coursemate** in Keywords and Crossword: start a session, send the link on WhatsApp, and the host starts it once both are in. **Race**: same puzzle on your own boards, each other's progress live, and who finished first. **Team up**: one shared board, every word or letter shows on both phones. Runs on Supabase Realtime (nothing stored, a few bytes per move); both players' scores still count on the leaderboard, and a session never touches your solo progress
+
 ## [2.24.0] - 2026-11-12
 
 ### Added
