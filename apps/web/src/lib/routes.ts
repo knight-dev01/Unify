@@ -20,6 +20,7 @@ export const ROUTES = {
   courses: '/courses',
   course: (code: string) => `/courses/${encodeURIComponent(code)}`,
   week: (code: string, week: number | string) => `/learn/${encodeURIComponent(code)}/week/${week}`,
+  keywords: (code: string, week: number | string) => `/learn/${encodeURIComponent(code)}/week/${week}/keywords`,
   cgpa: '/cgpa-planner',
   notifications: '/notifications',
 

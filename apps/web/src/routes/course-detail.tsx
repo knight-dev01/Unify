@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom';
 import { ChevronRight, ExternalLink, FileText } from 'lucide-react';
 import BackButton from '../components/BackButton';
+import { ROUTES } from '../lib/routes';
 import { BoxBoy } from '../components/redesign/brand';
 import Flash from '../components/Flash';
 import { api, type Material } from '../lib/api';
@@ -313,6 +314,19 @@ function Practice({ course, progress, preview }: { course: string; progress: Pro
         </span>
       </div>
       {quizzes.length === 0 && <div style={{ ...box, color: 'var(--text2)', textAlign: 'center' }}>Weekly quizzes show here as weeks are published.</div>}
+      {(progress || []).length > 0 && (
+        <div style={{ ...box, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <span>
+            <span style={{ display: 'block', fontWeight: 700 }}>Keywords</span>
+            <span style={{ fontSize: 12, color: 'var(--text2)' }}>Spell each week's key terms from a wheel of letters, with clues from the notes.</span>
+          </span>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {(progress || []).map((w) => (
+              <Link key={w.week} to={ROUTES.keywords(course, w.week)} className="chip chip--sm" style={{ textDecoration: 'none' }}>Week {w.week}</Link>
+            ))}
+          </div>
+        </div>
+      )}
       {quizzes.map((w) => (
         <Link
           key={w.week}
