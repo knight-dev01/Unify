@@ -5,6 +5,29 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.24.0] - 2026-11-12
+
+### Added
+- **Live wire**: urgent messages with a countdown ("Starts in", "Deadline in", "Ends in") at the top of Home, between the stats and the carousel, until the time runs out. Class reps send to their class, lecturers and contributors to students taking their courses, level admins to their class, HODs to their department, deans to their faculty, Unify admins to anyone. Bell + push, end early, at most three running per sender; admins see and can end every running live wire from the Overview (migration 0042)
+- **Keywords**: a word game for every week. Spell the week's key terms from a wheel of letters, with clues taken from the notes; the other words are the notes' own vocabulary. Shuffle, three hints per level
+- **Crossword** for every week: the key terms crossing each other with clues from the notes, an on-screen keyboard, Check and Reveal a letter
+- **Game scores and leaderboards**: best run kept per week, XP the first time a week's game is finished (Keywords 15, Crossword 20), week and course leaderboards (first names only, students taking the course), key terms mastered per course, and "Challenge your coursemates" to share on WhatsApp (migration 0043)
+- **Student guide**: course registration step by step, per school; admins edit it, students tick steps off from Me → Guide and it leads the Home carousel when updated (migration 0041)
+- **Contributors** for class reps and admins: who writes each course of a class, and which courses are behind the semester
+- **Natural read-aloud**: dashes and brackets become pauses, blanks are read as "blank", maths, units and naira are said as people say them, short phrases with real breaths; natural-sounding and Nigerian voices first
+- **Spoken welcome** (Settings, off by default): once a day on the first tap, "Good morning, Tunde. Welcome back to Unify Learn" and what's new; never in quiet hours
+- **Sign-in says "Welcome back, Tunde"** with the last first name used on the device, and "Not Tunde?" to forget it
+- **SEO**: robots.txt, sitemap, canonical links, structured data and per-page titles; only the welcome and sign-in pages are indexable
+- Admin Overview also tracks live wires, games and the student guide
+
+### Changed
+- **Nigerian voice**: Studio's AI writes in Nigerian English with Nigerian settings, names and naira (never Pidgin); first pass on app wording ("Add this course" instead of "Enroll", network and error messages, empty states)
+
+### Fixed
+- **Studio AI had been writing without its note and maths rules** since the docs move on 2 November; they ship with the API again and the build now fails if they go missing
+- Back from notes and course pages goes Home when there's no in-app history (reopened, refreshed, opened from a notification)
+- The persona picker centres the chosen Box Boy and its heading
+
 ## [2.23.0] - 2026-11-11
 
 ### Fixed
