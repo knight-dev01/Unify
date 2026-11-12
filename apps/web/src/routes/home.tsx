@@ -16,6 +16,7 @@ import ConfirmModal from '../components/ConfirmModal';
 import { HomeHero } from '../components/redesign/HomeHero';
 import { UpdatesSlider, type UpdateSlide } from '../components/redesign/UpdatesSlider';
 import { FACTS } from '../lib/naija';
+import LiveWire from '../components/LiveWire';
 import Loading from '../components/Loading';
 
 type CourseStat = { course: string; topics: number };
@@ -653,6 +654,9 @@ export default function HomeRoute() {
           <div style={{ fontSize: 11, color: 'var(--text2)' }}>Courses</div>
         </div>
       </div>
+
+      {/* Live wire: urgent messages with a countdown, between the stats and the carousel. */}
+      <LiveWire />
 
       <UpdatesSlider slides={updateSlides} />
 

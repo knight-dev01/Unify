@@ -170,6 +170,12 @@ export type Profile = {
   hide_cgpa?: boolean;
 };
 
+export type LiveWire = {
+  id: string; message: string; author: string; role: string; scope: string; course: string; level: string; department: string;
+  label: 'starts' | 'deadline' | 'ends'; endsAt: string; createdAt: string; mine: boolean; canEnd: boolean;
+};
+export type LiveWireTarget = { scope: 'all' | 'faculty' | 'department' | 'class' | 'course'; faculty?: string; department?: string; level?: string; course?: string; label: string };
+
 export type SchoolGuide = {
   institution: string;
   title: string;
@@ -675,6 +681,11 @@ export const api = {
   hocRequests: () => apiFetch<{ requests: { id: string; name: string; email: string; department: string; level: string; note: string; status: 'pending' | 'approved' | 'rejected'; at: string; repsInClass: number }[] }>('/v1/hoc/requests'),
   hocAnswer: (id: string, approve: boolean, note?: string) =>
     apiFetch<{ ok: boolean }>(`/v1/hoc/requests/${id}`, { method: 'POST', body: JSON.stringify({ approve, note }) }),
+  liveWires: () =>
+    apiFetch<{ wires: LiveWire[]; targets: LiveWireTarget[] }>('/v1/livewire'),
+  liveWireSend: (payload: Omit<LiveWireTarget, 'label'> & { message: string; minutes: number; label: LiveWire['label'] }) =>
+    apiFetch<{ ok: boolean; id: string; endsAt: string }>('/v1/livewire', { method: 'POST', body: JSON.stringify(payload) }),
+  liveWireEnd: (id: string) => apiFetch<{ ok: boolean }>(`/v1/livewire/${id}`, { method: 'DELETE' }),
   guide: (institution?: string) =>
     apiFetch<{ guide: SchoolGuide | null; canEdit: boolean }>(`/v1/guide${institution ? `?institution=${encodeURIComponent(institution)}` : ''}`),
   guideSave: (payload: { institution?: string; title: string; intro: string; steps: SchoolGuide['steps']; published: boolean }) =>

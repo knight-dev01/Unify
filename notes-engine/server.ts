@@ -211,6 +211,9 @@ app.use("/v1", teaching.default || teaching);
 // School pages: the student guide (kept by admins) and the class rep's contributors view.
 const school = require("./src/routes/school");
 app.use("/v1", school.default || school);
+// Live wire: urgent messages with a countdown at the top of Home.
+const livewire = require("./src/routes/livewire");
+app.use("/v1", livewire.default || livewire);
 // Live performance + browser vitals for the admin panel.
 const ops = require("./src/routes/ops");
 app.use("/v1", ops.default || ops);
