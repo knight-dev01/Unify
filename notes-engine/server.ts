@@ -34,6 +34,17 @@ app.use(cors({ origin: CORS_ORIGINS.length ? CORS_ORIGINS : true, maxAge: 7200 }
 app.use(require("compression")());
 // Big enough for an authored week with figures; far below the old 50mb that one bad request could use to eat memory.
 app.use(express.json({ limit: "12mb" }));
+// Note writes (publish, edit, delete, seed, admin content) clear the
+// assembled-week cache as soon as they succeed, so readers never wait out the TTL.
+{
+  const { bustWeekCache, NOTE_WRITE } = require("./src/lib/weekCache");
+  app.use((req, res, next) => {
+    if (req.method !== "GET" && req.method !== "HEAD" && req.method !== "OPTIONS" && NOTE_WRITE.test(req.path)) {
+      res.on("finish", () => { if (res.statusCode < 400) bustWeekCache(); });
+    }
+    next();
+  });
+}
 // NOTE: the legacy public/ playground was removed; authoring lives in the
 // web Studio now. /uploads stays (authored figure images).
 app.use("/uploads", express.static("uploads"));

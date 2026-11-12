@@ -5,6 +5,16 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.27.2] - 2026-11-14
+
+### Performance
+- **Week notes cached on the server** for a minute (shared by the reader, share links, course progress, Revision and the games); any successful note write clears it at once
+- **Sign-in tokens checked on the server** against the project's public signing keys (ES256) instead of a round trip to Supabase Auth per new token; each token is still confirmed with Auth in the background every 5 minutes and refused once Auth rejects it. Legacy or unknown-key tokens fall back to Auth as before
+- **Mark Topic Complete** saves progress, resume position and XP in one round trip (was three in a row)
+- **/me** no longer re-fetches the account from Auth on every call for unconfirmed emails (now hourly per user)
+- **Next screens preloaded** while the app is idle (Timetable, Class, Notifications, Revision, games), skipped on Data Saver and 2G
+- The offline worker takes the API address from the build's VITE_API_URL, so moving the API is an env change
+
 ## [2.27.1] - 2026-11-14
 
 ### Fixed

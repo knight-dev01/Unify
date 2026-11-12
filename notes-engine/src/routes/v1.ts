@@ -3,6 +3,7 @@ import { noteClientError } from "../lib/alert";
 import { Router, type Request, type Response } from "express";
 import rateLimit from "express-rate-limit";
 import { z } from "zod";
+import { cachedWeek } from "../lib/weekCache";
 import { supabaseAdmin } from "../lib/supabase";
 import { getSemesterCalendar, forgetSemesterCalendar } from "../lib/calendar";
 import { notifyCoursePublished, notifyInAppNewNote } from "../lib/email";
@@ -16,6 +17,7 @@ const router = Router();
 
 // /me SSO-picture backfill throttle: one Auth lookup per user per hour
 // while the profile has no picture (password users have none to find).
+const emailBackfillAt = new Map<string, number>();
 const picBackfillAt = new Map<string, number>();
 // /me ADMIN_EMAILS check: the Auth email per user, remembered 10 min so a
 // non-admin's every /me no longer costs an Auth admin round trip. (Read from
@@ -217,7 +219,10 @@ router.get("/me", requireAuth, async (req: Request, res: Response) => {
       ((p.role === "lecturer" || p.role === "contributor" || p.role === "admin") && Boolean(p.first_name));
     // One-time backfill (then only while unconfirmed): email + confirmation
     // from Auth, so publish notifications can reach confirmed inboxes.
-    if (!p.email || !p.email_confirmed) {
+    // Throttled per user (hourly): an unconfirmed account used to cost two extra
+    // round trips on every /me.
+    if ((!p.email || !p.email_confirmed) && Date.now() - (emailBackfillAt.get(userId) || 0) > 60 * 60 * 1000) {
+      emailBackfillAt.set(userId, Date.now());
       try {
         const uRes = await supabaseAdmin().auth.admin.getUserById(userId);
         const u = (uRes.data as { user?: { email?: string; email_confirmed_at?: string } } | null)?.user;
@@ -990,7 +995,11 @@ router.get("/courses/:code/weeks/:week", requireAuth, requireCourseAccess, async
 });
 
 // Shared assembly (reader + public share links): shell + latest topics.
-async function assembleWeek(
+// Cached for a minute (lib/weekCache); any note write clears it.
+function assembleWeek(code: string, week: number): ReturnType<typeof assembleWeekFresh> {
+  return cachedWeek(`${cleanCode(code) || code}|${week}`, () => assembleWeekFresh(code, week));
+}
+async function assembleWeekFresh(
   code: string,
   week: number
 ): Promise<{ course: string; week: number; title: string; subtitle: string; note_json: unknown; topicMeta: TopicMeta[]; lectures: number[]; authors: { name: string; avatar: string }[] } | null> {
@@ -1802,28 +1811,24 @@ router.post("/progress", requireAuth, async (req: Request, res: Response) => {
       res.json({ ok: true, xp: 0, streak: 0, awarded: 0 });
       return;
     }
-    const { error: upErr } = await sb.from("topic_progress").upsert(
-      { user_id: userId, course, week, topic, lecture_no: parsed.data.lectureNo, done: true, completed_at: new Date().toISOString() },
-      { onConflict: "user_id,course,week,topic,lecture_no" }
-    );
-    if (upErr) throw upErr;
-    // Keep the Resume card on the just-completed position.
-    await sb.from("resume_state").upsert(
-      {
+    // Progress, resume position and XP are independent writes: one round trip.
+    const [{ error: upErr }] = await Promise.all([
+      sb.from("topic_progress").upsert(
+        { user_id: userId, course, week, topic, lecture_no: parsed.data.lectureNo, done: true, completed_at: new Date().toISOString() },
+        { onConflict: "user_id,course,week,topic,lecture_no" }
+      ),
+      // Keep the Resume card on the just-completed position.
+      sb.from("resume_state").upsert(
+        { user_id: userId, course, week, topic, lecture_no: parsed.data.lectureNo, updated_at: new Date().toISOString() },
+        { onConflict: "user_id" }
+      ),
+      sb.from("xp_events").insert({
         user_id: userId,
-        course,
-        week,
-        topic,
-        lecture_no: parsed.data.lectureNo,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "user_id" }
-    );
-    await sb.from("xp_events").insert({
-      user_id: userId,
-      amount: TOPIC_XP,
-      reason: `topic_complete:${course}:w${week}:l${parsed.data.lectureNo}:t${topic}`,
-    });
+        amount: TOPIC_XP,
+        reason: `topic_complete:${course}:w${week}:l${parsed.data.lectureNo}:t${topic}`,
+      }),
+    ]);
+    if (upErr) throw upErr;
     const { data: xpRows } = await sb
       .from("xp_events")
       .select("amount,created_at")
