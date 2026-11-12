@@ -42,6 +42,8 @@ export const ROUTES = {
   reports: '/reports',
   adminRoles: '/admin-roles',
   onlineClass: '/online-class',
+  guide: '/guide',
+  contributors: '/class/contributors',
 
   admin: '/admin',
   adminContent: '/admin/content',

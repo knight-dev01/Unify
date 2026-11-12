@@ -252,6 +252,17 @@ export default function HomeRoute() {
   useEffect(() => {
     api.updates().then((r) => setLiveUpdates(r.updates || [])).catch(() => {});
   }, []);
+  // S44: the school's guide sits in the carousel; it leads when the admin has
+  // updated it since this student last opened it.
+  const [guide, setGuide] = useState<{ title: string; steps: number; updated: string; fresh: boolean } | null>(null);
+  useEffect(() => {
+    api.guide().then((r) => {
+      if (!r.guide) return;
+      let seen = '';
+      try { seen = localStorage.getItem('unify:guide-seen') || ''; } catch { /* fine */ }
+      setGuide({ title: r.guide.title, steps: r.guide.steps.length, updated: r.guide.updated_at, fresh: seen !== r.guide.updated_at });
+    }).catch(() => {});
+  }, []);
   const [resume, setResume] = useState<{ course: string; week: number; topic: number; lecture?: number } | null>(null);
   const [quizzes, setQuizzes] = useState({ taken: 0, avg: 0 });
   const [loading, setLoading] = useState(true);
@@ -601,6 +612,11 @@ export default function HomeRoute() {
     updateSlides.unshift({ id: 'resume', pose: 'readingStanding', tag: 'Pick up', title: `${resume.course} · Week ${resume.week}`, body: 'You stopped here. A few minutes keeps the streak alive.', to: `/learn/${encodeURIComponent(resume.course.trim())}/week/${resume.week}${qs ? `?${qs}` : ''}`, cta: 'Resume' });
   }
   if (shown.length === 0) updateSlides.push({ id: 'enroll', pose: 'peeking', tag: 'Start here', title: 'Add your courses', body: 'Find your department’s courses and the notes appear on Home.', to: '/courses/find', cta: 'Find courses' });
+  if (guide) {
+    const slide: UpdateSlide = { id: 'guide', pose: 'targetSign', tag: guide.fresh ? 'Updated by your school' : 'Guide', title: guide.title, body: `${guide.steps} steps, in order, with where to go for each one.`, to: '/guide', cta: 'Open the guide' };
+    if (guide.fresh) updateSlides.splice(resume ? 1 : 0, 0, slide);
+    else updateSlides.push(slide);
+  }
   updateSlides.push({ id: 'attend', pose: 'phoneOut', tag: 'In class', title: 'Your attendance pass', body: 'In class, open My pass and let your class rep or lecturer scan it.', to: '/attendance/pass', cta: 'My pass' });
   updateSlides.push({ id: 'class', pose: 'thumbsUpPhone', tag: 'Your class', title: 'Notices from your class rep', body: 'Board posts and shared materials from your course live in Class.', to: '/class', cta: 'Open Class' });
   {

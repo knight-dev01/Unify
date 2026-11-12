@@ -170,6 +170,15 @@ export type Profile = {
   hide_cgpa?: boolean;
 };
 
+export type SchoolGuide = {
+  institution: string;
+  title: string;
+  intro: string;
+  steps: { title: string; body: string; where: string }[];
+  published: boolean;
+  updated_at: string;
+};
+
 export type AdminUser = {
   id: string;
   first_name?: string;
@@ -666,6 +675,15 @@ export const api = {
   hocRequests: () => apiFetch<{ requests: { id: string; name: string; email: string; department: string; level: string; note: string; status: 'pending' | 'approved' | 'rejected'; at: string; repsInClass: number }[] }>('/v1/hoc/requests'),
   hocAnswer: (id: string, approve: boolean, note?: string) =>
     apiFetch<{ ok: boolean }>(`/v1/hoc/requests/${id}`, { method: 'POST', body: JSON.stringify({ approve, note }) }),
+  guide: (institution?: string) =>
+    apiFetch<{ guide: SchoolGuide | null; canEdit: boolean }>(`/v1/guide${institution ? `?institution=${encodeURIComponent(institution)}` : ''}`),
+  guideSave: (payload: { institution?: string; title: string; intro: string; steps: SchoolGuide['steps']; published: boolean }) =>
+    apiFetch<{ ok: boolean; updated_at: string }>('/v1/admin/guide', { method: 'PUT', body: JSON.stringify(payload) }),
+  classContributors: (q?: { department: string; level: string }) =>
+    apiFetch<{
+      department: string; level: string; week: number | null; contributors: number; onTrack: number; behind: number;
+      courses: { course: string; students: number; weeksPublished: number; latestWeek: number; lastPublished: string | null; status: 'on_track' | 'behind' | 'unknown'; people: { id: string; name: string; role: 'contributor' | 'lecturer'; lastPublished: string | null }[] }[];
+    }>(`/v1/hoc/contributors${q ? `?department=${encodeURIComponent(q.department)}&level=${encodeURIComponent(q.level)}` : ''}`),
   adminOverview: () =>
     apiFetch<{
       attention: { key: string; label: string; n: number; to: string }[];

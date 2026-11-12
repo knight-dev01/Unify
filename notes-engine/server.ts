@@ -208,6 +208,9 @@ app.use("/v1", roles.default || roles);
 // Teaching side: content reports, lecturer posts, course report, attendance per student, lecturer profile.
 const teaching = require("./src/routes/teaching");
 app.use("/v1", teaching.default || teaching);
+// School pages: the student guide (kept by admins) and the class rep's contributors view.
+const school = require("./src/routes/school");
+app.use("/v1", school.default || school);
 // Live performance + browser vitals for the admin panel.
 const ops = require("./src/routes/ops");
 app.use("/v1", ops.default || ops);
