@@ -5,6 +5,24 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.27.0] - 2026-11-14
+
+### Added
+- **Pick your time, then race the clock** in Keywords and Crossword: choose 3, 5, 8 or 12 minutes before starting (the size-based time is marked Suggested, your last pick is remembered; coursemate sessions use the suggested time). Time played counts only while the game is on screen, a countdown bar turns amber then red, and at zero the run ends with a Time's up card that still saves your score
+- **Cheers** while you play: a big pop-up word for every word found, streaks ("3 in a row!"), key terms, bonus words, crossword words finished, halfway there, levels cleared and the whole game done, with confetti for the big moments and a light buzz on phones
+- **Every word box has its own clue** in Keywords (a sentence from the notes with the word blanked out); the clue moves to the next word once one is found, and tapping a box shows its clue. Hints reveal letters of the word whose clue is showing
+- **Course games page** (/games): pick a course and a week to play, plus the course leaderboard and each week's. Reachable from a new Home slider card, from admin Home-slider buttons ("Practice games"), and from the course page
+- **Practice this week** at the end of every week's notes (the last tab): both games and that week's top 3 (the game buttons left the top of the notes)
+- **Class members** on the class board: everyone on Unify in your department and level, class rep first, with search. Names and photos or avatars only, never emails or matric numbers
+- **Live wire for everyone who sends one**: its own page (/livewire), linked from Me for class reps, lecturers, contributors, level admins, HODs, deans and admins, and a Live wire section in admin (send, plus every live wire running with End)
+
+### Changed
+- **Back goes back**: Back buttons step back through the browser history instead of opening the previous screen again, so Notes → Game → Back → Back no longer returns to the game (phone back gesture included). Leaving a game always lands on the course games page
+- **Smoother Shuffle** in Keywords: letters swirl clockwise round the ring to their new places
+- **Semester week tracker** on Home shades from green through yellow and orange to red as exams get closer, with "N weeks to go" and "final week"
+- **Timetable** shows the day as an 8am to 6pm timeline (with a now-line today) even when nothing is scheduled
+- Leaderboard time is now time actually played
+
 ## [2.26.0] - 2026-11-12
 
 ### Changed

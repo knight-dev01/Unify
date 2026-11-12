@@ -103,6 +103,47 @@ function readPass(token: string): { id: string } | { error: string } {
 // ---------- Head of Class ----------
 
 // Posts for my department + level (students, HOC and lecturers read them).
+// Class members: everyone on Unify in your class (same department + level),
+// for students, class reps and admins (admins may name any class with
+// ?department=&level=). Names and avatars only: no emails, no matric numbers.
+router.get("/hoc/members", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const me = await getProfile(uid(req));
+    if (!me) return fail(res, 404, "Finish onboarding first.");
+    const q = req.query as Record<string, unknown>;
+    const pick = me.is_admin && typeof q.department === "string" && typeof q.level === "string" && q.department && q.level;
+    const department = pick ? String(q.department) : me.department;
+    const level = pick ? String(q.level) : me.level;
+    if (!department || !level) {
+      res.json({ department: department || null, level: level || null, members: [] });
+      return;
+    }
+    if (!pick && me.role && me.role !== "student" && !me.is_hoc && !me.is_admin) return fail(res, 403, "Class members are for students in the class.");
+    const { data, error } = await supabaseAdmin()
+      .from("profiles")
+      .select("id,first_name,attendance_full_name,avatar_url,box_boy_persona,is_hoc")
+      .eq("department", department)
+      .eq("level", level)
+      .eq("role", "student")
+      .limit(1000);
+    if (error) throw error;
+    const rows = (data ?? []) as { id: string; first_name: string | null; attendance_full_name: string | null; avatar_url: string | null; box_boy_persona: string | null; is_hoc: boolean | null }[];
+    const members = rows
+      .map((p) => ({
+        id: p.id,
+        name: (p.attendance_full_name || p.first_name || "A student").trim(),
+        avatar: p.avatar_url || "",
+        persona: p.box_boy_persona || null,
+        isHoc: !!p.is_hoc,
+        me: p.id === me.id,
+      }))
+      .sort((x, y) => Number(y.isHoc) - Number(x.isHoc) || x.name.localeCompare(y.name));
+    res.json({ department, level, members });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
 router.get("/hoc/posts", requireAuth, async (req: Request, res: Response) => {
   try {
     const me = await getProfile(uid(req));
