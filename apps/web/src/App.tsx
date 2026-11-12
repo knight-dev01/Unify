@@ -1,4 +1,5 @@
 import { Suspense, useEffect, useState } from 'react';
+import { applyRouteMeta } from './lib/seo';
 import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import Layout from './routes/_layout';
 import CourseRoute from './routes/courses';
@@ -192,6 +193,13 @@ function RequireRole({ allow, children, strict = false }: { allow: string[]; chi
   return children;
 }
 
+// Page title, description, canonical and robots tag for every route (SEO).
+function RouteMeta() {
+  const { pathname } = useLocation();
+  useEffect(() => { applyRouteMeta(pathname); }, [pathname]);
+  return null;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -200,6 +208,7 @@ export default function App() {
         surface on EVERY screen including chromeless ones (/auth,
         /onboarding, /s/:token) that never mount the layout. */}
         <Toasts />
+        <RouteMeta />
         <ZoomBar />
         <InstallBar />
         {/* Lazy routes (Studio, admin, browse…) suspend on first open —
