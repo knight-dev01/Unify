@@ -5,6 +5,12 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.27.1] - 2026-11-14
+
+### Fixed
+- **Revision showed nothing after finishing a topic**: topics written without Active Recall questions now give cards from their mini checks and pulse check; finished topics match even when the week shows every lecture's topics together; Revision and progress always load fresh (never an older offline copy); staff accounts are told that only student accounts record finished topics. After "Mark Topic Complete" a link points to the topic's cards in Revision
+- **Loading skeletons now match their screens**: the notes reader (week header, topic tabs, narration bar, subtopic cards), Home (dark greeting card, stats, slider, course cards in one column), the course page, Me and both games. The rotating quote sits below the skeleton so nothing jumps when the page arrives
+
 ## [2.27.0] - 2026-11-14
 
 ### Added

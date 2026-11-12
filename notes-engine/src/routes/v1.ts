@@ -2147,6 +2147,21 @@ router.get("/progress", requireAuth, async (req: Request, res: Response) => {
 // ---- Learning: course progress, activity/streak, revision (S23–S25, S34–S36) ----
 
 type AssembledTopic = { number?: number; lecture?: number; title?: string; activeRecall?: { question?: string; answer?: string; badge?: string }[] };
+// Recall cards from a topic's check questions: reveal Qs as they are, fill-in-
+// the-blank with the accepted answer, multiple choice with the right option.
+type CheckQ = { type?: string; question?: string; answer?: string; acceptedAnswers?: string[]; options?: string[]; correctIndex?: number };
+function recallFromChecks(t: AssembledTopic): { question: string; answer: string; badge: string }[] {
+  const raw = t as unknown as { subtopics?: { miniCheck?: { questions?: CheckQ[] } }[]; pulseCheck?: { questions?: CheckQ[] } };
+  const qs: CheckQ[] = [...(raw.subtopics || []).flatMap((s) => s.miniCheck?.questions || []), ...(raw.pulseCheck?.questions || [])];
+  const out: { question: string; answer: string; badge: string }[] = [];
+  for (const q of qs) {
+    if (!q.question) continue;
+    const answer = q.type === "reveal" ? q.answer : q.type === "fitb" ? q.acceptedAnswers?.[0] : q.type === "mcq" ? q.options?.[q.correctIndex ?? -1] : undefined;
+    if (answer) out.push({ question: q.question, answer, badge: "Check" });
+    if (out.length >= 6) break;
+  }
+  return out;
+}
 const topicsOf = (noteJson: unknown): AssembledTopic[] => {
   const t = (noteJson as { topics?: unknown } | null)?.topics;
   return Array.isArray(t) ? (t as AssembledTopic[]) : [];
@@ -2257,10 +2272,23 @@ router.get("/learn/revision", requireAuth, async (req: Request, res: Response) =
       const a = assembled[i];
       if (!a) return;
       const mine = new Set(done.filter((d) => d.course === c && d.week === Number(w)).map((d) => `${d.lecture_no || 1}:${d.topic}`));
-      for (const t of topicsOf(a.note_json)) {
-        if (!mine.has(`${t.lecture || 1}:${t.number}`)) continue;
+      const topics = topicsOf(a.note_json);
+      // A topic counts as finished on its exact lecture, or on lecture 1 when the
+      // week shows every lecture's topics together (the reader records lecture 1).
+      const lectureOf = new Map<number, number>();
+      for (const t of topics) if (typeof t.number === "number") lectureOf.set(t.number, (lectureOf.get(t.number) || 0) + 1);
+      for (const t of topics) {
+        const exact = mine.has(`${t.lecture || 1}:${t.number}`);
+        const loose = (lectureOf.get(t.number as number) || 0) === 1 && mine.has(`1:${t.number}`);
+        if (!exact && !loose) continue;
+        const before = cards.length;
         for (const r of t.activeRecall || []) {
           if (r.question && r.answer) cards.push({ course: c, week: Number(w), topic: t.title || "", question: r.question, answer: r.answer, badge: r.badge || "" });
+        }
+        // No Active Recall written for this topic: use its other questions
+        // (mini checks and the pulse check), so finishing it still gives cards.
+        if (cards.length === before) {
+          for (const q of recallFromChecks(t)) cards.push({ course: c, week: Number(w), topic: t.title || "", ...q });
         }
       }
     });
