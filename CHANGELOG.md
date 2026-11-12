@@ -5,6 +5,11 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.25.1] - 2026-11-12
+
+### Fixed
+- **Keywords and Crossword said "Not enough key terms yet" on most weeks**: they only used terms the notes mark (symbols, bold words, one-word quiz answers). They now also take short subtopic titles (clue: the subtopic's opening sentence) and the technical words the notes keep coming back to (clue: a sentence that defines or uses the word), skipping everyday words. Plain notes now give up to 12 levels and a 12-word crossword
+
 ## [2.25.0] - 2026-11-12
 
 ### Added
