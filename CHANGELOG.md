@@ -5,6 +5,13 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.27.3] - 2026-11-13
+
+### Fixed (Review Round 2 bugs)
+- **Deleting a user now deletes everything**: enrollments, progress, XP, quiz attempts, resume position, notifications and error logs are wiped (they had no cascade), then the profile (everything else cascades), then the sign-in account, whose failure used to be swallowed. Signing up again starts fresh, so new accounts go through onboarding
+- **"Welcome back, [name]"**: logging out forgets the remembered name, so the next person gets a plain "Sign in"; the name only greets someone the app signed out on its own
+- **Back from a course page looped back to the course**: redirects (/course/X → /courses/X) now replace the screen in the Back trail instead of adding a stop, and links go straight to /courses/X
+
 ## [2.27.2] - 2026-11-14
 
 ### Performance

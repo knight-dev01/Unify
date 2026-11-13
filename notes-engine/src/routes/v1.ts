@@ -3324,13 +3324,24 @@ router.delete("/admin/users/:id", requireAuth, async (req: Request, res: Respons
   }
   try {
     const sb = supabaseAdmin();
-    try {
-      await sb.auth.admin.deleteUser(req.params.id);
-    } catch {
-      // auth row may already be gone; profile delete still proceeds
+    const id = req.params.id;
+    // A delete must leave nothing behind, so signing up again starts fresh.
+    // 1. Tables keyed by user_id with no foreign key (nothing cascades to them).
+    const loose = ["enrollments", "topic_progress", "xp_events", "quiz_attempts", "resume_state", "notifications", "client_errors"];
+    const wiped = await Promise.all(loose.map((t) => sb.from(t).delete().eq("user_id", id)));
+    const wipeErr = wiped.find((r) => r.error)?.error;
+    if (wipeErr) throw wipeErr;
+    // 2. The profile: everything else (attendance, games, posts, roles, push…)
+    //    cascades or is unlinked by its foreign key.
+    const { error: profErr } = await sb.from("profiles").delete().eq("id", id);
+    if (profErr) throw profErr;
+    // 3. The sign-in account itself. supabase-js reports failure in `error`
+    //    (it never throws), which is how deletes used to fail silently.
+    const { error: authErr } = await sb.auth.admin.deleteUser(id);
+    if (authErr && !/not.?found/i.test(authErr.message || "")) {
+      res.status(500).json({ error: `Their data is gone, but the sign-in account couldn't be removed: ${authErr.message}` });
+      return;
     }
-    const { error } = await sb.from("profiles").delete().eq("id", req.params.id);
-    if (error) throw error;
     res.json({ ok: true });
   } catch (e) {
     res.status(500).json(dbError(e));
