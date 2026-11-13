@@ -234,6 +234,9 @@ app.use("/v1", ops.default || ops);
 // In-app bug reports (Me › Report a bug) and their admin list.
 const bugs = require("./src/routes/bugs");
 app.use("/v1", bugs.default || bugs);
+// Faculties and departments (admin-managed; every picker reads them).
+const structure = require("./src/routes/structure");
+app.use("/v1", structure.default || structure);
 
 // Authoring guard: lecturers/contributors only (students get 403).
 // convert costs Claude money; save/upload cost disk. validate/render/sample

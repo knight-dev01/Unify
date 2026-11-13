@@ -5,6 +5,15 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.27.8] - 2026-11-13
+
+### Added
+- **Faculties & departments managed in Admin** (Academics): add, rename, move, retire/restore departments; add faculties and set them Open / Coming soon / Not open yet. Renames carry to everyone already in them (profiles, class lists, class boards, class rep requests, live wires, roles). Every picker (onboarding, Me, lecturer setup, admin roles, admin pickers) reads the one list, with the built-in list as fallback (migration 0045, seeded with today's data)
+- **Send a PDF** (lecturers, on Classroom and each course's Post tab): the PDF is compressed on the phone (~150 dpi, up to 25 MB in; the original is kept when it wouldn't shrink), uploaded straight to storage, saved to the course's materials for the contributor, and posted to every class taking the course with bell + push
+
+### Changed
+- **Lecturer tabs: Home · Timetable · Classroom · Me**. Home stays the new design view; Classroom is the former Classroom page (today's classes, attendance, tiles) plus Send a PDF
+
 ## [2.27.7] - 2026-11-13
 
 ### Changed (Review Round 2: lecturer side, phase 1)

@@ -338,4 +338,94 @@ router.get("/lecturer/profile/:id", requireAuth, async (req: Request, res: Respo
   }
 });
 
+// ---------- Send a PDF (lecturer, Classroom and course pages) ----------
+// The phone compresses the PDF, then uploads it straight to Storage through a
+// one-time signed link (the API never carries the file). Sending it then
+//  1. saves it to the course's materials (so the contributor can turn it into notes),
+//  2. posts it to every class taking the course (bell + push, opens in one tap),
+//  3. tells the course's contributors on their bell.
+const PDF_BUCKET = "course-files";
+const PDF_MAX = 25 * 1024 * 1024;
+let pdfBucketReady = false;
+async function ensurePdfBucket() {
+  if (pdfBucketReady) return;
+  const sb = supabaseAdmin();
+  const { data } = await sb.storage.getBucket(PDF_BUCKET);
+  if (!data) {
+    const { error } = await sb.storage.createBucket(PDF_BUCKET, { public: true, fileSizeLimit: PDF_MAX, allowedMimeTypes: ["application/pdf"] });
+    if (error && !/already exists/i.test(error.message)) throw error;
+  }
+  pdfBucketReady = true;
+}
+
+router.post("/lecturer/pdf/upload-url", requireAuth, async (req: Request, res: Response) => {
+  const parsed = z.object({ course: z.string().min(1).max(20), filename: z.string().min(1).max(200), size: z.number().int().min(1).max(PDF_MAX) }).safeParse(req.body);
+  if (!parsed.success) return fail(res, 400, "Pick a PDF up to 25 MB.");
+  try {
+    const m = await me(req);
+    const course = clean(parsed.data.course);
+    if (!m || !(m.role === "lecturer" || isAdmin(m)) || !(await teaches(m, course))) return fail(res, 403, "Only the course's lecturer sends files to its students.");
+    await ensurePdfBucket();
+    const safe = parsed.data.filename.replace(/\.pdf$/i, "").replace(/[^A-Za-z0-9._-]+/g, "_").slice(-60) || "file";
+    const path = `${course.replace(/[^A-Z0-9]/g, "")}/${Date.now()}-${safe}.pdf`;
+    const { data, error } = await supabaseAdmin().storage.from(PDF_BUCKET).createSignedUploadUrl(path);
+    if (error || !data) throw error || new Error("No upload link");
+    res.json({ path, token: data.token, signedUrl: data.signedUrl, bucket: PDF_BUCKET });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
+router.post("/lecturer/pdf", requireAuth, async (req: Request, res: Response) => {
+  const parsed = z
+    .object({
+      course: z.string().min(1).max(20),
+      path: z.string().min(1).max(300),
+      title: z.string().trim().min(1).max(120),
+      message: z.string().trim().max(1000).optional(),
+      week: z.number().int().min(1).max(30),
+      type: z.enum(["slides", "notes", "past-paper"]).default("notes"),
+      sizeKb: z.number().int().min(0).max(PDF_MAX / 1024).optional(),
+    })
+    .safeParse(req.body);
+  if (!parsed.success) return fail(res, 400, "Give the file a title and a week.");
+  try {
+    const m = await me(req);
+    const course = clean(parsed.data.course);
+    if (!m || !(m.role === "lecturer" || isAdmin(m)) || !(await teaches(m, course))) return fail(res, 403, "Only the course's lecturer sends files to its students.");
+    const d = parsed.data;
+    if (!d.path.startsWith(`${course.replace(/[^A-Z0-9]/g, "")}/`)) return fail(res, 400, "That file doesn't belong to this course.");
+    const sb = supabaseAdmin();
+    const url = sb.storage.from(PDF_BUCKET).getPublicUrl(d.path).data.publicUrl;
+    // 1. Course materials (for the contributor and the course page).
+    const { error: mErr } = await sb.from("lecturer_materials").insert({ uploaded_by: m.id, course_code: course, week_number: d.week, type: d.type, title: d.title, file_url: url });
+    if (mErr) throw mErr;
+    // 2. A post to every class taking the course.
+    const size = d.sizeKb ? ` (${d.sizeKb >= 1024 ? `${(d.sizeKb / 1024).toFixed(1)} MB` : `${d.sizeKb} KB`})` : "";
+    const content = `${d.message ? `${d.message}\n\n` : ""}📄 ${d.title}${size}: ${url}`;
+    const { error: pErr } = await sb.from("course_posts").insert({ author_id: m.id, course, type: "announcement", title: `${d.title} (Week ${d.week})`, content });
+    if (pErr) throw pErr;
+    const ids = (await takersOf(course)).filter((x) => x !== m.id);
+    const title = `${course}: new PDF from your lecturer`;
+    const body = d.message ? d.message.slice(0, 140) : d.title;
+    const link = `/courses/${encodeURIComponent(course)}`;
+    for (let i = 0; i < ids.length; i += 500) {
+      await sb.from("notifications").insert(ids.slice(i, i + 500).map((user_id) => ({ user_id, type: "lecturer_post", title, body, course, link })));
+    }
+    void sendPushToUsers(ids, { title, body, url: link }).catch(() => {});
+    // 3. The course's contributors: material to turn into notes.
+    const { data: teachers } = await sb.from("enrollments").select("user_id").in("course", variants(course)).eq("kind", "teaching");
+    const tIds = ((teachers ?? []) as { user_id: string }[]).map((t) => t.user_id).filter((x) => x !== m.id);
+    if (tIds.length) {
+      const { data: contribs } = await sb.from("profiles").select("id").in("id", tIds).eq("role", "contributor");
+      const cIds = ((contribs ?? []) as { id: string }[]).map((c) => c.id);
+      if (cIds.length) await sb.from("notifications").insert(cIds.map((user_id) => ({ user_id, type: "lecturer_material", title: `${course} Week ${d.week}: material from the lecturer`, body: d.title, course, link: "/studio" })));
+    }
+    res.json({ ok: true, reached: ids.length, url });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
+
 export default router;
