@@ -3778,6 +3778,9 @@ const quizSchema = z.object({
   week: z.number().int().min(1).max(52),
   score: z.number().int().min(0).max(100),
   total: z.number().int().min(1).max(100),
+  // Positions in the week's quiz that were asked / got wrong (most-missed report).
+  asked: z.array(z.number().int().min(0).max(199)).max(200).optional(),
+  wrong: z.array(z.number().int().min(0).max(199)).max(200).optional(),
 });
 
 // Authed: daily-activity heartbeat. Streak = days with qualifying activity:
@@ -3840,6 +3843,7 @@ router.post("/quiz/attempt", requireAuth, async (req: Request, res: Response) =>
       week: parsed.data.week,
       score: parsed.data.score,
       total: parsed.data.total,
+      ...(parsed.data.asked ? { asked: parsed.data.asked, wrong: parsed.data.wrong || [] } : {}),
     });
     if (error) throw error;
     // Passed quizzes extend the streak (amount 0: streak fuel, not XP).

@@ -5,6 +5,15 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.27.13] - 2026-11-13
+
+### Added (design L09, L11, L16, L17; migration 0049)
+- **Most missed questions** in the lecturer's Report: per week, the quiz questions with the highest wrong rate (quiz attempts now record which questions were asked and missed; counts from this release on)
+- **Practice questions**: lecturers add multiple-choice questions (with the right answer, an optional explanation and week) from the Report; students answer them in the course's Practice tab with instant feedback and a score
+- **Spot check** on the register: 10 random students marked present, one at a time, Here / Not here; "Not here" takes them off the register
+- **My own timetable** for lecturers: a Class timetables / My own switch on Timetable (same day and week grids) to add office hours and other duties only they see; also a row on Me
+- **Studio** tile on the lecturer's Classroom page
+
 ## [2.27.12] - 2026-11-13
 
 ### Added (Review Round 2: lecturer side, phase 3; migration 0048)

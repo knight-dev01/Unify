@@ -157,4 +157,38 @@ router.post("/hoc/lecturer-checks/:id", requireAuth, async (req: Request, res: R
   }
 });
 
+// My own timetable (design L09/L17): a lecturer's own entries, only they see them.
+const hhmm = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
+router.get("/lecturer/own-slots", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const { data } = await supabaseAdmin().from("lecturer_slots").select("id,day,start_time,end_time,title,venue").eq("user_id", uid(req)).order("day").order("start_time");
+    res.json({ slots: ((data ?? []) as { id: string; day: number; start_time: string; end_time: string; title: string; venue: string | null }[]).map((r) => ({ id: r.id, day: r.day, start: r.start_time, end: r.end_time, title: r.title, venue: r.venue || "" })) });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+router.post("/lecturer/own-slots", requireAuth, async (req: Request, res: Response) => {
+  const parsed = z.object({ day: z.number().int().min(0).max(6), start: hhmm, end: hhmm, title: z.string().trim().min(1).max(80), venue: z.string().trim().max(120).optional() }).safeParse(req.body);
+  if (!parsed.success || parsed.data.end <= parsed.data.start) return fail(res, 400, "Give it a name, a day, and an end after the start.");
+  try {
+    const m = await me(req);
+    if (!m || m.role !== "lecturer") return fail(res, 403, "Lecturers only.");
+    const { error } = await supabaseAdmin().from("lecturer_slots").insert({ user_id: m.id, day: parsed.data.day, start_time: parsed.data.start, end_time: parsed.data.end, title: parsed.data.title, venue: parsed.data.venue || null });
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+router.delete("/lecturer/own-slots/:id", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const { error } = await supabaseAdmin().from("lecturer_slots").delete().eq("id", req.params.id).eq("user_id", uid(req));
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
+
 export default router;

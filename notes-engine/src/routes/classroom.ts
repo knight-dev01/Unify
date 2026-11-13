@@ -765,6 +765,24 @@ router.get("/attendance/sessions/:id/register.csv", requireAuth, async (req: Req
   }
 });
 
+// Spot check (design L16): the lecturer calls out random names; anyone not in
+// the room comes off the register.
+router.delete("/attendance/sessions/:id/records/:studentId", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const me = await getProfile(uid(req));
+    const sb = supabaseAdmin();
+    const { data } = await sb.from("attendance_sessions").select("id,course_code").eq("id", req.params.id).single();
+    const s = data as { id: string; course_code: string } | null;
+    if (!s) return fail(res, 404, "Session not found.");
+    if (!me || !(await canScan(me, s.course_code))) return fail(res, 403, "Only the course's lecturer or class rep changes this register.");
+    const { error } = await sb.from("attendance_records").delete().eq("session_id", s.id).eq("student_id", req.params.studentId);
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
 router.post("/attendance/sessions/:id/close", requireAuth, async (req: Request, res: Response) => {
   try {
     const me = await getProfile(uid(req));

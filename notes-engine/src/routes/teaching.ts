@@ -565,4 +565,94 @@ router.post("/lecturer/week-review", requireAuth, async (req: Request, res: Resp
 });
 
 
+// ---------- Most missed quiz questions for a week (L11) ----------
+// Wrong rate per question across attempts that recorded their answers.
+router.get("/lecturer/missed", requireAuth, async (req: Request, res: Response) => {
+  const course = clean(req.query.course);
+  const week = Number(req.query.week);
+  if (!course || !week) return fail(res, 400, "Pass ?course=CODE&week=N.");
+  try {
+    const m = await me(req);
+    if (!(await teaches(m, course))) return fail(res, 403, "Only the course's lecturers see this.");
+    const sb = supabaseAdmin();
+    const [{ data: attempts }, { data: shell }] = await Promise.all([
+      sb.from("quiz_attempts").select("asked,wrong").in("course", variants(course)).eq("week", week).not("asked", "is", null).limit(20000),
+      sb.from("weeks").select("note_json").in("course", variants(course)).eq("week", week).limit(1),
+    ]);
+    const qs = ((((shell ?? []) as { note_json: { eoq?: { questions?: { question?: string }[] } } | null }[])[0]?.note_json?.eoq?.questions) || []);
+    const asked = new Map<number, number>();
+    const wrong = new Map<number, number>();
+    for (const a of (attempts ?? []) as { asked: number[] | null; wrong: number[] | null }[]) {
+      for (const i of a.asked || []) asked.set(i, (asked.get(i) || 0) + 1);
+      for (const i of a.wrong || []) wrong.set(i, (wrong.get(i) || 0) + 1);
+    }
+    const strip = (t: string) => t.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+    const rows = [...asked.entries()]
+      .filter(([, n]) => n >= 3)
+      .map(([i, n]) => ({ index: i, question: strip(qs[i]?.question || `Question ${i + 1}`).slice(0, 160), asked: n, wrongPct: Math.round(((wrong.get(i) || 0) / n) * 100) }))
+      .filter((r) => r.wrongPct > 0)
+      .sort((a, b) => b.wrongPct - a.wrongPct)
+      .slice(0, 5);
+    res.json({ week, attempts: (attempts ?? []).length, questions: rows });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
+// ---------- Practice questions a lecturer adds (L11), shown to students ----------
+const practiceSchema = z.object({
+  course: z.string().min(1).max(20),
+  week: z.number().int().min(1).max(30).optional(),
+  question: z.string().trim().min(5).max(600),
+  options: z.array(z.string().trim().min(1).max(200)).min(2).max(6),
+  correctIndex: z.number().int().min(0).max(5),
+  explanation: z.string().trim().max(600).optional(),
+});
+router.get("/practice", requireAuth, async (req: Request, res: Response) => {
+  const course = clean(req.query.course);
+  if (!course) return fail(res, 400, "Pass ?course=CODE.");
+  try {
+    const m = await me(req);
+    const staff = await teaches(m, course);
+    if (!m || !(staff || (await enrolled(m.id, course, "taking")))) return fail(res, 403, "Add this course to practise.");
+    const { data } = await supabaseAdmin().from("practice_questions").select("id,week,question,options,correct_index,explanation,author_id,created_at").in("course", variants(course)).order("week", { ascending: true, nullsFirst: false }).order("created_at").limit(300);
+    res.json({
+      questions: ((data ?? []) as { id: string; week: number | null; question: string; options: string[]; correct_index: number; explanation: string | null; author_id: string | null }[]).map((q) => ({
+        id: q.id, week: q.week, question: q.question, options: q.options, correctIndex: q.correct_index, explanation: q.explanation || "", mine: q.author_id === m.id,
+      })),
+    });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+router.post("/practice", requireAuth, async (req: Request, res: Response) => {
+  const parsed = practiceSchema.safeParse(req.body);
+  if (!parsed.success || (parsed.success && parsed.data.correctIndex >= parsed.data.options.length)) return fail(res, 400, "Write the question, at least two options, and pick the right one.");
+  try {
+    const m = await me(req);
+    const course = clean(parsed.data.course);
+    if (!m || !(m.role === "lecturer" || isAdmin(m)) || !(await teaches(m, course))) return fail(res, 403, "Only the course's lecturer adds practice questions.");
+    const d = parsed.data;
+    const { error } = await supabaseAdmin().from("practice_questions").insert({ course, week: d.week ?? null, question: d.question, options: d.options, correct_index: d.correctIndex, explanation: d.explanation || null, author_id: m.id });
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+router.delete("/practice/:id", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const m = await me(req);
+    const sb = supabaseAdmin();
+    const { data } = await sb.from("practice_questions").select("author_id").eq("id", req.params.id).maybeSingle();
+    if (!data) return fail(res, 404, "That question is gone.");
+    if ((data as { author_id: string | null }).author_id !== m?.id && !isAdmin(m)) return fail(res, 403, "You can only remove your own questions.");
+    await sb.from("practice_questions").delete().eq("id", req.params.id);
+    res.json({ ok: true });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
+
 export default router;
