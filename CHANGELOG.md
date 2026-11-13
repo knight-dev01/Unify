@@ -5,6 +5,13 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.27.11] - 2026-11-13
+
+### Changed (Review Round 2: student side)
+- **Course page (design S23)**: the course's full title and semester, lecturer cards (photo, title, department, bio; tap for their profile), Save for offline (every published week) and Report a problem (pick the week), and a Week X of 12 bar. Weeks are expandable cards (badge, classes done, quiz, attendance) that open to the week's classes (read / up next), attendance for each class held (a dot per class), the week's quiz and the notes. Weeks the semester has reached without notes show "Notes land soon". The attendance card with My pass sits under the weeks
+- **Square course cards on Home** (two per row on phones): lecturer photos and status, the course, progress
+- Course page and Home skeletons match the new layouts
+
 ## [2.27.10] - 2026-11-13
 
 ### Added
