@@ -6,6 +6,7 @@ import { supabaseAdmin } from "../lib/supabase";
 import { requireAuth, type AuthedRequest } from "../middleware/requireAuth";
 import { sendPushToUsers } from "../lib/push";
 import { expectedEntries, listsForCourse } from "../lib/classlist";
+import { postAudience } from "../lib/lecturerClaims";
 
 // Teaching side (mounted at /v1):
 //  - content reports: students "Report a problem" (S27), lecturers "Review this week" (L13);
@@ -162,9 +163,12 @@ router.post("/course-posts", requireAuth, async (req: Request, res: Response) =>
     const course = clean(parsed.data.course);
     if (!m || !(m.role === "lecturer" || isAdmin(m)) || !(await teaches(m, course))) return fail(res, 403, "Only the course's lecturer posts to its students.");
     const sb = supabaseAdmin();
+    // A course the lecturer added themselves reaches only classes whose rep confirmed them.
+    const aud = isAdmin(m) ? { ok: true, ids: await takersOf(course), waiting: false } : await postAudience(m.id, course, await takersOf(course));
+    if (!aud.ok) return fail(res, 403, "Waiting for a class rep to confirm you teach this course. Posts and files reach a class once its rep says yes.");
     const { error } = await sb.from("course_posts").insert({ author_id: m.id, course, type: parsed.data.type, title: parsed.data.title || null, content: parsed.data.content });
     if (error) throw error;
-    const ids = (await takersOf(course)).filter((x) => x !== m.id);
+    const ids = aud.ids.filter((x) => x !== m.id);
     const title = parsed.data.title || `${course}: ${parsed.data.type === "tip" ? "a tip" : parsed.data.type === "reminder" ? "reminder" : "announcement"} from your lecturer`;
     const body = parsed.data.content.slice(0, 140);
     const link = `/course/${encodeURIComponent(course)}`;
@@ -324,13 +328,14 @@ router.get("/lecturer/profile/:id", requireAuth, async (req: Request, res: Respo
   if (!/^[0-9a-f-]{36}$/i.test(req.params.id)) return fail(res, 404, "Not found.");
   try {
     const sb = supabaseAdmin();
-    const { data } = await sb.from("profiles").select("id,first_name,role,department,faculty,avatar_url,box_boy_persona").eq("id", req.params.id).maybeSingle();
-    const p = data as { id: string; first_name: string | null; role: string | null; department: string | null; faculty: string | null; avatar_url: string | null; box_boy_persona: string | null } | null;
+    const { data } = await sb.from("profiles").select("id,first_name,title,bio,contact_email,links,role,department,faculty,avatar_url,box_boy_persona").eq("id", req.params.id).maybeSingle();
+    const p = data as { id: string; first_name: string | null; title: string | null; bio: string | null; contact_email: string | null; links: string | null; role: string | null; department: string | null; faculty: string | null; avatar_url: string | null; box_boy_persona: string | null } | null;
     if (!p || p.role !== "lecturer") return fail(res, 404, "No lecturer here.");
     const { data: t } = await sb.from("enrollments").select("course").eq("user_id", p.id).eq("kind", "teaching");
     res.json({
       id: p.id, name: titleCase(p.first_name || "Lecturer"), department: p.department || "", faculty: p.faculty || "",
       avatar: p.avatar_url || "", persona: p.box_boy_persona || "",
+      title: p.title || "", bio: p.bio || "", contactEmail: p.contact_email || "", links: p.links || "",
       courses: [...new Set(((t ?? []) as { course: string }[]).map((r) => r.course))].sort(),
     });
   } catch (e) {
@@ -365,6 +370,7 @@ router.post("/lecturer/pdf/upload-url", requireAuth, async (req: Request, res: R
     const m = await me(req);
     const course = clean(parsed.data.course);
     if (!m || !(m.role === "lecturer" || isAdmin(m)) || !(await teaches(m, course))) return fail(res, 403, "Only the course's lecturer sends files to its students.");
+    if (!isAdmin(m) && !(await postAudience(m.id, course, [])).ok) return fail(res, 403, "Waiting for a class rep to confirm you teach this course. Posts and files reach a class once its rep says yes.");
     await ensurePdfBucket();
     const safe = parsed.data.filename.replace(/\.pdf$/i, "").replace(/[^A-Za-z0-9._-]+/g, "_").slice(-60) || "file";
     const path = `${course.replace(/[^A-Z0-9]/g, "")}/${Date.now()}-${safe}.pdf`;
@@ -405,7 +411,7 @@ router.post("/lecturer/pdf", requireAuth, async (req: Request, res: Response) =>
     const content = `${d.message ? `${d.message}\n\n` : ""}📄 ${d.title}${size}: ${url}`;
     const { error: pErr } = await sb.from("course_posts").insert({ author_id: m.id, course, type: "announcement", title: `${d.title} (Week ${d.week})`, content });
     if (pErr) throw pErr;
-    const ids = (await takersOf(course)).filter((x) => x !== m.id);
+    const ids = (isAdmin(m) ? await takersOf(course) : (await postAudience(m.id, course, await takersOf(course))).ids).filter((x) => x !== m.id);
     const title = `${course}: new PDF from your lecturer`;
     const body = d.message ? d.message.slice(0, 140) : d.title;
     const link = `/courses/${encodeURIComponent(course)}`;

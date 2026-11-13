@@ -5,6 +5,17 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.27.9] - 2026-11-13
+
+### Fixed
+- **Timetable didn't open for lecturers**: the route only admitted students, so the lecturers' Timetable tab bounced them to Home
+- **Loading skeletons**: lecturer Home has its own (header, today's class, courses by level) instead of the author dashboard's; the timetable shows a time-grid placeholder; onboarding steps, Live wire, Course games and Manage courses get shaped placeholders instead of text or a blank screen
+
+### Added (Review Round 2: lecturer side, phase 2; migration 0046)
+- **Lecturer onboarding, six steps (design L01–L06)**: Send it once · what should we call you (title + name) · your department · what are you teaching (any department, any level, semester switch and search) · let students know you (photo, bio, contact email, links; optional) · your courses are set
+- **Lecturers add the courses they teach**: works straight away; each class's rep gets "Is Dr. X your MEE 301 lecturer?" (bell + push) and answers on the class board (design S62). Until a class confirms, the course shows **Waiting for Head of Class**, and posts and PDFs only reach classes that said yes. Admin-assigned courses work as before
+- Lecturer public profile shows title, bio, contact email and links
+
 ## [2.27.8] - 2026-11-13
 
 ### Added

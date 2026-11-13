@@ -94,6 +94,11 @@ const profileSchema = onboardingSchema.partial().extend({
   studyGoal: z.enum(["grades", "habit", "understand", "together", "balance"]).optional(),
   studyTime: z.enum(["morning", "afternoon", "evening", "night", "any"]).optional(),
   focusMinutes: z.number().int().min(10).max(120).optional(),
+  // Lecturers: "Let students know you" (L05). Empty string clears.
+  title: z.enum(["", "Dr.", "Prof.", "Engr.", "Mr.", "Mrs.", "Ms."]).optional(),
+  bio: z.string().trim().max(400).optional(),
+  contactEmail: z.string().trim().max(120).refine((v) => v === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), "Use a full email address.").optional(),
+  links: z.string().trim().max(300).optional(),
 });
 
 const progressSchema = z.object({
@@ -525,6 +530,10 @@ router.put("/me", requireAuth, async (req: Request, res: Response) => {
           ...(d.studyGoal ? { study_goal: d.studyGoal } : {}),
           ...(d.studyTime ? { study_time: d.studyTime } : {}),
           ...(d.focusMinutes ? { focus_minutes: d.focusMinutes } : {}),
+          ...(d.title !== undefined ? { title: d.title || null } : {}),
+          ...(d.bio !== undefined ? { bio: d.bio || null } : {}),
+          ...(d.contactEmail !== undefined ? { contact_email: d.contactEmail.toLowerCase() || null } : {}),
+          ...(d.links !== undefined ? { links: d.links || null } : {}),
           updated_at: new Date().toISOString(),
         },
         { onConflict: "id" }
