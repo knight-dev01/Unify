@@ -5,6 +5,15 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.27.7] - 2026-11-13
+
+### Changed (Review Round 2: lecturer side, phase 1)
+- **Lecturer Home** (design L07/L08): name and department, today's class (now or next) with Open attendance scan, the meeting link and Post to students, a nudge to add a photo, then **Your courses** one level at a time (100L–500L tabs) with student counts
+- **Lecturers no longer see** Published notes, Next up, My contributions, Studio or the My Classes card; their tabs are **Home · Timetable · Class · Me**
+- **Timetable for lecturers**: every class they teach (time grid and week view), read-only
+- **Class times belong to class reps**: lecturers can't add, edit or remove class times (server-enforced); they can still cancel or move their own class for a week and set the online link. My classes hides slot editing except for admins
+- **Admin › Courses per level** and **Admin › All content** are grouped by level (tabs with counts), then by semester; search spans every level
+
 ## [2.27.6] - 2026-11-13
 
 ### Added

@@ -2482,8 +2482,8 @@ router.post("/timetable/:id/change", requireAuth, async (req: Request, res: Resp
       res.status(404).json({ error: "Class not found." });
       return;
     }
-    if (!(await canSetTimetable(userId, s.course))) {
-      res.status(403).json({ error: "Only your class rep or the course lecturer changes class times." });
+    if (!(await canSetTimetable(userId, s.course, { lecturer: true }))) {
+      res.status(403).json({ error: "Only your class rep changes class times." });
       return;
     }
     const d = parsed.data;
@@ -2600,13 +2600,16 @@ const slotSchema = z.object({
 // Who sets a course's class times: its lecturer, an admin, or (review: "the HOC
 // sets the timetable") a class rep who takes the course. Contributors author
 // content but don't set class times.
-async function canSetTimetable(userId: string, course: string): Promise<boolean> {
+// Class times belong to the class rep (Review Round 2): adding, editing and
+// removing a slot is class rep or admin only. A lecturer may still cancel or
+// move their own class for a week (the /change route passes lecturer: true).
+async function canSetTimetable(userId: string, course: string, opts: { lecturer?: boolean } = {}): Promise<boolean> {
   const sb = supabaseAdmin();
   const { data } = await sb.from("profiles").select("role,is_admin,is_hoc").eq("id", userId).maybeSingle();
   const p = data as { role?: string; is_admin?: boolean; is_hoc?: boolean } | null;
   if (!p) return false;
   if (p.is_admin || p.role === "admin") return true;
-  if (p.role === "lecturer") return canManageCourse(userId, course);
+  if (p.role === "lecturer") return !!opts.lecturer && canManageCourse(userId, course);
   if (!p.is_hoc) return false;
   const { data: e } = await sb
     .from("enrollments")
@@ -2636,7 +2639,7 @@ router.post("/timetable", requireAuth, async (req: Request, res: Response) => {
     return;
   }
   if (!(await canSetTimetable(userId, course))) {
-    res.status(403).json({ error: "Only your class rep or the course lecturer sets class times." });
+    res.status(403).json({ error: "Only your class rep sets class times." });
     return;
   }
   try {
@@ -2684,8 +2687,9 @@ router.patch("/timetable/:id", requireAuth, async (req: Request, res: Response) 
       res.status(404).json({ error: "Slot not found." });
       return;
     }
-    if (!(await canSetTimetable(userId, s.course))) {
-      res.status(403).json({ error: "Only your class rep or the course lecturer changes class times." });
+    // The online-class link is the lecturer's to set (class times aren't).
+    if (!(await canSetTimetable(userId, s.course, { lecturer: true }))) {
+      res.status(403).json({ error: "Only the course lecturer or class rep sets the online link." });
       return;
     }
     const { error } = await sb.from("class_slots").update({ meet_link: parsed.data.meetLink }).eq("id", req.params.id);
