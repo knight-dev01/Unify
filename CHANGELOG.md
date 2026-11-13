@@ -5,6 +5,12 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.27.14] - 2026-11-13
+
+### Fixed
+- **Remember me** stopped working about an hour after signing in (Supabase rotates the refresh token and the remembered copy went stale): the remembered sign-in is now re-saved on every refresh, for the same person only. Remember me ticked before **Continue with Google** now survives the redirect. (The 30-minute idle sign-out still applies.)
+- **Lecturer views**: Weeks shows an error with Try again instead of loading forever; "+ Add practice questions" is available before any week is published; switching weeks no longer shows the previous week's most-missed list; Classroom's today list shows classes at their real times with Cancelled / Running late / Confirmed and its Attendance buttons open the right course and class; Classroom's empty state points to adding your courses; Home's "Later today" leaves out cancelled classes; tapping a day in My own timetable's week view opens it
+
 ## [2.27.13] - 2026-11-13
 
 ### Added (design L09, L11, L16, L17; migration 0049)
