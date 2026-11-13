@@ -5,6 +5,15 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.27.5] - 2026-11-13
+
+### Changed (Review Round 2)
+- **Timetable as a time grid**: the day shows classes as blocks at their real times (8am–6pm, stretched to fit), side by side when they overlap, with a now-line; the class on now is dark with NOW, the next one amber-outlined with NEXT, finished ones faded; cancelled, not-confirmed and moved keep their colours (a moved class sits at its new time). Class reps keep remove, online classes keep Join
+- **Today's class is the call to action**: a dark card with Box Boy above the grid ("Happening now · till 12pm" / "Up next · in 25 min") with Open class and Join class
+- **Box Boy stays on the timetable** beside the title whether or not there are classes
+- **Day / Week switch** (remembered): the week view lays Monday–Friday (and a weekend day with classes) side by side, today highlighted; tap a class to open that day
+- **Keywords shuffle** is back to letters gliding straight to their new places (the swirl is gone); a shuffle always gives a new order
+
 ## [2.27.4] - 2026-11-13
 
 ### Added
