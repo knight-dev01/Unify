@@ -1,6 +1,6 @@
 {
     "name": "unify-notes-creation-engine",
-    "version": "2.27.3",
+    "version": "2.27.4",
     "description": "Unify Notes Creation Engine — Convert raw lecture notes into interactive Unify learning pages",
     "main": "dist/server.js",
     "scripts": {

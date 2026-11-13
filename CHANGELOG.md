@@ -5,6 +5,19 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.27.4] - 2026-11-13
+
+### Added
+- **Report a bug** (Me, and "Keeps happening? Report this problem" on error and crash screens): what went wrong and what you were doing, with the screen, app version and device attached automatically. Every admin gets it on their bell; Admin › Health › Bug reports lists them (open / resolved) with Mark resolved and Reopen (migration 0044)
+
+### Changed (Review Round 2)
+- **Home** shows "Week X of 12" once, on the semester tracker; the line under the greeting is just level · department · faculty ("400 Level · …")
+- **Manage courses** opens by level (100L–500L, with counts and "your level"), then semester (with counts), then the courses to add; a trail steps back, and search covers every level (carryovers, other levels)
+- **My pass** left the Class board: it sits with attendance (the course page's attendance card and My record) and the Home slider, and only once the student's class list is up
+
+### Fixed
+- **Hard-to-read buttons**: amber or bright-green fills with white text now use dark text (admin level, semester and role pickers, admin primary buttons, Manage courses "Added"), and white text on the app green now uses a new --u-on-good colour that turns dark in dark mode (completed topic, topic tabs, narration, mini-check buttons, guide steps, Studio)
+
 ## [2.27.3] - 2026-11-13
 
 ### Fixed (Review Round 2 bugs)

@@ -231,6 +231,9 @@ app.use("/v1", games.default || games);
 // Live performance + browser vitals for the admin panel.
 const ops = require("./src/routes/ops");
 app.use("/v1", ops.default || ops);
+// In-app bug reports (Me › Report a bug) and their admin list.
+const bugs = require("./src/routes/bugs");
+app.use("/v1", bugs.default || bugs);
 
 // Authoring guard: lecturers/contributors only (students get 403).
 // convert costs Claude money; save/upload cost disk. validate/render/sample
