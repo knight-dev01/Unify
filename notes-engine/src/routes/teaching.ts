@@ -6,7 +6,8 @@ import { supabaseAdmin } from "../lib/supabase";
 import { requireAuth, type AuthedRequest } from "../middleware/requireAuth";
 import { sendPushToUsers } from "../lib/push";
 import { expectedEntries, listsForCourse } from "../lib/classlist";
-import { postAudience } from "../lib/lecturerClaims";
+import { postAudience, classKey } from "../lib/lecturerClaims";
+import { currentSemesterWeek } from "../lib/calendar";
 
 // Teaching side (mounted at /v1):
 //  - content reports: students "Report a problem" (S27), lecturers "Review this week" (L13);
@@ -23,9 +24,9 @@ const clean = (s: unknown) => String(s ?? "").trim().toUpperCase().replace(/\s+/
 const variants = (c: string) => [...new Set([c, c.replace(/\s/g, "")])];
 const titleCase = (s: string) => s.trim().replace(/\s+/g, " ").toLowerCase().replace(/(^|[\s'’\-.])([a-z])/g, (_, a, b) => a + b.toUpperCase());
 
-type Me = { id: string; first_name: string | null; role: string | null; is_admin: boolean | null; is_hoc: boolean | null };
+type Me = { id: string; first_name: string | null; role: string | null; is_admin: boolean | null; is_hoc: boolean | null; department: string | null; level: string | null };
 async function me(req: Request): Promise<Me | null> {
-  const { data } = await supabaseAdmin().from("profiles").select("id,first_name,role,is_admin,is_hoc").eq("id", uid(req)).maybeSingle();
+  const { data } = await supabaseAdmin().from("profiles").select("id,first_name,role,is_admin,is_hoc,department,level").eq("id", uid(req)).maybeSingle();
   return (data as Me | null) ?? null;
 }
 async function enrolled(userId: string, course: string, kind: "taking" | "teaching") {
@@ -155,7 +156,14 @@ router.post("/content-reports/:id/resolve", requireAuth, async (req: Request, re
 // ---------- Lecturer posts to a course (L15) ----------
 router.post("/course-posts", requireAuth, async (req: Request, res: Response) => {
   const parsed = z
-    .object({ course: z.string().min(1).max(20), type: z.enum(["announcement", "tip", "reminder"]), title: z.string().trim().max(120).optional(), content: z.string().trim().min(1).max(2000) })
+    .object({
+      course: z.string().min(1).max(20),
+      type: z.enum(["announcement", "tip", "reminder", "test", "assignment", "exam", "notice"]),
+      title: z.string().trim().max(120).optional(),
+      content: z.string().trim().min(1).max(2000),
+      // One class only ("department|level"); omitted = every class taking the course.
+      audience: z.string().trim().max(160).optional(),
+    })
     .safeParse(req.body);
   if (!parsed.success) return fail(res, 400, "Write something (up to 2000 characters).");
   try {
@@ -166,10 +174,21 @@ router.post("/course-posts", requireAuth, async (req: Request, res: Response) =>
     // A course the lecturer added themselves reaches only classes whose rep confirmed them.
     const aud = isAdmin(m) ? { ok: true, ids: await takersOf(course), waiting: false } : await postAudience(m.id, course, await takersOf(course));
     if (!aud.ok) return fail(res, 403, "Waiting for a class rep to confirm you teach this course. Posts and files reach a class once its rep says yes.");
-    const { error } = await sb.from("course_posts").insert({ author_id: m.id, course, type: parsed.data.type, title: parsed.data.title || null, content: parsed.data.content });
+    const audience = parsed.data.audience || null;
+    let reach = aud.ids;
+    if (audience) {
+      const keep: string[] = [];
+      for (let i = 0; i < reach.length; i += 500) {
+        const { data } = await sb.from("profiles").select("id,department,level").in("id", reach.slice(i, i + 500));
+        for (const p of (data ?? []) as { id: string; department: string | null; level: string | null }[]) if (classKey(p.department, p.level) === audience) keep.push(p.id);
+      }
+      reach = keep;
+    }
+    const { error } = await sb.from("course_posts").insert({ author_id: m.id, course, type: parsed.data.type, title: parsed.data.title || null, content: parsed.data.content, audience });
     if (error) throw error;
-    const ids = aud.ids.filter((x) => x !== m.id);
-    const title = parsed.data.title || `${course}: ${parsed.data.type === "tip" ? "a tip" : parsed.data.type === "reminder" ? "reminder" : "announcement"} from your lecturer`;
+    const ids = reach.filter((x) => x !== m.id);
+    const kind: Record<string, string> = { tip: "a tip", reminder: "reminder", test: "test", assignment: "assignment", exam: "exam", notice: "notice", announcement: "announcement" };
+    const title = parsed.data.title || `${course}: ${kind[parsed.data.type] || "announcement"} from your lecturer`;
     const body = parsed.data.content.slice(0, 140);
     const link = `/course/${encodeURIComponent(course)}`;
     for (let i = 0; i < ids.length; i += 500) {
@@ -190,14 +209,17 @@ router.get("/course-posts", requireAuth, async (req: Request, res: Response) => 
     if (!m || !(isAdmin(m) || (await enrolled(m.id, course, "taking")) || (await teaches(m, course)))) return fail(res, 403, "Add this course to see its posts.");
     const sb = supabaseAdmin();
     const { data } = await sb.from("course_posts").select("*").in("course", variants(course)).order("created_at", { ascending: false }).limit(30);
-    const rows = (data ?? []) as { id: string; author_id: string | null; type: string; title: string | null; content: string; created_at: string }[];
+    const mineKey = classKey(m.department, m.level);
+    const staff = isAdmin(m) || (await teaches(m, course));
+    const rows = ((data ?? []) as { id: string; author_id: string | null; type: string; title: string | null; content: string; created_at: string; audience: string | null }[])
+      .filter((r) => staff || !r.audience || r.audience === mineKey);
     const ids = [...new Set(rows.map((r) => r.author_id || "").filter(Boolean))];
     const names: Record<string, string> = {};
     if (ids.length) {
       const { data: ps } = await sb.from("profiles").select("id,first_name").in("id", ids);
       for (const p of (ps ?? []) as { id: string; first_name: string | null }[]) names[p.id] = titleCase(p.first_name || "Your lecturer");
     }
-    res.json({ posts: rows.map((r) => ({ id: r.id, type: r.type, title: r.title, content: r.content, at: r.created_at, author: names[r.author_id || ""] || "Your lecturer", mine: r.author_id === m.id })) });
+    res.json({ posts: rows.map((r) => ({ id: r.id, type: r.type, title: r.title, content: r.content, at: r.created_at, author: names[r.author_id || ""] || "Your lecturer", mine: r.author_id === m.id, audience: r.audience })) });
   } catch (e) {
     dbFail(res, e);
   }
@@ -232,6 +254,14 @@ router.get("/lecturer/course-report", requireAuth, async (req: Request, res: Res
     const weeks = new Map<number, string>();
     for (const w of (weekRows ?? []) as { week: number; title: string }[]) if (!weeks.has(w.week)) weeks.set(w.week, w.title || "");
     const studied = new Map<number, Set<string>>();
+    // Each student's class (department|level), for the by-class breakdown.
+    const classOf = new Map<string, string>();
+    for (let i = 0; i < takers.length; i += 500) {
+      const { data } = await sb.from("profiles").select("id,department,level").in("id", takers.slice(i, i + 500));
+      for (const p of (data ?? []) as { id: string; department: string | null; level: string | null }[]) classOf.set(p.id, classKey(p.department, p.level));
+    }
+    const classCount = new Map<string, number>();
+    for (const k of classOf.values()) classCount.set(k, (classCount.get(k) || 0) + 1);
     const quiz = new Map<number, { n: number; pct: number; people: Set<string> }>();
     for (let i = 0; i < takers.length; i += 300) {
       const chunk = takers.slice(i, i + 300);
@@ -257,11 +287,14 @@ router.get("/lecturer/course-report", requireAuth, async (req: Request, res: Res
     res.json({
       course,
       students: total,
+      classes: [...classCount].sort((a, b) => b[1] - a[1]).map(([key, students]) => ({ key, students })),
       weeks: [...weeks].sort((a, b) => a[0] - b[0]).map(([week, title]) => {
         const s = studied.get(week)?.size || 0;
         const q = quiz.get(week);
+        const byClass: Record<string, number> = {};
+        for (const u of studied.get(week) || []) { const k = classOf.get(u) || "|"; byClass[k] = (byClass[k] || 0) + 1; }
         return {
-          week, title,
+          week, title, byClass,
           studied: s,
           studiedPct: total ? Math.round((s / total) * 100) : 0,
           quizTakers: q?.people.size || 0,
@@ -428,6 +461,104 @@ router.post("/lecturer/pdf", requireAuth, async (req: Request, res: Response) =>
       if (cIds.length) await sb.from("notifications").insert(cIds.map((user_id) => ({ user_id, type: "lecturer_material", title: `${course} Week ${d.week}: material from the lecturer`, body: d.title, course, link: "/studio" })));
     }
     res.json({ ok: true, reached: ids.length, url });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
+
+// ---------- Lecturer: each week's status (L10) and their review of it (L13) ----------
+// Weeks 1..(this semester week or the last published): notes out?, my review,
+// materials I've sent, classes held and how many came. Plus the header: course
+// title, level and its contributors.
+router.get("/lecturer/week-status", requireAuth, async (req: Request, res: Response) => {
+  const course = clean(req.query.course);
+  if (!course) return fail(res, 400, "Pass ?course=CODE.");
+  try {
+    const m = await me(req);
+    if (!(await teaches(m, course))) return fail(res, 403, "Only the course's lecturers see this.");
+    const sb = supabaseAdmin();
+    const [{ data: shells }, { data: topics }, { data: reviews }, { data: mats }, { data: sessions }, { data: info }, { data: levels }, { data: team }, semWeek, takers] = await Promise.all([
+      sb.from("weeks").select("week,title").in("course", variants(course)),
+      sb.from("topic_notes").select("week").in("course", variants(course)).limit(5000),
+      sb.from("week_reviews").select("week,status,note,lecturer_id,updated_at").in("course", variants(course)),
+      sb.from("lecturer_materials").select("week_number").in("course_code", variants(course)),
+      sb.from("attendance_sessions").select("id,week").in("course_code", variants(course)).limit(2000),
+      sb.from("courses").select("title").in("code", variants(course)).limit(1),
+      sb.from("course_levels").select("level,semester").in("course", variants(course)).limit(10),
+      sb.from("enrollments").select("user_id").in("course", variants(course)).eq("kind", "teaching"),
+      currentSemesterWeek(),
+      takersOf(course),
+    ]);
+    const titles = new Map<number, string>();
+    for (const w of (shells ?? []) as { week: number; title: string }[]) titles.set(w.week, w.title || titles.get(w.week) || "");
+    const published = new Set<number>([...titles.keys(), ...((topics ?? []) as { week: number }[]).map((t) => t.week)]);
+    const matsBy = new Map<number, number>();
+    for (const r of (mats ?? []) as { week_number: number }[]) matsBy.set(r.week_number, (matsBy.get(r.week_number) || 0) + 1);
+    const sess = (sessions ?? []) as { id: string; week: number | null }[];
+    const came = new Map<string, number>();
+    for (let i = 0; i < sess.length; i += 300) {
+      const { data } = await sb.from("attendance_records").select("session_id").in("session_id", sess.slice(i, i + 300).map((x) => x.id)).limit(50000);
+      for (const r of (data ?? []) as { session_id: string }[]) came.set(r.session_id, (came.get(r.session_id) || 0) + 1);
+    }
+    const last = Math.max(0, ...published);
+    const upTo = Math.min(26, Math.max(last, semWeek || 0, 1));
+    const myReview = new Map(((reviews ?? []) as { week: number; status: string; note: string | null; lecturer_id: string; updated_at: string }[]).filter((r) => r.lecturer_id === m!.id).map((r) => [r.week, r]));
+    const teamIds = ((team ?? []) as { user_id: string }[]).map((t) => t.user_id);
+    const { data: contribs } = teamIds.length ? await sb.from("profiles").select("first_name").in("id", teamIds).eq("role", "contributor") : { data: [] };
+    res.json({
+      course,
+      title: ((info ?? []) as { title: string }[])[0]?.title || "",
+      levels: [...new Set(((levels ?? []) as { level: string }[]).map((l) => l.level))],
+      contributors: ((contribs ?? []) as { first_name: string | null }[]).map((c) => c.first_name || "A contributor"),
+      students: takers.length,
+      semesterWeek: semWeek,
+      weeks: Array.from({ length: upTo }, (_, i) => i + 1).map((week) => {
+        const held = sess.filter((x) => x.week === week);
+        const present = held.reduce((n, x) => n + (came.get(x.id) || 0), 0);
+        const r = myReview.get(week);
+        return {
+          week,
+          title: titles.get(week) || "",
+          published: published.has(week),
+          review: r ? { status: r.status, note: r.note || "", at: r.updated_at } : null,
+          materials: matsBy.get(week) || 0,
+          classesHeld: held.length,
+          camePct: held.length && takers.length ? Math.round((present / (held.length * takers.length)) * 100) : null,
+        };
+      }),
+    });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
+router.post("/lecturer/week-review", requireAuth, async (req: Request, res: Response) => {
+  const parsed = z.object({ course: z.string().min(1).max(20), week: z.number().int().min(1).max(30), status: z.enum(["reviewed", "changes"]), note: z.string().trim().max(1000).optional() }).safeParse(req.body);
+  if (!parsed.success) return fail(res, 400, "Pick reviewed or needs changes.");
+  try {
+    const m = await me(req);
+    const course = clean(parsed.data.course);
+    if (!m || !(m.role === "lecturer" || isAdmin(m)) || !(await teaches(m, course))) return fail(res, 403, "Only the course's lecturer reviews its notes.");
+    const d = parsed.data;
+    if (d.status === "changes" && !d.note) return fail(res, 400, "Say what needs changing.");
+    const sb = supabaseAdmin();
+    const { error } = await sb.from("week_reviews").upsert({ course, week: d.week, lecturer_id: m.id, status: d.status, note: d.note || null, updated_at: new Date().toISOString() }, { onConflict: "course,week,lecturer_id" });
+    if (error) throw error;
+    // Tell the contributors; a "needs changes" note also lands in the course's messages.
+    const { data: team } = await sb.from("enrollments").select("user_id").in("course", variants(course)).eq("kind", "teaching");
+    const ids = ((team ?? []) as { user_id: string }[]).map((t) => t.user_id).filter((x) => x !== m.id);
+    const { data: contribs } = ids.length ? await sb.from("profiles").select("id").in("id", ids).eq("role", "contributor") : { data: [] };
+    const cIds = ((contribs ?? []) as { id: string }[]).map((c) => c.id);
+    if (d.status === "changes") await sb.from("course_messages").insert({ course, author_id: m.id, body: `Week ${d.week} needs changes: ${d.note}` });
+    if (cIds.length) {
+      const title = d.status === "reviewed" ? `${course} Week ${d.week}: reviewed by the lecturer` : `${course} Week ${d.week}: the lecturer asked for changes`;
+      const body = d.status === "reviewed" ? "Nice work. It's marked reviewed." : (d.note || "").slice(0, 140);
+      const link = d.status === "reviewed" ? "/home" : `/messages/${encodeURIComponent(course)}`;
+      await sb.from("notifications").insert(cIds.map((user_id) => ({ user_id, type: "week_review", title, body, course, link })));
+      void sendPushToUsers(cIds, { title, body, url: link }).catch(() => {});
+    }
+    res.json({ ok: true });
   } catch (e) {
     dbFail(res, e);
   }

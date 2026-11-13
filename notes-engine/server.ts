@@ -240,6 +240,9 @@ app.use("/v1", structure.default || structure);
 // Lecturer course claims and the class rep's "Is this your lecturer?".
 const lecturers = require("./src/routes/lecturers");
 app.use("/v1", lecturers.default || lecturers);
+// Lecturer <-> contributor messages per course.
+const coursechat = require("./src/routes/coursechat");
+app.use("/v1", coursechat.default || coursechat);
 
 // Authoring guard: lecturers/contributors only (students get 403).
 // convert costs Claude money; save/upload cost disk. validate/render/sample

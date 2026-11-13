@@ -5,6 +5,13 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.27.12] - 2026-11-13
+
+### Added (Review Round 2: lecturer side, phase 3; migration 0048)
+- **Lecturer ↔ contributor messages**, one thread per course for everyone who teaches it (students never see it): bell + push on new messages, unread counts, a Messages tab on the lecturer's course page, a Messages page (/messages), and links from Classroom, Me and the contributor's My courses
+- **Lecturer course page to the design (L10–L15)**: header with the course title, level, contributors and student count; **Weeks** shows each week's state (notes reviewed with classes held and % who came / notes ready to Check with Mark as reviewed or Needs changes / materials received / waiting for your materials with Send) and a "Tell this class something" card; **Report** adds stat tiles and "studied, by class" for a chosen week; **Attendance** adds the average card and Lowest first / Below 75% / A–Z; **Post** picks which students (every class or one class) and the kind (notice, test, assignment, exam, reminder). A "Needs changes" note also lands in the course's messages
+- **Lecturer Me (L17)**: My courses, Waiting for Head of Class, Messages
+
 ## [2.27.11] - 2026-11-13
 
 ### Changed (Review Round 2: student side)
