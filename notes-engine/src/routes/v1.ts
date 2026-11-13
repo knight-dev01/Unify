@@ -3,6 +3,7 @@ import { noteClientError } from "../lib/alert";
 import { Router, type Request, type Response } from "express";
 import rateLimit from "express-rate-limit";
 import { z } from "zod";
+import { courseLock, semesterEnded } from "../lib/courseLock";
 import { cachedWeek } from "../lib/weekCache";
 import { supabaseAdmin } from "../lib/supabase";
 import { getSemesterCalendar, forgetSemesterCalendar } from "../lib/calendar";
@@ -322,7 +323,7 @@ router.get("/me", requireAuth, async (req: Request, res: Response) => {
 // Public: platform settings students need (active semester picker source).
 router.get("/settings", async (_req: Request, res: Response) => {
   const cal = await getSemesterCalendar();
-  res.json({ currentSemester: await getCurrentSemester(), semesterStart: cal.start, semesterWeeks: cal.weeks });
+  res.json({ currentSemester: await getCurrentSemester(), semesterStart: cal.start, semesterWeeks: cal.weeks, semesterEnded: semesterEnded(cal) });
 });
 
 // Authed: enroll/unenroll in a course (taking for students, teaching for
@@ -349,9 +350,23 @@ router.post("/enrollments", requireAuth, async (req: Request, res: Response) => 
       return;
     }
     if (parsed.data.enroll) {
-      const { data: prof } = await sb.from("profiles").select("role").eq("id", userId).single();
+      const { data: prof } = await sb.from("profiles").select("role,level").eq("id", userId).single();
       const role = (prof as { role?: string } | null)?.role || "student";
       const kind = role === "student" ? "taking" : "teaching";
+      // Students: higher levels wait for promotion, the next semester for the
+      // running one to end (lib/courseLock). Carryovers stay open.
+      if (kind === "taking") {
+        const [{ data: slots }, current, cal] = await Promise.all([
+          sb.from("course_levels").select("level,semester").eq("course", code).limit(20),
+          getCurrentSemester(),
+          getSemesterCalendar(),
+        ]);
+        const why = courseLock((prof as { level?: string } | null)?.level, ((slots ?? []) as { level: string; semester: string }[]), current, semesterEnded(cal));
+        if (why) {
+          res.status(403).json({ error: `${code} is locked for now. ${why}.` });
+          return;
+        }
+      }
       // Contributor cap at the self-enroll path too: a contributor tapping
       // Enroll on a 3rd course of a level gets a 403, not a 3rd course.
       if (kind === "teaching" && role === "contributor") {
@@ -1351,6 +1366,12 @@ router.post("/role-requests", requireAuth, async (req: Request, res: Response) =
   const parsed = roleRequestSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: "Invalid body", details: parsed.error.flatten() });
+    return;
+  }
+  // Contributors are never applied for: an admin assigns a student to their
+  // courses (Admin › Users › Manage assigned courses), like class reps.
+  if (parsed.data.role === "contributor") {
+    res.status(403).json({ error: "Contributors are chosen by the Unify team. An admin will reach out if you're picked." });
     return;
   }
   try {

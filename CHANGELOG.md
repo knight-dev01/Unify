@@ -5,6 +5,18 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.27.6] - 2026-11-13
+
+### Added
+- **Course locks in Manage courses** (same rule on the server): lower levels stay open for carryovers; higher levels show a lock ("Opens when you move to 400 Level") and can be looked at but not added; in a student's own level the next semester opens once the running semester's teaching weeks are over (or the admin switches semester). Courses already added can still be removed
+- **"Session finished: promote students"** on admin Overview once the Second Semester's weeks are over; students move up only when an admin presses Promote
+- **Contributor onboarding**: four short screens (the job, your courses, writing in Studio, fixing reports) the first time a contributor opens Home after being assigned, and again when their courses change; "How it works" reopens it
+
+### Changed (Review Round 2, contributor side)
+- The green "My Classes" timetable card shows for lecturers only, not contributors
+- "My contributions" is now **My courses**, with a line saying what it holds; rows read "12 notes live · 5 written by you"
+- Contributors are only ever assigned by an admin: the server refuses contributor applications
+
 ## [2.27.5] - 2026-11-13
 
 ### Changed (Review Round 2)
