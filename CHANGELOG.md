@@ -5,6 +5,15 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.27.10] - 2026-11-13
+
+### Added
+- **Confirm class / Running late or cancelling?** on the lecturer's today-class card (design L07, L18): a status pill (Not confirmed, Confirmed, Running late, Cancelled), Confirm class, running late by +10/+15/+30/+45 min or a picked time, cancel today's class with a note, and Undo. Students taking the course get a bell + push; their timetable shows the class at its new time with "Running late" or "Confirmed" (migration 0047)
+- **Lecturers edit their title, bio, contact email and handles on Me**, with a link to see their profile as students see it
+
+### Fixed
+- The lecturer Home loading screen showed two hero cards; it now shows only the header (today's class card appears only when there is one)
+
 ## [2.27.9] - 2026-11-13
 
 ### Fixed

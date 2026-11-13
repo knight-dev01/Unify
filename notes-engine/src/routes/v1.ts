@@ -2471,7 +2471,7 @@ router.post("/timetable/:id/change", requireAuth, async (req: Request, res: Resp
   const hhmm = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
   const parsed = z
     .object({
-      status: z.enum(["cancelled", "moved", "unconfirmed", "normal"]),
+      status: z.enum(["cancelled", "moved", "unconfirmed", "confirmed", "late", "normal"]),
       date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
       start: hhmm.optional(),
       end: hhmm.optional(),
@@ -2480,7 +2480,7 @@ router.post("/timetable/:id/change", requireAuth, async (req: Request, res: Resp
     })
     .safeParse(req.body);
   if (!parsed.success || !/^[0-9a-f-]{36}$/i.test(req.params.id)) {
-    res.status(400).json({ error: "Pick cancelled, moved, not confirmed or normal." });
+    res.status(400).json({ error: "Pick cancelled, moved, running late, confirmed, not confirmed or normal." });
     return;
   }
   try {
@@ -2501,6 +2501,10 @@ router.post("/timetable/:id/change", requireAuth, async (req: Request, res: Resp
       res.status(400).json({ error: "Say where or when it moved to." });
       return;
     }
+    if (d.status === "late" && !d.start) {
+      res.status(400).json({ error: "Say what time it now starts." });
+      return;
+    }
     if (d.status === "normal") {
       await sb.from("slot_changes").delete().eq("slot_id", s.id).eq("class_date", date);
     } else {
@@ -2519,9 +2523,13 @@ router.post("/timetable/:id/change", requireAuth, async (req: Request, res: Resp
         d.status === "cancelled" ? `${s.course} on ${day} is cancelled`
         : d.status === "moved" ? `${s.course} on ${day} has moved`
         : d.status === "unconfirmed" ? `${s.course} on ${day} isn't confirmed yet`
+        : d.status === "confirmed" ? `${s.course} on ${day} is on: your lecturer confirmed it`
+        : d.status === "late" ? `${s.course} on ${day} is running late`
         : `${s.course} on ${day} is back on as normal`;
       const body = [
-        d.status === "moved" ? `Now ${d.start || s.start_time}${d.end ? `–${d.end}` : ""}${d.venue ? ` · ${d.venue}` : ""}.` : d.status === "normal" ? `${s.start_time}–${s.end_time}${s.venue ? ` · ${s.venue}` : ""}.` : "",
+        d.status === "moved" ? `Now ${d.start || s.start_time}${d.end ? `–${d.end}` : ""}${d.venue ? ` · ${d.venue}` : ""}.` :
+        d.status === "late" ? `Now starts at ${d.start}.` :
+        d.status === "confirmed" ? `${s.start_time}–${s.end_time}${s.venue ? ` · ${s.venue}` : ""}.` : d.status === "normal" ? `${s.start_time}–${s.end_time}${s.venue ? ` · ${s.venue}` : ""}.` : "",
         d.note || "",
       ].filter(Boolean).join(" ");
       if (ids.length) {
