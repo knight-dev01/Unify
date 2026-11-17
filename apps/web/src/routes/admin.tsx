@@ -18,6 +18,7 @@ import PerformancePanel from './admin/performance';
 import HomeUpdatesPanel from './admin/updates';
 import ModulesOverview from './admin/modules-overview';
 import AdminLiveWire from './admin/livewire';
+import AdminReminders from './admin/reminders';
 import AdminBugs from './admin/bugs';
 import AdminStructure from './admin/structure';
 import GuidePanel, { ClassContributorsPicker } from './admin/guide';
@@ -907,6 +908,10 @@ export default function AdminRoute() {
 
       <Module id="livewire" openId={openModule}>
         {openModule === 'livewire' && <AdminLiveWire />}
+      </Module>
+
+      <Module id="reminders" openId={openModule}>
+        {openModule === 'reminders' && <AdminReminders />}
       </Module>
 
       <Module id="announce" openId={openModule}>

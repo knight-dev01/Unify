@@ -7,6 +7,7 @@ import { supabaseBrowser, touchActivity, isSessionExpired, expireSession } from 
 import { pushSupported, enablePush } from '../lib/push';
 import ConfirmModal from '../components/ConfirmModal';
 import Wordmark from '../components/Wordmark';
+import GetSetUp from '../components/GetSetUp';
 import { api, NOTIFS_CHANGED, type Profile } from '../lib/api';
 import { PICTURE_EVENT, resolvePicture } from '../lib/picture';
 import { recordNav } from '../lib/navHistory';
@@ -371,7 +372,8 @@ export default function Layout() {
             <Menu size={18} />
           </button>
         )}
-        <Link to="/home" style={{ textDecoration: 'none' }} aria-label="Unify Learn home">
+        <Link to="/home" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 }} aria-label="Unify Learn home">
+          <img src="/icons/v5/icon-192.png" alt="" width={28} height={28} style={{ borderRadius: 8, display: 'block', flexShrink: 0 }} />
           <Wordmark size={20} />
         </Link>
         <span style={{ flex: 1 }} />
@@ -435,6 +437,7 @@ export default function Layout() {
       </header>
       )}
       <OfflineBanner />
+      {authed === true && !immersive && <GetSetUp />}
       {/* Content column. Reader zoom is NOT applied here: it targets only
           the note body (.reader-zoom in learn/week.tsx), desktop only. */}
       <div style={{ display: isDesktop ? 'flex' : 'block', alignItems: 'flex-start', minHeight: isDesktop ? 'calc(100vh - 56px)' : 'auto' }}>

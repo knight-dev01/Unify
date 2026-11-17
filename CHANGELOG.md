@@ -5,6 +5,17 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.27.15] - 2026-11-17
+
+### Added (migration 0050)
+- **Study reminders** (Settings › Notifications): a push at your own times (up to four, Lagos time). Until you pick times they follow the study time from sign-up plus an evening nudge. Students who have already studied that day are skipped. "Send me one now" tests the whole chain
+- **Reminders for everyone** (Admin › Reminders): title, message, link, time, days of the week and audience (everyone, students, lecturers, lecturers and contributors); bell + push; pause, edit, delete, "Send to me". Starts with "Plan your week", Sundays at 6 pm
+- **Get Unify ready on this phone**: until the app is installed (phones) and notifications are allowed, every app open starts with a two-step sheet (Install, Allow notifications) with iPhone and blocked-permission help. "Later" hides it until the next open
+
+### Changed
+- The Unify U icon sits beside "Unify Learn" in the top bar on phones
+- The status-bar notification icon is now a white U (like WhatsApp's chat bubble) instead of a blank square
+
 ## [2.27.14] - 2026-11-13
 
 ### Fixed

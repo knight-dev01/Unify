@@ -121,7 +121,7 @@ export async function sendPushToUsers(userIds: string[], payload: PushPayload): 
   return { sent, pruned: dead.length };
 }
 
-function appBaseUrl(): string {
+export function appBaseUrl(): string {
   const fromEnv = (process.env.CORS_ORIGIN || "").split(",")[0].trim();
   return (fromEnv || "https://unify-virid.vercel.app").replace(/\/$/, "");
 }

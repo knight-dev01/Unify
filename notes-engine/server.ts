@@ -243,6 +243,9 @@ app.use("/v1", lecturers.default || lecturers);
 // Lecturer <-> contributor messages per course.
 const coursechat = require("./src/routes/coursechat");
 app.use("/v1", coursechat.default || coursechat);
+// Scheduled reminders: my own times, and the ones admins set for everyone.
+const reminders = require("./src/routes/reminders");
+app.use("/v1", reminders.default || reminders);
 
 // Authoring guard: lecturers/contributors only (students get 403).
 // convert costs Claude money; save/upload cost disk. validate/render/sample
@@ -798,6 +801,7 @@ app.listen(PORT, () => {
   // Self-sampling (memory, event loop, database round trip) and the admin alert watchdog.
   startSampling();
   alerts.startWatchdog();
+  require("./src/lib/reminders").startReminders();
   logger.info("unify-api listening", {
     port: PORT,
     env: {
