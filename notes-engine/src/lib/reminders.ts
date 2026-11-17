@@ -51,7 +51,7 @@ type Resume = { user_id: string; course: string; week: number };
 const STUDENT_LINES: ((n: string, r?: Resume) => { title: string; body: string })[] = [
   (n, r) => ({ title: r ? `${n}, ${r.course} is waiting` : `${n}, ten minutes today?`, body: r ? `Pick up Week ${r.week} where you stopped. One topic is enough.` : "Open a week and read one topic. Small steps add up." }),
   (n) => ({ title: "Keep your streak alive", body: `${n}, one topic or one quiz today keeps it going.` }),
-  (n, r) => ({ title: "Quick recall?", body: r ? `Five questions on ${r.course}. See what stuck.` : `${n}, try five quick questions on any course.` }),
+  (n, r) => ({ title: "Quick recall?", body: r ? `A quick quiz on ${r.course}. See what stuck.` : `${n}, try a quick quiz on any course.` }),
   (n) => ({ title: "Your classes, your plan", body: `${n}, check today's timetable and what's coming up this week.` }),
   (n, r) => ({ title: `Study time, ${n}`, body: r ? `Your spot in ${r.course} Week ${r.week} is saved. Carry on.` : "Your notes are ready when you are." }),
 ];

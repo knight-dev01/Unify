@@ -2221,6 +2221,11 @@ router.get("/courses/:code/my-progress", requireAuth, requireCourseAccess, async
       sb.from("quiz_attempts").select("week,score,total").eq("user_id", userId).in("course", variants).limit(500),
       sb.from("enrollments").select("user_id").eq("kind", "teaching").in("course", variants).limit(20),
     ]);
+    // Names from the faculty's course list (migration 0051), shown until a
+    // lecturer on Unify Learn teaches the course.
+    const { data: named } = await sb.from("courses").select("lecturer_names").in("code", variants).not("lecturer_names", "is", null).limit(1);
+    const namedLecturers = (((named ?? [])[0] as { lecturer_names?: string } | undefined)?.lecturer_names || "")
+      .split("/").map((n) => n.trim()).filter(Boolean).slice(0, 4);
     // The course's lecturers (S53: tap through to their profile).
     const teachIds = [...new Set(((teach ?? []) as { user_id: string }[]).map((t) => t.user_id))];
     const lecturers: { id: string; name: string }[] = [];
@@ -2244,6 +2249,7 @@ router.get("/courses/:code/my-progress", requireAuth, requireCourseAccess, async
     res.json({
       course: code,
       lecturers,
+      namedLecturers: lecturers.length ? [] : namedLecturers,
       weeks: weeks.map((w, i) => {
         const a = assembled[i];
         const topics = a ? topicsOf(a.note_json) : [];

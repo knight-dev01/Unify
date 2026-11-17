@@ -5,6 +5,16 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.27.16] - 2026-11-17
+
+### Added (migration 0051)
+- **2026/2027 course list**: every course in the faculty's First Semester list (200L to 500L, six departments, `docs/engineering_courses.xlsx`) is in the app at its level. Insert only: existing courses keep their titles. IPE 305 is left out until its title is confirmed (the sheet lists it twice)
+- **Lecturer names on the course page**: until a lecturer on Unify Learn teaches the course, the course page shows the names from the faculty's list ("not on Unify Learn yet"); a lecturer who joins replaces them
+
+### Fixed (Review 3)
+- The app's name is "Unify Learn" everywhere in the setup sheet and the test reminder, never "Unify" alone
+- Reminders no longer promise a fixed number of questions
+
 ## [2.27.15] - 2026-11-17
 
 ### Added (migration 0050)

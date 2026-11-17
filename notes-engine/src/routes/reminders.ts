@@ -69,7 +69,7 @@ router.put("/me/reminders", requireAuth, async (req: Request, res: Response) => 
 // "Send me one now": proves the whole chain (permission, subscription, push).
 router.post("/me/reminders/test", requireAuth, async (req: Request, res: Response) => {
   try {
-    await pushToUser(uid(req), { title: "Unify reminders are on", body: "This is how a reminder looks. See you at your next study time.", url: "/home" });
+    await pushToUser(uid(req), { title: "Unify Learn reminders are on", body: "This is how a reminder looks. See you at your next study time.", url: "/home" });
     res.json({ ok: true });
   } catch (e) {
     fail(res, e);
