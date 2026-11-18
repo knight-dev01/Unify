@@ -1101,12 +1101,16 @@ router.get("/attendance/course", requireAuth, async (req: Request, res: Response
         .or(entry ? `student_id.eq.${me.id},entry_id.eq.${entry.id}` : `student_id.eq.${me.id}`);
       for (const r of (data ?? []) as { session_id: string }[]) mineSet.add(r.session_id);
     }
-    const byWeek = new Map<number, { held: number; attended: number }>();
-    for (const s of sessions) {
+    // Each class held, oldest first, so the course page can show a tick or a
+    // cross per class on every week row (Review 3, C1).
+    const byWeek = new Map<number, { held: number; attended: number; classes: { at: string; came: boolean }[] }>();
+    for (const s of [...sessions].reverse()) {
       const w = s.week ?? 0;
-      const row = byWeek.get(w) || { held: 0, attended: 0 };
+      const row = byWeek.get(w) || { held: 0, attended: 0, classes: [] };
       row.held++;
-      if (mineSet.has(s.id)) row.attended++;
+      const came = mineSet.has(s.id);
+      if (came) row.attended++;
+      row.classes.push({ at: s.opens_at, came });
       byWeek.set(w, row);
     }
     const mine = {

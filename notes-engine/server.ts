@@ -246,6 +246,9 @@ app.use("/v1", coursechat.default || coursechat);
 // Scheduled reminders: my own times, and the ones admins set for everyone.
 const reminders = require("./src/routes/reminders");
 app.use("/v1", reminders.default || reminders);
+// Course page: lecturers with their weeks and the course intro (Review 3, C1/C10).
+const courseLecturers = require("./src/routes/courseLecturers");
+app.use("/v1", courseLecturers.default || courseLecturers);
 
 // Authoring guard: lecturers/contributors only (students get 403).
 // convert costs Claude money; save/upload cost disk. validate/render/sample

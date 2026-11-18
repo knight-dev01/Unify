@@ -5,6 +5,20 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.28.0] - 2026-11-18
+
+### Added (Review 3: C1, C2, C10; migration 0053)
+- **New course page order:** big course title, a short introduction, the lecturers, a "Link your matric number" prompt (until the student has linked), then the weeks
+- **All 12 weeks on the course page**, as compact rows. Each row has a tick (came), a cross (missed) or an empty circle (not held yet) for every class, with a legend. Weeks not published yet still show, greyed, with their lecturer. The "Attendance 7 of 8" count sits beside the week bar
+- **This week's classes have dates.** Today's class has Read notes as the main button and a small Pass button beside it, with "Show your pass at the door when the scan opens"
+- **More than one lecturer per course:** overlapping circles, "3 lecturers", one row each with their weeks ("Wk 1–4"). The lecturer teaching this week is highlighted. A lecturer not on Unify Learn yet shows by name only; once a lecturer with the same surname joins and teaches the course, their profile shows instead
+- **Class rep sets a course's lecturers and their weeks** (Course page → "Set lecturers and their weeks"): 1–4 lecturers, names, first and last week each (moved when a lecturer starts late), plus the course's short introduction
+
+### Changed
+- **The attendance pass opens from the week** (course → week → Pass). It says "Week 4 · Class 2" with the course and class name, and goes back to the course. The "A screenshot won't work" line is gone ("New code in 0:21" instead), and the pass says the week shows a tick once you're scanned
+- The student's own week-by-week attendance grid under the weeks is gone (the week rows show it now); class reps and lecturers keep Take attendance and the registers there
+- "Tell Unify Learn" on the pass (was "Tell Unify")
+
 ## [2.27.18] - 2026-11-18
 
 ### Fixed (Review 2 and Review 3: "students are signed out about every 30 minutes")
