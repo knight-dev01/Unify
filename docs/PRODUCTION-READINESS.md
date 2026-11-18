@@ -1,5 +1,7 @@
 # Production readiness: honest grade
 
+> Assessed at v2.13. The scalability review at v2.30 (paging past Supabase's 1,000-row limit, batched reminder ticks, indexes) is in `docs/SCALABILITY.md`.
+
 Assessed at v2.13.x. "Production" here means real students relying on it daily, including **100 people using it at the same moment** (a lecture hall opening the app, or a class scanning attendance).
 
 ## Verdict

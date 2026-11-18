@@ -143,6 +143,7 @@ Settings → Environment Variables (Production + Preview):
 |---|---|
 | `ATTENDANCE_SECRET` | Optional. Signs attendance passes and online codes; falls back to the Supabase secret key. |
 | `ADMIN_EMAILS` + `BREVO_API_KEY` | Also where **alert emails** go. After setting, open Admin, Live performance and press **Send test alert**. |
+| `BREVO_DAILY_LIMIT` | Optional, default 300 (Brevo's free plan). The app spends its daily emails by priority and keeps about a fifth for Supabase's sign-in emails. Raise it after upgrading Brevo. |
 | `SEED_TEST_USERS` | Test accounts for QA only. Remove it afterwards and delete the accounts. |
 
 No new Supabase table is needed for the Home slider updates: they live in `app_settings` under `home_updates`.

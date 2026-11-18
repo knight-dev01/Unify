@@ -16,8 +16,8 @@ Bump the version in four places and add a changelog entry (see the root `README.
 
 | Variable | Effect |
 |---|---|
-| `ADMIN_EMAILS` | Comma-separated bootstrap admins. Also where alert emails go. |
-| `BREVO_API_KEY`, `EMAIL_FROM` | Email (new-note mail, announcements, **alert emails**). `EMAIL_FROM` must be a sender verified in Brevo. Without the key, alerts still appear in Admin, marked "not emailed". |
+| `ADMIN_EMAILS` | Comma-separated bootstrap admins. Also where alert emails go (with admin accounts' own emails; placeholder `@unify.learn` and `@test.unify` addresses are skipped). |
+| `BREVO_API_KEY`, `EMAIL_FROM` | Every app email. `BREVO_API_KEY` is a Brevo **API** key (Settings, SMTP & API, **API Keys** tab, usually `xkeysib-…`); the SMTP login and SMTP key do not work here. `EMAIL_FROM` must be a sender verified in Brevo, ideally on your own authenticated domain. Without the key nothing is emailed; alerts still appear in Admin, marked "not emailed". |
 | `BREVO_DAILY_LIMIT` | Optional. Brevo emails a day (default 300, the free plan). The app keeps a daily count and spends it by priority: codes and alerts, then class cancelled or moved and live wires, then answers, announcements and new notes, then the weekly summary. About 20% is left for Supabase's sign-up and password-reset emails when Supabase sends through Brevo SMTP. Raise it after upgrading the Brevo plan. Admin, Email check shows today's count. |
 | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | Web Push. The public key must match the one in the web app. |
 | `SEED_TEST_USERS` | `1` creates `*.test.unify` accounts for testing. **Remove after testing and delete those accounts.** |
@@ -41,6 +41,23 @@ Bump the version in four places and add a changelog entry (see the root `README.
 - **Class lists** (2.20.0) hold names and matric numbers per class (`class_lists`, `class_list_entries`, tagged `institution = 'LASU'`). Only that class's HOCs and admins can read a list; lecturers see names only on the register of a course they teach. A course's register uses the lists for the course's level(s) in the departments of students taking it; a claimed student who doesn't take the course isn't counted absent. Removing an entry keeps it (and its attendance) and can be undone. Every change is in `class_list_log`.
 - **LASU email verification** for class-list claims is optional. It sends a 6-digit code through Brevo to `…@st.lasu.edu.ng`. Before relying on it, have a LASU student confirm the code arrives (school mail servers can block outside senders); if it doesn't, students still claim by matric and the class rep resolves disputes.
 
+## Email
+
+- **Two Brevo credentials.** The app (Render) sends through Brevo's API with `BREVO_API_KEY`. Supabase's sign-up, invite and password-reset emails go through Brevo **SMTP**: Supabase, Authentication, Emails, SMTP Settings, host `smtp-relay.brevo.com`, port 587, username = the Brevo SMTP **Login**, password = the **SMTP key**, sender = the same verified address. Paste the designs from `notes-engine/emails/` into Supabase, Authentication, Email Templates.
+- **Deliverability.** "Emailed" in the admin panel means Brevo accepted it. If it doesn't arrive: check spam, then Brevo, Transactional, Logs for that address (delivered, bounced, blocked). A Gmail or Yahoo address as `EMAIL_FROM` is often rejected or spam-foldered; authenticate a domain you own in Brevo (Senders, Domains) and send from it. Don't keep made-up addresses in `ADMIN_EMAILS`: bounces hurt the sender's reputation.
+- **The daily budget.** Brevo's free plan sends 300 a day (midnight UTC), shared with Supabase's SMTP emails. The app counts its own sends (`email_budget`) and spends them by priority: (1) class-list codes, alerts, role changes; (2) class cancelled, moved or late, live wires; (3) answers, class board posts, announcements, new notes; (4) the weekly summary. Each stops at its own ceiling and about a fifth is kept for Supabase. Admin, Email check shows "Emails today". After upgrading Brevo, set `BREVO_DAILY_LIMIT`.
+- **Email backs up push.** Class changes, live wires and class board updates are emailed only to people with no push subscription on any device, a confirmed email, and "Class updates and a weekly summary by email" on (Settings, Notifications). Study reminders are push only.
+- **Weekly summary.** New notes in the student's courses that week, their streak and where they stopped. Each student has their own day of the week (17:00 Lagos); students without push go first; it only uses what's left of the day's budget.
+
+## Notifications and reminders
+
+- **Tapping a notification** opens its page: the timetable for a class change, the week for new notes, the class board for answers and posts, where the student stopped for a study reminder, Home for live wires and Confirm today. If the app is already open, that window goes there. Phones pick up a new service worker after the app is fully closed and reopened once.
+- **Study reminders:** the times each student picked (by period in onboarding, editable in Settings). One reminder at each time if they haven't studied that day, at most one follow-up about 105 minutes later, never more than 3 a day; class alerts don't count. Nothing between 22:00 and 06:00 unless the student turned on late-night reminders.
+- **Quiet hours** (Settings) hold back everything except live wires, "online class is live" and "attendance is open".
+- **Offline phones** get notifications when they reconnect (push services keep them up to 4 weeks). iPhones only receive them once the app is added to the Home Screen.
+- **The 1-minute tick** sends reminders, class rep confirm reminders and weekly summaries. Render's free instance can sleep; the app's keep-alive pings stop most gaps, and a slot missed by more than 45 minutes (reminders) or 10 to 20 minutes (confirm, summary) is skipped, not sent late.
+- **Class rules** (class rep): when each class gets confirmed (the evening before at 18:00, 2 hours or 1 hour before; the rep gets a push then) and the latest a lecturer can cancel in the app. After the cut-off a lecturer's cancel is refused; the class rep can always cancel, and a live wire always goes out.
+
 ## Home slider updates
 
 Admin, Announcements: tick "Also show it on everyone's Home slider" on the announcement form to post one notice to the bell, email and Home together. Below the form, the Home slider card lets you post slider-only notices (and remove old ones): title, message, optional link (`/path` inside the app or `https://…`), button label, a Box Boy, and an optional end date. Up to 12 at a time. Everyone sees changes within about 30 seconds.
@@ -52,7 +69,10 @@ Admin, Announcements: tick "Also show it on everyone's Home slider" on the annou
 | Everything is slow, first request takes 30 to 60 s | Render free instances sleep after about 15 minutes idle. The web app warms `/healthz`; a paid always-on instance removes it. |
 | Many users see "You're going a bit fast" | Rate limit is 240 requests a minute per signed-in session. A single user hitting it means a client bug (look for a loop in Admin, Errors). |
 | Scanner says "That pass has expired" for everyone | The scanner's phone or the server clock is off by more than 30 seconds, or the student's app is offline (My pass needs a connection to fetch a fresh QR). |
-| Alerts say "not emailed" | `BREVO_API_KEY` or `ADMIN_EMAILS` missing, or the sender is not verified. |
+| Alerts say "not emailed" | The note says why: no address (set `ADMIN_EMAILS` to a real inbox), `BREVO_API_KEY` missing, or Brevo's reason (unverified sender, wrong key: it must be the API key, not the SMTP key). |
+| Alerts say "emailed" but nothing arrives | Brevo accepted it. Check spam, then Brevo, Transactional, Logs. Usually a Gmail/Yahoo `EMAIL_FROM` or an unauthenticated domain. |
+| Emails stopped for the day | The daily budget is spent (Admin, Email check, "Emails today"). Lower priorities stop first. It resets at midnight UTC; raise `BREVO_DAILY_LIMIT` after upgrading Brevo. |
+| A notification opens Home instead of its page | The phone still runs the old service worker: close the app fully and reopen it once. |
 | A user cannot sign in right after being removed | A signed-out or revoked session can stay valid for up to 60 seconds (auth cache). |
 | Installed app shows an old icon or screen | It updates itself on next open while online. If stuck, remove and reinstall the PWA. |
 | Out of Supabase storage | Check the `avatars` and `diagrams` buckets. |
