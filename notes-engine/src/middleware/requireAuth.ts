@@ -26,6 +26,12 @@ function confirmLater(token: string): void {
   if (confirmedAt.size >= MAX_ENTRIES) confirmedAt.clear();
   confirmedAt.set(token, now);
   supabaseAnon().auth.getUser(token).then(({ data, error }) => {
+    // Only a real rejection from Auth (4xx) revokes. A timeout or Auth outage
+    // must never sign a student out.
+    if (error && !isRejection(error)) {
+      confirmedAt.delete(token);
+      return;
+    }
     if (error || !data.user) {
       if (revoked.size >= MAX_ENTRIES) revoked.clear();
       revoked.add(token);
@@ -33,6 +39,14 @@ function confirmLater(token: string): void {
     }
   }).catch(() => { confirmedAt.delete(token); /* network blip: try again next time */ });
 }
+
+// Auth said no (bad, expired or revoked token) vs Auth couldn't answer.
+function isRejection(error: unknown): boolean {
+  const status = (error as { status?: number } | null)?.status;
+  return typeof status === "number" && status >= 400 && status < 500;
+}
+const unavailable = (res: Response) =>
+  res.status(503).json({ error: "Sign-in check is briefly unavailable. Try again in a moment." });
 
 function expiryOf(token: string): number {
   try {
@@ -78,6 +92,10 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
   }
   try {
     const { data, error } = await supabaseAnon().auth.getUser(token);
+    if (error && !isRejection(error)) {
+      unavailable(res);
+      return;
+    }
     if (error || !data.user) {
       res.status(401).json({ error: "Invalid session" });
       return;
@@ -91,6 +109,7 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
     (req as AuthedRequest).userId = data.user.id;
     next();
   } catch {
-    res.status(401).json({ error: "Invalid session" });
+    // Network failure reaching Auth: not the student's fault, keep them signed in.
+    unavailable(res);
   }
 }

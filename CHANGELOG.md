@@ -5,6 +5,13 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.27.18] - 2026-11-18
+
+### Fixed (Review 2 and Review 3: "students are signed out about every 30 minutes")
+- **No more idle sign-out.** The 30-minute inactivity timer is gone; students stay signed in until they log out
+- **Keep me signed in is on by default** (was "Remember me", off by default), so closing the app or the phone killing it in the background no longer signs anyone out. Unticking it on a shared phone is remembered on that device and also applies to Google sign-in
+- **A server or network hiccup no longer signs people out.** The API answers "try again" (503) instead of "invalid session" when Supabase Auth is slow or unreachable, and a background check only revokes a session that Auth actually rejects. The app refreshes the session before giving up and only signs out when Supabase refuses the refresh
+
 ## [2.27.17] - 2026-11-18
 
 ### Added (migration 0052)
