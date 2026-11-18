@@ -13,6 +13,7 @@ const sendPushToUsersSafe = (ids: string[], p: { title: string; body: string; ur
 import { requireAuth, type AuthedRequest } from "../middleware/requireAuth";
 import { requireAuthor } from "../middleware/requireAuthor";
 import { requireCourseAccess } from "../middleware/requireCourseAccess";
+import { lecturerCancelTooLate } from "./classRep";
 
 const router = Router();
 
@@ -2503,6 +2504,18 @@ router.post("/timetable/:id/change", requireAuth, async (req: Request, res: Resp
     }
     const d = parsed.data;
     const date = d.date || thisWeekDate(s.day);
+    // Review 3 (C11): past the class rep's cut-off, a lecturer can't cancel here.
+    if (d.status === "cancelled") {
+      const { data: who } = await sb.from("profiles").select("role,is_admin,is_hoc").eq("id", userId).maybeSingle();
+      const w = who as { role?: string; is_admin?: boolean; is_hoc?: boolean } | null;
+      if (w?.role === "lecturer" && !w.is_admin) {
+        const tooLate = await lecturerCancelTooLate(s.course, date, s.start_time);
+        if (tooLate) {
+          res.status(403).json({ error: tooLate });
+          return;
+        }
+      }
+    }
     if (d.status === "moved" && !d.start && !d.venue) {
       res.status(400).json({ error: "Say where or when it moved to." });
       return;

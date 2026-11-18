@@ -211,7 +211,11 @@ export async function reminderTick(): Promise<void> {
   running = true;
   try {
     const now = lagosNow();
-    const [a, b] = await Promise.allSettled([personalTick(now), scheduledTick(now)]);
+    // Class reps: "confirm your class" at the time they chose (Review 3, C11).
+    // Required lazily: routes/classRep imports this file.
+    const confirm = (require("../routes/classRep") as { confirmTick: (n: typeof now) => Promise<number> }).confirmTick;
+    const [a, b, c] = await Promise.allSettled([personalTick(now), scheduledTick(now), confirm(now)]);
+    if (c.status === "rejected") console.warn("[reminders] confirm tick failed", c.reason instanceof Error ? c.reason.message : c.reason);
     if (a.status === "rejected") console.warn("[reminders] personal tick failed", a.reason instanceof Error ? a.reason.message : a.reason);
     if (b.status === "rejected") console.warn("[reminders] scheduled tick failed", b.reason instanceof Error ? b.reason.message : b.reason);
     const sentPersonal = a.status === "fulfilled" ? a.value : 0;

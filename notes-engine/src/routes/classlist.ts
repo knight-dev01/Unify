@@ -369,6 +369,34 @@ router.delete("/class-list/entries/:id", requireAuth, async (req: Request, res: 
   }
 });
 
+// Review 3: clear the whole list in one go (wrong file uploaded). Every entry
+// is removed the same way as one at a time (claims released, rows kept), so
+// the rep can upload the right file straight after.
+router.post("/class-list/clear", requireAuth, async (req: Request, res: Response) => {
+  if ((req.body as { confirm?: string } | undefined)?.confirm !== "CLEAR") return fail(res, 400, "Type CLEAR to confirm.");
+  try {
+    const me = await getMe(req);
+    const cls = await managedClass(req, me);
+    if ("error" in cls) return fail(res, cls.status, cls.error);
+    const list = await listForClass(cls.institution, cls.department, cls.level);
+    if (!list) return fail(res, 404, "There's no class list to clear.");
+    const sb = supabaseAdmin();
+    const { data } = await sb.from("class_list_entries").select(ENTRY_COLS).eq("list_id", list.id).is("removed_at", null).limit(5000);
+    const entries = (data ?? []) as EntryRow[];
+    for (const e of entries) if (e.student_id) await releaseEntry(e, me!.id, "class list cleared");
+    if (entries.length) {
+      const { error } = await sb.from("class_list_entries").update({ removed_at: new Date().toISOString() }).eq("list_id", list.id).is("removed_at", null);
+      if (error) throw error;
+    }
+    await logList(list.id, me!.id, "clear", { count: entries.length });
+    await touchList(list.id);
+    forgetCourseLists();
+    res.json({ ok: true, cleared: entries.length });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
 router.post("/class-list/entries/:id/restore", requireAuth, async (req: Request, res: Response) => {
   try {
     const g = await guardEntry(req, res);

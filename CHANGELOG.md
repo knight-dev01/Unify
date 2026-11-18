@@ -5,6 +5,18 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.29.0] - 2026-11-18
+
+### Added (Review 3: C7, C8, C9, C11, clear class list; migration 0054)
+- **Class rep Home (C7):** one quiet tools row (Post, Questions, Class list, Live wire) and a **Confirm today** card listing the day's classes in the rep's courses, each with Confirm (the class is told) or its status (confirmed, cancelled, moved, running late). From 5 PM it shows tomorrow's classes instead
+- **Class size on the Class page (C8):** how many students are on the class list and how many have joined, with a bar. Home's Post opens the post box directly, and Questions opens the Questions filter
+- **Class rules (C11, Class page → Class rules):** when classes get confirmed (the evening before, 2 hours or 1 hour before; the class rep gets a push reminder then for each class not yet confirmed) and the latest a lecturer can cancel (by 6 PM the evening before, 2 hours, 1 hour, or any time). After the cut-off a lecturer's cancel is refused with a note to ask the class rep or send a live wire. One rule covers all the rep's courses
+- **Clear the whole class list** in one go, for a wrong file: confirm by typing CLEAR. Claims are released and attendance already taken is kept; the history shows who cleared it
+
+### Changed
+- **Manage courses (C9):** levels open in place (your level open first), each with a First / Second semester switch and its courses to add or remove. Search, carryovers and locks work as before
+- **No "Send a live wire" button on Home** (it lives under Live wire in the tools row), and the class rep's Home shows live wires without the countdown
+
 ## [2.28.0] - 2026-11-18
 
 ### Added (Review 3: C1, C2, C10; migration 0053)
