@@ -1,4 +1,5 @@
 import { Router, type Request, type Response } from "express";
+import { brandEmail, escHtml, panel } from "../lib/email-templates";
 import rateLimit from "express-rate-limit";
 import { createHash, randomInt } from "node:crypto";
 import { z } from "zod";
@@ -184,7 +185,7 @@ router.get("/class-list", requireAuth, async (req: Request, res: Response) => {
           entry: onList ? { id: onList.id, name: onList.full_name, claimedBy: onList.student_id ? who[onList.student_id]?.first || "Student" : "" } : null,
         };
       }),
-      log: log.map((l) => ({ id: l.id, action: l.action, detail: l.detail, at: l.created_at, by: l.actor_id ? who[l.actor_id]?.first || "Someone" : "Unify" })),
+      log: log.map((l) => ({ id: l.id, action: l.action, detail: l.detail, at: l.created_at, by: l.actor_id ? who[l.actor_id]?.first || "Someone" : "Unify Learn" })),
     });
   } catch (e) {
     dbFail(res, e);
@@ -626,8 +627,17 @@ router.post("/class-list/verify-email/start", requireAuth, emailLimiter, async (
     if (error) throw error;
     const sent = await sendSimpleEmail({
       to: [{ email, name: me.first_name || undefined }],
-      subject: `${code} is your Unify class-list code`,
-      html: `<div style="font-family:Arial,sans-serif;font-size:15px;color:#0a0a0a"><p>Hi ${me.first_name ? me.first_name.replace(/[<>&"]/g, "") : "there"},</p><p>Your code to confirm your place on your class list is:</p><p style="font-size:28px;font-weight:700;letter-spacing:4px">${code}</p><p>It works for 15 minutes. If you didn't ask for this, ignore this email.</p><p>Unify Learn</p></div>`,
+      subject: `${code} is your Unify Learn class-list code`,
+      html: brandEmail({
+        eyebrow: "Class list",
+        title: "Your class-list code",
+        pose: "phone-out",
+        body:
+          `<p style="margin:0 0 4px;">Hi ${escHtml(me.first_name || "there")}, here's the code to confirm your place on your class list:</p>` +
+          panel(`<div style="font-family:'DM Sans',Arial,sans-serif;font-size:32px;font-weight:700;letter-spacing:8px;text-align:center;color:#0a0a0a;">${code}</div>`) +
+          `<p style="margin:8px 0 0;">It works for 15 minutes.</p>`,
+        note: "Didn't ask for this? Ignore it. Nothing changes on your account.",
+      }),
     });
     if (!sent) {
       await sb.from("class_claim_codes").delete().eq("student_id", me.id);

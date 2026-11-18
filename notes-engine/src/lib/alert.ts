@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "./supabase";
+import { brandEmail, panel } from "./email-templates";
 import { sendSimpleEmail } from "./email";
 import { recentCompleted, systemSnapshot, lastDbProbes } from "./metrics";
 
@@ -61,14 +62,18 @@ export async function raise(signature: string, kind: string, message: string, de
       if (!to.length) rec.note = "no admin email on file (set ADMIN_EMAILS)";
       else if (!process.env.BREVO_API_KEY) rec.note = "BREVO_API_KEY is not set: email not sent";
       else {
-        const html =
-          `<div style="font-family:Arial,sans-serif;max-width:560px">` +
-          `<h2 style="margin:0 0 8px">Unify alert: ${esc(kind)}</h2>` +
-          `<p style="font-size:15px;line-height:1.5">${esc(message)}</p>` +
-          (detail ? `<pre style="background:#f4f4f0;padding:12px;border-radius:8px;white-space:pre-wrap;font-size:12px">${esc(detail.slice(0, 1500))}</pre>` : "") +
-          `<p style="font-size:13px;color:#555">${new Date().toUTCString()}<br/>` +
-          `See live performance: <a href="${appUrl()}/admin/performance">${appUrl()}/admin/performance</a></p></div>`;
-        const sent = await sendSimpleEmail({ to: to.map((email) => ({ email })), subject: `[Unify ALERT] ${kind}`, html });
+        const html = brandEmail({
+          eyebrow: "System alert",
+          title: kind,
+          pose: "peeking",
+          body:
+            `<p style="margin:0;">${esc(message)}</p>` +
+            (detail ? panel(`<pre style="margin:0;white-space:pre-wrap;font-size:12px;font-family:ui-monospace,Menlo,monospace;">${esc(detail.slice(0, 1500))}</pre>`, "grey") : "") +
+            `<p style="margin:12px 0 0;font-size:13px;color:#555555;">${new Date().toUTCString()}</p>`,
+          cta: { url: `${appUrl()}/admin/performance`, label: "See live performance" },
+          note: "You get this because you're an admin on Unify Learn. The same problem emails at most once every 15 minutes.",
+        });
+        const sent = await sendSimpleEmail({ to: to.map((email) => ({ email })), subject: `[Unify Learn alert] ${kind}`, html });
         rec.emailed = sent > 0;
         if (sent > 0) {
           lastSent.set(signature, now);

@@ -1,5 +1,5 @@
 import { supabaseAdmin } from "./supabase";
-import { newNoteEmail } from "./email-templates";
+import { brandEmail, newNoteEmail } from "./email-templates";
 
 // New-note email notifications (Duolingo-style nudges, event-driven).
 // Provider: Brevo SMTP API over HTTPS (no extra deps). Without BREVO_API_KEY
@@ -67,36 +67,18 @@ export async function probeEmail(to: string): Promise<
   const res = await brevoSend(key, {
     sender,
     to: [{ email: to }],
-    subject: "Unify email test",
-    htmlContent:
-      `<div style="font-family:sans-serif;max-width:420px;"><p>This is a test from Unify.</p>` +
-      `<p style="font-size:12px;color:#777;">If you can read this, the Brevo sender, API key and domain are all working.</p></div>`,
+    subject: "Unify Learn email test",
+    htmlContent: brandEmail({
+      eyebrow: "Email check",
+      title: "Your emails work",
+      pose: "thumbs-up",
+      body: `<p style="margin:0;">This is a test from the Unify Learn admin panel. If you can read this, the Brevo key, the sender and delivery all work.</p>`,
+      note: "Sent from Admin, Email check.",
+    }),
   });
   return { ...res, sender: sender.email, keySet: true, fromSet };
 }
 
-function noteHtml(opts: {
-  firstName: string;
-  course: string;
-  week: number;
-  topics: { topic: number; version: number }[];
-  url: string;
-}): string {
-  const topicLine = opts.topics.map((t) => `Topic ${t.topic} (v${t.version})`).join(" · ") || "fresh content";
-  const name = opts.firstName ? ` ${opts.firstName}` : "";
-  return [
-    `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;">`,
-    `<div style="background:linear-gradient(135deg,#10b981,#059669);color:#fff;padding:20px;border-radius:12px 12px 0 0;">`,
-    `<div style="font-weight:800;font-size:20px;">Unify Learn</div>`,
-    `</div>`,
-    `<div style="padding:20px;border:1px solid #e5e5e5;border-top:none;border-radius:0 0 12px 12px;">`,
-    `<p>Hi${name},</p>`,
-    `<p><strong>${opts.course} &middot; Week ${opts.week}</strong> just got ${topicLine}.</p>`,
-    `<p><a href="${opts.url}" style="display:inline-block;padding:12px 24px;background:#10b981;color:#fff;border-radius:9999px;text-decoration:none;font-weight:800;">Open it now</a></p>`,
-    `<p style="font-size:12px;color:#777;">You get this because new-note emails are on in your Unify profile. Turn them off there any time.</p>`,
-    `</div></div>`,
-  ].join("");
-}
 
 export async function sendNewNoteEmails(opts: {
   course: string;

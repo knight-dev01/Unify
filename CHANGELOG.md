@@ -5,6 +5,13 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.33.2] - 2026-11-18
+
+### Changed
+- **Every email has the Unify Learn design:** warm off-white page, near-black header with the "Unify Learn." wordmark and Box Boy in his green ring, a serif headline, a green button, and the "Built for the ones who build." footer. Covers new notes, announcements, role changes, staff requests, the class-list code, admin alerts, the email check and the sign-up, invite and password-reset templates (paste these into Supabase from notes-engine/emails)
+- **"Unify Learn" everywhere in emails and labels:** subjects ("Unify Learn: …", "… is your Unify Learn class-list code", "[Unify Learn alert] …"), footers, and the live wire and class-list history labels that said plain "Unify"
+- Names and messages people typed are escaped in emails
+
 ## [2.33.1] - 2026-11-18
 
 ### Fixed

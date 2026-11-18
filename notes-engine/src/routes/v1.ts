@@ -1,4 +1,5 @@
 import { apiLimiter } from "../middleware/limits";
+import { brandEmail, escHtml, textHtml } from "../lib/email-templates";
 import { noteClientError } from "../lib/alert";
 import { Router, type Request, type Response } from "express";
 import rateLimit from "express-rate-limit";
@@ -1428,8 +1429,15 @@ router.post("/role-requests", requireAuth, async (req: Request, res: Response) =
       const base = (process.env.CORS_ORIGIN || "").split(",")[0].trim() || "https://unify-virid.vercel.app";
       await sendSimpleEmail({
         to: emails,
-        subject: `Unify: new ${label} request needs review`,
-        html: `<div style="font-family:sans-serif;max-width:480px;"><p><strong>${p?.first_name || "Someone"}</strong> (${p?.email || "no email"}) requested the <strong>${label}</strong> role${parsed.data.level ? ` for <strong>${parsed.data.level}</strong>` : ""}${courses.length ? ` (${courses.join(", ")})` : ""}.</p><p><a href="${base}/admin" style="display:inline-block;padding:12px 24px;background:#10b981;color:#fff;border-radius:9999px;text-decoration:none;font-weight:800;">Review in admin panel</a></p></div>`,
+        subject: `Unify Learn: new ${label} request to review`,
+        html: brandEmail({
+          eyebrow: "Needs review",
+          title: `New ${label} request`,
+          pose: "arms-crossed",
+          body: `<p style="margin:0;"><strong>${escHtml(p?.first_name || "Someone")}</strong> (${escHtml(p?.email || "no email")}) asked for the <strong>${escHtml(label)}</strong> role${parsed.data.level ? ` for <strong>${escHtml(parsed.data.level)}</strong>` : ""}${courses.length ? `, teaching ${escHtml(courses.join(", "))}` : ""}.</p>`,
+          cta: { url: `${base}/admin`, label: "Review it" },
+          note: "You get this because you're an admin on Unify Learn.",
+        }),
       }).catch(() => {});
     }
     res.json({ ok: true, id: (ins as { id: string }).id });
@@ -1541,8 +1549,15 @@ async function notifyApplicant(userId: string, title: string, body: string, url:
       const base = (process.env.CORS_ORIGIN || "").split(",")[0].trim() || "https://unify-virid.vercel.app";
       await sendSimpleEmail({
         to: [{ email: u.email, name: u.first_name || "" }],
-        subject: `Unify: ${title}`,
-        html: `<div style="font-family:sans-serif;max-width:480px;"><p>Hi${u.first_name ? ` ${u.first_name}` : ""},</p><p>${body}</p><p><a href="${base}${url}" style="display:inline-block;padding:12px 24px;background:#10b981;color:#fff;border-radius:9999px;text-decoration:none;font-weight:800;">Open Unify Learn</a></p></div>`,
+        subject: `Unify Learn: ${title}`,
+        html: brandEmail({
+          eyebrow: "Your request",
+          title,
+          pose: "thumbs-up",
+          body: `<p style="margin:0 0 8px;">Hi${u.first_name ? ` ${escHtml(u.first_name)}` : ""},</p><p style="margin:0;">${textHtml(body)}</p>`,
+          cta: { url: `${base}${url}`, label: "Open Unify Learn" },
+          note: "You get this because you asked for a staff role on Unify Learn.",
+        }),
       }).catch(() => {});
     }
   } catch {
@@ -3373,8 +3388,15 @@ router.patch("/admin/users/:id", requireAuth, async (req: Request, res: Response
             const base = (process.env.CORS_ORIGIN || "").split(",")[0].trim() || "https://unify-virid.vercel.app";
             await sendSimpleEmail({
               to: [{ email: u.email, name: u.first_name || "" }],
-              subject: `Unify: your role is now ${label}`,
-              html: `<div style="font-family:sans-serif;max-width:480px;"><p>Hi${u.first_name ? ` ${u.first_name}` : ""},</p><p>${body}</p><p><a href="${base}${link}" style="display:inline-block;padding:12px 24px;background:#10b981;color:#fff;border-radius:9999px;text-decoration:none;font-weight:800;">Open Unify Learn</a></p></div>`,
+              subject: `Unify Learn: your role is now ${label}`,
+              html: brandEmail({
+                eyebrow: "Account update",
+                title: `Your role is now ${label}`,
+                pose: "thumbs-up",
+                body: `<p style="margin:0 0 8px;">Hi${u.first_name ? ` ${escHtml(u.first_name)}` : ""},</p><p style="margin:0;">${textHtml(body)}</p>`,
+                cta: { url: `${base}${link}`, label: "Open Unify Learn" },
+                note: "You get this because an admin changed your role on Unify Learn.",
+              }),
             }).catch(() => {});
           }
         } catch {
@@ -3758,15 +3780,20 @@ router.post("/admin/announce", requireAuth, async (req: Request, res: Response) 
       try {
         const { sendSimpleEmail } = await import("../lib/email");
         const base = (process.env.CORS_ORIGIN || "").split(",")[0].trim() || "https://unify-virid.vercel.app";
-        const html =
-          `<div style="font-family:sans-serif;max-width:480px;"><p>Hi there,</p><p>${parsed.data.body}</p>` +
-          `<p><a href="${base}${parsed.data.link || "/dashboard"}" style="display:inline-block;padding:12px 24px;background:#10b981;color:#fff;border-radius:9999px;text-decoration:none;font-weight:800;">Open Unify Learn</a></p></div>`;
+        const html = brandEmail({
+          eyebrow: "Announcement",
+          title: parsed.data.title,
+          pose: "teaching",
+          body: `<p style="margin:0;">${textHtml(parsed.data.body)}</p>`,
+          cta: { url: `${base}${parsed.data.link || "/home"}`, label: "Open Unify Learn" },
+          note: "You get this because you have a Unify Learn account. Important updates only.",
+        });
         let sent = 0;
         for (let i = 0; i < inboxes.length; i += 50) {
           const chunk = inboxes.slice(i, i + 50);
           sent += await sendSimpleEmail({
             to: chunk,
-            subject: `Unify: ${parsed.data.title}`,
+            subject: `Unify Learn: ${parsed.data.title}`,
             html,
           }).catch((e: unknown) => {
             console.warn("[email] announce chunk failed", e instanceof Error ? e.message : e);

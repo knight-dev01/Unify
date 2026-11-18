@@ -71,11 +71,11 @@ function targetsFor(x: Awaited<ReturnType<typeof load>>): Target[] {
 }
 
 const roleLabel = (x: Awaited<ReturnType<typeof load>>, t: Target) =>
-  x.admin && t.scope === "all" ? "Unify" :
+  x.admin && t.scope === "all" ? "Unify Learn" :
   t.scope === "faculty" ? "Dean" :
   t.scope === "department" ? "Head of department" :
   t.scope === "course" ? (x.me?.role === "contributor" ? "Contributor" : "Lecturer") :
-  x.me?.is_hoc ? "Class rep" : x.admin ? "Unify" : "Level admin";
+  x.me?.is_hoc ? "Class rep" : x.admin ? "Unify Learn" : "Level admin";
 
 // Does this wire reach this person?
 function reaches(w: Wire, me: Me, taking: string[], teaching: string[]): boolean {
