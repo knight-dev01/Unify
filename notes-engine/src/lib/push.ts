@@ -145,7 +145,7 @@ export async function pushAnnounce(title: string, body: string, link?: string): 
   try {
     const ids = (await pageAll<{ id: string }>((from, to) => supabaseAdmin().from("profiles").select("id").order("id").range(from, to))).map((r) => r.id);
     if (!ids.length) return;
-    await sendPushToUsers(ids, { title, body, url: `${appBaseUrl()}${link || "/dashboard"}` });
+    await sendPushToUsers(ids, { title, body, url: `${appBaseUrl()}${link || "/home"}` });
   } catch (e) {
     console.warn("[push] announce fan-out failed", e instanceof Error ? e.message : e);
   }

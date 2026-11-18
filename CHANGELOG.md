@@ -5,6 +5,12 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.34.1] - 2026-11-18
+
+### Fixed
+- **Tapping a notification opens what it's about** (the timetable for a class change, the week for new notes, the class board for an answer, where you stopped for a study reminder) instead of Home. When the app was already open, the tap used to bring it forward on whatever page it was on; now that window goes to the right page. Full web addresses of the app open inside the installed app
+- **The bell** handles the same links, opens outside links in the browser, and old notifications that pointed at the retired /dashboard page now open Home
+
 ## [2.34.0] - 2026-11-18
 
 ### Added (migration 0059)

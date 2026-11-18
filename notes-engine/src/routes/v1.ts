@@ -1593,9 +1593,9 @@ router.post("/admin/role-requests/:id", requireAuth, async (req: Request, res: R
         type: "role",
         title: "Staff request not approved",
         body: "An admin reviewed your lecturer/contributor request and declined it this time. You keep full student access.",
-        link: "/dashboard",
+        link: "/home",
       });
-      void notifyApplicant(r.user_id, "Staff request not approved", "An admin reviewed your lecturer/contributor request and declined it this time. You keep full student access.", "/dashboard");
+      void notifyApplicant(r.user_id, "Staff request not approved", "An admin reviewed your lecturer/contributor request and declined it this time. You keep full student access.", "/home");
       res.json({ ok: true, approved: false });
       return;
     }
@@ -3782,7 +3782,7 @@ router.post("/admin/announce", requireAuth, async (req: Request, res: Response) 
       type: "announce",
       title: parsed.data.title,
       body: parsed.data.body,
-      link: parsed.data.link || "/dashboard",
+      link: parsed.data.link || "/home",
       pinned: !!parsed.data.pin,
     }));
     for (let i = 0; i < rows.length; i += 200) {
