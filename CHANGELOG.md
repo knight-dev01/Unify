@@ -5,6 +5,12 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.31.0] - 2026-11-18
+
+### Changed (Review 3: new persona art, C15)
+- **New Box Boy personas:** five different people at a glance, each with its own pose, outfit and circle colour, on the splash screen, the persona picker and profile pictures. In the review's order: Goal-Driven, Concept-First, Collaborative, Multi-Commitment, Comeback. Everyone keeps the persona they picked
+- **Persona picker (C15):** arrow buttons right beside the big avatar, "1 of 5" with dots (tap a dot to jump), swipe on the avatar, and Continue stays on screen without scrolling
+
 ## [2.30.0] - 2026-11-18
 
 ### Added
