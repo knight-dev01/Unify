@@ -5,6 +5,14 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.34.0] - 2026-11-18
+
+### Added (migration 0059)
+- **Email works within Brevo's free plan (300 a day, shared with sign-in emails):** the app keeps a daily count and spends it by priority, so the important emails always have room: codes and alerts first, then class cancelled or moved and live wires, then answers, class board posts, announcements and new notes, then the weekly summary. About a fifth stays free for sign-ups and password resets. Set `BREVO_DAILY_LIMIT` on Render after upgrading Brevo. Admin, Email check shows today's count
+- **Email as the backup for push:** class cancelled, moved or running late, live wires, class board announcements, polls and answers are emailed to students push can't reach (no push on any device), so nobody misses them and the budget isn't spent on people who already got the notification
+- **Weekly summary email:** new notes in your courses this week, your streak, and a link back to where you stopped. Each student gets theirs on their own day of the week at 5 PM, students without push first, using what's left of the day's budget
+- **Settings, Notifications:** "Class updates and a weekly summary by email" (on by default)
+
 ## [2.33.2] - 2026-11-18
 
 ### Changed

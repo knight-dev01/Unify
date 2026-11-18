@@ -1,4 +1,6 @@
 import { Router, type Request, type Response } from "express";
+import { brandEmail, emailBase, escHtml, textHtml } from "../lib/email-templates";
+import { emailWithoutPush } from "../lib/email";
 import rateLimit from "express-rate-limit";
 import { z } from "zod";
 import { clientKey } from "../middleware/limits";
@@ -164,6 +166,18 @@ router.post("/livewire", requireAuth, sendLimit, async (req: Request, res: Respo
           await sb.from("notifications").insert(ids.slice(i, i + 500).map((user_id) => ({ user_id, type: "live_wire", title, body: d.message, link: "/home" })));
         }
         await sendPushToUsers(ids, { title, body: d.message, url: "/home" });
+        // Email backup for students push can't reach.
+        void emailWithoutPush(ids, (first) => ({
+          subject: `Unify Learn: ${title}`,
+          html: brandEmail({
+            eyebrow: "Live wire · emergency",
+            title,
+            pose: "phone-out",
+            body: `<p style="margin:0 0 8px;">Hi${first ? ` ${escHtml(first)}` : ""},</p><p style="margin:0;">${textHtml(d.message)}</p>`,
+            cta: { url: `${emailBase()}/home`, label: "Open Unify Learn" },
+            note: "You get this by email because push notifications aren't on for you. Turn them on in Settings, Notifications to get live wires instantly.",
+          }),
+        }), "urgent").catch(() => 0);
       } catch (e) {
         console.warn("[livewire] fan-out failed", e instanceof Error ? e.message : e);
       }

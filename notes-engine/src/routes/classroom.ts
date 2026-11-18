@@ -1,4 +1,6 @@
 import { clientKey } from "../middleware/limits";
+import { brandEmail, emailBase, escHtml, textHtml } from "../lib/email-templates";
+import { emailWithoutPush } from "../lib/email";
 import { Router, type Request, type Response } from "express";
 import rateLimit from "express-rate-limit";
 import { createHmac, timingSafeEqual } from "node:crypto";
@@ -170,6 +172,18 @@ async function classReps(dept: string, level: string): Promise<string[]> {
 }
 async function tell(ids: string[], title: string, body: string): Promise<void> {
   if (!ids.length) return;
+  // Email backup for classmates push can't reach.
+  void emailWithoutPush(ids, (first) => ({
+    subject: `Unify Learn: ${title}`,
+    html: brandEmail({
+      eyebrow: "Your class",
+      title,
+      pose: "teaching",
+      body: `<p style="margin:0 0 8px;">Hi${first ? ` ${escHtml(first)}` : ""},</p><p style="margin:0;">${textHtml(body.slice(0, 600))}</p>`,
+      cta: { url: `${emailBase()}/hoc`, label: "Open your class board" },
+      note: "You get this by email because push notifications aren't on for you. Turn them on in Settings, Notifications.",
+    }),
+  }), "update").catch(() => 0);
   const sb = supabaseAdmin();
   for (let i = 0; i < ids.length; i += 500) {
     await sb.from("notifications").insert(ids.slice(i, i + 500).map((user_id) => ({ user_id, type: "hoc_post", title, body: body.slice(0, 140), link: "/hoc" })));

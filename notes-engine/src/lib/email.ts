@@ -1,4 +1,6 @@
 import { supabaseAdmin } from "./supabase";
+import { emailRoom, persistSoon, returnEmail, takeEmail, type EmailPriority } from "./emailBudget";
+import { inChunks } from "./paging";
 import { brandEmail, newNoteEmail } from "./email-templates";
 
 // New-note email notifications (Duolingo-style nudges, event-driven).
@@ -25,7 +27,17 @@ function parseSender(): { name: string; email: string } {
 // sender, daily limit reached, bad recipient), which is what used to vanish.
 type BrevoResult = { ok: boolean; status: number; body: string };
 
-async function brevoSend(key: string, payload: Record<string, unknown>): Promise<BrevoResult> {
+// Every app email passes here, so this is where the daily budget is kept
+// (lib/emailBudget: Brevo's free plan is 300 a day). Over budget, the email
+// is skipped and reported, never sent.
+async function brevoSend(key: string, payload: Record<string, unknown>, priority: EmailPriority = "critical"): Promise<BrevoResult> {
+  if (!(await takeEmail(priority))) return { ok: false, status: 0, body: `daily email budget reached (${priority})` };
+  const out = await brevoSendNow(key, payload);
+  if (out.ok) persistSoon();
+  else returnEmail();
+  return out;
+}
+async function brevoSendNow(key: string, payload: Record<string, unknown>): Promise<BrevoResult> {
   let last: BrevoResult = { ok: false, status: 0, body: "no attempt made" };
   for (let attempt = 0; attempt < 3; attempt += 1) {
     const res = await fetch("https://api.brevo.com/v3/smtp/email", {
@@ -118,7 +130,7 @@ export async function sendNewNoteEmails(opts: {
           to: [{ email: r.email, name: r.firstName || undefined }],
           subject: built.subject,
           htmlContent: built.html,
-        });
+        }, "update");
       })
     );
     let failed = false;
@@ -154,6 +166,7 @@ export async function sendSimpleEmail(opts: {
   to: { email: string; name?: string }[];
   subject: string;
   html: string;
+  priority?: EmailPriority;
 }): Promise<number> {
   const list = (opts.to || []).filter((r) => r.email).slice(0, 50);
   if (!list.length) return 0;
@@ -175,7 +188,7 @@ export async function sendSimpleEmail(opts: {
           to: [{ email: r.email, name: r.name || undefined }],
           subject: opts.subject,
           htmlContent: opts.html,
-        })
+        }, opts.priority || "critical")
       )
     );
     results.forEach((res, idx) => {
@@ -308,4 +321,41 @@ export async function notifyCoursePublished(
     console.warn("[email] notify failed", e instanceof Error ? e.message : e);
     return { sent: 0, skipped: 0 };
   }
+}
+
+
+// Email as the backup for push (Review: "reminders and notifications should
+// use email too"). Only people push can't reach get it: no push subscription
+// on any device, a confirmed email, and class-update emails left on in
+// Settings. Capped by the day's budget for the priority; returns how many
+// went out. build() gets the person's first name.
+export async function emailWithoutPush(
+  ids: string[],
+  build: (firstName: string) => { subject: string; html: string },
+  priority: EmailPriority,
+): Promise<number> {
+  const key = process.env.BREVO_API_KEY || "";
+  const uniq = [...new Set(ids.filter(Boolean))];
+  if (!key || !uniq.length) return 0;
+  const sb = supabaseAdmin();
+  const people = await inChunks<{ id: string; email: string | null; first_name: string | null }>(uniq, (c, from, to) =>
+    sb.from("profiles").select("id,email,first_name").in("id", c).eq("email_confirmed", true).neq("email_updates", false).order("id").range(from, to));
+  if (!people.length) return 0;
+  const withPush = new Set((await inChunks<{ user_id: string }>(people.map((p) => p.id), (c, from, to) =>
+    sb.from("push_subscriptions").select("user_id").in("user_id", c).order("user_id").range(from, to))).map((r) => r.user_id));
+  const targets = people.filter((p) => p.email && !withPush.has(p.id) && !/@(test\.unify|unify\.learn)$/i.test(p.email));
+  const room = await emailRoom(priority);
+  const list = targets.slice(0, room);
+  if (targets.length > list.length) console.info(`[email] budget: ${targets.length - list.length} ${priority} email(s) skipped today`);
+  const sender = parseSender();
+  let sent = 0;
+  for (let i = 0; i < list.length; i += 5) {
+    const chunk = list.slice(i, i + 5);
+    const results = await Promise.all(chunk.map((p) => {
+      const built = build((p.first_name || "").trim().split(/\s+/)[0] || "");
+      return brevoSend(key, { sender, to: [{ email: p.email!, name: p.first_name || undefined }], subject: built.subject, htmlContent: built.html }, priority);
+    }));
+    sent += results.filter((r) => r.ok).length;
+  }
+  return sent;
 }

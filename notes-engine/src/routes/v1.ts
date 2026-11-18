@@ -1,4 +1,5 @@
 import { apiLimiter } from "../middleware/limits";
+import { emailWithoutPush } from "../lib/email";
 import { brandEmail, escHtml, textHtml } from "../lib/email-templates";
 import { noteClientError } from "../lib/alert";
 import { Router, type Request, type Response } from "express";
@@ -91,6 +92,7 @@ const onboardingSchema = z.object({
 
 const profileSchema = onboardingSchema.partial().extend({
   notifyNewNotes: z.boolean().optional(),
+  emailUpdates: z.boolean().optional(),
   // Quiet hours for push (Lagos time). Both null to switch off.
   quietStart: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/).nullable().optional(),
   quietEnd: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/).nullable().optional(),
@@ -535,6 +537,7 @@ router.put("/me", requireAuth, async (req: Request, res: Response) => {
           ...(d.gradTarget != null ? { cgpa_target: d.gradTarget } : {}),
           // role is immutable: never updated via PUT (see POST lock above)
           ...(typeof d.notifyNewNotes === "boolean" ? { notify_new_notes: d.notifyNewNotes } : {}),
+          ...(typeof d.emailUpdates === "boolean" ? { email_updates: d.emailUpdates } : {}),
           ...(d.quietStart !== undefined ? { quiet_start: d.quietStart } : {}),
           ...(d.quietEnd !== undefined ? { quiet_end: d.quietEnd } : {}),
           ...(d.studyGoal ? { study_goal: d.studyGoal } : {}),
@@ -2583,6 +2586,21 @@ router.post("/timetable/:id/change", requireAuth, async (req: Request, res: Resp
           await sb.from("notifications").insert(ids.slice(i, i + 500).map((user_id) => ({ user_id, type: "class_change", title, body: body || "Check the timetable.", course: s.course, link: "/timetable" })));
         }
         void sendPushToUsersSafe(ids, { title, body: body || "Check the timetable.", url: "/timetable" });
+        // Email backup for students push can't reach (cancelled, moved, running late).
+        if (d.status === "cancelled" || d.status === "moved" || d.status === "late") {
+          const base = (process.env.CORS_ORIGIN || "").split(",")[0].trim() || "https://unify-virid.vercel.app";
+          void emailWithoutPush(ids, (first) => ({
+            subject: `Unify Learn: ${title}`,
+            html: brandEmail({
+              eyebrow: "Class update",
+              title,
+              pose: "phone-out",
+              body: `<p style="margin:0 0 8px;">Hi${first ? ` ${escHtml(first)}` : ""},</p><p style="margin:0;">${textHtml(body || "Check the timetable for the details.")}</p>`,
+              cta: { url: `${base}/timetable`, label: "Open your timetable" },
+              note: "You get this by email because push notifications aren't on for you. Turn them on in Settings, Notifications to get these instantly.",
+            }),
+          }), "urgent").catch(() => 0);
+        }
       }
     } catch {
       // the change is saved either way
@@ -3795,6 +3813,7 @@ router.post("/admin/announce", requireAuth, async (req: Request, res: Response) 
             to: chunk,
             subject: `Unify Learn: ${parsed.data.title}`,
             html,
+            priority: "update",
           }).catch((e: unknown) => {
             console.warn("[email] announce chunk failed", e instanceof Error ? e.message : e);
             return 0;
@@ -3823,7 +3842,8 @@ router.post("/admin/email/test", requireAuth, async (req: Request, res: Response
   try {
     const { probeEmail } = await import("../lib/email");
     const result = await probeEmail(parsed.data.to);
-    res.json(result);
+    const { emailBudgetStatus } = await import("../lib/emailBudget");
+    res.json({ ...result, budget: await emailBudgetStatus() });
   } catch (e) {
     res.status(500).json({ error: e instanceof Error ? e.message : "Test email failed." });
   }

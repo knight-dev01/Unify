@@ -18,6 +18,7 @@ Bump the version in four places and add a changelog entry (see the root `README.
 |---|---|
 | `ADMIN_EMAILS` | Comma-separated bootstrap admins. Also where alert emails go. |
 | `BREVO_API_KEY`, `EMAIL_FROM` | Email (new-note mail, announcements, **alert emails**). `EMAIL_FROM` must be a sender verified in Brevo. Without the key, alerts still appear in Admin, marked "not emailed". |
+| `BREVO_DAILY_LIMIT` | Optional. Brevo emails a day (default 300, the free plan). The app keeps a daily count and spends it by priority: codes and alerts, then class cancelled or moved and live wires, then answers, announcements and new notes, then the weekly summary. About 20% is left for Supabase's sign-up and password-reset emails when Supabase sends through Brevo SMTP. Raise it after upgrading the Brevo plan. Admin, Email check shows today's count. |
 | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | Web Push. The public key must match the one in the web app. |
 | `SEED_TEST_USERS` | `1` creates `*.test.unify` accounts for testing. **Remove after testing and delete those accounts.** |
 | `CORS_ORIGIN` | Comma-separated web origins allowed to call the API. |

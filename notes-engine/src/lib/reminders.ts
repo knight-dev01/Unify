@@ -239,7 +239,10 @@ export async function reminderTick(): Promise<void> {
     // Class reps: "confirm your class" at the time they chose (Review 3, C11).
     // Required lazily: routes/classRep imports this file.
     const confirm = (require("../routes/classRep") as { confirmTick: (n: typeof now) => Promise<number> }).confirmTick;
-    const [a, b, c] = await Promise.allSettled([personalTick(now), scheduledTick(now), confirm(now)]);
+    // The weekly summary email (lib/digest), lazily required like the confirm tick.
+    const digest = (require("./digest") as { digestTick: (n: typeof now) => Promise<number> }).digestTick;
+    const [a, b, c, d] = await Promise.allSettled([personalTick(now), scheduledTick(now), confirm(now), digest(now)]);
+    if (d.status === "rejected") console.warn("[reminders] digest tick failed", d.reason instanceof Error ? d.reason.message : d.reason);
     if (c.status === "rejected") console.warn("[reminders] confirm tick failed", c.reason instanceof Error ? c.reason.message : c.reason);
     if (a.status === "rejected") console.warn("[reminders] personal tick failed", a.reason instanceof Error ? a.reason.message : a.reason);
     if (b.status === "rejected") console.warn("[reminders] scheduled tick failed", b.reason instanceof Error ? b.reason.message : b.reason);
