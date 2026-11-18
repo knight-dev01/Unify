@@ -5,6 +5,11 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.31.1] - 2026-11-18
+
+### Fixed
+- **Home course cards:** with a long course title or several lecturers, the lecturer line ran over the "x of y topics" line. Cards stay square when everything fits and grow taller when it doesn't, so nothing overlaps
+
 ## [2.31.0] - 2026-11-18
 
 ### Changed (Review 3: new persona art, C15)
