@@ -13,6 +13,12 @@ import { appBaseUrl, sendPushToUsers, type PushPayload } from "./push";
 // CATCH_UP minutes old (the server was asleep) is skipped, not sent late.
 
 const CATCH_UP = 45;
+const FOLLOW_UP = 105; // minutes after a reminder, if they still haven't studied
+const MAX_NUDGES = 3;  // personal nudges a day
+const plusMinutes = (t: string, m: number): string => {
+  const total = (Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5)) + m) % 1440;
+  return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
+};
 const TIME_RX = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 export type Audience = "all" | "students" | "lecturers" | "staff";
@@ -46,7 +52,9 @@ export function cleanTimes(times: string[]): string[] {
   return [...new Set(times.filter((t) => TIME_RX.test(t)))].sort().slice(0, 4);
 }
 
-type Person = { id: string; first_name: string | null; role: string | null; study_time: string | null; reminder_times: string[] | null };
+type Person = { id: string; first_name: string | null; role: string | null; study_time: string | null; reminder_times: string[] | null; late_night_nudges?: boolean | null };
+// 22:00 to 06:00: personal nudges only with the student's yes (Review 3).
+const lateNight = (minutes: number) => minutes >= 22 * 60 || minutes < 6 * 60;
 type Resume = { user_id: string; course: string; week: number };
 
 const STUDENT_LINES: ((n: string, r?: Resume) => { title: string; body: string })[] = [
@@ -93,19 +101,24 @@ async function personalTick(now: ReturnType<typeof lagosNow>): Promise<number> {
   for (let i = 0; i < subscribed.length; i += 300) {
     const { data } = await sb
       .from("profiles")
-      .select("id,first_name,role,study_time,reminder_times")
+      .select("id,first_name,role,study_time,reminder_times,late_night_nudges")
       .in("id", subscribed.slice(i, i + 300))
       .eq("reminders_on", true);
     people.push(...((data ?? []) as Person[]));
   }
 
-  // Who has a slot due right now (and which one)?
-  const dueNow: { p: Person; slot: string; index: number }[] = [];
+  // Who has a slot due right now (and which one)? Review 3 rules: one
+  // reminder at each chosen time, and at most one follow-up 90 to 120 minutes
+  // later (we use 105) if they still haven't studied.
+  const dueNow: { p: Person; slot: string; index: number; followUpOf?: string }[] = [];
   for (const p of people) {
     if (p.role === "admin") continue;
+    if (lateNight(now.minutes) && !p.late_night_nudges) continue;
     const times = p.reminder_times && p.reminder_times.length ? cleanTimes(p.reminder_times) : defaultTimes(p.study_time);
     const index = times.findIndex((t) => due(t, now.minutes));
-    if (index >= 0) dueNow.push({ p, slot: times[index], index });
+    if (index >= 0) { dueNow.push({ p, slot: times[index], index }); continue; }
+    const f = times.findIndex((t) => due(plusMinutes(t, FOLLOW_UP), now.minutes));
+    if (f >= 0) dueNow.push({ p, slot: `${times[f]}~f`, index: f + 1, followUpOf: times[f] });
   }
   if (!dueNow.length) return 0;
 
@@ -124,7 +137,18 @@ async function personalTick(now: ReturnType<typeof lagosNow>): Promise<number> {
   for (const row of x) studied.add(row.user_id);
   for (const row of r) resume.set(row.user_id, row);
 
-  const todo = dueNow.filter((d) => !sent.has(`${d.p.id}|${d.slot}`));
+  // Personal nudges sent today per person (class alerts like "confirm:" don't count).
+  const sentToday = new Map<string, number>();
+  for (const k of sent) {
+    const [id, slot] = k.split("|");
+    if (!slot.includes(":") || /^\d\d:\d\d/.test(slot)) sentToday.set(id, (sentToday.get(id) || 0) + 1);
+  }
+  const todo = dueNow.filter((d) =>
+    !sent.has(`${d.p.id}|${d.slot}`) &&
+    // A follow-up only follows a reminder that really went out today.
+    (!d.followUpOf || sent.has(`${d.p.id}|${d.followUpOf}`)) &&
+    // At most 3 nudges a day (Review 3); urgent class alerts don't count.
+    (sentToday.get(d.p.id) || 0) < MAX_NUDGES);
   if (!todo.length) return 0;
   // Claim the slots first (the primary key makes a second tick a no-op), then send.
   const { error } = await sb

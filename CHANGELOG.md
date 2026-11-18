@@ -5,6 +5,28 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.32.0] - 2026-11-18
+
+### Added (Review 3; migrations 0056, 0057)
+- **Class board (C3, C4):** the live wire sits on top of the Class page, with All / Announcements / Questions / Polls. Students ask their class rep from a bar at the bottom ("Your class rep sees your name. Classmates see the question once it's answered"), and classmates can add "Same question". The class rep posts an Announcement, a Poll (2 to 4 options, optional closing time) or a Live wire, answers the questions waiting or turns one into a poll. Questions waiting also show as a count on the class rep's Home. Everyone in the class gets a bell and push for new announcements and polls; the asker (and anyone with the same question) is told when it's answered
+- **Streak screens (C5, C13, C14):** on the day's first open, a black screen with the streak, this week's days and "Continue studying" (or "Keep going"); the green milestone screen at 3, 7, 14 and 30 days. Weekends are free: they never break a streak. Students back after a week or more get the Welcome back card instead
+- **New intro slides** from the 22 student interviews: "All in one place", "Your phone is your note", "Remember what you learned", "You'll know first", green and black alternating
+- **Study times in onboarding:** "When do you usually find time to study?" Pick morning, afternoon, evening and/or late night, each with its own time; they become the reminder times. Late-night reminders (10 PM to 6 AM) only with the student's yes, asked there and in Settings
+- **Course games get their own spot on Home**, and a "Link your matric number" slide leads the Home slideshow (in place of the guide) until the student has linked
+
+### Changed
+- **Reminder rules:** at most one follow-up about 105 minutes after a reminder if the student still hasn't studied, and never more than 3 study nudges a day (class alerts don't count)
+- **Live wire is for emergencies only:** the card says so, the countdown is gone for everyone, the send form carries the emergency-only warning, and live wires now come through quiet hours
+- **All pop-ups use the app's own design:** every browser confirm and prompt (end a live wire, remove a class time, unlink or remove a student, cancel a class, turn down a request, and more) is now an in-app dialog
+- **Home course cards are all the same size**
+- **Onboarding:** the Next / Continue button is always visible in a bar at the bottom (C12); the study rhythm reads "We suggest 25 minutes of reading, then a 5-minute break."; the glowing-phone and glowing-key Box Boys are replaced by the cheering one
+- **Timetable:** the selected day is yellow
+- **Course game questions** skip heading words such as "topic", "week", "introduction" and "summary"
+
+### Hidden for now
+- **CGPA target** (Home, Me, Settings and onboarding) until setting it works properly
+- **Course game leaderboards**, to come back as a new feature (scores are still saved)
+
 ## [2.31.1] - 2026-11-18
 
 ### Fixed

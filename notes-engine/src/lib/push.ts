@@ -49,7 +49,8 @@ async function pruneDead(endpoints: string[]): Promise<void> {
 // Quiet hours (Me → Settings → Notifications): no push between the person's
 // quiet_start and quiet_end, Lagos time. The bell still gets everything. Class
 // happening now (online class live, attendance open) always comes through.
-const ALWAYS = /online class is live|attendance is open/i;
+// Live wires are for emergencies only (Review 3, C4), so they come through quiet hours too.
+const ALWAYS = /online class is live|attendance is open|^live wire/i;
 function lagosMinutes(now = new Date()): number {
   const t = now.toLocaleTimeString("en-GB", { timeZone: "Africa/Lagos", hour12: false, hour: "2-digit", minute: "2-digit" });
   const [h, m] = t.split(":").map(Number);

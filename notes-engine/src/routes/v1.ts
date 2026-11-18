@@ -136,13 +136,19 @@ async function hocClassChangeBlocked(
 }
 const HOC_CLASS_LOCKED = "Your class is locked while you're Head of Class. Contact Unify support to change it.";
 
+// Streak = study days in a row, counting back from today (or yesterday, if
+// today has nothing yet). Weekends are free (Review 3, C5/C13): a Saturday or
+// Sunday without study never breaks it, and one with study still counts.
+const isWeekend = (d: Date) => d.getUTCDay() === 0 || d.getUTCDay() === 6;
 function calcStreak(dateIsos: string[]): number {
   const days = new Set(dateIsos.map((d) => d.slice(0, 10)));
   let streak = 0;
   const cursor = new Date();
   if (!days.has(cursor.toISOString().slice(0, 10))) cursor.setUTCDate(cursor.getUTCDate() - 1);
-  while (days.has(cursor.toISOString().slice(0, 10))) {
-    streak += 1;
+  for (let i = 0; i < 800; i++) {
+    const key = cursor.toISOString().slice(0, 10);
+    if (days.has(key)) streak += 1;
+    else if (!isWeekend(cursor)) break;
     cursor.setUTCDate(cursor.getUTCDate() - 1);
   }
   return streak;
@@ -2284,14 +2290,19 @@ router.get("/learn/activity", requireAuth, async (req: Request, res: Response) =
     const byDay: Record<string, number> = {};
     for (const r of rows) byDay[r.created_at.slice(0, 10)] = (byDay[r.created_at.slice(0, 10)] || 0) + (r.amount || 0);
     // Longest run of consecutive study days in the window.
+    // Longest run (weekends free, like the streak). Any activity counts,
+    // including the daily check-in (amount 0), so `active` lists those days.
+    const active = new Set(rows.map((r) => r.created_at.slice(0, 10)));
     let longest = 0;
     let run = 0;
     for (let i = days - 1; i >= 0; i--) {
-      const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
-      run = byDay[d] ? run + 1 : 0;
+      const at = new Date(Date.now() - i * 86400000);
+      const d = at.toISOString().slice(0, 10);
+      if (active.has(d)) run += 1;
+      else if (!isWeekend(at)) run = 0;
       longest = Math.max(longest, run);
     }
-    res.json({ days: Object.entries(byDay).map(([date, xp]) => ({ date, xp })), streak: calcStreak(rows.map((r) => r.created_at)), longest });
+    res.json({ days: Object.entries(byDay).map(([date, xp]) => ({ date, xp })), active: [...active].sort(), streak: calcStreak(rows.map((r) => r.created_at)), longest });
   } catch (e) {
     res.status(500).json(dbError(e));
   }
@@ -3818,7 +3829,8 @@ router.post("/ping", requireAuth, async (req: Request, res: Response) => {
       .eq("reason", "daily_active")
       .gte("created_at", `${day}T00:00:00.000Z`)
       .limit(1);
-    if (!((existing ?? []) as unknown[]).length) {
+    const first = !((existing ?? []) as unknown[]).length;
+    if (first) {
       const { error } = await sb.from("xp_events").insert({
         user_id: userId,
         amount: 0,
@@ -3826,7 +3838,11 @@ router.post("/ping", requireAuth, async (req: Request, res: Response) => {
       });
       if (error) throw error;
     }
-    res.json({ ok: true });
+    // The streak screens (C5/C13/C14) show on the day's first open.
+    const since = new Date(Date.now() - 120 * 86400000).toISOString();
+    const { data: recent } = await sb.from("xp_events").select("created_at").eq("user_id", userId).gt("created_at", since).order("created_at", { ascending: false }).limit(1000);
+    const dates = ((recent ?? []) as { created_at: string }[]).map((r) => r.created_at);
+    res.json({ ok: true, first, streak: calcStreak(dates) });
   } catch (e) {
     res.status(500).json(dbError(e));
   }

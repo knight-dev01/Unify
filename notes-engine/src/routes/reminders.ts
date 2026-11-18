@@ -34,13 +34,14 @@ const fail = (res: Response, e: unknown) => res.status(500).json({ error: e inst
 // ---- My reminders ----
 router.get("/me/reminders", requireAuth, async (req: Request, res: Response) => {
   try {
-    const { data } = await supabaseAdmin().from("profiles").select("reminders_on,reminder_times,study_time").eq("id", uid(req)).maybeSingle();
-    const p = data as { reminders_on?: boolean; reminder_times?: string[] | null; study_time?: string | null } | null;
+    const { data } = await supabaseAdmin().from("profiles").select("reminders_on,reminder_times,study_time,late_night_nudges").eq("id", uid(req)).maybeSingle();
+    const p = data as { reminders_on?: boolean; reminder_times?: string[] | null; study_time?: string | null; late_night_nudges?: boolean } | null;
     const custom = !!(p?.reminder_times && p.reminder_times.length);
     res.json({
       on: p?.reminders_on !== false,
       times: custom ? cleanTimes(p!.reminder_times!) : defaultTimes(p?.study_time),
       custom,
+      lateNight: !!p?.late_night_nudges,
     });
   } catch (e) {
     fail(res, e);
@@ -48,13 +49,14 @@ router.get("/me/reminders", requireAuth, async (req: Request, res: Response) => 
 });
 
 router.put("/me/reminders", requireAuth, async (req: Request, res: Response) => {
-  const parsed = z.object({ on: z.boolean().optional(), times: z.array(TIME).max(4).nullable().optional() }).safeParse(req.body);
+  const parsed = z.object({ on: z.boolean().optional(), times: z.array(TIME).max(4).nullable().optional(), lateNight: z.boolean().optional() }).safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: "Invalid body", details: parsed.error.flatten() });
     return;
   }
   const patch: Record<string, unknown> = {};
   if (parsed.data.on !== undefined) patch.reminders_on = parsed.data.on;
+  if (parsed.data.lateNight !== undefined) patch.late_night_nudges = parsed.data.lateNight;
   // null (or an empty list) goes back to the defaults.
   if (parsed.data.times !== undefined) patch.reminder_times = parsed.data.times && parsed.data.times.length ? cleanTimes(parsed.data.times) : null;
   try {

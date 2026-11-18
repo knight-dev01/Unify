@@ -4,7 +4,7 @@ import rateLimit from "express-rate-limit";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import { supabaseAdmin } from "../lib/supabase";
-import { repsAmong, takersOf } from "../lib/paging";
+import { inChunks, pageAll, repsAmong, takersOf } from "../lib/paging";
 import { requireAuth, type AuthedRequest } from "../middleware/requireAuth";
 import { sendPushToUsers } from "../lib/push";
 import { currentSemesterWeek } from "../lib/calendar";
@@ -145,6 +145,38 @@ router.get("/hoc/members", requireAuth, async (req: Request, res: Response) => {
   }
 });
 
+// Class board (Review 3, C3/C4): posts for a department + level. The class
+// rep posts announcements and polls; students ask the class rep questions
+// (only the asker and class reps see a question until it's answered, then
+// the whole class does); classmates can add "same question"; everyone votes
+// in polls.
+type BoardRow = {
+  id: string; author_id: string; type: string; title: string | null; content: string; created_at: string;
+  asked_by_student: boolean | null; answer: string | null; answered_by: string | null; answered_at: string | null;
+  poll_options: string[] | null; closes_at: string | null;
+};
+const BOARD_COLS = "id,author_id,type,title,content,created_at,asked_by_student,answer,answered_by,answered_at,poll_options,closes_at";
+const isRepOf = (me: Prof | null, dept: string, level: string) => !!me && (!!me.is_admin || (!!me.is_hoc && me.department === dept && me.level === level));
+
+// Everyone in the class (students on Unify), for the bell and push.
+async function classmates(dept: string, level: string, except: string): Promise<string[]> {
+  const rows = await pageAll<{ id: string }>((from, to) =>
+    supabaseAdmin().from("profiles").select("id").eq("department", dept).eq("level", level).eq("role", "student").order("id").range(from, to));
+  return rows.map((r) => r.id).filter((id) => id !== except);
+}
+async function classReps(dept: string, level: string): Promise<string[]> {
+  const { data } = await supabaseAdmin().from("profiles").select("id").eq("department", dept).eq("level", level).eq("is_hoc", true).limit(20);
+  return ((data ?? []) as { id: string }[]).map((r) => r.id);
+}
+async function tell(ids: string[], title: string, body: string): Promise<void> {
+  if (!ids.length) return;
+  const sb = supabaseAdmin();
+  for (let i = 0; i < ids.length; i += 500) {
+    await sb.from("notifications").insert(ids.slice(i, i + 500).map((user_id) => ({ user_id, type: "hoc_post", title, body: body.slice(0, 140), link: "/hoc" })));
+  }
+  void sendPushToUsers(ids, { title, body: body.slice(0, 140), url: "/hoc" }).catch(() => {});
+}
+
 router.get("/hoc/posts", requireAuth, async (req: Request, res: Response) => {
   try {
     const me = await getProfile(uid(req));
@@ -153,25 +185,35 @@ router.get("/hoc/posts", requireAuth, async (req: Request, res: Response) => {
       return;
     }
     const sb = supabaseAdmin();
+    const rep = isRepOf(me, me.department, me.level);
     const { data, error } = await sb
       .from("hoc_posts")
-      .select("id,author_id,type,title,content,created_at")
+      .select(BOARD_COLS)
       .eq("department", me.department)
       .eq("level", me.level)
       .order("created_at", { ascending: false })
-      .limit(50);
+      .limit(60);
     if (error) throw error;
-    const rows = (data ?? []) as { id: string; author_id: string; type: string; title: string | null; content: string; created_at: string }[];
-    const ids = [...new Set(rows.map((r) => r.author_id))];
-    const names: Record<string, string> = {};
-    if (ids.length) {
-      const { data: authors } = await sb.from("profiles").select("id,first_name").in("id", ids);
-      for (const a of (authors ?? []) as { id: string; first_name: string | null }[]) names[a.id] = a.first_name || "HOC";
+    // A question waiting for an answer: only its asker and the class reps see it.
+    const rows = ((data ?? []) as BoardRow[]).filter((r) => !(r.type === "question" && r.asked_by_student && !r.answer && r.author_id !== me.id && !rep));
+    const people = [...new Set(rows.flatMap((r) => [r.author_id, r.answered_by || ""]).filter(Boolean))];
+    const who: Record<string, { name: string; rep: boolean }> = {};
+    if (people.length) {
+      const { data: authors } = await sb.from("profiles").select("id,first_name,is_hoc").in("id", people);
+      for (const a of (authors ?? []) as { id: string; first_name: string | null; is_hoc: boolean | null }[]) {
+        who[a.id] = { name: a.first_name || "Classmate", rep: !!a.is_hoc };
+      }
     }
+    const pollIds = rows.filter((r) => r.type === "poll").map((r) => r.id);
+    const questionIds = rows.filter((r) => r.type === "question").map((r) => r.id);
+    const [votes, same] = await Promise.all([
+      inChunks<{ post_id: string; user_id: string; choice: number }>(pollIds, (c, from, to) => sb.from("hoc_poll_votes").select("post_id,user_id,choice").in("post_id", c).order("post_id").order("user_id").range(from, to)),
+      inChunks<{ post_id: string; user_id: string }>(questionIds, (c, from, to) => sb.from("hoc_question_same").select("post_id,user_id").in("post_id", c).order("post_id").order("user_id").range(from, to)),
+    ]);
     // Who a post reaches, shown to the class rep: "Posting to Chemical Engineering · 200L · 84 students".
     // The class list is the count once it's up; before that, students in the class on Unify.
     let audience: { students: number; fromList: boolean } | undefined;
-    if (me.is_hoc || me.is_admin) {
+    if (rep) {
       const list = await listForClass(institutionOf(), me.department, me.level);
       if (list) {
         const { count } = await sb.from("class_list_entries").select("id", { count: "exact", head: true }).eq("list_id", list.id).is("removed_at", null);
@@ -181,20 +223,46 @@ router.get("/hoc/posts", requireAuth, async (req: Request, res: Response) => {
         audience = { students: count ?? 0, fromList: false };
       }
     }
-    res.json({
-      isHoc: !!me.is_hoc,
-      department: me.department,
-      level: me.level,
-      audience,
-      posts: rows.map((r) => ({
+    const now = Date.now();
+    const posts = rows.map((r) => {
+      const base = {
         id: r.id,
         type: r.type,
         title: r.title,
         content: r.content,
         createdAt: r.created_at,
-        author: names[r.author_id] || "HOC",
+        author: who[r.author_id]?.name || "Class rep",
+        byRep: !r.asked_by_student && (who[r.author_id]?.rep ?? true),
         mine: r.author_id === me.id,
-      })),
+      };
+      if (r.type === "poll") {
+        const opts = (r.poll_options || []).slice(0, 4);
+        const mineVote = votes.find((v) => v.post_id === r.id && v.user_id === me.id);
+        const counts = opts.map((_, i) => votes.filter((v) => v.post_id === r.id && v.choice === i).length);
+        return { ...base, poll: { options: opts, counts, total: counts.reduce((a, b) => a + b, 0), myVote: mineVote ? mineVote.choice : null, closesAt: r.closes_at, closed: !!r.closes_at && new Date(r.closes_at).getTime() < now } };
+      }
+      if (r.type === "question" && r.asked_by_student) {
+        const s = same.filter((x) => x.post_id === r.id);
+        return {
+          ...base,
+          question: {
+            answer: r.answer,
+            answeredBy: r.answered_by ? who[r.answered_by]?.name || "Class rep" : null,
+            answeredAt: r.answered_at,
+            same: s.length,
+            iSame: s.some((x) => x.user_id === me.id),
+          },
+        };
+      }
+      return base;
+    });
+    res.json({
+      isHoc: !!me.is_hoc,
+      department: me.department,
+      level: me.level,
+      audience,
+      waiting: rep ? rows.filter((r) => r.type === "question" && r.asked_by_student && !r.answer).length : undefined,
+      posts,
     });
   } catch (e) {
     dbFail(res, e);
@@ -202,17 +270,21 @@ router.get("/hoc/posts", requireAuth, async (req: Request, res: Response) => {
 });
 
 const postSchema = z.object({
-  type: z.enum(["announcement", "tip", "question"]),
+  type: z.enum(["announcement", "tip", "question", "poll"]),
   title: z.string().trim().max(120).optional(),
   content: z.string().trim().min(1).max(1000),
+  options: z.array(z.string().trim().min(1).max(80)).min(2).max(4).optional(),
+  closesAt: z.string().datetime().optional(),
 });
 
+// The class rep (or an admin) posts to the class.
 router.post("/hoc/posts", requireAuth, async (req: Request, res: Response) => {
   const parsed = postSchema.safeParse(req.body);
-  if (!parsed.success) return fail(res, 400, "Write something (up to 1000 characters).");
+  if (!parsed.success) return fail(res, 400, "Write something (up to 1000 characters). A poll needs 2 to 4 options.");
+  if (parsed.data.type === "poll" && !parsed.data.options) return fail(res, 400, "A poll needs 2 to 4 options.");
   try {
     const me = await getProfile(uid(req));
-    if (!me || !(me.is_hoc || me.is_admin)) return fail(res, 403, "Only your Head of Class can post here.");
+    if (!me || !(me.is_hoc || me.is_admin)) return fail(res, 403, "Only your class rep can post here. Ask them a question instead.");
     if (!me.department || !me.level) return fail(res, 400, "Set your department and level in Me first.");
     const sb = supabaseAdmin();
     const { data, error } = await sb
@@ -224,48 +296,126 @@ router.post("/hoc/posts", requireAuth, async (req: Request, res: Response) => {
         type: parsed.data.type,
         title: parsed.data.title || null,
         content: parsed.data.content,
+        poll_options: parsed.data.type === "poll" ? parsed.data.options : null,
+        closes_at: parsed.data.type === "poll" ? parsed.data.closesAt || null : null,
       })
       .select("id")
       .single();
     if (error) throw error;
-    // Announcements ping the class (same department + level), best effort.
-    if (parsed.data.type === "announcement") {
-      try {
-        const { data: mates } = await sb
-          .from("profiles")
-          .select("id")
-          .eq("department", me.department)
-          .eq("level", me.level)
-          .eq("role", "student")
-          .neq("id", me.id)
-          .limit(500);
-        const rows = ((mates ?? []) as { id: string }[]).map((m) => ({
-          user_id: m.id,
-          type: "hoc_post",
-          title: parsed.data.title || "New announcement from your HOC",
-          body: parsed.data.content.slice(0, 140),
-          link: "/hoc",
-        }));
-        if (rows.length) await sb.from("notifications").insert(rows);
-      } catch {
-        // posting must not fail because notifications did
-      }
-    }
     res.json({ ok: true, id: (data as { id: string }).id });
+    // Announcements and polls reach the class (bell + push), after replying.
+    if (parsed.data.type === "announcement" || parsed.data.type === "poll") {
+      void classmates(me.department, me.level, me.id)
+        .then((ids) => tell(ids, parsed.data.type === "poll" ? "New poll from your class rep" : parsed.data.title || "New announcement from your class rep", parsed.data.content))
+        .catch(() => {});
+    }
   } catch (e) {
     dbFail(res, e);
   }
 });
 
+// A student asks their class rep a question. The class rep sees their name;
+// classmates see the question once it's answered.
+router.post("/hoc/questions", requireAuth, async (req: Request, res: Response) => {
+  const parsed = z.object({ content: z.string().trim().min(5).max(500) }).safeParse(req.body);
+  if (!parsed.success) return fail(res, 400, "Write your question (5 to 500 characters).");
+  try {
+    const me = await getProfile(uid(req));
+    if (!me?.department || !me?.level) return fail(res, 400, "Set your department and level in Me first.");
+    const sb = supabaseAdmin();
+    const dayAgo = new Date(Date.now() - 86400000).toISOString();
+    const { count } = await sb.from("hoc_posts").select("id", { count: "exact", head: true }).eq("author_id", me.id).eq("asked_by_student", true).gt("created_at", dayAgo);
+    if ((count ?? 0) >= 5) return fail(res, 429, "You've asked 5 questions today. Your class rep will get to them.");
+    const { data, error } = await sb
+      .from("hoc_posts")
+      .insert({ author_id: me.id, department: me.department, level: me.level, type: "question", content: parsed.data.content, asked_by_student: true })
+      .select("id")
+      .single();
+    if (error) throw error;
+    res.json({ ok: true, id: (data as { id: string }).id });
+    void classReps(me.department, me.level)
+      .then((ids) => tell(ids.filter((id) => id !== me.id), `${me.first_name || "A classmate"} asked a question`, parsed.data.content))
+      .catch(() => {});
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
+async function boardPost(id: string): Promise<(BoardRow & { department: string; level: string }) | null> {
+  const { data } = await supabaseAdmin().from("hoc_posts").select(`${BOARD_COLS},department,level`).eq("id", id).maybeSingle();
+  return (data as (BoardRow & { department: string; level: string }) | null) ?? null;
+}
+
+// The class rep answers a question: the asker and everyone with the same
+// question are told, and the whole class can now see it.
+router.post("/hoc/posts/:id/answer", requireAuth, async (req: Request, res: Response) => {
+  const parsed = z.object({ answer: z.string().trim().min(1).max(1000) }).safeParse(req.body);
+  if (!parsed.success) return fail(res, 400, "Write your answer.");
+  try {
+    const me = await getProfile(uid(req));
+    const post = await boardPost(req.params.id);
+    if (!post || post.type !== "question") return fail(res, 404, "That question is gone.");
+    if (!isRepOf(me, post.department, post.level)) return fail(res, 403, "Only your class rep answers questions.");
+    const sb = supabaseAdmin();
+    const { error } = await sb.from("hoc_posts").update({ answer: parsed.data.answer, answered_by: me!.id, answered_at: new Date().toISOString() }).eq("id", post.id);
+    if (error) throw error;
+    res.json({ ok: true });
+    void (async () => {
+      const { data: same } = await sb.from("hoc_question_same").select("user_id").eq("post_id", post.id).limit(1000);
+      const ids = [...new Set([post.author_id, ...((same ?? []) as { user_id: string }[]).map((s) => s.user_id)])].filter((id) => id !== me!.id);
+      await tell(ids, "Your class rep answered", parsed.data.answer);
+    })().catch(() => {});
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
+// "Same question": a classmate adds themselves (again to take it back).
+router.post("/hoc/posts/:id/same", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const me = await getProfile(uid(req));
+    const post = await boardPost(req.params.id);
+    if (!post || post.type !== "question" || !post.asked_by_student) return fail(res, 404, "That question is gone.");
+    if (!me || me.department !== post.department || me.level !== post.level) return fail(res, 403, "That question is for another class.");
+    if (post.author_id === me.id) return fail(res, 400, "It's your own question.");
+    const sb = supabaseAdmin();
+    const { data: had } = await sb.from("hoc_question_same").select("post_id").eq("post_id", post.id).eq("user_id", me.id).maybeSingle();
+    if (had) await sb.from("hoc_question_same").delete().eq("post_id", post.id).eq("user_id", me.id);
+    else await sb.from("hoc_question_same").insert({ post_id: post.id, user_id: me.id });
+    res.json({ ok: true, same: !had });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
+// Vote in a poll (change your vote until it closes).
+router.post("/hoc/posts/:id/vote", requireAuth, async (req: Request, res: Response) => {
+  const parsed = z.object({ choice: z.number().int().min(0).max(3) }).safeParse(req.body);
+  if (!parsed.success) return fail(res, 400, "Pick an option.");
+  try {
+    const me = await getProfile(uid(req));
+    const post = await boardPost(req.params.id);
+    if (!post || post.type !== "poll") return fail(res, 404, "That poll is gone.");
+    if (!me || ((me.department !== post.department || me.level !== post.level) && !me.is_admin)) return fail(res, 403, "That poll is for another class.");
+    if (post.closes_at && new Date(post.closes_at).getTime() < Date.now()) return fail(res, 400, "This poll has closed.");
+    if (parsed.data.choice >= (post.poll_options || []).length) return fail(res, 400, "Pick an option.");
+    const { error } = await supabaseAdmin().from("hoc_poll_votes").upsert({ post_id: post.id, user_id: me.id, choice: parsed.data.choice, created_at: new Date().toISOString() }, { onConflict: "post_id,user_id" });
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
+// Delete: your own post or question; the class rep can remove any post in
+// their class (an admin, any).
 router.delete("/hoc/posts/:id", requireAuth, async (req: Request, res: Response) => {
   try {
     const me = await getProfile(uid(req));
-    const sb = supabaseAdmin();
-    const { data: post } = await sb.from("hoc_posts").select("author_id").eq("id", req.params.id).single();
-    const authorId = (post as { author_id?: string } | null)?.author_id;
-    if (!authorId) return fail(res, 404, "That post is gone.");
-    if (authorId !== me?.id && !me?.is_admin) return fail(res, 403, "You can only delete your own posts.");
-    const { error } = await sb.from("hoc_posts").delete().eq("id", req.params.id);
+    const post = await boardPost(req.params.id);
+    if (!post) return fail(res, 404, "That post is gone.");
+    if (post.author_id !== me?.id && !isRepOf(me, post.department, post.level)) return fail(res, 403, "You can only delete your own posts.");
+    const { error } = await supabaseAdmin().from("hoc_posts").delete().eq("id", post.id);
     if (error) throw error;
     res.json({ ok: true });
   } catch (e) {
