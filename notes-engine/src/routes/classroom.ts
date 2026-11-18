@@ -4,6 +4,7 @@ import rateLimit from "express-rate-limit";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import { supabaseAdmin } from "../lib/supabase";
+import { repsAmong, takersOf } from "../lib/paging";
 import { requireAuth, type AuthedRequest } from "../middleware/requireAuth";
 import { sendPushToUsers } from "../lib/push";
 import { currentSemesterWeek } from "../lib/calendar";
@@ -582,8 +583,7 @@ async function notifyOnline(me: Prof, session: SessionRow, meetLink?: string): P
   try {
     const sb = supabaseAdmin();
     const course = session.course_code;
-    const { data: taking } = await sb.from("enrollments").select("user_id").eq("kind", "taking").in("course", variants(course)).limit(2000);
-    const ids = [...new Set(((taking ?? []) as { user_id: string }[]).map((r) => r.user_id))].filter((id) => id !== me.id);
+    const ids = (await takersOf([course])).filter((id) => id !== me.id);
     if (!ids.length) return;
     const who = me.first_name || "Your lecturer";
     const title = `${course} online class is live`;
@@ -607,11 +607,9 @@ async function notifyPair(me: Prof, session: SessionRow): Promise<void> {
     const starterIsTeacher = me.is_admin || me.role === "lecturer" || teacherIds.includes(me.id);
     let recipients: string[] = [];
     if (starterIsTeacher) {
-      const { data: taking } = await sb.from("enrollments").select("user_id").eq("kind", "taking").in("course", variants(course)).limit(2000);
-      const takerIds = [...new Set(((taking ?? []) as { user_id: string }[]).map((r) => r.user_id))];
+      const takerIds = await takersOf([course]);
       if (takerIds.length) {
-        const { data: reps } = await sb.from("profiles").select("id").eq("is_hoc", true).in("id", takerIds);
-        recipients = ((reps ?? []) as { id: string }[]).map((r) => r.id);
+        recipients = await repsAmong(takerIds);
       }
     } else {
       recipients = teacherIds;

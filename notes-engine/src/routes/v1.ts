@@ -6,6 +6,8 @@ import { z } from "zod";
 import { courseLock, semesterEnded } from "../lib/courseLock";
 import { cachedWeek } from "../lib/weekCache";
 import { supabaseAdmin } from "../lib/supabase";
+import { pageAll, takersOf } from "../lib/paging";
+import { catalogLevels, catalogNotes, catalogWeeks } from "../lib/catalog";
 import { getSemesterCalendar, forgetSemesterCalendar } from "../lib/calendar";
 import { notifyCoursePublished, notifyInAppNewNote } from "../lib/email";
 import { pushNewNote, pushAnnounce, pushToUser, sendPushToUsers } from "../lib/push";
@@ -774,11 +776,11 @@ router.get("/courses", async (req: Request, res: Response) => {
     const sb = supabaseAdmin();
     const { data: courses, error } = await sb.from("courses").select("code,title").order("code");
     if (error) throw error;
-    const { data: links, error: linkErr } = await sb.from("course_levels").select("course,level,semester");
+    const { data: links, error: linkErr } = await catalogLevels();
     if (linkErr) throw linkErr;
     // Week counts ride along so catalog screens never fan out into one
     // request per course (that N+1 is what melts the server in a pilot).
-    const { data: weekRows, error: weekErr } = await sb.from("weeks").select("course").limit(5000);
+    const { data: weekRows, error: weekErr } = await catalogWeeks();
     if (weekErr) throw weekErr;
     const weeksByCourse: Record<string, number> = {};
     for (const w of ((weekRows ?? []) as { course: string }[])) {
@@ -850,8 +852,8 @@ router.get("/courses/search", async (req: Request, res: Response) => {
     const [coursesRes, aliasRes, linksRes, weeksRes] = await Promise.all([
       sb.from("courses").select("code,title").or(`code.ilike.${like},title.ilike.${like}`).limit(30),
       sb.from("course_aliases").select("alias,course").ilike("alias", like).limit(30),
-      sb.from("course_levels").select("course,level,semester").limit(2000),
-      sb.from("weeks").select("course").limit(5000),
+      catalogLevels(),
+      catalogWeeks(),
     ]);
     const err = coursesRes.error || aliasRes.error || linksRes.error || weeksRes.error;
     if (err) throw err;
@@ -1638,12 +1640,12 @@ router.get("/contributions", requireAuth, async (req: Request, res: Response) =>
     const [mine, teaching, links] = await Promise.all([
       sb.from("topic_notes").select("course,week,topic,lecture_no,version").eq("author_id", userId).limit(5000),
       sb.from("enrollments").select("course").eq("user_id", userId).eq("kind", "teaching").limit(100),
-      sb.from("course_levels").select("course,level,semester").limit(2000),
+      catalogLevels(),
     ]);
     if (mine.error) throw mine.error;
     // Course totals across ALL authors: shared courses show the whole
     // library next to the contributor's own count.
-    const { data: allNotes } = await sb.from("topic_notes").select("course,week,topic,lecture_no").limit(5000);
+    const { data: allNotes } = await catalogNotes();
     const totalByCourse: Record<string, Set<string>> = {};
     for (const n of (((allNotes ?? []) as unknown[]) as { course: string; week: number; topic: number; lecture_no?: number }[])) {
       const e = (totalByCourse[n.course] = totalByCourse[n.course] || new Set());
@@ -2535,8 +2537,7 @@ router.post("/timetable/:id/change", requireAuth, async (req: Request, res: Resp
     }
     // Tell everyone taking the course (bell + push). Never fails the change.
     try {
-      const { data: takers } = await sb.from("enrollments").select("user_id").eq("kind", "taking").in("course", [...new Set([s.course, s.course.replace(/\s/g, "")])]).limit(3000);
-      const ids = [...new Set(((takers ?? []) as { user_id: string }[]).map((t) => t.user_id))].filter((x) => x !== userId);
+      const ids = (await takersOf([s.course])).filter((x) => x !== userId);
       const day = new Date(`${date}T12:00:00`).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
       const title =
         d.status === "cancelled" ? `${s.course} on ${day} is cancelled`
@@ -3003,9 +3004,9 @@ router.get("/admin/content", requireAuth, async (req: Request, res: Response) =>
     }
     const [coursesRes, levelsRes, weeksRes, notesRes] = await Promise.all([
       sb.from("courses").select("code,title").order("code").limit(500),
-      sb.from("course_levels").select("course,level,semester").limit(2000),
-      sb.from("weeks").select("course,week,title").order("course").order("week").limit(5000),
-      sb.from("topic_notes").select("course,week,topic,lecture_no,version,title").order("course").order("week").order("lecture_no").order("topic").order("version").limit(5000),
+      catalogLevels(),
+      catalogWeeks(),
+      catalogNotes(),
     ]);
     const err = coursesRes.error || levelsRes.error || weeksRes.error || notesRes.error;
     if (err) throw err;
@@ -3697,9 +3698,8 @@ router.post("/admin/announce", requireAuth, async (req: Request, res: Response) 
   }
   try {
     const sb = supabaseAdmin();
-    const { data, error } = await sb.from("profiles").select("id").limit(5000);
-    if (error) throw error;
-    const ids = ((data ?? []) as { id: string }[]).map((r) => r.id);
+    // Paged: one request stops at 1,000 rows (everyone after got no bell).
+    const ids = (await pageAll<{ id: string }>((from, to) => sb.from("profiles").select("id").order("id").range(from, to))).map((r) => r.id);
     // Mailboxes are collected BEFORE the bell inserts so the response can
     // tell the admin how many inboxes this announcement actually reaches.
     // Keyset pagination over profiles.id, breaking on the RAW page size (not

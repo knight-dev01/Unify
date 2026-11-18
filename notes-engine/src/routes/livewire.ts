@@ -3,6 +3,7 @@ import rateLimit from "express-rate-limit";
 import { z } from "zod";
 import { clientKey } from "../middleware/limits";
 import { supabaseAdmin } from "../lib/supabase";
+import { pageAll, takersOf } from "../lib/paging";
 import { requireAuth, type AuthedRequest } from "../middleware/requireAuth";
 import { sendPushToUsers } from "../lib/push";
 import { DEFAULT_INSTITUTION } from "../lib/classlist";
@@ -144,15 +145,17 @@ router.post("/livewire", requireAuth, sendLimit, async (req: Request, res: Respo
       try {
         let ids: string[] = [];
         if (t.scope === "course") {
-          const { data: e } = await sb.from("enrollments").select("user_id").eq("course", t.course || "").eq("kind", "taking").limit(5000);
-          ids = ((e ?? []) as { user_id: string }[]).map((r) => r.user_id);
+          ids = await takersOf([t.course || ""]);
         } else {
-          let q = sb.from("profiles").select("id").eq("role", "student").limit(10000);
-          if (t.scope === "faculty") q = q.eq("faculty", t.faculty || "");
-          if (t.scope === "department") q = q.eq("department", t.department || "");
-          if (t.scope === "class") q = q.eq("department", t.department || "").eq("level", t.level || "");
-          const { data: p } = await q;
-          ids = ((p ?? []) as { id: string }[]).map((r) => r.id);
+          // Paged: one request stops at 1,000 rows.
+          const rows = await pageAll<{ id: string }>((from, to) => {
+            let q = sb.from("profiles").select("id").eq("role", "student");
+            if (t.scope === "faculty") q = q.eq("faculty", t.faculty || "");
+            if (t.scope === "department") q = q.eq("department", t.department || "");
+            if (t.scope === "class") q = q.eq("department", t.department || "").eq("level", t.level || "");
+            return q.order("id").range(from, to);
+          });
+          ids = rows.map((r) => r.id);
         }
         ids = ids.filter((id) => id !== x.me!.id);
         if (!ids.length) return;

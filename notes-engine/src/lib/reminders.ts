@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "./supabase";
+import { inChunks, pageAll } from "./paging";
 import { appBaseUrl, sendPushToUsers, type PushPayload } from "./push";
 
 // Scheduled reminders (migration 0050). Two kinds, both Lagos time:
@@ -83,8 +84,9 @@ function personalPayload(p: Person, slotIndex: number, date: string, resume?: Re
 async function personalTick(now: ReturnType<typeof lagosNow>): Promise<number> {
   const sb = supabaseAdmin();
   // Only people with push on this or another device: no subscription, no nudge.
-  const { data: subs } = await sb.from("push_subscriptions").select("user_id").limit(5000);
-  const subscribed = [...new Set(((subs ?? []) as { user_id: string }[]).map((r) => r.user_id))];
+  // Paged: one request stops at 1,000 rows, which silently dropped everyone after.
+  const subs = await pageAll<{ user_id: string }>((from, to) => sb.from("push_subscriptions").select("user_id").order("id").range(from, to));
+  const subscribed = [...new Set(subs.map((r) => r.user_id))];
   if (!subscribed.length) return 0;
 
   const people: Person[] = [];
@@ -111,17 +113,16 @@ async function personalTick(now: ReturnType<typeof lagosNow>): Promise<number> {
   const sent = new Set<string>();
   const studied = new Set<string>();
   const resume = new Map<string, Resume>();
-  for (let i = 0; i < ids.length; i += 300) {
-    const chunk = ids.slice(i, i + 300);
-    const [s, x, r] = await Promise.all([
-      sb.from("reminder_sends").select("user_id,slot").in("user_id", chunk).eq("sent_on", now.date),
-      sb.from("xp_events").select("user_id").in("user_id", chunk).gte("created_at", now.midnightIso).limit(5000),
-      sb.from("resume_state").select("user_id,course,week").in("user_id", chunk),
-    ]);
-    for (const row of (s.data ?? []) as { user_id: string; slot: string }[]) sent.add(`${row.user_id}|${row.slot}`);
-    for (const row of (x.data ?? []) as { user_id: string }[]) studied.add(row.user_id);
-    for (const row of (r.data ?? []) as Resume[]) resume.set(row.user_id, row);
-  }
+  // Paged per chunk: a busy day has many xp events per person, and one page
+  // stops at 1,000 rows (people past it looked like they hadn't studied).
+  const [s, x, r] = await Promise.all([
+    inChunks<{ user_id: string; slot: string }>(ids, (c, from, to) => sb.from("reminder_sends").select("user_id,slot").in("user_id", c).eq("sent_on", now.date).order("user_id").order("slot").range(from, to)),
+    inChunks<{ user_id: string; id: string }>(ids, (c, from, to) => sb.from("xp_events").select("id,user_id").in("user_id", c).gte("created_at", now.midnightIso).order("id").range(from, to)),
+    inChunks<Resume>(ids, (c, from, to) => sb.from("resume_state").select("user_id,course,week").in("user_id", c).order("user_id").range(from, to)),
+  ]);
+  for (const row of s) sent.add(`${row.user_id}|${row.slot}`);
+  for (const row of x) studied.add(row.user_id);
+  for (const row of r) resume.set(row.user_id, row);
 
   const todo = dueNow.filter((d) => !sent.has(`${d.p.id}|${d.slot}`));
   if (!todo.length) return 0;

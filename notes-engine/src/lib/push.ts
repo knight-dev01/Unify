@@ -1,5 +1,6 @@
 import webpush from "web-push";
 import { supabaseAdmin } from "./supabase";
+import { IN_CHUNK, inChunks, pageAll, takersOf } from "./paging";
 
 // Web Push (browser push notifications) — the third leg next to the
 // in-app bell and Brevo email. Needs VAPID keys on Render:
@@ -28,16 +29,12 @@ function vapid(): boolean {
   return configured;
 }
 
+// Every subscription for these users, in chunks (no cut-off at 2,000 users
+// or at the API's 1,000-row page).
 async function subscriptionsFor(userIds: string[]): Promise<({ user_id: string } & PushRow)[]> {
-  const uniq = [...new Set(userIds.filter(Boolean))].slice(0, 2000);
-  if (!uniq.length) return [];
-  const { data, error } = await supabaseAdmin()
-    .from("push_subscriptions")
-    .select("user_id,endpoint,p256dh,auth")
-    .in("user_id", uniq)
-    .limit(2000);
-  if (error) throw error;
-  return ((data ?? []) as ({ user_id: string } & PushRow)[]);
+  return inChunks<{ user_id: string } & PushRow>(userIds, (chunk, from, to) =>
+    supabaseAdmin().from("push_subscriptions").select("user_id,endpoint,p256dh,auth").in("user_id", chunk).order("id").range(from, to),
+  );
 }
 
 async function pruneDead(endpoints: string[]): Promise<void> {
@@ -67,8 +64,8 @@ async function outsideQuietHours(userIds: string[], payload: PushPayload): Promi
   const now = lagosMinutes();
   const quiet = new Set<string>();
   const uniq = [...new Set(userIds)];
-  for (let i = 0; i < uniq.length; i += 500) {
-    const { data } = await supabaseAdmin().from("profiles").select("id,quiet_start,quiet_end").in("id", uniq.slice(i, i + 500)).not("quiet_start", "is", null);
+  for (let i = 0; i < uniq.length; i += IN_CHUNK) {
+    const { data } = await supabaseAdmin().from("profiles").select("id,quiet_start,quiet_end").in("id", uniq.slice(i, i + IN_CHUNK)).not("quiet_start", "is", null);
     for (const p of (data ?? []) as { id: string; quiet_start: string | null; quiet_end: string | null }[]) {
       const a = toMin(p.quiet_start || "");
       const b = toMin(p.quiet_end || "");
@@ -129,9 +126,7 @@ export function appBaseUrl(): string {
 // New-note push twin: students taking the course get a lock-screen nudge.
 export async function pushNewNote(course: string, week: number, topics: { topic: number; version: number }[]): Promise<void> {
   try {
-    const sb = supabaseAdmin();
-    const { data } = await sb.from("enrollments").select("user_id").eq("course", course).eq("kind", "taking").limit(2000);
-    const ids = [...new Set(((data ?? []) as { user_id: string }[]).map((r) => r.user_id))];
+    const ids = await takersOf([course]);
     if (!ids.length) return;
     const topicLine = topics.map((t) => `Topic ${t.topic} (v${t.version})`).join(" · ") || "fresh content";
     await sendPushToUsers(ids, {
@@ -147,9 +142,7 @@ export async function pushNewNote(course: string, week: number, topics: { topic:
 // Broadcast push twin for admin announcements.
 export async function pushAnnounce(title: string, body: string, link?: string): Promise<void> {
   try {
-    const sb = supabaseAdmin();
-    const { data } = await sb.from("profiles").select("id").limit(5000);
-    const ids = ((data ?? []) as { id: string }[]).map((r) => r.id);
+    const ids = (await pageAll<{ id: string }>((from, to) => supabaseAdmin().from("profiles").select("id").order("id").range(from, to))).map((r) => r.id);
     if (!ids.length) return;
     await sendPushToUsers(ids, { title, body, url: `${appBaseUrl()}${link || "/dashboard"}` });
   } catch (e) {

@@ -1,13 +1,14 @@
 {
     "name": "unify-notes-creation-engine",
-    "version": "2.29.0",
+    "version": "2.30.0",
     "description": "Unify Notes Creation Engine — Convert raw lecture notes into interactive Unify learning pages",
     "main": "dist/server.js",
     "scripts": {
         "dev": "tsx watch server.ts",
         "build": "tsc && node scripts/copy-js.js",
         "start": "node dist/server.js",
-        "test:render": "tsx scripts/test_render.ts"
+        "test:render": "tsx scripts/test_render.ts",
+        "test:paging": "tsx scripts/test_paging.ts"
     },
     "dependencies": {
         "@prisma/client": "^5.18.0",

@@ -5,6 +5,17 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.30.0] - 2026-11-18
+
+### Added
+- **Students can set up their own timetable** (Timetable → My own): study time, labs, or a class their rep hasn't added yet, with their courses one tap away. Only they see it. Students whose class has no times yet get a "Set up my own timetable" button. Up to 60 entries each
+
+### Fixed (scalability pass; migration 0055, see docs/SCALABILITY.md)
+- **Notifications past the first 1,000:** the database returns at most 1,000 rows per request, so pushes, announcements, live wires and personal reminders silently skipped everyone after the first 1,000 devices or users. They now page through everyone
+- **Course lists past 1,000 weeks of notes:** course lists, search and the studio read the whole weeks and notes tables, which cut off later courses' week counts. Now paged and cached for a minute (cleared when notes or courses change)
+- **Class rep confirm reminders** run in a fixed handful of database calls instead of one per course, class and rep, every minute
+- **Indexes** for "who takes this course", attendance by session, progress and quiz stats by course, and class audiences
+
 ## [2.29.0] - 2026-11-18
 
 ### Added (Review 3: C7, C8, C9, C11, clear class list; migration 0054)

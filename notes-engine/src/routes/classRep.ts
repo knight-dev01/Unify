@@ -4,6 +4,7 @@ import { supabaseAdmin } from "../lib/supabase";
 import { requireAuth, type AuthedRequest } from "../middleware/requireAuth";
 import { lagosNow } from "../lib/reminders";
 import { pushToUser } from "../lib/push";
+import { inChunks, pageAll, repsAmong } from "../lib/paging";
 
 // Class rep tools from Review 3:
 // - C7: "Confirm today": today's classes in the courses the rep takes, with
@@ -95,11 +96,11 @@ async function classesOn(courses: string[], date: string, day: number): Promise<
   if (!courses.length) return [];
   const sb = supabaseAdmin();
   const all = [...new Set(courses.flatMap(variants))];
-  const { data } = await sb.from("class_slots").select("id,course,day,start_time,end_time,venue").in("course", all).eq("day", day).order("start_time");
-  const slots = (data ?? []) as Slot[];
+  const slots = await inChunks<Slot>(all, (c, from, to) => sb.from("class_slots").select("id,course,day,start_time,end_time,venue").in("course", c).eq("day", day).order("start_time").order("id").range(from, to));
   if (!slots.length) return [];
-  const { data: ch } = await sb.from("slot_changes").select("slot_id,status,new_start,new_venue").in("slot_id", slots.map((s) => s.id)).eq("class_date", date);
-  const byId = new Map(((ch ?? []) as Change[]).map((c) => [c.slot_id, c]));
+  slots.sort((x, y) => x.start_time.localeCompare(y.start_time));
+  const ch = await inChunks<Change>(slots.map((s) => s.id), (c, from, to) => sb.from("slot_changes").select("slot_id,status,new_start,new_venue").in("slot_id", c).eq("class_date", date).order("slot_id").range(from, to));
+  const byId = new Map(ch.map((c) => [c.slot_id, c]));
   return slots.map((slot) => ({ slot, change: byId.get(slot.id) || null }));
 }
 
@@ -135,44 +136,64 @@ router.get("/hoc/today", requireAuth, async (req: Request, res: Response) => {
 
 // Reminder tick (lib/reminders.ts): at each course's confirm time, remind
 // the class reps taking it to confirm the class (once per class per day).
+// Runs every minute, so it's batched: a fixed handful of queries however many
+// courses, classes and reps there are (it used to query per rule, per class
+// and per rep).
 export async function confirmTick(now = lagosNow()): Promise<number> {
   const sb = supabaseAdmin();
-  const { data: ruleRows } = await sb.from("class_rules").select("course,confirm_when");
-  const rules = (ruleRows ?? []) as { course: string; confirm_when: ConfirmWhen }[];
+  // A 10-minute window so a missed tick (cold start) still sends; reminder_sends stops repeats.
+  const inWindow = (at: number) => now.minutes >= at && now.minutes < at + 10;
+  const rules = await pageAll<{ course: string; confirm_when: ConfirmWhen }>((from, to) => sb.from("class_rules").select("course,confirm_when").order("course").range(from, to));
   if (!rules.length) return 0;
   const tomorrow = lagosNow(new Date(Date.now() + 86400000));
+  // "Evening before": tomorrow's classes, in the 18:00 window. Otherwise today's.
+  const evening = inWindow(18 * 60) ? rules.filter((r) => r.confirm_when === "evening").map((r) => r.course) : [];
+  const sameDay = rules.filter((r) => r.confirm_when !== "evening");
+  const whenOf = new Map(sameDay.flatMap((r) => variants(r.course).map((v) => [v, r.confirm_when] as const)));
+
+  const due: { slot: Slot; date: string; when: "today" | "tomorrow" }[] = [];
+  for (const { slot, change } of await classesOn(evening, tomorrow.date, tomorrow.day)) {
+    if (!change || change.status === "unconfirmed") due.push({ slot, date: tomorrow.date, when: "tomorrow" });
+  }
+  const todayRows = await classesOn(sameDay.map((r) => r.course), now.date, now.day);
+  for (const { slot, change } of todayRows) {
+    if (change && change.status !== "unconfirmed") continue;
+    const rule = whenOf.get(slot.course);
+    const at = rule ? offsetMinutes(rule, toMin(slot.start_time)) : null;
+    if (at !== null && inWindow(at)) due.push({ slot, date: now.date, when: "today" });
+  }
+  if (!due.length) return 0;
+
+  // Class reps taking each due course: one paged lookup for all of them.
+  const courses = [...new Set(due.flatMap((d) => variants(d.slot.course)))];
+  const taking = await pageAll<{ user_id: string; course: string }>((from, to) =>
+    sb.from("enrollments").select("user_id,course").eq("kind", "taking").in("course", courses).order("user_id").order("course").range(from, to),
+  );
+  const reps = new Set(await repsAmong(taking.map((t) => t.user_id)));
+  const repsOf = new Map<string, Set<string>>();
+  for (const t of taking) {
+    if (!reps.has(t.user_id)) continue;
+    const key = t.course.replace(/\s/g, "");
+    if (!repsOf.has(key)) repsOf.set(key, new Set());
+    repsOf.get(key)!.add(t.user_id);
+  }
+
+  // Claim every (rep, class, date) in one upsert; only the rows that come
+  // back are new, so each reminder goes out once.
+  const want = due.flatMap((d) => [...(repsOf.get(d.slot.course.replace(/\s/g, "")) || [])].map((user_id) => ({ user_id, slot: `confirm:${d.slot.id}`, sent_on: d.date })));
+  if (!want.length) return 0;
+  const { data: claimed } = await sb.from("reminder_sends").upsert(want, { onConflict: "user_id,slot,sent_on", ignoreDuplicates: true }).select("user_id,slot");
+  const fresh = new Set(((claimed ?? []) as { user_id: string; slot: string }[]).map((c) => `${c.user_id}|${c.slot}`));
   let sent = 0;
-  for (const r of rules) {
-    // "Evening before": tomorrow's classes at 18:00 today. Otherwise today's.
-    const target = r.confirm_when === "evening" ? tomorrow : now;
-    // A 10-minute window so a missed tick (cold start) still sends; reminder_sends stops repeats.
-    const inWindow = (at: number) => now.minutes >= at && now.minutes < at + 10;
-    if (r.confirm_when === "evening" && !inWindow(18 * 60)) continue;
-    const rows = await classesOn([r.course], target.date, target.day);
-    for (const { slot, change } of rows) {
-      if (change && change.status !== "unconfirmed") continue;
-      if (r.confirm_when !== "evening") {
-        const at = offsetMinutes(r.confirm_when, toMin(slot.start_time));
-        if (at === null || !inWindow(at)) continue;
-      }
-      const { data: reps } = await sb.from("enrollments").select("user_id").eq("kind", "taking").in("course", variants(slot.course)).limit(3000);
-      const ids = [...new Set(((reps ?? []) as { user_id: string }[]).map((x) => x.user_id))];
-      if (!ids.length) continue;
-      const { data: hocs } = await sb.from("profiles").select("id").in("id", ids.slice(0, 1000)).eq("is_hoc", true);
-      for (const h of (hocs ?? []) as { id: string }[]) {
-        const { data: claimed } = await sb
-          .from("reminder_sends")
-          .upsert({ user_id: h.id, slot: `confirm:${slot.id}`, sent_on: target.date }, { onConflict: "user_id,slot,sent_on", ignoreDuplicates: true })
-          .select("user_id");
-        if (!claimed?.length) continue;
-        const when = r.confirm_when === "evening" ? "tomorrow" : "today";
-        await pushToUser(h.id, {
-          title: `Confirm ${slot.course} ${when} at ${slot.start_time.slice(0, 5)}`,
-          body: "Is the class still on? Confirm it so your class knows.",
-          url: "/home",
-        }).catch(() => undefined);
-        sent++;
-      }
+  for (const d of due) {
+    for (const id of repsOf.get(d.slot.course.replace(/\s/g, "")) || []) {
+      if (!fresh.has(`${id}|confirm:${d.slot.id}`)) continue;
+      await pushToUser(id, {
+        title: `Confirm ${d.slot.course} ${d.when} at ${d.slot.start_time.slice(0, 5)}`,
+        body: "Is the class still on? Confirm it so your class knows.",
+        url: "/home",
+      }).catch(() => undefined);
+      sent++;
     }
   }
   return sent;

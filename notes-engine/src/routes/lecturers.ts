@@ -1,6 +1,7 @@
 import { Router, type Request, type Response } from "express";
 import { z } from "zod";
 import { supabaseAdmin } from "../lib/supabase";
+import { repsAmong, takersOf } from "../lib/paging";
 import { requireAuth, type AuthedRequest } from "../middleware/requireAuth";
 import { sendPushToUsers } from "../lib/push";
 import { claimStatuses, classKey } from "../lib/lecturerClaims";
@@ -59,14 +60,7 @@ router.post("/lecturer/claims", requireAuth, async (req: Request, res: Response)
       if (cErr) throw cErr;
       // Ask the class reps of classes taking each course.
       for (const course of fresh) {
-        const { data: takers } = await sb.from("enrollments").select("user_id").in("course", variants(course)).eq("kind", "taking").limit(5000);
-        const ids = ((takers ?? []) as { user_id: string }[]).map((t) => t.user_id);
-        if (!ids.length) continue;
-        const hocs: string[] = [];
-        for (let i = 0; i < ids.length; i += 500) {
-          const { data } = await sb.from("profiles").select("id").in("id", ids.slice(i, i + 500)).eq("is_hoc", true);
-          hocs.push(...((data ?? []) as { id: string }[]).map((p) => p.id));
-        }
+        const hocs = await repsAmong(await takersOf([course]));
         if (!hocs.length) continue;
         const title = `Is ${display(m)} your ${course} lecturer?`;
         const body = "Confirm it so their posts and materials reach your class.";
@@ -157,11 +151,15 @@ router.post("/hoc/lecturer-checks/:id", requireAuth, async (req: Request, res: R
   }
 });
 
-// My own timetable (design L09/L17): a lecturer's own entries, only they see them.
+// My own timetable (design L09/L17): a user's own entries, only they see them.
+// Lecturers: office hours, other duties. Students: study time, labs, or a
+// class their rep hasn't added yet. Capped per user so one account can't
+// grow the table without bound.
+const OWN_SLOT_CAP = 60;
 const hhmm = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
 router.get("/lecturer/own-slots", requireAuth, async (req: Request, res: Response) => {
   try {
-    const { data } = await supabaseAdmin().from("lecturer_slots").select("id,day,start_time,end_time,title,venue").eq("user_id", uid(req)).order("day").order("start_time");
+    const { data } = await supabaseAdmin().from("lecturer_slots").select("id,day,start_time,end_time,title,venue").eq("user_id", uid(req)).order("day").order("start_time").limit(OWN_SLOT_CAP);
     res.json({ slots: ((data ?? []) as { id: string; day: number; start_time: string; end_time: string; title: string; venue: string | null }[]).map((r) => ({ id: r.id, day: r.day, start: r.start_time, end: r.end_time, title: r.title, venue: r.venue || "" })) });
   } catch (e) {
     dbFail(res, e);
@@ -171,9 +169,10 @@ router.post("/lecturer/own-slots", requireAuth, async (req: Request, res: Respon
   const parsed = z.object({ day: z.number().int().min(0).max(6), start: hhmm, end: hhmm, title: z.string().trim().min(1).max(80), venue: z.string().trim().max(120).optional() }).safeParse(req.body);
   if (!parsed.success || parsed.data.end <= parsed.data.start) return fail(res, 400, "Give it a name, a day, and an end after the start.");
   try {
-    const m = await me(req);
-    if (!m || m.role !== "lecturer") return fail(res, 403, "Lecturers only.");
-    const { error } = await supabaseAdmin().from("lecturer_slots").insert({ user_id: m.id, day: parsed.data.day, start_time: parsed.data.start, end_time: parsed.data.end, title: parsed.data.title, venue: parsed.data.venue || null });
+    const sb = supabaseAdmin();
+    const { count } = await sb.from("lecturer_slots").select("id", { count: "exact", head: true }).eq("user_id", uid(req));
+    if ((count ?? 0) >= OWN_SLOT_CAP) return fail(res, 400, `You have ${OWN_SLOT_CAP} entries already. Remove one to add another.`);
+    const { error } = await sb.from("lecturer_slots").insert({ user_id: uid(req), day: parsed.data.day, start_time: parsed.data.start, end_time: parsed.data.end, title: parsed.data.title, venue: parsed.data.venue || null });
     if (error) throw error;
     res.json({ ok: true });
   } catch (e) {
