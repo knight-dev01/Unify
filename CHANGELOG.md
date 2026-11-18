@@ -5,6 +5,11 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.33.1] - 2026-11-18
+
+### Fixed
+- **Term of the Day opens much faster:** today's word is kept on the phone (opening it again is instant), every course's week list loads at once and up to three weeks' notes load together, and Home gets the word ready in the background so Play opens straight away. The word is still the same for everyone in the course
+
 ## [2.33.0] - 2026-11-18
 
 ### Added (migration 0058)
