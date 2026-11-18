@@ -5,6 +5,14 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.27.17] - 2026-11-18
+
+### Added (migration 0052)
+- **IPE 305 Metrology** (300 Level, First Semester, Dr. V.D. Obasa), confirmed after the 2026/2027 sheet listed IPE 305 twice
+
+### Changed
+- Superseded documents moved to `docs/archive/` (PRDs, reviews, handoffs, redesign plans, v1.x developer report). Every document is also gathered in `docs/Unify-Learn-Documentation.pdf`, kept locally and out of git
+
 ## [2.27.16] - 2026-11-17
 
 ### Added (migration 0051)

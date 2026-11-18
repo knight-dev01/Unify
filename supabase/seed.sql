@@ -360,7 +360,7 @@ end $$;
 -- Course aliases (alternate codes students type).
 insert into course_aliases (alias, course) values ('ME 352', 'MEE 352') on conflict (alias) do nothing;
 
--- Full faculty catalog from Artifacts/*.xlsx (Oct 2026): Aerospace + missing departmental courses. Source rows without a semester land on First Semester (course_levels is one row per course+level) — see docs/SEED-GAPS.md for placements needing confirmation.
+-- Full faculty catalog from Artifacts/*.xlsx (Oct 2026): Aerospace + missing departmental courses. Source rows without a semester land on First Semester (course_levels is one row per course+level) — see docs/archive/SEED-GAPS.md for placements needing confirmation.
 insert into courses (code, title) values
   ('AAE 449', 'Propulsion Engineering'),
   ('AAE 460', 'Computer Technology III'),
