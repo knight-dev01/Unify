@@ -5,6 +5,11 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.33.0] - 2026-11-18
+
+### Added (migration 0058)
+- **Term of the Day:** a daily word game. Guess one key term from your course's notes in 6 tries; letters turn green (right place), amber (in the word) or grey (not in it). The clue from the notes opens after the third guess, and "One letter away!" shows on a near miss. The word is the same for everyone in the course that day and changes at midnight; the course rotates daily through your courses (or pick one). Solving it counts as today's study (+10 XP, streak). The result shares to WhatsApp as coloured squares, with no letters, so nothing is spoiled. It shows how many in the course solved it today, your solve streak and best streak, and opens the week the word came from. On Home (in place of the course games card, with a link to all games) and at the top of Course games
+
 ## [2.32.0] - 2026-11-18
 
 ### Added (Review 3; migrations 0056, 0057)

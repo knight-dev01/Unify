@@ -129,4 +129,60 @@ router.get("/games/mine", requireAuth, async (req: Request, res: Response) => {
   }
 });
 
+// Term of the Day: a key term from the course's notes, the same for everyone
+// in the course on a given day (the app picks it from the notes). The first
+// finished attempt is saved; solving it counts as today's study (streak).
+const DAILY_XP = 10;
+const dayOk = (day: string) => {
+  const t = new Date(`${day}T12:00:00Z`).getTime();
+  return Number.isFinite(t) && Math.abs(Date.now() - t) < 2 * 86400000;
+};
+router.get("/games/daily", requireAuth, async (req: Request, res: Response) => {
+  const course = String(req.query.course || "").trim();
+  const day = String(req.query.day || "");
+  if (!course || !/^\d{4}-\d{2}-\d{2}$/.test(day)) return fail(res, 400, "Pick a course and a day.");
+  try {
+    const sb = supabaseAdmin();
+    const [{ count: played }, { count: solved }, { data: mine }] = await Promise.all([
+      sb.from("daily_word_results").select("user_id", { count: "exact", head: true }).eq("course", course).eq("day", day),
+      sb.from("daily_word_results").select("user_id", { count: "exact", head: true }).eq("course", course).eq("day", day).eq("solved", true),
+      sb.from("daily_word_results").select("guesses,solved").eq("course", course).eq("day", day).eq("user_id", uid(req)).maybeSingle(),
+    ]);
+    res.json({ played: played ?? 0, solved: solved ?? 0, mine: (mine as { guesses: number; solved: boolean } | null) ?? null });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
+router.post("/games/daily", requireAuth, async (req: Request, res: Response) => {
+  const parsed = z.object({
+    course: z.string().trim().min(2).max(20),
+    day: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    word: z.string().trim().toUpperCase().regex(/^[A-Z]{4,9}$/),
+    guesses: z.number().int().min(1).max(6),
+    solved: z.boolean(),
+  }).safeParse(req.body);
+  if (!parsed.success || !dayOk(parsed.data.day)) return fail(res, 400, "That result doesn't look right.");
+  const d = parsed.data;
+  try {
+    const { ok } = await access(req, d.course);
+    if (!ok) return fail(res, 403, "Join the course to play its Term of the Day.");
+    const sb = supabaseAdmin();
+    const { data: saved } = await sb
+      .from("daily_word_results")
+      .upsert({ user_id: uid(req), course: d.course, day: d.day, word: d.word, guesses: d.guesses, solved: d.solved }, { onConflict: "user_id,course,day", ignoreDuplicates: true })
+      .select("user_id");
+    const first = !!(saved && (saved as unknown[]).length);
+    let xp = 0;
+    if (first && d.solved) {
+      xp = DAILY_XP;
+      await sb.from("xp_events").insert({ user_id: uid(req), amount: xp, reason: `game:daily:${d.course}:${d.day}` });
+    }
+    const { count: solvedCount } = await sb.from("daily_word_results").select("user_id", { count: "exact", head: true }).eq("course", d.course).eq("day", d.day).eq("solved", true);
+    res.json({ ok: true, first, xp, solved: solvedCount ?? 0 });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
+
 export default router;
