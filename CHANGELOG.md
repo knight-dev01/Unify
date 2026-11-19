@@ -5,6 +5,11 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.37.0] - 2026-11-19
+
+### Added
+- **Welcome email:** a student who finishes onboarding for the first time gets one email with their name, the courses assigned to them this semester, and a button straight into Week 1 of the first one (or a pointer to Find courses when their department's courses aren't on yet). Sent once, in the background so finishing setup never waits, at "update" priority within the daily email budget; test accounts are skipped. The in-app welcome in the bell stays
+
 ## [2.36.0] - 2026-11-19
 
 ### Changed

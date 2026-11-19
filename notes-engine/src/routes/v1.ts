@@ -9,6 +9,7 @@ import { z } from "zod";
 import { courseLock, semesterEnded } from "../lib/courseLock";
 import { cachedWeek } from "../lib/weekCache";
 import { syncClassCourses } from "../lib/classCourses";
+import { sendWelcomeEmail } from "../lib/welcomeEmail";
 import { supabaseAdmin } from "../lib/supabase";
 import { inChunks, pageAll, takersOf } from "../lib/paging";
 import { catalogLevels, catalogNotes, catalogWeeks } from "../lib/catalog";
@@ -878,6 +879,9 @@ router.post("/onboarding", requireAuth, async (req: Request, res: Response) => {
       } catch {
         // onboarding must never fail on a nicety
       }
+      // And once by email: their name, assigned courses and a link into Week 1.
+      // Sent in the background so finishing setup never waits on Brevo.
+      if (isStudent) void sendWelcomeEmail(userId, d.firstName);
     }
     res.json({ ok: true, profile: data });
   } catch (e) {
