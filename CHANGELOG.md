@@ -5,6 +5,23 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.38.0] - 2026-11-19
+
+### Added (migration 0063)
+- **Daily goal:** a ring on Home fills with today's XP towards the student's goal: Light (10 XP, about one topic), Steady (20) or Serious (40), set in Settings. Meeting it plays a chime (and a spoken well done, if voice is on) once a day
+- **Streak freeze:** one missed weekday in any 7 days is forgiven automatically, everywhere a streak shows (Home, the streak screen, the weekly email). The streak screen marks frozen days in blue and says when a freeze saved the streak. Weekends stay free
+- **Sound effects:** a chime for right answers and finished topics, a soft bump for a wrong answer, a fanfare for finishing a game, passing a quiz or a perfect score, and a sparkle for the daily goal. Made in the browser (no downloads, works offline); on by default, off switch in Settings
+- **Voice cheers:** the spoken welcome (which greets the student by name) also cheers them on by name when they finish a topic, get a perfect score, meet the daily goal or finish a game. Same switch in Settings, still off by default and never in quiet hours
+- **Progress through a week:** a bar under the week's title fills as topics are finished. A perfect quiz shows a "Perfect score" badge
+- **Badges on Me:** 12 milestones (streaks of 3, 7, 14 and 30 days, first and 25 topics, first and 10 quizzes, 25 terms mastered in games, 5 Terms of the Day, 500 and 1,000 XP), worked out from what the app already records
+- **Match-up game:** pair each of the week's key terms with what it means, four pairs a round, from the week's notes. Perfect runs get a "Perfect!" cheer. On the Games page and at the end of every week, with its own icon; saves scores and XP like the other games (15 XP the first time)
+- **Courses saved for offline by themselves:** on Wi-Fi, every published week of the student's courses is saved in the background; on mobile data Home asks first ("Not now" waits 3 days); never on Data Saver
+
+### Changed
+- **Find courses lists the student's added courses first** in every level and in search results, then the rest
+- **Saved weeks always open offline:** the offline worker now also reads weeks saved for offline (before, a saved week only opened if it had been viewed too), and up to 300 weeks are remembered (was 30)
+- **"Unify Learn" naming:** "Install Unify Learn on this device", the scanner's instructions for students, an admin heading and the spoken welcome no longer say "Unify" on its own
+
 ## [2.37.1] - 2026-11-19
 
 ### Changed

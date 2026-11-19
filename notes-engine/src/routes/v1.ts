@@ -9,6 +9,7 @@ import { z } from "zod";
 import { courseLock, semesterEnded } from "../lib/courseLock";
 import { cachedWeek } from "../lib/weekCache";
 import { syncClassCourses } from "../lib/classCourses";
+import { calcStreak, longestRun, streakDetail } from "../lib/streak";
 import { sendWelcomeEmail } from "../lib/welcomeEmail";
 import { supabaseAdmin } from "../lib/supabase";
 import { inChunks, pageAll, takersOf } from "../lib/paging";
@@ -142,23 +143,7 @@ async function hocClassChangeBlocked(
 }
 const HOC_CLASS_LOCKED = "Your class is locked while you're Head of Class. Contact Unify support to change it.";
 
-// Streak = study days in a row, counting back from today (or yesterday, if
-// today has nothing yet). Weekends are free (Review 3, C5/C13): a Saturday or
-// Sunday without study never breaks it, and one with study still counts.
-const isWeekend = (d: Date) => d.getUTCDay() === 0 || d.getUTCDay() === 6;
-function calcStreak(dateIsos: string[]): number {
-  const days = new Set(dateIsos.map((d) => d.slice(0, 10)));
-  let streak = 0;
-  const cursor = new Date();
-  if (!days.has(cursor.toISOString().slice(0, 10))) cursor.setUTCDate(cursor.getUTCDate() - 1);
-  for (let i = 0; i < 800; i++) {
-    const key = cursor.toISOString().slice(0, 10);
-    if (days.has(key)) streak += 1;
-    else if (!isWeekend(cursor)) break;
-    cursor.setUTCDate(cursor.getUTCDate() - 1);
-  }
-  return streak;
-}
+// Streaks (weekends free, one forgiven weekday per 7 days): lib/streak.
 
 // Public: never dead-ends onboarding when seeded.
 router.get("/universities", async (_req: Request, res: Response) => {
@@ -2512,20 +2497,12 @@ router.get("/learn/activity", requireAuth, async (req: Request, res: Response) =
     const rows = (data ?? []) as { amount: number; created_at: string }[];
     const byDay: Record<string, number> = {};
     for (const r of rows) byDay[r.created_at.slice(0, 10)] = (byDay[r.created_at.slice(0, 10)] || 0) + (r.amount || 0);
-    // Longest run of consecutive study days in the window.
-    // Longest run (weekends free, like the streak). Any activity counts,
-    // including the daily check-in (amount 0), so `active` lists those days.
+    // Longest run (same rules as the streak). Any activity counts, including
+    // the daily check-in (amount 0), so `active` lists those days. `frozen`:
+    // the weekdays a streak freeze covered, for the streak screen.
     const active = new Set(rows.map((r) => r.created_at.slice(0, 10)));
-    let longest = 0;
-    let run = 0;
-    for (let i = days - 1; i >= 0; i--) {
-      const at = new Date(Date.now() - i * 86400000);
-      const d = at.toISOString().slice(0, 10);
-      if (active.has(d)) run += 1;
-      else if (!isWeekend(at)) run = 0;
-      longest = Math.max(longest, run);
-    }
-    res.json({ days: Object.entries(byDay).map(([date, xp]) => ({ date, xp })), active: [...active].sort(), streak: calcStreak(rows.map((r) => r.created_at)), longest });
+    const { streak, frozen } = streakDetail(rows.map((r) => r.created_at));
+    res.json({ days: Object.entries(byDay).map(([date, xp]) => ({ date, xp })), active: [...active].sort(), streak, frozen, longest: Math.max(longestRun(active, days), streak) });
   } catch (e) {
     res.status(500).json(dbError(e));
   }

@@ -4,6 +4,7 @@ import { emailRoom } from "./emailBudget";
 import { sendSimpleEmail } from "./email";
 import { brandEmail, emailBase, escHtml, panel } from "./email-templates";
 import type { lagosNow } from "./reminders";
+import { calcStreak } from "./streak";
 
 // The weekly summary email: what's new in your courses this week, your
 // streak, and where you stopped. One per student per week, spread over the
@@ -20,21 +21,6 @@ const dayOf = (id: string) => {
   for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
   return h % 7;
 };
-// Streak with weekends free (same rule as the app).
-function streakOf(dates: string[]): number {
-  const days = new Set(dates.map((d) => d.slice(0, 10)));
-  let n = 0;
-  const c = new Date();
-  if (!days.has(c.toISOString().slice(0, 10))) c.setUTCDate(c.getUTCDate() - 1);
-  for (let i = 0; i < 120; i++) {
-    const k = c.toISOString().slice(0, 10);
-    if (days.has(k)) n += 1;
-    else if (c.getUTCDay() !== 0 && c.getUTCDay() !== 6) break;
-    c.setUTCDate(c.getUTCDate() - 1);
-  }
-  return n;
-}
-
 type Student = { id: string; email: string | null; first_name: string | null };
 
 export async function digestTick(now: ReturnType<typeof lagosNow>): Promise<number> {
@@ -99,7 +85,7 @@ export async function digestTick(now: ReturnType<typeof lagosNow>): Promise<numb
       .filter((c) => newWeeks.has(c))
       .slice(0, 5)
       .map((c) => `<div style="padding:4px 0;"><strong>${escHtml(c)}</strong> &middot; new notes for Week ${[...newWeeks.get(c)!].sort((a, b) => a - b).join(", ")}</div>`);
-    const streak = streakOf(datesOf.get(p.id) || []);
+    const streak = calcStreak(datesOf.get(p.id) || []);
     const r = resumeOf.get(p.id);
     const cta = r ? { url: `${base}/learn/${encodeURIComponent(r.course)}/week/${r.week}`, label: `Pick up ${r.course} Week ${r.week}` } : { url: `${base}/home`, label: "Open Unify Learn" };
     const html = brandEmail({
