@@ -114,7 +114,21 @@ export async function digestTick(now: ReturnType<typeof lagosNow>): Promise<numb
       note: "Your weekly summary from Unify Learn. Turn it off in Settings, Notifications.",
     });
     const ok = await sendSimpleEmail({ to: [{ email: p.email!, name: p.first_name || undefined }], subject: lines.length ? "Unify Learn: new notes in your courses this week" : "Unify Learn: your week", html, priority: "digest" });
-    if (ok) { n += 1; room -= 1; }
+    if (ok) {
+      n += 1;
+      room -= 1;
+      // Every email has an in-app twin: the same summary in the bell.
+      const newIn = (coursesOf.get(p.id) || []).filter((c) => newWeeks.has(c)).slice(0, 5);
+      await sb.from("notifications").insert({
+        user_id: p.id,
+        type: "digest",
+        title: newIn.length ? "New notes in your courses" : "Your week on Unify Learn",
+        body: newIn.length
+          ? newIn.map((c) => `${c} Week ${[...newWeeks.get(c)!].sort((a, b) => a - b).join(", ")}`).join(" · ")
+          : streak ? `You're on a ${streak}-day streak. Weekends are free.` : "One topic or one Term of the Day starts a new streak.",
+        link: r ? `/learn/${encodeURIComponent(r.course)}/week/${r.week}` : "/home",
+      }).then(() => {}, () => {});
+    }
     else await sb.from("reminder_sends").delete().eq("user_id", p.id).eq("slot", "digest").eq("sent_on", week); // not sent: a later tick today can retry
   }
   if (n) console.info(`[digest] sent ${n} weekly summaries`);

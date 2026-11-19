@@ -1,14 +1,16 @@
 import { apiLimiter } from "../middleware/limits";
-import { emailWithoutPush } from "../lib/email";
-import { brandEmail, escHtml, textHtml } from "../lib/email-templates";
+import { emailWithoutPush, sendSimpleEmail } from "../lib/email";
+import { createHash, randomInt } from "node:crypto";
+import { brandEmail, escHtml, panel, textHtml } from "../lib/email-templates";
 import { noteClientError } from "../lib/alert";
 import { Router, type Request, type Response } from "express";
 import rateLimit from "express-rate-limit";
 import { z } from "zod";
 import { courseLock, semesterEnded } from "../lib/courseLock";
 import { cachedWeek } from "../lib/weekCache";
+import { syncClassCourses } from "../lib/classCourses";
 import { supabaseAdmin } from "../lib/supabase";
-import { pageAll, takersOf } from "../lib/paging";
+import { inChunks, pageAll, takersOf } from "../lib/paging";
 import { catalogLevels, catalogNotes, catalogWeeks } from "../lib/catalog";
 import { getSemesterCalendar, forgetSemesterCalendar } from "../lib/calendar";
 import { notifyCoursePublished, notifyInAppNewNote } from "../lib/email";
@@ -172,16 +174,91 @@ router.get("/universities", async (_req: Request, res: Response) => {
 });
 
 // Delete my account (review: "In-app account deletion stays"). The person types
-// DELETE to confirm. Their profile, progress, notes history, notifications and
+// DELETE, then enters a 6-digit code emailed to the account's address (good for
+// 15 minutes, 5 tries), so a phone left signed in can't delete the account.
+// Their profile, progress, notes history, notifications and
 // sign-in go. What belongs to the class stays: attendance taken against their
 // class-list entry keeps the entry (name + matric, from the class rep's list)
 // without the account, and the entry is free to be claimed again. Platform
 // admins are removed by another admin, so the panel is never left without one.
+const DELETE_CODE_MINUTES = 15;
+const deleteCodeHash = (userId: string, code: string) => createHash("sha256").update(`delete:${userId}:${code}`).digest("hex");
+const deleteCodeLimiter = rateLimit({
+  windowMs: 24 * 60 * 60 * 1000,
+  max: 6,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => (req as AuthedRequest).userId || "anon",
+  message: { error: "Too many codes today. Try again tomorrow." },
+});
+
+router.post("/me/delete-code", requireAuth, deleteCodeLimiter, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  try {
+    const sb = supabaseAdmin();
+    const { data: prof } = await sb.from("profiles").select("is_admin,role,first_name").eq("id", userId).maybeSingle();
+    const p = prof as { is_admin?: boolean; role?: string; first_name?: string | null } | null;
+    if (!p) {
+      res.status(404).json({ error: "Account not found." });
+      return;
+    }
+    if (p.is_admin || p.role === "admin") {
+      res.status(403).json({ error: "Admins are removed by another admin from the admin panel." });
+      return;
+    }
+    const { data: authUser } = await sb.auth.admin.getUserById(userId);
+    const email = authUser?.user?.email;
+    if (!email) {
+      res.status(400).json({ error: "This account has no email address to send a code to. Contact support from Help." });
+      return;
+    }
+    const { data: prev } = await sb.from("account_delete_codes").select("sent_at").eq("user_id", userId).maybeSingle();
+    const sentAt = (prev as { sent_at: string } | null)?.sent_at;
+    if (sentAt && Date.now() - new Date(sentAt).getTime() < 60 * 1000) {
+      res.status(429).json({ error: "We just sent a code. Wait a minute before asking again." });
+      return;
+    }
+    const code = String(randomInt(0, 1000000)).padStart(6, "0");
+    const { error } = await sb.from("account_delete_codes").upsert({
+      user_id: userId,
+      code_hash: deleteCodeHash(userId, code),
+      attempts: 0,
+      sent_at: new Date().toISOString(),
+      expires_at: new Date(Date.now() + DELETE_CODE_MINUTES * 60 * 1000).toISOString(),
+    });
+    if (error) throw error;
+    const sent = await sendSimpleEmail({
+      to: [{ email, name: p.first_name || undefined }],
+      subject: `${code} is your Unify Learn account deletion code`,
+      html: brandEmail({
+        eyebrow: "Your account",
+        title: "Confirm you want to delete your account",
+        pose: "phone-out",
+        body:
+          `<p style="margin:0 0 4px;">Hi ${escHtml((p.first_name || "there").trim().split(/\s+/)[0])}, enter this code in the app to delete your Unify Learn account:</p>` +
+          panel(`<div style="font-family:'DM Sans',Arial,sans-serif;font-size:32px;font-weight:700;letter-spacing:8px;text-align:center;color:#0a0a0a;">${code}</div>`) +
+          `<p style="margin:8px 0 0;">It works for ${DELETE_CODE_MINUTES} minutes. Deleting can't be undone.</p>`,
+        note: "Didn't ask for this? Don't share the code, and change your password. Your account stays as it is.",
+      }),
+    });
+    if (!sent) {
+      await sb.from("account_delete_codes").delete().eq("user_id", userId);
+      res.status(502).json({ error: "We couldn't send the code right now. Try again in a few minutes." });
+      return;
+    }
+    // Show where it went without printing the whole address.
+    const [name, domain] = email.split("@");
+    res.json({ ok: true, sentTo: `${name.slice(0, 2)}${"•".repeat(Math.max(1, name.length - 2))}@${domain}`, minutes: DELETE_CODE_MINUTES });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
 router.delete("/me", requireAuth, async (req: Request, res: Response) => {
   const userId = (req as AuthedRequest).userId as string;
-  const parsed = z.object({ confirm: z.literal("DELETE") }).safeParse(req.body);
+  const parsed = z.object({ confirm: z.literal("DELETE"), code: z.string().trim().regex(/^\d{6}$/) }).safeParse(req.body);
   if (!parsed.success) {
-    res.status(400).json({ error: "Type DELETE to confirm." });
+    res.status(400).json({ error: "Type DELETE and the 6-digit code from the email." });
     return;
   }
   try {
@@ -190,6 +267,21 @@ router.delete("/me", requireAuth, async (req: Request, res: Response) => {
     const p = prof as { is_admin?: boolean; role?: string } | null;
     if (p?.is_admin || p?.role === "admin") {
       res.status(403).json({ error: "Admins are removed by another admin from the admin panel." });
+      return;
+    }
+    const { data: codeRow } = await sb.from("account_delete_codes").select("code_hash,attempts,expires_at").eq("user_id", userId).maybeSingle();
+    const c = codeRow as { code_hash: string; attempts: number; expires_at: string } | null;
+    if (!c || new Date(c.expires_at).getTime() < Date.now()) {
+      res.status(410).json({ error: "That code has expired. Send a new one." });
+      return;
+    }
+    if (c.attempts >= 5) {
+      res.status(429).json({ error: "Too many wrong codes. Send a new one." });
+      return;
+    }
+    if (deleteCodeHash(userId, parsed.data.code) !== c.code_hash) {
+      await sb.from("account_delete_codes").update({ attempts: c.attempts + 1 }).eq("user_id", userId);
+      res.status(400).json({ error: "That code isn't right. Check the latest email." });
       return;
     }
     // Class register entries stay with the class list; everything else cascades with the profile.
@@ -312,9 +404,21 @@ router.get("/me", requireAuth, async (req: Request, res: Response) => {
       }
     }
     // Never hand blank codes to clients (they render as ghost courses).
-    const courses = ((enrolled ?? []) as { course: string }[])
+    let courses = ((enrolled ?? []) as { course: string }[])
       .map((r) => r.course)
       .filter((c) => c && c.trim());
+    // A student with no courses (signed up before courses were assigned, or
+    // wiped by promotion) gets their class's courses now, not a picker.
+    if (!courses.length && onboarded && (p.role || "student") === "student" && (data as { department?: string }).department && (data as { level?: string }).level) {
+      try {
+        if (await syncClassCourses([userId])) {
+          const { data: again } = await sbm.from("enrollments").select("course").eq("user_id", userId);
+          courses = ((again ?? []) as { course: string }[]).map((r) => r.course).filter((c) => c && c.trim());
+        }
+      } catch {
+        // Home still opens; Find courses is there
+      }
+    }
     // Resume: live position if tracked, else the most recently completed
     // topic (pre-tracking progress still resumes somewhere sensible).
     let resume: { course: string; week: number; topic: number; lecture: number } | null = null;
@@ -756,6 +860,9 @@ router.post("/onboarding", requireAuth, async (req: Request, res: Response) => {
         if (eErr) throw eErr;
       }
     }
+    // Students never pick courses: their class's courses for this semester are
+    // enrolled for them (and swapped if they change department or level).
+    if (isStudent) await syncClassCourses([userId]).catch((e) => console.warn("[class-courses] onboarding", e));
     // First onboarding ever: drop a welcome notification (re-saves skip it).
     if (isNewProfile) {
       try {
@@ -783,15 +890,70 @@ router.get("/courses", async (req: Request, res: Response) => {
   const level = String(req.query.level || "");
   const semester = String(req.query.semester || "");
   try {
+    // The whole list is the same for everyone: built once a minute (cleared on
+    // any course or note write) instead of 4-5 database trips per request.
+    let out = await cachedWeek("catalog:courseList", () => buildCourseList());
+    if (level) out = out.filter((c) => c.levels.includes(level));
+    if (semester) out = out.filter((c) => c.semesters.includes(semester));
+    res.json(out);
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+// Public: the courses a class takes (department code + level), from the
+// faculty's course sheet (migration 0060). Onboarding ticks them for the
+// student, so nobody scrolls the whole faculty list to find their own.
+// Shared courses appear under every class that takes them.
+router.get("/courses/for-class", async (req: Request, res: Response) => {
+  const department = String(req.query.department || "").trim().toUpperCase();
+  const level = String(req.query.level || "").trim();
+  const semester = String(req.query.semester || "").trim();
+  if (!department || !level) {
+    res.status(400).json({ error: "Department and level are required." });
+    return;
+  }
+  try {
+    const rows = await cachedWeek(`catalog:class:${department}|${level}`, async () => {
+      const { data, error } = await supabaseAdmin()
+        .from("course_departments")
+        .select("course,semester,status")
+        .eq("department", department)
+        .eq("level", level)
+        .order("course")
+        .limit(200);
+      if (error) throw error;
+      return (data ?? []) as { course: string; semester: string; status: string }[];
+    });
+    const titles = new Map((await cachedWeek("catalog:courseList", () => buildCourseList())).map((c) => [c.code, c.title]));
+    res.json({
+      courses: rows
+        .filter((r) => !semester || r.semester === semester)
+        .map((r) => ({ code: r.course, title: titles.get(r.course) || "", status: r.status })),
+    });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+type CourseListItem = { code: string; title: string; levels: string[]; semesters: string[]; weeks: number; lecturers: string[]; staff: { name: string; avatar: string; persona: string }[] };
+async function buildCourseList(): Promise<CourseListItem[]> {
     const sb = supabaseAdmin();
-    const { data: courses, error } = await sb.from("courses").select("code,title").order("code");
-    if (error) throw error;
-    const { data: links, error: linkErr } = await catalogLevels();
-    if (linkErr) throw linkErr;
-    // Week counts ride along so catalog screens never fan out into one
-    // request per course (that N+1 is what melts the server in a pilot).
-    const { data: weekRows, error: weekErr } = await catalogWeeks();
-    if (weekErr) throw weekErr;
+    // Independent reads go out together: one round trip instead of four in a row.
+    const [coursesRes, linksRes, weeksRes, teachingRes] = await Promise.all([
+      sb.from("courses").select("code,title").order("code"),
+      catalogLevels(),
+      // Week counts ride along so catalog screens never fan out into one
+      // request per course (that N+1 is what melts the server in a pilot).
+      catalogWeeks(),
+      sb.from("enrollments").select("course,user_id").eq("kind", "teaching").limit(2000).then((r) => r, () => ({ data: null })),
+    ]);
+    if (coursesRes.error) throw coursesRes.error;
+    if (linksRes.error) throw linksRes.error;
+    if (weeksRes.error) throw weeksRes.error;
+    const courses = coursesRes.data;
+    const links = linksRes.data;
+    const weekRows = weeksRes.data;
     const weeksByCourse: Record<string, number> = {};
     for (const w of ((weekRows ?? []) as { course: string }[])) {
       weeksByCourse[w.course] = (weeksByCourse[w.course] || 0) + 1;
@@ -803,7 +965,7 @@ router.get("/courses", async (req: Request, res: Response) => {
     const staffByCourse: Record<string, { name: string; avatar: string; persona: string }[]> = {};
     const titleCase = (s: string) => s.trim().replace(/\s+/g, " ").toLowerCase().replace(/(^|[\s'’\-.])([a-z])/g, (_, a, b) => a + b.toUpperCase());
     try {
-      const { data: teaching } = await sb.from("enrollments").select("course,user_id").eq("kind", "teaching").limit(2000);
+      const teaching = teachingRes.data;
       const ids = [...new Set(((teaching ?? []) as { course: string; user_id: string }[]).map((t) => t.user_id))].slice(0, 500);
       if (ids.length) {
         const { data: profs } = await sb.from("profiles").select("id,first_name,avatar_url,box_boy_persona,role").in("id", ids).eq("role", "lecturer");
@@ -828,7 +990,7 @@ router.get("/courses", async (req: Request, res: Response) => {
       if (!e.levels.includes(l.level)) e.levels.push(l.level);
       if (l.semester && !e.semesters.includes(l.semester)) e.semesters.push(l.semester);
     }
-    let out = ((courses ?? []) as { code: string; title: string }[])
+    return ((courses ?? []) as { code: string; title: string }[])
       .filter((c) => c.code && c.code.trim())
       .map((c) => ({
       ...c,
@@ -838,13 +1000,7 @@ router.get("/courses", async (req: Request, res: Response) => {
       lecturers: (staffByCourse[c.code] || []).map((s) => s.name),
       staff: staffByCourse[c.code] || [],
     }));
-    if (level) out = out.filter((c) => c.levels.includes(level));
-    if (semester) out = out.filter((c) => c.semesters.includes(semester));
-    res.json(out);
-  } catch (e) {
-    res.status(500).json(dbError(e));
-  }
-});
+}
 
 // Public: course search across code, title AND aliases (BUG-006: "ME 352"
 // finds "MEE 352"). Level-scoped when given; spans both semesters with
@@ -2297,6 +2453,51 @@ router.get("/courses/:code/my-progress", requireAuth, requireCourseAccess, async
   }
 });
 
+// Home's course cards: topics done out of topics published, for several
+// courses in one request (was one my-progress request per card). Uses the
+// cached week list and cached weeks, plus one progress read for all courses.
+router.get("/my-progress/summary", requireAuth, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  const codes = [...new Set(String(req.query.courses || "").split(",").map((c) => cleanCode(c)).filter((c): c is string => !!c))].slice(0, 30);
+  if (!codes.length) {
+    res.json({ courses: {} });
+    return;
+  }
+  try {
+    const sb = supabaseAdmin();
+    const variantsOf = new Map(codes.map((c) => [c, courseVariants(c)]));
+    const allVariants = [...new Set([...variantsOf.values()].flat())];
+    const [{ data: weekRows }, { data: prog }] = await Promise.all([
+      catalogWeeks(),
+      sb.from("topic_progress").select("course,week,topic,lecture_no").eq("user_id", userId).in("course", allVariants).limit(5000),
+    ]);
+    const out: Record<string, { done: number; topics: number }> = {};
+    await Promise.all(codes.map(async (code) => {
+      const vs = new Set(variantsOf.get(code));
+      const weeks = [...new Set((weekRows ?? []).filter((w) => vs.has(w.course)).map((w) => w.week))];
+      const assembled = await Promise.all(weeks.map((w) => assembleWeek(code, w).catch(() => null)));
+      const doneBy = new Map<number, Set<string>>();
+      for (const p of (prog ?? []) as { course: string; week: number; topic: number; lecture_no: number | null }[]) {
+        if (!vs.has(p.course)) continue;
+        const s = doneBy.get(p.week) || new Set<string>();
+        s.add(`${p.lecture_no || 1}:${p.topic}`);
+        doneBy.set(p.week, s);
+      }
+      let done = 0;
+      let topics = 0;
+      weeks.forEach((w, i) => {
+        const n = assembled[i] ? topicsOf(assembled[i]!.note_json).length : 0;
+        topics += n;
+        done += Math.min(doneBy.get(w)?.size || 0, n || Infinity);
+      });
+      out[code] = { done, topics };
+    }));
+    res.json({ courses: out });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
 // Days I studied (any XP) over the last N days, for the streak screen.
 router.get("/learn/activity", requireAuth, async (req: Request, res: Response) => {
   const userId = (req as AuthedRequest).userId as string;
@@ -3616,38 +3817,65 @@ router.put("/admin/settings/semester", requireAuth, async (req: Request, res: Re
     const { error } = await supabaseAdmin().from("app_settings").upsert(rows, { onConflict: "key" });
     if (error) throw error;
     forgetSemesterCalendar();
+    // New semester: every student gets their class's courses for it.
+    void syncClassCourses().catch((e) => console.warn("[class-courses] semester", e));
     res.json({ ok: true, currentSemester: parsed.data.semester });
   } catch (e) {
     res.status(500).json(dbError(e));
   }
 });
 
-// One-click promotion: every student moves up exactly one level
-// (500 Level -> Graduated). Taking-enrollments are cleared so students
-// pick new-level courses; teaching assignments are kept.
+// One-click promotion at the end of a session: every student moves up exactly
+// one level (500 Level -> Graduated) and the new session starts on its First
+// Semester. Courses follow on their own (lib/classCourses): last level's
+// class courses and the electives a student added at that level go; courses
+// they added from a LOWER level (carryovers still being cleared) stay. A
+// course just failed at the old level is re-added from Find courses as a
+// carryover. Graduates keep nothing. Teaching assignments are never touched.
 router.post("/admin/users/promote", requireAuth, async (req: Request, res: Response) => {
   const adminId = await requireAdminUser(req, res);
   if (!adminId) return;
   try {
     const sb = supabaseAdmin();
-    const { data, error } = await sb.from("profiles").select("id,level").eq("role", "student");
-    if (error) throw error;
+    const students = await pageAll<{ id: string; level: string | null }>((from, to) =>
+      sb.from("profiles").select("id,level").or("role.is.null,role.eq.student").order("id").range(from, to));
+    const [mine, levelRows] = await Promise.all([
+      inChunks<{ user_id: string; course: string; auto: boolean }>(students.map((p) => p.id), (c, from, to) =>
+        sb.from("enrollments").select("user_id,course,auto").in("user_id", c).eq("kind", "taking").order("user_id").order("course").range(from, to)),
+      pageAll<{ course: string; level: string }>((from, to) => sb.from("course_levels").select("course,level").order("course").order("level").range(from, to)),
+    ]);
+    const levelsOf = new Map<string, Set<string>>();
+    for (const r of levelRows) {
+      if (!levelsOf.has(r.course)) levelsOf.set(r.course, new Set());
+      levelsOf.get(r.course)!.add(r.level);
+    }
+    const takingOf = new Map<string, { course: string; auto: boolean }[]>();
+    for (const m of mine) takingOf.set(m.user_id, [...(takingOf.get(m.user_id) || []), m]);
     let promoted = 0;
     let graduated = 0;
-    for (const p of ((data ?? []) as { id: string; level: string | null }[])) {
+    const now = new Date().toISOString();
+    for (const p of students) {
       const idx = LEVEL_ORDER.indexOf(p.level || "");
       if (idx === -1) continue;
+      const old = LEVEL_ORDER[idx];
       const next = idx + 1 < LEVEL_ORDER.length ? LEVEL_ORDER[idx + 1] : "Graduated";
-      const { error: uErr } = await sb
-        .from("profiles")
-        .update({ level: next, updated_at: new Date().toISOString() })
-        .eq("id", p.id);
+      const { error: uErr } = await sb.from("profiles").update({ level: next, updated_at: now }).eq("id", p.id);
       if (uErr) throw uErr;
-      await sb.from("enrollments").delete().eq("user_id", p.id).eq("kind", "taking");
+      // Keep only the student's own lower-level courses (carryovers).
+      const drop = (takingOf.get(p.id) || [])
+        .filter((m) => next === "Graduated" || m.auto || levelsOf.get(m.course)?.has(old) || !levelsOf.get(m.course)?.size)
+        .map((m) => m.course);
+      if (drop.length) await sb.from("enrollments").delete().eq("user_id", p.id).eq("kind", "taking").in("course", drop);
       if (next === "Graduated") graduated += 1;
       else promoted += 1;
     }
-    res.json({ ok: true, promoted, graduated });
+    // A new session starts on its First Semester; the admin sets its start date.
+    const { error: sErr } = await sb.from("app_settings").upsert([{ key: "current_semester", value: "First Semester", updated_at: now }], { onConflict: "key" });
+    if (sErr) throw sErr;
+    forgetSemesterCalendar();
+    // New level, new semester: every student gets their new class's courses.
+    void syncClassCourses().catch((e) => console.warn("[class-courses] promote", e));
+    res.json({ ok: true, promoted, graduated, semester: "First Semester" });
   } catch (e) {
     res.status(500).json(dbError(e));
   }

@@ -5,6 +5,24 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.35.0] - 2026-11-19
+
+### Added (migrations 0060, 0061, 0062)
+- **Students never pick courses:** onboarding ends on the level step. Each student is enrolled in their class's compulsory and required courses for the current semester, from the faculty's course sheet (department + level, `course_departments`). Electives and carryovers are added from Find courses
+- **Courses follow the student:** changing department or level, the admin switching the semester, and promotion all swap the class courses on their own. Only courses the app added are swapped (`enrollments.auto`); courses a student added stay. Students who signed up earlier with no courses get theirs when the app next loads
+- **Promotion starts the new session:** Promote all moves every student up a level and sets the First Semester. Carryovers students added from lower levels stay; last level's courses go; graduates keep none
+- **Delete my account needs an emailed code:** after typing DELETE, a 6-digit code goes to the account's email (good for 15 minutes, 5 tries, one a minute, six a day)
+- **Scan attendance on every open week** of a course page, and a week's content is labelled as parts of one week, not separate classes
+- **The weekly summary email also lands in the bell**
+
+### Changed
+- **Faster loading:** the course list is built once a minute on the server, Home's course cards fetch progress in one request, Home's panels no longer wait on each other, and the app falls back to its saved copy after 2 seconds instead of 4.
+- **Course cards** without a cover show a book icon instead of a persona
+
+### Fixed
+- **Term of the Day:** the tab bar no longer covers the on-screen keyboard; the keyboard stays pinned to the bottom of the screen
+- **Class list and attendance pass** show a loading message instead of an empty white box while they load
+
 ## [2.34.1] - 2026-11-18
 
 ### Fixed

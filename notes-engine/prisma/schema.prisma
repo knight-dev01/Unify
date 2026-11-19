@@ -136,6 +136,7 @@ model Enrollment {
   userId    String   @map("user_id") @db.Uuid
   course    String
   kind      String   @default("taking")
+  auto      Boolean  @default(false)
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   @@id([userId, course])
