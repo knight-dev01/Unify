@@ -5,6 +5,12 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.36.0] - 2026-11-19
+
+### Changed
+- **The app opens from the phone:** after the first visit, opening the app no longer waits for the network. The page saved on the phone opens straight away (only when every file it needs is saved too) and the newest version downloads in the background. On a simulated Nigerian 4G phone the screen is ready in about 0.15 s instead of 1.4 s, and it opens the same way offline. A reload always fetches the newest version, and after a release the next open picks it up
+- **Lighter first open:** the course list, course page, week reader and Me load when first needed (and in the background once Home is idle, so the first tap stays instant). The main code a phone downloads first drops from 117 KB to 83 KB
+
 ## [2.35.2] - 2026-11-19
 
 ### Fixed
