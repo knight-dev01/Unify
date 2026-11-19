@@ -5,6 +5,11 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.38.1] - 2026-11-19
+
+### Changed
+- **The Studio's Pipeline has its own page** (/studio/pipeline). The Studio shows a link to it instead of loading every taught course's weeks and materials each time it opens, so the Studio opens faster and the Pipeline's code only downloads when it's opened. Picking a week there opens the Studio with that course and week filled in
+
 ## [2.38.0] - 2026-11-19
 
 ### Added (migration 0063)
