@@ -5,6 +5,11 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.35.1] - 2026-11-19
+
+### Changed
+- **The API now runs in Frankfurt** (`unify-api-eu`), next to the database and closer to Nigeria: first requests answer in about a third of the time they took from Oregon. The app, the offline worker, share-link previews and the keep-alive check all fall back to the new address, and the app warms its connection to it on load
+
 ## [2.35.0] - 2026-11-19
 
 ### Added (migrations 0060, 0061, 0062)
