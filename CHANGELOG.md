@@ -5,6 +5,11 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.37.1] - 2026-11-19
+
+### Changed
+- **Each course game has its own icon, the same everywhere** (Home, Games, the course page, the end of a week): Keywords is a word (you spell terms), Crossword is a grid, and Term of the Day is its coloured tiles (you guess a word in tiles). Term of the Day on Home and Keywords no longer share the generic game-controller icon
+
 ## [2.37.0] - 2026-11-19
 
 ### Added
