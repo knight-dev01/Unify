@@ -5,6 +5,11 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.35.2] - 2026-11-19
+
+### Fixed
+- **The "Install Unify Learn" box no longer covers the main button** on phones: it is hidden on screens without a tab bar (welcome, sign-in, onboarding, Term of the Day, chat), where it sat on top of Next or the keyboard. It still shows on Home and the other tabbed screens
+
 ## [2.35.1] - 2026-11-19
 
 ### Changed
