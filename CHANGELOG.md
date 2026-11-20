@@ -5,6 +5,14 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.38.6] - 2026-11-20
+
+### Changed
+- **Badges on Me are bolder:** earned badges get a larger amber medal, an amber frame and heavier labels; badges still to earn are readable instead of faded
+
+### Fixed
+- **One server pause is one alert:** the stall check looks at the newest minute only, so a single pause no longer shows as five "Server stalling" alerts in a row, and a pause while the server was starting is logged as waking up, not as stalling
+
 ## [2.38.5] - 2026-11-20
 
 ### Fixed

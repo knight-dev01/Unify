@@ -140,9 +140,14 @@ export function startWatchdog(): void {
 
       const sys = systemSnapshot();
       if (sys.rssMb >= 450) void raise("mem", "High memory", `The server is using ${sys.rssMb} MB of memory (heap ${sys.heapMb} MB). A restart may be near.`);
-      if (sys.lagMaxMs >= 1500) {
-        if (waking) void raise("lag", "Server waking up", `The server started ${Math.round(process.uptime() / 60)} min ago and paused for up to ${sys.lagMaxMs} ms while starting.`, undefined, { logOnly: WAKE_NOTE });
-        else void raise("lag", "Server stalling", `The server stopped responding for up to ${sys.lagMaxMs} ms in the last 5 minutes.`);
+      // Judge only the newest minute: the 5-minute peak repeats one pause in
+      // five alerts in a row, and carries a start-up pause into "stalling".
+      const newest = sys.lag[sys.lag.length - 1];
+      const bootAt = Date.now() - process.uptime() * 1000;
+      if (newest && Date.now() - newest.t < 90000 && newest.ms >= 1500) {
+        const duringStart = newest.t - 60000 < bootAt + 6 * 60 * 1000;
+        if (waking || duringStart) void raise("lag", "Server waking up", `The server started ${Math.round(process.uptime() / 60)} min ago and paused for up to ${newest.ms} ms while starting.`, undefined, { logOnly: WAKE_NOTE });
+        else void raise("lag", "Server stalling", `The server stopped responding for up to ${newest.ms} ms in the last minute.`);
       }
     } catch {
       // the watchdog must never take the server down
