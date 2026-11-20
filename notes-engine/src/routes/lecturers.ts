@@ -179,6 +179,18 @@ router.post("/lecturer/own-slots", requireAuth, async (req: Request, res: Respon
     dbFail(res, e);
   }
 });
+// Move or stretch an entry (dragged on the timetable).
+router.patch("/lecturer/own-slots/:id", requireAuth, async (req: Request, res: Response) => {
+  const parsed = z.object({ day: z.number().int().min(0).max(6), start: hhmm, end: hhmm }).safeParse(req.body);
+  if (!parsed.success || parsed.data.end <= parsed.data.start) return fail(res, 400, "Pick a day, and an end after the start.");
+  try {
+    const { error } = await supabaseAdmin().from("lecturer_slots").update({ day: parsed.data.day, start_time: parsed.data.start, end_time: parsed.data.end }).eq("id", req.params.id).eq("user_id", uid(req));
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch (e) {
+    dbFail(res, e);
+  }
+});
 router.delete("/lecturer/own-slots/:id", requireAuth, async (req: Request, res: Response) => {
   try {
     const { error } = await supabaseAdmin().from("lecturer_slots").delete().eq("id", req.params.id).eq("user_id", uid(req));

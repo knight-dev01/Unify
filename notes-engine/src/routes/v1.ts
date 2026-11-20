@@ -2932,9 +2932,55 @@ router.post("/timetable", requireAuth, async (req: Request, res: Response) => {
   }
 });
 
-// Set or clear the online-class link on a slot (lecturer, class rep or admin).
+// Set or clear the online-class link on a slot (lecturer, class rep or admin),
+// or move the class to a new weekly time (dragged on the timetable: class rep
+// or admin only, and the class is told).
+const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
 router.patch("/timetable/:id", requireAuth, async (req: Request, res: Response) => {
   const userId = (req as AuthedRequest).userId as string;
+  if (req.body && typeof req.body.start === "string") {
+    const mv = z.object({ day: z.number().int().min(0).max(6), start: z.string().regex(HHMM), end: z.string().regex(HHMM) }).safeParse(req.body);
+    if (!mv.success || mv.data.end <= mv.data.start) {
+      res.status(400).json({ error: "Pick a day, and an end after the start." });
+      return;
+    }
+    try {
+      const sb = supabaseAdmin();
+      const { data: slot } = await sb.from("class_slots").select("id,course,day,start_time,end_time,venue").eq("id", req.params.id).single();
+      const s = slot as { id: string; course: string; day: number; start_time: string; end_time: string; venue: string | null } | null;
+      if (!s) {
+        res.status(404).json({ error: "Slot not found." });
+        return;
+      }
+      if (!(await canSetTimetable(userId, s.course))) {
+        res.status(403).json({ error: "Only your class rep sets class times." });
+        return;
+      }
+      const { error } = await sb.from("class_slots").update({ day: mv.data.day, start_time: mv.data.start, end_time: mv.data.end }).eq("id", s.id);
+      if (error) {
+        if (String((error as { code?: string }).code) === "23505") {
+          res.status(409).json({ error: "That day and start time already has a class.", code: "SLOT_OCCUPIED" });
+          return;
+        }
+        throw error;
+      }
+      // Tell the class (bell + push). Never fails the move.
+      try {
+        const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const ids = (await takersOf([s.course])).filter((x) => x !== userId);
+        const title = `${s.course} has a new class time`;
+        const body = `Now ${DAYS[mv.data.day]}s ${mv.data.start}–${mv.data.end}${s.venue ? ` · ${s.venue}` : ""} (was ${DAYS[s.day]}s ${String(s.start_time).slice(0, 5)}). Every week from now.`;
+        for (let i = 0; i < ids.length; i += 500) {
+          await sb.from("notifications").insert(ids.slice(i, i + 500).map((user_id) => ({ user_id, type: "class_change", title, body, course: s.course, link: "/timetable" })));
+        }
+        if (ids.length) void sendPushToUsersSafe(ids, { title, body, url: "/timetable" });
+      } catch { /* the move stands */ }
+      res.json({ ok: true });
+    } catch (e) {
+      res.status(500).json(dbError(e));
+    }
+    return;
+  }
   const parsed = z
     .object({ meetLink: z.string().trim().max(300).url().refine((u) => /^https:\/\//i.test(u), "Use an https link.").or(z.literal("")) })
     .safeParse(req.body);

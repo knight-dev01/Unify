@@ -5,6 +5,13 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.42.0] - 2026-11-20
+
+### Added
+- **Drag and drop on the timetable:** in the day view, hold and drag a class to a new time, or drag its bottom edge to change when it ends; times snap to 15 minutes and show as you drag. Holding and dragging on empty time sets a new entry from there to there and opens the add form with those times filled in. A quick swipe still scrolls the page
+- Class reps drag the class times (asked first, since it changes the whole class's timetable every week; the class gets a bell and push saying the new time). Everyone can drag their own timetable entries. Lecturers' view of class times stays read-only
+- New: moving a class time or an own entry on the server (PATCH /v1/timetable/:id with day, start, end; PATCH /v1/lecturer/own-slots/:id)
+
 ## [2.41.0] - 2026-11-20
 
 ### Changed
