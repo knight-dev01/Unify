@@ -5,6 +5,17 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.43.0] - 2026-11-20
+
+### Added
+- **Every game is timed:** Match-up (12 seconds a term), True or False (15 a statement) and Fill the gap (20 a gap) now run a countdown, from 1½ to 6 minutes, shown under the progress bar; when time's up the round ends with what you've answered and still counts. Term of the Day has 5 minutes a day, starting from the first letter typed (only while on screen, kept if you come back); running out ends the day unsolved, like using all six tries. Keywords and Crossword keep their pick-your-time clock
+- **Term of the Day rows are numbered:** each row shows which try it is (1 to 6), the one you're on in amber
+- **Term of the Day blurs the misses:** in past guesses, letters that aren't in the word blur out, so the exact (green) and close (amber) letters stand out
+
+### Changed
+- **Leaving midway costs 5 XP:** a topic left midway earns 5 XP instead of 10 when it's finished; a game left midway means the next finish of it that week earns 5 XP less (or takes 5 XP back on a replay, which earns none), on top of the 10% score cut. The warnings, the notice when you come back and the finish screen all say so
+- **Keywords wheel:** no green rim; the dish sits on a thick dark edge with a shadow on the page. The letters keep their newer look, glow and shadow, and no longer darken when tapped (no focus ring or press dimming)
+
 ## [2.42.1] - 2026-11-20
 
 ### Changed

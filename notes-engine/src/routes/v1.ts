@@ -116,7 +116,10 @@ const progressSchema = z.object({
   week: z.number().int().min(1).max(52),
   topic: z.number().int().min(0).max(100),
   lectureNo: z.number().int().min(1).max(3).default(1),
+  // The student left this topic midway before: it earns 5 XP, not 10.
+  leftMidway: z.boolean().optional(),
 });
+const LEFT_MIDWAY_COST = 5;
 
 function dbError(e: unknown): { error: string; message: string } {
   return { error: "Database error", message: e instanceof Error ? e.message : String(e) };
@@ -2026,8 +2029,8 @@ router.post("/progress", requireAuth, async (req: Request, res: Response) => {
       ),
       sb.from("xp_events").insert({
         user_id: userId,
-        amount: TOPIC_XP,
-        reason: `topic_complete:${course}:w${week}:l${parsed.data.lectureNo}:t${topic}`,
+        amount: parsed.data.leftMidway ? TOPIC_XP - LEFT_MIDWAY_COST : TOPIC_XP,
+        reason: `topic_complete:${course}:w${week}:l${parsed.data.lectureNo}:t${topic}${parsed.data.leftMidway ? ":left_midway" : ""}`,
       }),
     ]);
     if (upErr) throw upErr;
