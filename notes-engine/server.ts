@@ -26,7 +26,11 @@ const PORT = process.env.PORT || 3000;
 // Behind Render's proxy: trust one hop so rate limiters see real client IPs.
 app.set("trust proxy", 1);
 
-const CORS_ORIGINS = (process.env.CORS_ORIGIN || "").split(",").map((s) => s.trim()).filter(Boolean);
+// The app's own addresses are always allowed (unifylearn.app and the old
+// vercel.app address), on top of CORS_ORIGIN, so a domain change can never
+// lock the app out of its own server while settings catch up.
+const APP_ORIGINS = ["https://unifylearn.app", "https://www.unifylearn.app", "https://unify-virid.vercel.app"];
+const CORS_ORIGINS = [...new Set([...(process.env.CORS_ORIGIN || "").split(",").map((s) => s.trim()).filter(Boolean), ...APP_ORIGINS])];
 // maxAge: browsers reuse the preflight answer for 2h (Chrome's cap) instead of
 // sending an OPTIONS round trip before nearly every authed call.
 app.use(cors({ origin: CORS_ORIGINS.length ? CORS_ORIGINS : true, maxAge: 7200 }));

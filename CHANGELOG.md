@@ -5,6 +5,11 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.38.4] - 2026-11-20
+
+### Fixed
+- **The app on unifylearn.app can reach its server:** the server always accepts the app's own addresses (unifylearn.app, www.unifylearn.app and the old vercel.app address) on top of `CORS_ORIGIN`, so the new domain works without waiting for that setting
+
 ## [2.38.3] - 2026-11-20
 
 ### Changed
