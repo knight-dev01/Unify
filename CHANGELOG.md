@@ -5,6 +5,11 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.43.1] - 2026-11-20
+
+### Changed
+- **Term of the Day: which try, as a pop-up:** instead of a number beside each row (taking space), each new try pops up like a cheer ("Try 3 of 6 · 4 tries left", "Last try!"), with no sound. The board is back to full width
+
 ## [2.43.0] - 2026-11-20
 
 ### Added
