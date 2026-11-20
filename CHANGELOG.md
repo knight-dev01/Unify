@@ -5,6 +5,11 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.38.5] - 2026-11-20
+
+### Fixed
+- **Install prompts say "Unify Learn"**: the install bar and the "already installed" message no longer say bare "Unify"
+
 ## [2.38.4] - 2026-11-20
 
 ### Fixed
