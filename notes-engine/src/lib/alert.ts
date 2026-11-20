@@ -42,7 +42,7 @@ async function recipients(): Promise<string[]> {
 }
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-const appUrl = () => ((process.env.CORS_ORIGIN || "").split(",")[0].trim() || "https://unify-virid.vercel.app");
+const appUrl = () => ((process.env.CORS_ORIGIN || "").split(",")[0].trim() || "https://unifylearn.app");
 
 export function recentAlerts(): AlertRec[] {
   return [...log].reverse();

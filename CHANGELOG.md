@@ -5,6 +5,11 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.38.3] - 2026-11-20
+
+### Changed
+- **New address: unifylearn.app.** Link previews, search engines (canonical address, sitemap, robots), share-link previews and the Supabase email templates use https://unifylearn.app. Links to unifylearn.app and to the old unify-virid.vercel.app both open inside the app, and the old address keeps working. The server takes its link address from the first entry of `CORS_ORIGIN` (set it to `https://unifylearn.app,https://www.unifylearn.app,https://unify-virid.vercel.app`); the built-in fallback is now the new address
+
 ## [2.38.2] - 2026-11-20
 
 ### Fixed

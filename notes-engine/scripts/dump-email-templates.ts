@@ -24,7 +24,7 @@ const files = [
         { topic: 1, version: 2 },
         { topic: 2, version: 1 },
       ],
-      url: "https://unify-virid.vercel.app/learn/CVE%20214/week/1",
+      url: "https://unifylearn.app/learn/CVE%20214/week/1",
     }),
   },
 ];

@@ -12,7 +12,7 @@ type Recipient = { email: string; firstName?: string };
 
 function appBaseUrl(): string {
   const fromEnv = (process.env.CORS_ORIGIN || "").split(",")[0].trim();
-  return fromEnv || "https://unify-virid.vercel.app";
+  return fromEnv || "https://unifylearn.app";
 }
 
 function parseSender(): { name: string; email: string } {

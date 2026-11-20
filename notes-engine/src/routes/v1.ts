@@ -1574,7 +1574,7 @@ router.post("/role-requests", requireAuth, async (req: Request, res: Response) =
     }
     if (emails.length) {
       const { sendSimpleEmail } = await import("../lib/email");
-      const base = (process.env.CORS_ORIGIN || "").split(",")[0].trim() || "https://unify-virid.vercel.app";
+      const base = (process.env.CORS_ORIGIN || "").split(",")[0].trim() || "https://unifylearn.app";
       await sendSimpleEmail({
         to: emails,
         subject: `Unify Learn: new ${label} request to review`,
@@ -1694,7 +1694,7 @@ async function notifyApplicant(userId: string, title: string, body: string, url:
     pushToUser(userId, { title, body, url }).catch(() => {});
     if (u?.email && u.email_confirmed) {
       const { sendSimpleEmail } = await import("../lib/email");
-      const base = (process.env.CORS_ORIGIN || "").split(",")[0].trim() || "https://unify-virid.vercel.app";
+      const base = (process.env.CORS_ORIGIN || "").split(",")[0].trim() || "https://unifylearn.app";
       await sendSimpleEmail({
         to: [{ email: u.email, name: u.first_name || "" }],
         subject: `Unify Learn: ${title}`,
@@ -2770,7 +2770,7 @@ router.post("/timetable/:id/change", requireAuth, async (req: Request, res: Resp
         void sendPushToUsersSafe(ids, { title, body: body || "Check the timetable.", url: "/timetable" });
         // Email backup for students push can't reach (cancelled, moved, running late).
         if (d.status === "cancelled" || d.status === "moved" || d.status === "late") {
-          const base = (process.env.CORS_ORIGIN || "").split(",")[0].trim() || "https://unify-virid.vercel.app";
+          const base = (process.env.CORS_ORIGIN || "").split(",")[0].trim() || "https://unifylearn.app";
           void emailWithoutPush(ids, (first) => ({
             subject: `Unify Learn: ${title}`,
             html: brandEmail({
@@ -3585,7 +3585,7 @@ router.patch("/admin/users/:id", requireAuth, async (req: Request, res: Response
           const u = up as { first_name?: string; email?: string; email_confirmed?: boolean } | null;
           if (u?.email && u.email_confirmed) {
             const { sendSimpleEmail } = await import("../lib/email");
-            const base = (process.env.CORS_ORIGIN || "").split(",")[0].trim() || "https://unify-virid.vercel.app";
+            const base = (process.env.CORS_ORIGIN || "").split(",")[0].trim() || "https://unifylearn.app";
             await sendSimpleEmail({
               to: [{ email: u.email, name: u.first_name || "" }],
               subject: `Unify Learn: your role is now ${label}`,
@@ -4006,7 +4006,7 @@ router.post("/admin/announce", requireAuth, async (req: Request, res: Response) 
     if (emailIt) void (async () => {
       try {
         const { sendSimpleEmail } = await import("../lib/email");
-        const base = (process.env.CORS_ORIGIN || "").split(",")[0].trim() || "https://unify-virid.vercel.app";
+        const base = (process.env.CORS_ORIGIN || "").split(",")[0].trim() || "https://unifylearn.app";
         const html = brandEmail({
           eyebrow: "Announcement",
           title: parsed.data.title,

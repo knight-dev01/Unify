@@ -121,7 +121,7 @@ export async function sendPushToUsers(userIds: string[], payload: PushPayload): 
 
 export function appBaseUrl(): string {
   const fromEnv = (process.env.CORS_ORIGIN || "").split(",")[0].trim();
-  return (fromEnv || "https://unify-virid.vercel.app").replace(/\/$/, "");
+  return (fromEnv || "https://unifylearn.app").replace(/\/$/, "");
 }
 
 // New-note push twin: students taking the course get a lock-screen nudge.

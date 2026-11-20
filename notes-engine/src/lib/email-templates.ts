@@ -7,7 +7,7 @@
 // Georgia / Arial, Box Boy is a hosted PNG (SVG and WebP are stripped by
 // Gmail and Outlook), source is ASCII with HTML entities.
 
-const APP_URL = "https://unify-virid.vercel.app";
+const APP_URL = "https://unifylearn.app";
 export function emailBase(): string {
   const fromEnv = (process.env.CORS_ORIGIN || "").split(",")[0].trim();
   return (fromEnv || APP_URL).replace(/\/$/, "");
