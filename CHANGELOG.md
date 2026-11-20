@@ -5,6 +5,11 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.42.1] - 2026-11-20
+
+### Changed
+- **Keywords wheel depth you can see, light mode too:** the dish now sits in a raised green bevel ring (bright on top, deep green below, a shine along the top) with a thick edge under it and a real shadow on the page, and the dish is more clearly sunk (shadowed at the top, lit along the bottom)
+
 ## [2.42.0] - 2026-11-20
 
 ### Added
