@@ -5,6 +5,16 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.40.0] - 2026-11-20
+
+### Changed
+- **Type with your own keyboard:** Term of the Day and Crossword use the phone's (or computer's) own keyboard instead of one drawn on screen. Tapping the boxes or a square opens it, and the row or square you're typing into is kept in view, so there's no scrolling to see your letters
+- **Term of the Day says what to do first:** a short "How to play" (tap the boxes, type a word from your notes, press Enter, what green, amber and grey mean) shows until the first guess and stays one tap away after; the row you're on is outlined, and a strip of letters tried so far keeps the colours the drawn keyboard used to show
+- **Games have colour and life:** each game has its own gradient on the app's green to amber scale (its buttons and progress bar), progress bars shimmer as they fill, answers squash and spring when tapped, letters pop into Term of the Day's boxes, and a perfect score gets a bigger confetti burst
+- **Encouragement in games:** a kind line after a miss, and a light tease if you go quiet for 25 seconds mid-game (Term of the Day, Crossword, Match-up, True or False, Fill the gap)
+- **Welcome back after 2 days, not 7:** a short break gets a teasing hello and a Term of the Day button; a week or more keeps the gentle version
+- **The installed app can rotate** to landscape (it was locked to portrait)
+
 ## [2.39.2] - 2026-11-20
 
 ### Changed
