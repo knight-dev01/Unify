@@ -40,10 +40,7 @@ const scoreSchema = z.object({
   terms: z.number().int().min(0).max(60),
   hints: z.number().int().min(0).max(200),
   seconds: z.number().int().min(0).max(24 * 3600),
-  // The last round of this game for this week was left midway: 5 XP less.
-  quit: z.boolean().optional(),
 });
-const QUIT_XP = 5;
 
 router.post("/games/score", requireAuth, async (req: Request, res: Response) => {
   const parsed = scoreSchema.safeParse(req.body);
@@ -62,16 +59,11 @@ router.post("/games/score", requireAuth, async (req: Request, res: Response) => 
     } else {
       await sb.from("game_scores").insert({ user_id: uid(req), game: d.game, course: d.course, week: d.week, score: d.score, terms: d.terms, hints: d.hints, seconds: d.seconds });
     }
-    // XP once per game per week, on the first completed run. Finishing after
-    // leaving a round midway costs 5 XP: off the first-run XP, or taken back
-    // on a later run (which earns none).
+    // XP once per game per week, on the first completed run.
     let xp = 0;
     if (!old) {
-      xp = d.quit ? Math.max(0, XP[d.game] - QUIT_XP) : XP[d.game];
-      await sb.from("xp_events").insert({ user_id: uid(req), amount: xp, reason: `game:${d.game}:${d.course}:w${d.week}${d.quit ? ":left_midway" : ""}` });
-    } else if (d.quit) {
-      xp = -QUIT_XP;
-      await sb.from("xp_events").insert({ user_id: uid(req), amount: xp, reason: `game_left_midway:${d.game}:${d.course}:w${d.week}` });
+      xp = XP[d.game];
+      await sb.from("xp_events").insert({ user_id: uid(req), amount: xp, reason: `game:${d.game}:${d.course}:w${d.week}` });
     }
     res.json({ ok: true, best: better ? d.score : old!.score, newBest: better, xp });
   } catch (e) {

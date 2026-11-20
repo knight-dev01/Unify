@@ -5,6 +5,15 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.44.0] - 2026-11-20
+
+### Changed
+- **Leaving midway costs 5 XP, straight away:** choosing "Leave anyway (−5 XP)" in a game or the notes takes 5 XP off at once (it can go below zero, so a student with no XP goes to −5), and a "−5 XP" pop-up in the cheer style shows as the app moves on. The earlier delayed costs are gone: no 10% score cut, no smaller XP on the next finish, and topics always earn 10 XP when finished. A double tap can't charge twice. The notes still offer to take you back to the topic you left
+- **Encouragements and teases use the cheer pop-up:** the same shape and animation as the cheers (smaller words, a little longer on screen, amber after a miss), replacing the separate bubble with Box Boy
+
+### Added
+- Server: POST /v1/xp/left records a −5 XP leave (students only)
+
 ## [2.43.2] - 2026-11-20
 
 ### Changed

@@ -116,10 +116,7 @@ const progressSchema = z.object({
   week: z.number().int().min(1).max(52),
   topic: z.number().int().min(0).max(100),
   lectureNo: z.number().int().min(1).max(3).default(1),
-  // The student left this topic midway before: it earns 5 XP, not 10.
-  leftMidway: z.boolean().optional(),
 });
-const LEFT_MIDWAY_COST = 5;
 
 function dbError(e: unknown): { error: string; message: string } {
   return { error: "Database error", message: e instanceof Error ? e.message : String(e) };
@@ -2029,8 +2026,8 @@ router.post("/progress", requireAuth, async (req: Request, res: Response) => {
       ),
       sb.from("xp_events").insert({
         user_id: userId,
-        amount: parsed.data.leftMidway ? TOPIC_XP - LEFT_MIDWAY_COST : TOPIC_XP,
-        reason: `topic_complete:${course}:w${week}:l${parsed.data.lectureNo}:t${topic}${parsed.data.leftMidway ? ":left_midway" : ""}`,
+        amount: TOPIC_XP,
+        reason: `topic_complete:${course}:w${week}:l${parsed.data.lectureNo}:t${topic}`,
       }),
     ]);
     if (upErr) throw upErr;
@@ -4122,6 +4119,37 @@ const quizSchema = z.object({
 // topic completions, passed quizzes, or simply showing up and engaging
 // (one ping per day, client-throttled). Amount 0: streak fuel, not XP —
 // lifetime XP totals never move on heartbeats.
+// Authed: left a game or a topic midway (after "Leave anyway"). Costs 5 XP at
+// once, even below zero. Students only; at most one charge per 10 seconds so a
+// double tap can't charge twice.
+const LEAVE_COST = 5;
+router.post("/xp/left", requireAuth, async (req: Request, res: Response) => {
+  const userId = (req as AuthedRequest).userId as string;
+  const parsed = z.object({ kind: z.enum(["game", "topic"]), course: z.string().trim().min(1).max(20), week: z.number().int().min(1).max(52), what: z.string().trim().max(40).default("") }).safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid body" });
+    return;
+  }
+  try {
+    const sb = supabaseAdmin();
+    const { data: prof } = await sb.from("profiles").select("role").eq("id", userId).single();
+    if ((prof as { role?: string } | null)?.role && (prof as { role?: string }).role !== "student") {
+      res.json({ ok: true, xp: 0, charged: 0 });
+      return;
+    }
+    const { data: recent } = await sb.from("xp_events").select("id").eq("user_id", userId).like("reason", "left_midway:%").gt("created_at", new Date(Date.now() - 10000).toISOString()).limit(1);
+    if (!((recent ?? []) as unknown[]).length) {
+      const d = parsed.data;
+      const { error } = await sb.from("xp_events").insert({ user_id: userId, amount: -LEAVE_COST, reason: `left_midway:${d.kind}:${cleanCode(d.course) || d.course}:w${d.week}:${d.what}`.slice(0, 200) });
+      if (error) throw error;
+    }
+    const { data: rows } = await sb.from("xp_events").select("amount").eq("user_id", userId).limit(5000);
+    res.json({ ok: true, xp: ((rows ?? []) as { amount: number }[]).reduce((s, r) => s + (r.amount || 0), 0), charged: LEAVE_COST });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
 router.post("/ping", requireAuth, async (req: Request, res: Response) => {
   const userId = (req as AuthedRequest).userId as string;
   try {
