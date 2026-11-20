@@ -5,6 +5,17 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.39.0] - 2026-11-20
+
+### Added
+- **True or False** (new course game): a meaning from the week's notes and a key term: does it describe that term? About half are true; a wrong answer shows the right term. Streak cheers, 10 XP on the first finish
+- **Fill the gap** (new course game): a sentence from the week's notes with a key term taken out; pick it from four of the week's terms. 15 XP on the first finish
+- Both appear under Practice this week, on Games, with their own icons, scores and leaderboards (migration 0064)
+
+### Changed
+- **Opening the app is one calm screen:** a signed-in student sees the same Box Boy loading screen from the moment the app opens until Home, with no sign-in form, splash or second loading design flashing past. Loading screens that follow each other no longer fade in again or change their proverb, a very fast sign-in still holds the screen for a moment, and pages whose access is already known open without a "Checking access" flash
+- **Games load with dealt letter tiles** instead of grey skeleton blocks
+
 ## [2.38.6] - 2026-11-20
 
 ### Changed

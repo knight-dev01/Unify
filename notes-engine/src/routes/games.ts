@@ -18,7 +18,7 @@ router.use("/games", rateLimit({ windowMs: 15 * 60 * 1000, max: 400, standardHea
 const uid = (req: Request) => (req as AuthedRequest).userId as string;
 const fail = (res: Response, status: number, message: string) => res.status(status).json({ error: message });
 const dbFail = (res: Response, e: unknown) => res.status(500).json({ error: "Database error", message: e instanceof Error ? e.message : String(e) });
-const XP = { keywords: 15, crossword: 20, match: 15 } as const;
+const XP = { keywords: 15, crossword: 20, match: 15, truefalse: 10, gapfill: 15 } as const;
 type Row = { user_id: string; game: string; course: string; week: number; score: number; terms: number; hints: number; seconds: number; plays: number };
 
 async function access(req: Request, course: string): Promise<{ ok: boolean; admin: boolean }> {
@@ -33,7 +33,7 @@ async function access(req: Request, course: string): Promise<{ ok: boolean; admi
 }
 
 const scoreSchema = z.object({
-  game: z.enum(["keywords", "crossword", "match"]),
+  game: z.enum(["keywords", "crossword", "match", "truefalse", "gapfill"]),
   course: z.string().trim().min(2).max(20),
   week: z.number().int().min(1).max(30),
   score: z.number().int().min(0).max(5000),
@@ -74,7 +74,7 @@ router.post("/games/score", requireAuth, async (req: Request, res: Response) => 
 router.get("/games/leaderboard", requireAuth, async (req: Request, res: Response) => {
   const course = String(req.query.course || "").trim().slice(0, 20);
   const week = req.query.week ? Number(req.query.week) : null;
-  const game = req.query.game === "keywords" || req.query.game === "crossword" || req.query.game === "match" ? req.query.game : null;
+  const game = typeof req.query.game === "string" && req.query.game in XP ? (req.query.game as keyof typeof XP) : null;
   if (!course) return fail(res, 400, "Which course?");
   try {
     const a = await access(req, course);
