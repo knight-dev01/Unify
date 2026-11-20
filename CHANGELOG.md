@@ -5,6 +5,14 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.38.2] - 2026-11-20
+
+### Fixed
+- **Admin alerts say why an email didn't go:** instead of "email provider did not accept it", the alert log names Brevo's reason in plain words (for example, Brevo blocking the server's IP address, a rejected API key, an unverified sender, or today's budget being used up)
+- **A failed alert email isn't retried every minute:** the same problem tries again after 15 minutes
+- **Waking up isn't an emergency:** on the free plan the server sleeps after 15 minutes without traffic, and the first minutes after it wakes are slow by nature. Stalls and slow responses in the first 6 minutes after start are logged as "Server waking up" / "Slow while waking up" and not emailed
+- **Slow-response alerts name the slowest parts of the app**, so the cause is visible from the alert itself
+
 ## [2.38.1] - 2026-11-19
 
 ### Changed

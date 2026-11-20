@@ -1,6 +1,6 @@
 import { supabaseAdmin } from "./supabase";
 import { brandEmail, panel } from "./email-templates";
-import { sendSimpleEmail } from "./email";
+import { lastEmailFailure, sendSimpleEmail } from "./email";
 import { recentCompleted, systemSnapshot, lastDbProbes } from "./metrics";
 
 // When something is suddenly wrong, the admins hear about it by email.
@@ -18,6 +18,8 @@ import { recentCompleted, systemSnapshot, lastDbProbes } from "./metrics";
 export type AlertRec = { at: string; signature: string; kind: string; message: string; emailed: boolean; note?: string };
 const log: AlertRec[] = [];
 const lastSent = new Map<string, number>();
+// A failed send isn't retried every minute: the next try is 15 minutes later.
+const lastFailed = new Map<string, { at: number; why: string }>();
 let sentThisHour: number[] = [];
 const COOLDOWN_MS = 15 * 60 * 1000;
 const HOURLY_CAP = 12;
@@ -47,14 +49,19 @@ export function recentAlerts(): AlertRec[] {
 }
 
 /** Raise an alert. `signature` groups repeats of the same problem. Never throws. */
-export async function raise(signature: string, kind: string, message: string, detail?: string, opts: { force?: boolean } = {}): Promise<AlertRec> {
+export async function raise(signature: string, kind: string, message: string, detail?: string, opts: { force?: boolean; logOnly?: string } = {}): Promise<AlertRec> {
   const rec: AlertRec = { at: new Date().toISOString(), signature, kind, message, emailed: false };
   try {
     const now = Date.now();
     sentThisHour = sentThisHour.filter((t) => now - t < 3600000);
     const last = lastSent.get(signature) ?? 0;
-    if (!opts.force && now - last < COOLDOWN_MS) {
+    const failed = lastFailed.get(signature);
+    if (opts.logOnly) {
+      rec.note = opts.logOnly;
+    } else if (!opts.force && now - last < COOLDOWN_MS) {
       rec.note = "repeat within 15 minutes: not emailed again";
+    } else if (!opts.force && failed && now - failed.at < COOLDOWN_MS) {
+      rec.note = `email failed ${Math.round((now - failed.at) / 60000)} min ago (tries again after 15 minutes): ${failed.why}`;
     } else if (!opts.force && sentThisHour.length >= HOURLY_CAP) {
       rec.note = "hourly email cap reached";
     } else {
@@ -77,8 +84,13 @@ export async function raise(signature: string, kind: string, message: string, de
         rec.emailed = sent > 0;
         if (sent > 0) {
           lastSent.set(signature, now);
+          lastFailed.delete(signature);
           sentThisHour.push(now);
-        } else rec.note = "email provider did not accept it";
+        } else {
+          const why = lastEmailFailure() || "no reason given";
+          lastFailed.set(signature, { at: now, why });
+          rec.note = `email provider did not accept it: ${why}`;
+        }
       }
     }
   } catch (e) {
@@ -110,8 +122,15 @@ export function startWatchdog(): void {
       const w = recentCompleted(5);
       if (w.all.n >= 10 && w.all.e5 / w.all.n >= 0.2)
         void raise("spike:all", "Error spike", `${w.all.e5} of ${w.all.n} requests failed with a server error in the last 5 minutes (${Math.round((w.all.e5 / w.all.n) * 100)}%).`);
-      if (w.all.n >= 10 && w.all.p95 >= 4000)
-        void raise("slow:all", "Slow responses", `95% of requests in the last 5 minutes finished within ${w.all.p95} ms or slower (slowest ${w.all.max} ms) across ${w.all.n} requests.`);
+      // On the free plan the server sleeps after 15 minutes without traffic;
+      // the first minutes after it wakes are slow by nature. Those are logged
+      // (so the panel shows it) but not emailed.
+      const waking = process.uptime() < 6 * 60;
+      const WAKE_NOTE = "server was waking up (the free plan sleeps after 15 minutes without traffic): logged, not emailed";
+      if (w.all.n >= 10 && w.all.p95 >= 4000) {
+        const worst = [...w.perModule].sort((a, b) => b.max - a.max).slice(0, 3).map((m) => `${m.name} ${m.max} ms`).join(", ");
+        void raise("slow:all", waking ? "Slow while waking up" : "Slow responses", `95% of requests in the last 5 minutes finished within ${w.all.p95} ms or slower (slowest ${w.all.max} ms) across ${w.all.n} requests. Slowest parts: ${worst}.`, undefined, waking ? { logOnly: WAKE_NOTE } : {});
+      }
       for (const m of w.perModule)
         if (m.n >= 5 && m.e5 / m.n >= 0.5) void raise("spike:" + m.name, `Module failing: ${m.name}`, `${m.e5} of ${m.n} ${m.name} requests failed with a server error in the last 5 minutes.`);
 
@@ -121,7 +140,10 @@ export function startWatchdog(): void {
 
       const sys = systemSnapshot();
       if (sys.rssMb >= 450) void raise("mem", "High memory", `The server is using ${sys.rssMb} MB of memory (heap ${sys.heapMb} MB). A restart may be near.`);
-      if (sys.lagMaxMs >= 1500) void raise("lag", "Server stalling", `The server stopped responding for up to ${sys.lagMaxMs} ms in the last 5 minutes.`);
+      if (sys.lagMaxMs >= 1500) {
+        if (waking) void raise("lag", "Server waking up", `The server started ${Math.round(process.uptime() / 60)} min ago and paused for up to ${sys.lagMaxMs} ms while starting.`, undefined, { logOnly: WAKE_NOTE });
+        else void raise("lag", "Server stalling", `The server stopped responding for up to ${sys.lagMaxMs} ms in the last 5 minutes.`);
+      }
     } catch {
       // the watchdog must never take the server down
     }

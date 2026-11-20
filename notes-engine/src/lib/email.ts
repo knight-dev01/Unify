@@ -27,6 +27,20 @@ function parseSender(): { name: string; email: string } {
 // sender, daily limit reached, bad recipient), which is what used to vanish.
 type BrevoResult = { ok: boolean; status: number; body: string };
 
+// The last refusal, in plain words, for the admin alert log (the full text
+// still goes to the server log).
+let lastFailure: { at: number; status: number; body: string } | null = null;
+export function lastEmailFailure(): string {
+  if (!lastFailure) return "";
+  const b = lastFailure.body.toLowerCase();
+  if (/unrecogni[sz]ed ip|authori[sz]ed ip|ip address/.test(b)) return "Brevo blocked this server's IP address. In Brevo, open Security, Authorised IPs, and add the server's IP (or turn the IP check off).";
+  if (lastFailure.status === 401 || /key not found|invalid api key|unauthori[sz]ed/.test(b)) return "Brevo rejected the API key. Check BREVO_API_KEY on Render.";
+  if (/sender|from/.test(b) && /valid|verif/.test(b)) return "Brevo doesn't accept the sender address. Verify EMAIL_FROM in Brevo, Senders.";
+  if (/budget reached/.test(b)) return "Today's email budget is used up.";
+  if (lastFailure.status === 429) return "Brevo's sending limit was hit. It eases off by itself.";
+  return `Brevo said ${lastFailure.status || "nothing"}: ${lastFailure.body.slice(0, 160) || "no reason given"}`;
+}
+
 // Every app email passes here, so this is where the daily budget is kept
 // (lib/emailBudget: Brevo's free plan is 300 a day). Over budget, the email
 // is skipped and reported, never sent.
@@ -138,6 +152,7 @@ export async function sendNewNoteEmails(opts: {
       if (res.ok) sent += 1;
       else {
         failed = true;
+        lastFailure = { at: Date.now(), status: res.status, body: res.body };
         if (res.status === 429) limited = true;
         console.warn(
           `[email] send failed (${opts.course} w${opts.week}) — brevo ${res.status} from=${sender.email} to=${chunk[idx].email}: ${res.body.slice(0, 400) || "no response body"}`
@@ -195,6 +210,7 @@ export async function sendSimpleEmail(opts: {
       if (res.ok) sent += 1;
       else {
         failed = true;
+        lastFailure = { at: Date.now(), status: res.status, body: res.body };
         if (res.status === 429) limited = true;
         console.warn(
           `[email] send failed ("${opts.subject}") — brevo ${res.status} from=${sender.email} to=${chunk[idx].email}: ${res.body.slice(0, 400) || "no response body"}`
