@@ -5,6 +5,12 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.39.1] - 2026-11-20
+
+### Changed
+- **Keywords wheel has depth:** a sunken dish with a raised green rim, letter tiles that stand up off it, and a soft green glow on the letters you've picked
+- **Steadier spoken welcome and cheers:** one voice chosen once per visit (no switching voice part-way when the browser's voice list arrives late), whole sentences instead of short phrases, and the same calm pace for the welcome and every cheer
+
 ## [2.39.0] - 2026-11-20
 
 ### Added
