@@ -5,6 +5,17 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.41.0] - 2026-11-20
+
+### Changed
+- **One progress bar everywhere:** every progress bar in the app (home course cards, course weeks, revision, Studio converting, recall, class join and study bars for lecturers, and all five games) is now the same chunky bar at the same height; in a game it takes that game's colour with the light sweeping across
+- **No progress bar on the notes:** the bar under a week's title is gone; the topic tabs still tick off what's done
+- **Encouragements pop up:** the kind words after a miss and the teases when you go quiet now pop up at the top in a bubble with Box Boy (spring in, a wobble, float away) instead of sitting in a line of text
+
+### Added
+- **Leaving midway asks first:** in all five scored games and in the notes, leaving a round or an unfinished topic midway (Back, the tab bar, any link, or the phone's back gesture) asks "Leave anyway?" first
+- **And it counts after:** leaving a game midway means the next finish of that game for that week scores 10% less; the game says so when you open it again and the finish screen shows the cut, then it's cleared. Leaving a topic midway is remembered, and the week shows "You left Topic N midway" with a button back to it until it's done
+
 ## [2.40.0] - 2026-11-20
 
 ### Changed
