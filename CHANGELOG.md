@@ -5,6 +5,12 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.43.2] - 2026-11-20
+
+### Changed
+- **The same cheers in every game:** a right answer in Fill the gap and True or False now gets the cheer pop-up (True or False's small inline "Right!" is gone); Keywords no longer shows a second "Nice one" / "Bonus word" toast on top of the cheer. Misses get the kind-word pop-up in Keywords and Crossword (on Check) too, and Keywords now teases when you go quiet, like the others
+- **Typing stays in the middle:** in Term of the Day and Crossword, the row or square you're typing into is centred in the part of the screen above the phone keyboard (after the keyboard opens and after each guess), instead of being pushed past the top of the screen
+
 ## [2.43.1] - 2026-11-20
 
 ### Changed
