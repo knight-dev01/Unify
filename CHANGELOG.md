@@ -5,6 +5,25 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.45.1] - 2026-11-25
+
+Studio bug sweep.
+
+### Fixed
+- Diagram upload no longer wipes a caption or description typed while the image was uploading; a failed upload shows a message, and the same file can be picked again.
+- "Edit content" at the bottom of Review opens the editor in place. It used to jump back to Compose, where a generated note had no editor and Review could stay locked.
+- Going back from Review to Compose no longer locks Review for generated or imported notes (the fill-everything-in gate stays for hand-written notes).
+- Editing a published week fills in the course and week, so the checks, the draft and going back all work; the loader says "Opening the published week" instead of talking about the AI.
+- A short connection drop while a note is generating no longer abandons the job; real failures still stop at once.
+- Deleting a quiz question renumbers the rest (two questions could share a number after a delete and an add).
+- Number answers accept negatives and half-typed decimals.
+- Changing a block's type keeps its text (Text, Insight, Analogy, Bullets).
+- "Next up" after publishing uses the real list of live weeks.
+- Starting a new note clears the old warnings and hints.
+- "Publishing…" shows only on the topic being published when two parts share a topic number; the delete prompt names the right topic.
+- Opening a week from the Pipeline or Home while an unfinished draft is for another week keeps the draft and asks, instead of mixing it into the new course.
+- Pipeline: shows a loading line and an empty message, loads every course at once (no longer stops at 8), and a live week opens for editing.
+
 ## [2.45.0] - 2026-11-25
 
 Review 4 (25 Nov).
