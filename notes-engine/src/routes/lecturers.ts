@@ -81,7 +81,7 @@ router.delete("/lecturer/claims/:code", requireAuth, async (req: Request, res: R
     const course = clean(decodeURIComponent(req.params.code));
     const sb = supabaseAdmin();
     const { data: claim } = await sb.from("lecturer_claims").select("id,course").eq("lecturer_id", m.id).in("course", variants(course)).maybeSingle();
-    if (!claim) return fail(res, 403, "That course was assigned by the Unify team. Ask them to remove it.");
+    if (!claim) return fail(res, 403, "That course was assigned by the Unify Learn team. Ask them to remove it.");
     await sb.from("lecturer_claims").delete().eq("id", (claim as { id: string }).id);
     await sb.from("enrollments").delete().eq("user_id", m.id).eq("kind", "teaching").eq("course", (claim as { course: string }).course);
     res.json({ ok: true });
@@ -142,7 +142,7 @@ router.post("/hoc/lecturer-checks/:id", requireAuth, async (req: Request, res: R
     if (error) throw error;
     const cls = `${m.level} ${m.department}`;
     const title = status === "confirmed" ? `${cls} confirmed you for ${c.course}` : `${cls} said you don't teach them ${c.course}`;
-    const body = status === "confirmed" ? "Your posts and materials for the course now reach this class." : "If that's a mistake, ask their class rep or the Unify team.";
+    const body = status === "confirmed" ? "Your posts and materials for the course now reach this class." : "If that's a mistake, ask their class rep or the Unify Learn team.";
     await sb.from("notifications").insert({ user_id: c.lecturer_id, type: "lecturer_check", title, body, course: c.course, link: "/home" });
     void sendPushToUsers([c.lecturer_id], { title, body, url: "/home" }).catch(() => {});
     res.json({ ok: true, status, class: classKey(m.department, m.level) });

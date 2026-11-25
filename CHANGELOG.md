@@ -5,6 +5,33 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.45.0] - 2026-11-25
+
+Review 4 (25 Nov).
+
+### Added
+- **Separate sign-up links:** /join (students), /join/lecturer and /join/contributor all open the one sign-in page, with a note saying who is joining. The link never grants a role: once the profile is filled in, a request goes to the admins, and the role is given only when one approves it
+- **Approval before access:** a lecturer who signs up from the lecturer link sees only a "waiting for approval" screen (no tabs) until an admin approves; they can add a photo or withdraw. Contributors from their link keep full student access while they wait
+- **Admin › Lecturers & staff:** the lecturer sign-up link (copy), lecturer sign-ups waiting for approval (Approve / Decline), and the approved lecturers and admins, searchable
+- **Admin › Course Contributors** is its own page in the sidebar: the contributor sign-up link, contributor sign-ups to approve, and every contributor filtered by level (100–500) and department, with the courses each one writes. "Contributors by class" moved here from Class reps
+- **Admin › Course assignment:** every course and who teaches it ("11 courses, 3 unassigned"), by level or unassigned only, with Assign (lecturers and contributors; the 2-per-level contributor cap still holds) and unassign. The assigned person gets a notification
+- **Class rep guide:** a step 1, 2, 3 walkthrough (class board, class list, classes and attendance) the first time a class rep opens Class, ending at the class setup checklist. "Class rep guide" on the Class page opens it again
+- **Photos on the class list:** class reps see each student's photo (or their Box Boy) beside their name
+- Server: GET /v1/admin/course-assignments, POST and DELETE /v1/admin/courses/:code/assign; /v1/admin/users takes level, department and courses=1; /v1/me returns pendingRole; contributor role requests are accepted again; POST /v1/avatar also takes { url } for a picture already uploaded to the user's own folder
+
+### Changed
+- **Student Home is lighter:** XP and streak are small chips in the header (the XP / Streak / Courses card is gone). The first card under Your Courses holds where you stopped (Resume), today's goal ring and the quiz average, replacing the separate goal card. Term of the Day and Revise sit under the courses as two half-width tiles; "Finish your profile" is a slide in the updates slideshow
+- **Cleaner course cards:** no "Not started / In progress" pill (the progress bar says it; done courses get a tick), and topics and week shown with small icons
+- **Admin Overview:** one slim greeting line; a single "Needs you" list (sign-ups to approve, unassigned courses, staff requests, app errors, cap violations, and the server's checks) that hides zero counts and says "All clear" when empty; Users, Courses and Topics in one strip (Weeks, XP and Authors moved to Analytics); "Across the modules", Recent activity and What's new folded
+- **Splash:** only the five persona characters (the three extra poses are out), three on top and two below
+- **"Ask your class rep a question"** is pinned flat on top of the tab bar (it measured the wrong bar height and floated above it)
+- **Profile pictures upload the same way as Studio diagrams:** straight from the phone to storage, then saved on the profile (the old route stays as a fallback)
+- **Studio diagram images are all one size:** cropped from the centre to 16:9 and saved at 1280×720 on the device before upload (larger originals up to 20 MB are fine). Diagrams show in a 16:9 frame in the notes and the Studio preview
+
+### Fixed
+- **Profile picture upload in Me:** after uploading (or picking a Box Boy) the app kept a cached copy of the profile for up to 15 s, so Home and the header snapped back to the old picture; choosing the same file twice did nothing; and a failed save on the server was reported as success. All three fixed, and errors now show in red
+- "Unify" alone in class list and course messages now reads "Unify Learn"
+
 ## [2.44.0] - 2026-11-20
 
 ### Changed

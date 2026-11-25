@@ -292,10 +292,13 @@ router.get("/me", requireAuth, async (req: Request, res: Response) => {
   try {
     // Profile, enrollments and saved position are independent: one round trip, not three.
     const sbm = supabaseAdmin();
-    const [{ data, error }, { data: enrolled }, { data: saved }] = await Promise.all([
+    const [{ data, error }, { data: enrolled }, { data: saved }, { data: pendingRq }] = await Promise.all([
       sbm.from("profiles").select("*").eq("id", userId).single(),
       sbm.from("enrollments").select("course").eq("user_id", userId),
       sbm.from("resume_state").select("course,week,topic,lecture_no").eq("user_id", userId).maybeSingle(),
+      // Review 4: a lecturer who signed up from the lecturer link waits on
+      // approval before anything opens; the app reads this to hold them there.
+      sbm.from("role_requests").select("role").eq("user_id", userId).eq("status", "pending").limit(1).maybeSingle(),
     ]);
     if (error || !data) {
       res.json({ onboarded: false, profile: null });
@@ -421,7 +424,8 @@ router.get("/me", requireAuth, async (req: Request, res: Response) => {
       const row = ((last ?? []) as { course: string; week: number; topic: number; lecture_no?: number }[])[0];
       if (row && row.course) resume = { course: row.course, week: row.week, topic: row.topic, lecture: row.lecture_no || 1 };
     }
-    res.json({ onboarded, profile: data, isAdmin, courses, resume, avatar: await avatarFor(data as { avatar_url?: string; email?: string } | null) });
+    const pendingRole = (pendingRq as { role?: string } | null)?.role || null;
+    res.json({ onboarded, profile: data, isAdmin, courses, resume, pendingRole, avatar: await avatarFor(data as { avatar_url?: string; email?: string } | null) });
   } catch (e) {
     res.status(500).json(dbError(e));
   }
@@ -1535,12 +1539,8 @@ router.post("/role-requests", requireAuth, async (req: Request, res: Response) =
     res.status(400).json({ error: "Invalid body", details: parsed.error.flatten() });
     return;
   }
-  // Contributors are never applied for: an admin assigns a student to their
-  // courses (Admin › Users › Manage assigned courses), like class reps.
-  if (parsed.data.role === "contributor") {
-    res.status(403).json({ error: "Contributors are chosen by the Unify team. An admin will reach out if you're picked." });
-    return;
-  }
+  // Review 4: contributors now sign up from their own link and wait for an
+  // admin's approval, like lecturers (they keep student access meanwhile).
   try {
     const sb = supabaseAdmin();
     const { data: prof } = await sb.from("profiles").select("first_name,email,role").eq("id", userId).single();
@@ -1850,6 +1850,27 @@ router.get("/contributions", requireAuth, async (req: Request, res: Response) =>
 // into the avatars bucket; the public URL lands on the profile.
 router.post("/avatar", requireAuth, async (req: Request, res: Response) => {
   const userId = (req as AuthedRequest).userId as string;
+  // Review 4: the app now uploads straight to Storage, the same way Studio
+  // uploads diagrams, and only sends the URL here. Accept it only when it
+  // points into this user's own folder of the avatars bucket.
+  const byUrl = z.object({ url: z.string().url().max(600) }).safeParse(req.body);
+  if (byUrl.success) {
+    try {
+      const own = supabaseAdmin().storage.from("avatars").getPublicUrl(`${userId}/`).data.publicUrl;
+      const clean = byUrl.data.url.split("?")[0];
+      if (!clean.startsWith(own) || clean.length <= own.length || clean.slice(own.length).includes("/")) {
+        res.status(400).json({ error: "That picture isn't in your own folder." });
+        return;
+      }
+      const avatarUrl = `${clean}?v=${Date.now()}`;
+      const { error: profErr } = await supabaseAdmin().from("profiles").update({ avatar_url: avatarUrl, updated_at: new Date().toISOString() }).eq("id", userId);
+      if (profErr) throw profErr;
+      res.json({ ok: true, avatarUrl });
+    } catch (e) {
+      res.status(500).json(dbError(e));
+    }
+    return;
+  }
   const parsed = z.object({ image: z.string().min(100).max(3000000) }).safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: "Pass { image: dataURL } (≤2MB)." });
@@ -1893,7 +1914,10 @@ router.post("/avatar", requireAuth, async (req: Request, res: Response) => {
     // cache the moment a new picture lands, so header, profile and cards
     // all pick up the update instead of the old cached image.
     const avatarUrl = `${data.publicUrl}?v=${Date.now()}`;
-    await supabaseAdmin().from("profiles").update({ avatar_url: avatarUrl, updated_at: new Date().toISOString() }).eq("id", userId);
+    // Review 4: a failed profile write used to be ignored, so the picture
+    // "uploaded" but never showed. Report it instead.
+    const { error: profErr } = await supabaseAdmin().from("profiles").update({ avatar_url: avatarUrl, updated_at: new Date().toISOString() }).eq("id", userId);
+    if (profErr) throw profErr;
     res.json({ ok: true, avatarUrl });
   } catch (e) {
     res.status(500).json(dbError(e));
@@ -3450,6 +3474,109 @@ router.put("/admin/users/:id/courses", requireAuth, async (req: Request, res: Re
   }
 });
 
+// ---- Admin: course assignment (Review 4). Every course with who teaches it
+// ("11 courses, 3 unassigned"), and an Assign action. Lecturers and
+// contributors can be assigned; contributors keep the 2-per-level cap.
+router.get("/admin/course-assignments", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  try {
+    const sb = supabaseAdmin();
+    const [coursesRes, linksRes, teachRes] = await Promise.all([
+      sb.from("courses").select("code,title").order("code"),
+      catalogLevels(),
+      sb.from("enrollments").select("course,user_id").eq("kind", "teaching").limit(5000),
+    ]);
+    if (coursesRes.error) throw coursesRes.error;
+    const teach = (teachRes.data ?? []) as { course: string; user_id: string }[];
+    const ids = [...new Set(teach.map((t) => t.user_id))];
+    const people: Record<string, { name: string; role: string }> = {};
+    for (let i = 0; i < ids.length; i += 500) {
+      const { data } = await sb.from("profiles").select("id,first_name,role").in("id", ids.slice(i, i + 500));
+      for (const p of (data ?? []) as { id: string; first_name: string | null; role: string | null }[]) people[p.id] = { name: p.first_name || "Unnamed", role: p.role || "" };
+    }
+    const levels: Record<string, Set<string>> = {};
+    const sems: Record<string, Set<string>> = {};
+    for (const l of linksRes.data) {
+      (levels[l.course] ||= new Set()).add(l.level);
+      (sems[l.course] ||= new Set()).add(l.semester);
+    }
+    const by: Record<string, { id: string; name: string; role: string }[]> = {};
+    for (const t of teach) {
+      const p = people[t.user_id];
+      // Only staff count as assignees (a student row with kind teaching is stale).
+      if (p && (p.role === "lecturer" || p.role === "contributor")) (by[t.course] ||= []).push({ id: t.user_id, ...p });
+    }
+    const courses = ((coursesRes.data ?? []) as { code: string; title: string | null }[]).map((c) => ({
+      code: c.code,
+      title: c.title || "",
+      levels: [...(levels[c.code] || [])].sort(),
+      semesters: [...(sems[c.code] || [])].sort(),
+      assignees: (by[c.code] || []).sort((a, b) => a.role.localeCompare(b.role) || a.name.localeCompare(b.name)),
+    }));
+    res.json({ courses });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+router.post("/admin/courses/:code/assign", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  const parsed = z.object({ userId: z.string().uuid() }).safeParse(req.body);
+  const code = cleanCode(decodeURIComponent(req.params.code));
+  if (!parsed.success || !code) {
+    res.status(400).json({ error: "Pass { userId } for a real course." });
+    return;
+  }
+  try {
+    const sb = supabaseAdmin();
+    const [{ data: course }, { data: prof }] = await Promise.all([
+      sb.from("courses").select("code").eq("code", code).maybeSingle(),
+      sb.from("profiles").select("role,first_name").eq("id", parsed.data.userId).maybeSingle(),
+    ]);
+    if (!course) { res.status(404).json({ error: "Unknown course." }); return; }
+    const role = (prof as { role?: string } | null)?.role || "";
+    if (role !== "lecturer" && role !== "contributor") {
+      res.status(400).json({ error: "Only lecturers and contributors can be assigned a course." });
+      return;
+    }
+    if (role === "contributor") {
+      const counts = await teachingCountsByLevel(parsed.data.userId);
+      const { data: links } = await sb.from("course_levels").select("level").eq("course", code);
+      const full = [...new Set(((links ?? []) as { level: string }[]).map((l) => l.level))].filter((lv) => (counts[lv] || 0) >= 2);
+      if (full.length) {
+        res.status(400).json({ error: `Contributor cap: they already write 2 courses in ${full.join(", ")}.` });
+        return;
+      }
+    }
+    const { error } = await sb.from("enrollments").upsert({ user_id: parsed.data.userId, course: code, kind: "teaching" }, { onConflict: "user_id,course" });
+    if (error) throw error;
+    await sb.from("notifications").insert({
+      user_id: parsed.data.userId,
+      type: "role",
+      title: `You've been assigned ${code}`,
+      body: role === "lecturer" ? `${code} is now on your Home.` : `Open the Studio to start writing ${code}.`,
+      link: role === "lecturer" ? "/home" : "/studio",
+    }).then(() => {}, () => {});
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
+router.delete("/admin/courses/:code/assign/:userId", requireAuth, async (req: Request, res: Response) => {
+  const adminId = await requireAdminUser(req, res);
+  if (!adminId) return;
+  const code = cleanCode(decodeURIComponent(req.params.code));
+  try {
+    await supabaseAdmin().from("enrollments").delete().eq("user_id", req.params.userId).eq("course", code).eq("kind", "teaching");
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json(dbError(e));
+  }
+});
+
 // ---- Admin: contributor-cap audit. Lists every contributor holding more
 // than 2 teaching courses in any level (legacy rows predate the gate).
 // POST { trim: true } unassigns the excess, keeping the two earliest per
@@ -3545,6 +3672,11 @@ router.get("/admin/users", requireAuth, async (req: Request, res: Response) => {
     if (role === "student" || role === "lecturer" || role === "contributor" || role === "admin") {
       query = query.eq("role", role);
     }
+    // Review 4: the Course Contributors page filters by level and department.
+    const level = String(req.query.level || "").slice(0, 40);
+    const department = String(req.query.department || "").slice(0, 120);
+    if (level) query = query.eq("level", level);
+    if (department) query = query.eq("department", department);
     const { data, error } = await query;
     if (error) throw error;
     let rows = ((data ?? []) as Record<string, unknown>[]);
@@ -3554,6 +3686,14 @@ router.get("/admin/users", requireAuth, async (req: Request, res: Response) => {
           String(r.first_name || "").toLowerCase().includes(q) ||
           String(r.email || "").toLowerCase().includes(q)
       );
+    }
+    // ?courses=1: each person's teaching courses in the same answer (one query).
+    if (req.query.courses === "1" && rows.length) {
+      const ids = rows.map((r) => String(r.id));
+      const { data: links } = await supabaseAdmin().from("enrollments").select("user_id,course").eq("kind", "teaching").in("user_id", ids);
+      const by: Record<string, string[]> = {};
+      for (const l of (links ?? []) as { user_id: string; course: string }[]) (by[l.user_id] ||= []).push(l.course);
+      rows = rows.map((r) => ({ ...r, courses: (by[String(r.id)] || []).sort() }));
     }
     res.json({ users: rows });
   } catch (e) {

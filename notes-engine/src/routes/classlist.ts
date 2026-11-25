@@ -111,11 +111,12 @@ async function guardEntry(req: Request, res: Response): Promise<{ me: Me; entry:
 }
 
 const names = async (ids: string[]) => {
-  const out: Record<string, { first: string; email: string }> = {};
+  // Review 4: the class rep sees each student's picture (photo or Box Boy).
+  const out: Record<string, { first: string; email: string; avatar: string; persona: string }> = {};
   const uniq = [...new Set(ids.filter(Boolean))];
   for (let i = 0; i < uniq.length; i += 500) {
-    const { data } = await supabaseAdmin().from("profiles").select("id,first_name,email").in("id", uniq.slice(i, i + 500));
-    for (const p of (data ?? []) as { id: string; first_name: string | null; email: string | null }[]) out[p.id] = { first: p.first_name || "Student", email: p.email || "" };
+    const { data } = await supabaseAdmin().from("profiles").select("id,first_name,email,avatar_url,box_boy_persona").in("id", uniq.slice(i, i + 500));
+    for (const p of (data ?? []) as { id: string; first_name: string | null; email: string | null; avatar_url: string | null; box_boy_persona: string | null }[]) out[p.id] = { first: p.first_name || "Student", email: p.email || "", avatar: p.avatar_url || "", persona: p.box_boy_persona || "" };
   }
   return out;
 };
@@ -166,6 +167,8 @@ router.get("/class-list", requireAuth, async (req: Request, res: Response) => {
         matric: e.matric,
         claimed: !!e.student_id,
         claimedBy: e.student_id ? who[e.student_id]?.first || "Student" : "",
+        avatar: e.student_id ? who[e.student_id]?.avatar || "" : "",
+        persona: e.student_id ? who[e.student_id]?.persona || "" : "",
         claimMethod: e.claim_method || "",
         verifiedEmail: !!e.verified_email,
         removed: !!e.removed_at,
