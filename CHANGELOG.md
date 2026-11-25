@@ -5,6 +5,18 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.45.2] - 2026-11-25
+
+### Fixed
+- **Profile pictures upload again.** The server's fallback route looked for `data:image/jpeg:base64,` (a colon), but every real picture is `data:image/jpeg;base64,` (a semicolon), so since 7 Oct every photo that went that way was refused with "Image must be a PNG/JPEG/WEBP data URL". It now accepts any picture and decides the format from the file's bytes. When the direct upload to storage fails, the reason is logged under admin's recent app errors.
+
+### Changed
+- Studio: the yellow note under the editor is a live checklist by section (Week details, each topic, the quiz) in a fixed order. Each section shows what's left or a tick when complete, and finished sections stay where they are instead of the list shifting.
+
+### Security
+- Removed a hidden malware payload from the Vercel repo (DIBBLS/Unify): a file named `init`, scrambled code tacked onto the end of `vite.config.js`, and `node init &&` in the npm scripts.
+- New `scripts/malware-scan.mjs` and a "Malware scan" GitHub Action (every push, pull request and daily) in both repos. The frontend sync refuses to run if either repo fails the scan, and copies the scan to DIBBLS/Unify.
+
 ## [2.45.1] - 2026-11-25
 
 Studio bug sweep.

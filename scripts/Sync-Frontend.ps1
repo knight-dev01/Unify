@@ -7,6 +7,10 @@ $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
 $prev = Get-Location
 try {
+  # Malware guard (Nov 2026 incident: hidden "init" payload). Refuse to sync
+  # from an infected working copy...
+  node (Join-Path $root "scripts/malware-scan.mjs") $root
+  if ($LASTEXITCODE -ne 0) { throw "Malware scan failed on the local repo. Nothing was synced." }
   $tmp = Join-Path ([System.IO.Path]::GetTempPath()) ("unify-frontend-" + [System.Guid]::NewGuid().ToString("N"))
   git clone --depth 1 https://github.com/DIBBLS/Unify.git $tmp
 
@@ -36,6 +40,16 @@ try {
     $p = Join-Path $tmp $d
     if (Test-Path -LiteralPath $p) { Remove-Item -LiteralPath $p -Recurse -Force }
   }
+
+  # Ship the scanner and its CI check upstream too, so DIBBLS/Unify checks itself.
+  New-Item -ItemType Directory -Force -Path (Join-Path $tmp "scripts"), (Join-Path $tmp ".github/workflows") | Out-Null
+  Copy-Item -Path (Join-Path $root "scripts/malware-scan.mjs") -Destination (Join-Path $tmp "scripts/malware-scan.mjs") -Force
+  Copy-Item -Path (Join-Path $root ".github/workflows/malware-scan.yml") -Destination (Join-Path $tmp ".github/workflows/malware-scan.yml") -Force
+
+  # ...and refuse to push if the upstream tree (including root files this script
+  # never copies, like init or vite.config.js) carries anything suspicious.
+  node (Join-Path $root "scripts/malware-scan.mjs") $tmp
+  if ($LASTEXITCODE -ne 0) { throw "Malware scan failed on DIBBLS/Unify. Nothing was pushed. Clean it first." }
 
   Set-Location -LiteralPath $tmp
   git add -A

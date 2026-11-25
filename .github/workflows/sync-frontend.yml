@@ -22,6 +22,9 @@ jobs:
           fetch-depth: 1
           persist-credentials: false
 
+      - name: Malware scan (this repo)
+        run: node scripts/malware-scan.mjs
+
       - name: Push frontend-only snapshot upstream
         env:
           UPSTREAM_TOKEN: ${{ secrets.UPSTREAM_TOKEN }}
@@ -34,8 +37,12 @@ jobs:
           git config user.email "frontend-sync[bot]@users.noreply.github.com"
           rsync -a --delete --exclude node_modules --exclude dist --exclude '.env*' "$SRC/apps/web/" "$TMP/apps/web/"
           cp "$SRC/vercel.json" "$SRC/.gitignore" "$SRC/README.md" "$TMP/"
+          mkdir -p "$TMP/scripts" "$TMP/.github/workflows"
+          cp "$SRC/scripts/malware-scan.mjs" "$TMP/scripts/"
+          cp "$SRC/.github/workflows/malware-scan.yml" "$TMP/.github/workflows/"
           rm -rf "$TMP/notes-engine" "$TMP/supabase" "$TMP/render.yaml" "$TMP/SETUP.md" "$TMP/COLLAB.md" "$TMP/messages.unify.txt"
           cd "$TMP"
+          node "$SRC/scripts/malware-scan.mjs" "$TMP" || { echo "Malware scan failed upstream; not pushing."; exit 1; }
           git add -A
           if git diff --cached --quiet; then
             echo "frontend: no changes to sync"

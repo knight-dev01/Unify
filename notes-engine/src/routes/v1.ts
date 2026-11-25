@@ -1876,30 +1876,34 @@ router.post("/avatar", requireAuth, async (req: Request, res: Response) => {
     res.status(400).json({ error: "Pass { image: dataURL } (≤2MB)." });
     return;
   }
-  const m = parsed.data.image.match(/^data:image\/(png|jpe?g|webp|gif|avif|bmp):base64,(.+)$/i);
+  // Any data URL is fine: "data:<whatever>;base64,<bytes>". The bytes decide
+  // what the picture is, never the label. (This used to demand
+  // "data:image/jpeg:base64," with a colon, which no real picture has, so every
+  // photo sent this way was refused with "Image must be a PNG/JPEG/WEBP".)
+  const m = parsed.data.image.match(/^data:([^;,]*)(?:;[^,]*)?;base64,([\s\S]+)$/i);
   if (!m) {
-    res.status(400).json({ error: "Image must be a PNG/JPEG/WEBP data URL." });
+    res.status(400).json({ error: "That picture couldn't be read. Try another photo." });
     return;
   }
   try {
-    const buf = Buffer.from(m[2], "base64");
+    const buf = Buffer.from(m[2].replace(/\s+/g, ""), "base64");
     if (buf.length > 2 * 1024 * 1024) {
-      res.status(400).json({ error: "Image must be ≤2MB." });
+      res.status(400).json({ error: "That picture is too big. Try a smaller one." });
       return;
     }
-    // Trust the bytes, not the declared MIME: pick the real format from
-    // magic numbers so any picker's odd label (or a mislabeled file) still
-    // uploads. Fallback to the declared type when no signature matches.
-    const sniff = (
+    const sniff =
       buf.length > 12 && buf[0] === 0x89 && buf[1] === 0x50 ? "png" :
       buf.length > 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff ? "jpg" :
       buf.length > 12 && buf.toString("ascii", 0, 4) === "RIFF" && buf.toString("ascii", 8, 12) === "WEBP" ? "webp" :
       buf.length > 4 && buf.toString("ascii", 0, 4) === "GIF8" ? "gif" :
       buf.length > 12 && buf.toString("ascii", 4, 8) === "ftyp" ? "avif" :
       buf.length > 2 && buf[0] === 0x42 && buf[1] === 0x4d ? "bmp" :
-      (/jpe?g/i.test(m[1]) ? "jpg" : m[1].toLowerCase())
-    );
-    const ext = sniff === "jpeg" ? "jpg" : sniff;
+      "";
+    if (!sniff) {
+      res.status(400).json({ error: "That file isn't a picture. Pick a photo." });
+      return;
+    }
+    const ext = sniff;
     const contentType = sniff === "jpg" ? "image/jpeg" : `image/${sniff}`;
     const path = `${userId}.${ext}`;
     const { error: upErr } = await supabaseAdmin().storage.from("avatars").upload(path, buf, {
