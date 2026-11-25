@@ -5,6 +5,11 @@ All notable changes to Unify Learn.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.45.3] - 2026-11-25
+
+### Fixed
+- Notes: "Mark Topic Complete" keeps you where you are. Finishing a topic switches off the "leave midway?" guard, which steps back one entry in the browser history; the browser then restored the scroll from when the topic started, jumping the page up. The scroll position is now kept (also when a game round ends).
+
 ## [2.45.2] - 2026-11-25
 
 ### Fixed
